@@ -1,0 +1,15 @@
+#server.port: 5698
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        order_by.default_null_ordering: last
+    hibernate:
+    ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost:5432/underwriter
