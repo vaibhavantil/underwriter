@@ -60,7 +60,7 @@ internal class QuoteControllerTest {
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         val incompleteQuote: IncompleteQuote = IncompleteQuote(
-                dateStartedRecievingQuoteInfo = Instant.now(),
+                createdAt = Instant.now(),
                 quoteState = QuoteState.INCOMPLETE,
                 productType = ProductType.HOME,
                 incompleteQuoteData = IncompleteQuoteData.Home(

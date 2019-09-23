@@ -20,14 +20,14 @@ class IncompleteQuote (
         @field:GeneratedValue(generator = "UUID")
         @field:GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
         var id: UUID? = null,
-        var quoteState: QuoteState = QuoteState.INCOMPLETE,
-        var dateStartedRecievingQuoteInfo: Instant,
+        val quoteState: QuoteState = QuoteState.INCOMPLETE,
+        val createdAt: Instant,
         val productType: ProductType = ProductType.UNKNOWN,
         var lineOfBusiness: LineOfBusiness?,
 
         @field:Type(type="jsonb")
         @field:Column(columnDefinition = "jsonb")
-        var incompleteQuoteData: IncompleteQuoteData? = null,
+        val incompleteQuoteData: IncompleteQuoteData? = null,
         var quoteInitiatedFrom: QuoteInitiatedFrom?
 ) {
 
@@ -48,7 +48,7 @@ class IncompleteQuote (
 
                 private fun house(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
                         quoteState = incompleteQuoteDto.quoteState,
-                        dateStartedRecievingQuoteInfo = Instant.now(),
+                        createdAt = Instant.now(),
                         productType = ProductType.HOUSE,
                         lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
                         quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
@@ -64,7 +64,7 @@ class IncompleteQuote (
 
                 private fun home(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
                         quoteState = incompleteQuoteDto.quoteState,
-                        dateStartedRecievingQuoteInfo = Instant.now(),
+                        createdAt = Instant.now(),
                         productType = ProductType.HOME,
                         lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
                         quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
@@ -76,8 +76,8 @@ class IncompleteQuote (
 
                 private fun genericQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
                         quoteState = incompleteQuoteDto.quoteState,
-                        dateStartedRecievingQuoteInfo = Instant.now(),
-                        productType = ProductType.HOME,
+                        createdAt = Instant.now(),
+                        productType = ProductType.UNKNOWN,
                         lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
                         quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
                         incompleteQuoteData = null

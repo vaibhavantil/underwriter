@@ -7,6 +7,6 @@ import java.util.*
 import javax.management.Query
 
 @Repository
-public interface QuoteRepository: CrudRepository<IncompleteQuote, UUID> {
+public interface IncompleteQuoteRepository: CrudRepository<IncompleteQuote, UUID> {
 
 }
