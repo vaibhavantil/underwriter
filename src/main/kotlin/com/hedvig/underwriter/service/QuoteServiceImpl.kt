@@ -27,48 +27,27 @@ class QuoteServiceImpl @Autowired constructor(
 
         val incompleteQuote = getIncompleteQuote(quoteId)
 
-        if (incompleteQuoteDto.lineOfBusiness != null) {
-            incompleteQuote.lineOfBusiness = incompleteQuoteDto.lineOfBusiness
-        }
-        if (incompleteQuoteDto.quoteInitiatedFrom != null) {
-            incompleteQuote.quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom
-        }
-
+        if (incompleteQuoteDto.lineOfBusiness != null) incompleteQuote.lineOfBusiness = incompleteQuoteDto.lineOfBusiness
+        if (incompleteQuoteDto.quoteInitiatedFrom != null) incompleteQuote.quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom
 
         if (incompleteQuoteDto.incompleteQuoteDataDto != null && incompleteQuote.incompleteQuoteData is IncompleteQuoteData.House) {
             val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto? = incompleteQuoteDto.incompleteQuoteDataDto.incompleteHouseQuoteDataDto
-            val incompleteHouseQuoteData: IncompleteQuoteData.House = (incompleteQuote.incompleteQuoteData as IncompleteQuoteData.House)
+            val incompleteHouseQuoteData: IncompleteQuoteData.House = incompleteQuote.incompleteQuoteData
 
-            if (incompleteHouseQuoteDataDto?.zipcode != null) {
-                incompleteHouseQuoteData.zipcode = incompleteHouseQuoteDataDto.zipcode
-            }
-            if (incompleteHouseQuoteDataDto?.city != null) {
-                incompleteHouseQuoteData.city = incompleteHouseQuoteDataDto.city
-            }
-            if (incompleteHouseQuoteDataDto?.city != null) {
-                incompleteHouseQuoteData.personalNumber = incompleteHouseQuoteDataDto.personalNumber
-            }
-            if (incompleteHouseQuoteDataDto?.street != null) {
-                incompleteHouseQuoteData.street = incompleteHouseQuoteDataDto.street
-            }
-            if (incompleteHouseQuoteDataDto?.householdSize != null) {
-                incompleteHouseQuoteData.householdSize = incompleteHouseQuoteDataDto.householdSize
-            }
-            if (incompleteHouseQuoteDataDto?.livingSpace != null) {
-                incompleteHouseQuoteData.livingSpace = incompleteHouseQuoteDataDto.livingSpace
-            }
+            if (incompleteHouseQuoteDataDto?.zipcode != null) incompleteHouseQuoteData.zipcode = incompleteHouseQuoteDataDto.zipcode
+            if (incompleteHouseQuoteDataDto?.city != null) incompleteHouseQuoteData.city = incompleteHouseQuoteDataDto.city
+            if (incompleteHouseQuoteDataDto?.city != null) incompleteHouseQuoteData.personalNumber = incompleteHouseQuoteDataDto.personalNumber
+            if (incompleteHouseQuoteDataDto?.street != null) incompleteHouseQuoteData.street = incompleteHouseQuoteDataDto.street
+            if (incompleteHouseQuoteDataDto?.householdSize != null) incompleteHouseQuoteData.householdSize = incompleteHouseQuoteDataDto.householdSize
+            if (incompleteHouseQuoteDataDto?.livingSpace != null) incompleteHouseQuoteData.livingSpace = incompleteHouseQuoteDataDto.livingSpace
         }
 
         if (incompleteQuoteDto.incompleteQuoteDataDto != null && incompleteQuote.incompleteQuoteData is IncompleteQuoteData.Home) {
             val incompleteHomeQuoteDataDto: IncompleteHomeQuoteDataDto? = incompleteQuoteDto.incompleteQuoteDataDto.incompleteHomeQuoteDataDto
             val incompleteHomeQuoteData: IncompleteQuoteData.Home = (incompleteQuote.incompleteQuoteData as IncompleteQuoteData.Home)
 
-            if (incompleteHomeQuoteDataDto?.numberOfRooms != null) {
-                incompleteHomeQuoteData.numberOfRooms = incompleteHomeQuoteDataDto.numberOfRooms
-            }
-            if (incompleteHomeQuoteDataDto?.address != null) {
-                incompleteHomeQuoteData.address = incompleteHomeQuoteDataDto.address
-            }
+            if (incompleteHomeQuoteDataDto?.numberOfRooms != null) incompleteHomeQuoteData.numberOfRooms = incompleteHomeQuoteDataDto.numberOfRooms
+            if (incompleteHomeQuoteDataDto?.address != null) incompleteHomeQuoteData.address = incompleteHomeQuoteDataDto.address
         }
         incompleteQuoteRepository.save(incompleteQuote)
     }
@@ -132,10 +111,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     private fun getIncompleteQuote(quoteId: UUID): IncompleteQuote {
         val optionalQuote: Optional<IncompleteQuote> = incompleteQuoteRepository.findById(quoteId)
-
-        if(!optionalQuote.isPresent) {
-            throw NullPointerException("No Incomplete quote found with id $quoteId")
-        }
+        if(!optionalQuote.isPresent) throw NullPointerException("No Incomplete quote found with id $quoteId")
         return optionalQuote.get()
     }
 }

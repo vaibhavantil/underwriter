@@ -8,7 +8,7 @@ import java.time.Instant;
 
 data class IncompleteQuoteDto (
     val quoteState: QuoteState,
-    val dateStartedRecievingQuoteInfo: Instant,
+    val createdAt: Instant,
     val productType: ProductType,
     val lineOfBusiness: LineOfBusiness?,
     val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
