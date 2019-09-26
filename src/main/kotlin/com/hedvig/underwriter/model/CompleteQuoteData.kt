@@ -2,7 +2,6 @@ package com.hedvig.underwriter.model
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -21,6 +20,8 @@ sealed class CompleteQuoteData {
 
     data class Home(
             val address: String,
-            val numberOfRooms: Int
+            val numberOfRooms: Int,
+            val zipCode: String,
+            val floor: Int
     ): CompleteQuoteData()
 }

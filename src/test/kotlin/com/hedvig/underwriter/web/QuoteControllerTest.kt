@@ -2,7 +2,6 @@ package com.hedvig.underwriter.web;
 
 import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.service.QuoteService;
-import com.hedvig.underwriter.web.Dtos.IncompleteHomeQuoteDataDto
 import org.junit.Test;
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -17,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 @RunWith(SpringRunner::class)
@@ -43,7 +43,7 @@ internal class QuoteControllerTest {
     """.trimIndent()
 
     @Test
-    fun createQuote() {
+    fun createIncompleteQuote() {
         val request = post("/_/v1/quote/create")
                 .content(createQuoteRequestJson)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,10 +65,16 @@ internal class QuoteControllerTest {
                 productType = ProductType.HOME,
                 incompleteQuoteData = IncompleteQuoteData.Home(
                         address = "123 Baker street",
-                        numberOfRooms = 3
+                        numberOfRooms = 3,
+                        zipCode = "11216",
+                        floor = 1
                 ),
                 lineOfBusiness = LineOfBusiness.RENT,
-                quoteInitiatedFrom = QuoteInitiatedFrom.APP
+                quoteInitiatedFrom = QuoteInitiatedFrom.APP,
+                birthDate = LocalDate.parse("1990-05-05"),
+                livingSpace = 50,
+                houseHoldSize = 3,
+                isStudent = false
                 )
 
         Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))
@@ -81,6 +87,43 @@ internal class QuoteControllerTest {
                 .andExpect(jsonPath("quoteState").value("INCOMPLETE"))
                 .andExpect(jsonPath("productType").value("HOME"))
                 .andExpect(jsonPath("incompleteQuoteData.numberOfRooms").value(3));
+    }
+
+    @Test
+    fun createCompleteQuote() {
+
+        val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
+
+        val incompleteQuote: IncompleteQuote = IncompleteQuote(
+                createdAt = Instant.now(),
+                quoteState = QuoteState.INCOMPLETE,
+                productType = ProductType.HOME,
+                incompleteQuoteData = IncompleteQuoteData.Home(
+                        address = "123 Baker street",
+                        numberOfRooms = 3,
+                        zipCode = "11216",
+                        floor = 1
+                ),
+                lineOfBusiness = LineOfBusiness.RENT,
+                quoteInitiatedFrom = QuoteInitiatedFrom.APP,
+                birthDate = LocalDate.parse("1990-05-05"),
+                livingSpace = 50,
+                houseHoldSize = 3,
+                isStudent = false
+        )
+
+        Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))
+                .thenReturn(Optional.of(incompleteQuote))
+
+        mockMvc
+                .perform(
+                        post("/_/v1/quote/71919787-70d2-4614-bd4a-26427861991d/completeQuote"))
+                .andExpect(status().is2xxSuccessful)
+    }
+
+    @Test
+    fun shouldNotCompleteQuoteIfDataIsIncomplete() {
+//        TODO
     }
 
 }

@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.model
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -21,7 +20,9 @@ sealed class IncompleteQuoteData {
 
      data class Home(
              var address: String?,
-            var numberOfRooms: Int?
+            var numberOfRooms: Int?,
+             var zipCode: String?,
+             var floor: Int?
      ): IncompleteQuoteData()
 
  }

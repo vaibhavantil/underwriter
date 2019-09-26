@@ -8,6 +8,7 @@ import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
 import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
 
@@ -20,15 +21,23 @@ class IncompleteQuote (
         @field:GeneratedValue(generator = "UUID")
         @field:GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
         var id: UUID? = null,
+        @Enumerated(EnumType.STRING)
         val quoteState: QuoteState = QuoteState.INCOMPLETE,
         val createdAt: Instant,
+        @Enumerated(EnumType.STRING)
         val productType: ProductType = ProductType.UNKNOWN,
+        @Enumerated(EnumType.STRING)
         var lineOfBusiness: LineOfBusiness?,
 
         @field:Type(type="jsonb")
         @field:Column(columnDefinition = "jsonb")
         val incompleteQuoteData: IncompleteQuoteData? = null,
-        var quoteInitiatedFrom: QuoteInitiatedFrom?
+        @Enumerated(EnumType.STRING)
+        var quoteInitiatedFrom: QuoteInitiatedFrom?,
+        var birthDate: LocalDate?,
+        var livingSpace: Int?,
+        var houseHoldSize: Int?,
+        var isStudent: Boolean?
 ) {
 
         override fun hashCode(): Int {
@@ -59,7 +68,11 @@ class IncompleteQuote (
                                 livingSpace = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.livingSpace,
                                 personalNumber = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.personalNumber,
                                 householdSize = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.householdSize
-                        )
+                        ),
+                        birthDate = incompleteQuoteDto.birthDate,
+                        livingSpace = incompleteQuoteDto.livingSpace,
+                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
+                        isStudent = incompleteQuoteDto.isStudent
                 )
 
                 private fun home(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
@@ -70,8 +83,14 @@ class IncompleteQuote (
                         quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
                         incompleteQuoteData = IncompleteQuoteData.Home(
                                 address = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.address,
-                                numberOfRooms = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.numberOfRooms
-                        )
+                                numberOfRooms = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.numberOfRooms,
+                                zipCode = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.zipCode,
+                                floor = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.floor
+                        ),
+                        birthDate = incompleteQuoteDto.birthDate,
+                        livingSpace = incompleteQuoteDto.livingSpace,
+                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
+                        isStudent = incompleteQuoteDto.isStudent
                 )
 
                 private fun genericQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
@@ -80,7 +99,11 @@ class IncompleteQuote (
                         productType = ProductType.UNKNOWN,
                         lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
                         quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
-                        incompleteQuoteData = null
+                        incompleteQuoteData = null,
+                        birthDate = incompleteQuoteDto.birthDate,
+                        livingSpace = incompleteQuoteDto.livingSpace,
+                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
+                        isStudent = incompleteQuoteDto.isStudent
                 )
 
                 fun from(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote {

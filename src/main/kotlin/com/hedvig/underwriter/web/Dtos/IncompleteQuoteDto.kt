@@ -1,18 +1,21 @@
 package com.hedvig.underwriter.web.Dtos;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
 import com.hedvig.underwriter.model.*;
 
 import java.time.Instant;
+import java.time.LocalDate
 
 data class IncompleteQuoteDto (
-    val quoteState: QuoteState,
-    val createdAt: Instant,
-    val productType: ProductType,
-    val lineOfBusiness: LineOfBusiness?,
-    val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
-    val quoteInitiatedFrom: QuoteInitiatedFrom?
+        val quoteState: QuoteState,
+        val createdAt: Instant,
+        val productType: ProductType,
+        val lineOfBusiness: LineOfBusiness?,
+        val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
+        val quoteInitiatedFrom: QuoteInitiatedFrom?,
+        val birthDate: LocalDate?,
+        val livingSpace: Int?,
+        val houseHoldSize: Int?,
+        val isStudent: Boolean?
 )
 
 data class IncompleteQuoteDataDto(
@@ -31,6 +34,8 @@ data class IncompleteHouseQuoteDataDto(
 
 data class IncompleteHomeQuoteDataDto(
         val address: String?,
-        val numberOfRooms: Int?
+        val numberOfRooms: Int?,
+        val zipCode: String?,
+        val floor: Int?
 )
 

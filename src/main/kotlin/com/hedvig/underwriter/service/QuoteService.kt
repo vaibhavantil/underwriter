@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.service
 
 import com.hedvig.underwriter.model.IncompleteQuote
-import com.hedvig.underwriter.web.Dtos.CompleteQuoteResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteResponseDto
 import java.util.*
@@ -13,6 +13,6 @@ interface QuoteService {
 
     fun updateIncompleteQuoteData(incompleteincompleteQuoteDto: IncompleteQuoteDto, quoteId: UUID)
 
-    fun createCompleteQuote(incompleteQuoteId: UUID):CompleteQuoteResponseDto
+    fun createCompleteQuote(incompleteQuoteId: UUID): QuotePriceResponseDto
 }
 

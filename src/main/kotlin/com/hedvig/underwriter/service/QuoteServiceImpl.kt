@@ -3,19 +3,21 @@ package com.hedvig.underwriter.service
 import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
+import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.lang.NullPointerException
 import java.time.Instant
 import java.util.*
-import java.util.stream.Collectors
 
 @Service
 class QuoteServiceImpl @Autowired constructor(
         val incompleteQuoteRepository: IncompleteQuoteRepository,
-        val completeQuoteRepository: CompleteQuoteRepository
+        val completeQuoteRepository: CompleteQuoteRepository,
+        val productPricingService: ProductPricingService
 ): QuoteService {
     override fun createIncompleteQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
         val incompleteQuote = incompleteQuoteRepository.save(IncompleteQuote.from(incompleteQuoteDto))
@@ -29,6 +31,11 @@ class QuoteServiceImpl @Autowired constructor(
 
         if (incompleteQuoteDto.lineOfBusiness != null) incompleteQuote.lineOfBusiness = incompleteQuoteDto.lineOfBusiness
         if (incompleteQuoteDto.quoteInitiatedFrom != null) incompleteQuote.quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom
+        if (incompleteQuoteDto.birthDate != null) incompleteQuote.birthDate = incompleteQuoteDto.birthDate
+        if (incompleteQuoteDto.livingSpace != null) incompleteQuote.livingSpace = incompleteQuoteDto.livingSpace
+        if (incompleteQuoteDto.houseHoldSize != null) incompleteQuote.houseHoldSize = incompleteQuoteDto.houseHoldSize
+        if (incompleteQuoteDto.isStudent != null) incompleteQuote.isStudent = incompleteQuoteDto.isStudent
+
 
         if (incompleteQuoteDto.incompleteQuoteDataDto != null && incompleteQuote.incompleteQuoteData is IncompleteQuoteData.House) {
             val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto? = incompleteQuoteDto.incompleteQuoteDataDto.incompleteHouseQuoteDataDto
@@ -48,6 +55,8 @@ class QuoteServiceImpl @Autowired constructor(
 
             if (incompleteHomeQuoteDataDto?.numberOfRooms != null) incompleteHomeQuoteData.numberOfRooms = incompleteHomeQuoteDataDto.numberOfRooms
             if (incompleteHomeQuoteDataDto?.address != null) incompleteHomeQuoteData.address = incompleteHomeQuoteDataDto.address
+            if (incompleteHomeQuoteDataDto?.zipCode != null) incompleteHomeQuoteData.zipCode = incompleteHomeQuoteDataDto.zipCode
+            if (incompleteHomeQuoteDataDto?.floor != null) incompleteHomeQuoteData.floor = incompleteHomeQuoteDataDto.floor
         }
         incompleteQuoteRepository.save(incompleteQuote)
     }
@@ -56,18 +65,21 @@ class QuoteServiceImpl @Autowired constructor(
         return incompleteQuoteRepository.findById(id)
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): QuotePriceResponseDto {
 
         val incompleteQuote = getIncompleteQuote(incompleteQuoteId)
 
             if (incompleteQuote.incompleteQuoteData is IncompleteQuoteData.House) {
                 try {
+                    val quotePriceResponseDto = getQuotePriceDto(incompleteQuote)
+
                     val completeQuote = CompleteQuote(
+                            incompleteQuote = incompleteQuote,
                             quoteState = incompleteQuote.quoteState,
                             quoteCreatedAt = Instant.now(),
                             productType = incompleteQuote.productType,
-                            lineOfBusiness = incompleteQuote.lineOfBusiness,
-                            price = 100,
+                            lineOfBusiness = incompleteQuote.lineOfBusiness!!,
+                            price = quotePriceResponseDto?.price!!,
                             completeQuoteData = CompleteQuoteData.House(incompleteQuote.incompleteQuoteData.street!!,
                                     incompleteQuote.incompleteQuoteData.zipcode!!,
                                     incompleteQuote.incompleteQuoteData.city!!,
@@ -75,43 +87,76 @@ class QuoteServiceImpl @Autowired constructor(
                                     incompleteQuote.incompleteQuoteData.personalNumber!!,
                                     incompleteQuote.incompleteQuoteData.householdSize!!
                             ),
-                            quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom
+                            quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom!!,
+                            birthDate = incompleteQuote.birthDate,
+                            livingSpace = incompleteQuote.livingSpace,
+                            houseHoldSize = incompleteQuote.houseHoldSize,
+                            isStudent = incompleteQuote.isStudent
                     )
                     completeQuoteRepository.save(completeQuote)
+                    return quotePriceResponseDto
 
-                    return CompleteQuoteResponseDto(completeQuote.id!!, completeQuote.price)
                 } catch(exception: Exception) {
-                    throw NullPointerException("Cannot create quote, info missing")
+                    throw NullPointerException("Cannot create quote, info missing $exception")
                 }
-
             }
 
             if (incompleteQuote.incompleteQuoteData is IncompleteQuoteData.Home) {
                 try {
+                    val quotePriceResponseDto = getQuotePriceDto(incompleteQuote)
+
                     val completeQuote = CompleteQuote(
+                            incompleteQuote = incompleteQuote,
                             quoteState = incompleteQuote.quoteState,
                             quoteCreatedAt = Instant.now(),
                             productType = incompleteQuote.productType,
-                            lineOfBusiness = incompleteQuote.lineOfBusiness,
-                            price = 250,
-                            completeQuoteData = CompleteQuoteData.Home(incompleteQuote.incompleteQuoteData.address!!,
-                                    incompleteQuote.incompleteQuoteData.numberOfRooms!!),
-                            quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom
+                            lineOfBusiness = incompleteQuote.lineOfBusiness!!,
+                            price = quotePriceResponseDto?.price!!,
+                            completeQuoteData = CompleteQuoteData.Home(
+                                    incompleteQuote.incompleteQuoteData.address!!,
+                                    incompleteQuote.incompleteQuoteData.numberOfRooms!!,
+                                    incompleteQuote.incompleteQuoteData.zipCode!!,
+                                    incompleteQuote.incompleteQuoteData.floor!!
+                            ),
+                            quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom!!,
+                            birthDate = incompleteQuote.birthDate,
+                            livingSpace = incompleteQuote.livingSpace,
+                            houseHoldSize = incompleteQuote.houseHoldSize,
+                            isStudent = incompleteQuote.isStudent
                     )
 
                     completeQuoteRepository.save(completeQuote)
-                    return CompleteQuoteResponseDto(completeQuote.id!!, completeQuote.price)
+                    return quotePriceResponseDto
+
                     } catch(exception: Exception) {
-                        throw NullPointerException("Cannot create quote, info missing")
+                        throw NullPointerException("Cannot create quote, info missing $exception")
                 }
 
             }
-        return CompleteQuoteResponseDto(UUID.randomUUID(), 1)
+        return QuotePriceResponseDto(0.00)
     }
 
     private fun getIncompleteQuote(quoteId: UUID): IncompleteQuote {
         val optionalQuote: Optional<IncompleteQuote> = incompleteQuoteRepository.findById(quoteId)
         if(!optionalQuote.isPresent) throw NullPointerException("No Incomplete quote found with id $quoteId")
         return optionalQuote.get()
+    }
+
+    private fun getQuotePriceDto(incompleteQuote: IncompleteQuote): QuotePriceResponseDto? {
+
+        if (incompleteQuote.incompleteQuoteData is IncompleteQuoteData.Home) {
+            val quotePriceDto = QuotePriceDto(
+                    birthDate = incompleteQuote.birthDate!!,
+                    livingSpace = incompleteQuote.livingSpace!!,
+                    houseHoldSize = incompleteQuote.houseHoldSize!!,
+                    zipCode = incompleteQuote.incompleteQuoteData.zipCode!!,
+                    floor = incompleteQuote.incompleteQuoteData.floor!!,
+                    houseType = incompleteQuote.lineOfBusiness!!,
+                    isStudent = incompleteQuote.isStudent!!
+            )
+            val quotePriceResponseDto: QuotePriceResponseDto? = productPricingService.getQuotePrice(quotePriceDto)
+            return quotePriceResponseDto
+        }
+        return QuotePriceResponseDto(0.0)
     }
 }
