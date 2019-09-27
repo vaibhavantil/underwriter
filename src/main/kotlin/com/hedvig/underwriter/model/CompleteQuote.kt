@@ -6,10 +6,10 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
-//import javax.money.MonetaryAmount
 import javax.persistence.*
 
 @Entity
@@ -34,7 +34,7 @@ class CompleteQuote (
 
         @Enumerated(EnumType.STRING)
         var lineOfBusiness: LineOfBusiness,
-        val price: Double,
+        var price: BigDecimal?,
 
         @field:Type(type = "jsonb")
         @field:Column(columnDefinition = "jsonb")
@@ -43,10 +43,10 @@ class CompleteQuote (
         @Enumerated(EnumType.STRING)
         var quoteInitiatedFrom: QuoteInitiatedFrom,
 
-        var birthDate: LocalDate?,
-        var livingSpace: Int?,
-        var houseHoldSize: Int?,
-        var isStudent: Boolean?
+        var birthDate: LocalDate,
+        var livingSpace: Int,
+        var houseHoldSize: Int,
+        var isStudent: Boolean
     ) {
 
     override fun hashCode(): Int {
