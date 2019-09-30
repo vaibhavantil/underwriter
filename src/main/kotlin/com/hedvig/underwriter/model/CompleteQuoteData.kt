@@ -14,7 +14,6 @@ sealed class CompleteQuoteData {
             val zipcode: String,
             val city: String,
             val livingSpace: Int,
-            val personalNumber: String,
             val householdSize: Int
     ): CompleteQuoteData()
 

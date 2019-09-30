@@ -49,7 +49,6 @@ class QuoteServiceImpl @Autowired constructor(
 
             if (incompleteHouseQuoteDataDto?.zipcode != null) incompleteHouseQuoteData.zipcode = incompleteHouseQuoteDataDto.zipcode
             if (incompleteHouseQuoteDataDto?.city != null) incompleteHouseQuoteData.city = incompleteHouseQuoteDataDto.city
-            if (incompleteHouseQuoteDataDto?.city != null) incompleteHouseQuoteData.personalNumber = incompleteHouseQuoteDataDto.personalNumber
             if (incompleteHouseQuoteDataDto?.street != null) incompleteHouseQuoteData.street = incompleteHouseQuoteDataDto.street
             if (incompleteHouseQuoteDataDto?.householdSize != null) incompleteHouseQuoteData.householdSize = incompleteHouseQuoteDataDto.householdSize
             if (incompleteHouseQuoteDataDto?.livingSpace != null) incompleteHouseQuoteData.livingSpace = incompleteHouseQuoteDataDto.livingSpace
@@ -146,7 +145,6 @@ class QuoteServiceImpl @Autowired constructor(
                                 incompleteQuote.incompleteQuoteData.zipcode!!,
                                 incompleteQuote.incompleteQuoteData.city!!,
                                 incompleteQuote.incompleteQuoteData.livingSpace!!,
-                                incompleteQuote.incompleteQuoteData.personalNumber!!,
                                 incompleteQuote.incompleteQuoteData.householdSize!!
                         ),
                         quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom!!,

@@ -14,7 +14,6 @@ sealed class IncompleteQuoteData {
              var zipcode: String?,
              var city: String?,
              var livingSpace: Int?,
-             var personalNumber: String?,
              var householdSize: Int?
      ): IncompleteQuoteData()
 

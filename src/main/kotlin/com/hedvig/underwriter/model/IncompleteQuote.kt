@@ -67,7 +67,6 @@ class IncompleteQuote (
                                 zipcode = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.zipcode,
                                 city = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.city,
                                 livingSpace = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.livingSpace,
-                                personalNumber = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.personalNumber,
                                 householdSize = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.householdSize
                         ),
                         birthDate = incompleteQuoteDto.birthDate,
