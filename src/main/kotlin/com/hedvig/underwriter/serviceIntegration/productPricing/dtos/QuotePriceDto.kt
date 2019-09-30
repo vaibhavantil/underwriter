@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.serviceIntegration.productPricing.Dtos;
+package com.hedvig.underwriter.serviceIntegration.productPricing.dtos;
 
 import com.hedvig.underwriter.model.LineOfBusiness;
 import java.time.LocalDate

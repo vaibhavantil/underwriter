@@ -3,8 +3,10 @@ package com.hedvig.underwriter.service
 import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
-import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Flag
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +21,9 @@ class QuoteServiceImpl @Autowired constructor(
         val incompleteQuoteRepository: IncompleteQuoteRepository,
         val completeQuoteRepository: CompleteQuoteRepository,
         val productPricingService: ProductPricingService,
-        val uwGuidelinesChecker: UwGuidelinesChecker
+        val uwGuidelinesChecker: UwGuidelinesChecker,
+        val memberService: MemberService,
+        val debtChecker: DebtChecker
 ): QuoteService {
     override fun createIncompleteQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
         val incompleteQuote = incompleteQuoteRepository.save(IncompleteQuote.from(incompleteQuoteDto))
@@ -37,7 +41,7 @@ class QuoteServiceImpl @Autowired constructor(
         if (incompleteQuoteDto.livingSpace != null) incompleteQuote.livingSpace = incompleteQuoteDto.livingSpace
         if (incompleteQuoteDto.houseHoldSize != null) incompleteQuote.houseHoldSize = incompleteQuoteDto.houseHoldSize
         if (incompleteQuoteDto.isStudent != null) incompleteQuote.isStudent = incompleteQuoteDto.isStudent
-
+        if (incompleteQuoteDto.ssn != null) incompleteQuote.ssn = incompleteQuoteDto.ssn
 
         if (incompleteQuoteDto.incompleteQuoteDataDto != null && incompleteQuote.incompleteQuoteData is IncompleteQuoteData.House) {
             val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto? = incompleteQuoteDto.incompleteQuoteDataDto.incompleteHouseQuoteDataDto
@@ -68,7 +72,6 @@ class QuoteServiceImpl @Autowired constructor(
     }
 
     override fun createCompleteQuote(incompleteQuoteId: UUID): QuotePriceResponseDto {
-
         val incompleteQuote = getIncompleteQuote(incompleteQuoteId)
         try {
             val nullableCompleteQuote = createQuoteWithInfoCompleteAwaitingPriceAndUnderwritingChecks(incompleteQuote)
@@ -76,20 +79,25 @@ class QuoteServiceImpl @Autowired constructor(
 
             val completeQuote = nullableCompleteQuote
 
-                val quoteMeetsUWGuidelines: Boolean
-                if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
-                    quoteMeetsUWGuidelines = uwGuidelinesChecker.meetsHomeUwGuidelines(completeQuote)
-                } else {
-                    quoteMeetsUWGuidelines = uwGuidelinesChecker.meetsHouseUwGuidelines(completeQuote)
-                }
+            val quoteMeetsUWGuidelines: Boolean
+            quoteMeetsUWGuidelines = if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
+                uwGuidelinesChecker.meetsHomeUwGuidelines(completeQuote)
+            } else {
+                uwGuidelinesChecker.meetsHouseUwGuidelines(completeQuote)
+            }
 
-                if (quoteMeetsUWGuidelines) {
+                val debtFlag: Flag = debtChecker.checkDebt(incompleteQuote.ssn!!)
+
+                if (quoteMeetsUWGuidelines && debtFlag == Flag.GREEN) {
                     val quotePriceResponseDto = getQuotePriceDto(completeQuote)!!
 
                     completeQuote.price = quotePriceResponseDto.price
                     completeQuoteRepository.save(completeQuote)
                     return quotePriceResponseDto
-                } else {
+                } else if(debtFlag != Flag.GREEN) {
+                    throw NullPointerException("Failed Debt Check")
+                }
+                else {
                     throw NullPointerException("Failed underwriting guideline")
                 }
             } catch (exception: Exception) {
@@ -117,7 +125,7 @@ class QuoteServiceImpl @Autowired constructor(
                     houseType = completeQuote.lineOfBusiness,
                     isStudent = completeQuote.isStudent
             )
-            val quotePriceResponseDto: QuotePriceResponseDto? = productPricingService.getQuotePrice(quotePriceDto)
+            val quotePriceResponseDto: QuotePriceResponseDto? = productPricingService.quotePrice(quotePriceDto)
             return quotePriceResponseDto
         }
         return QuotePriceResponseDto(BigDecimal(0))
@@ -145,7 +153,8 @@ class QuoteServiceImpl @Autowired constructor(
                         birthDate = incompleteQuote.birthDate!!,
                         livingSpace = incompleteQuote.livingSpace!!,
                         houseHoldSize = incompleteQuote.houseHoldSize!!,
-                        isStudent = incompleteQuote.isStudent!!
+                        isStudent = incompleteQuote.isStudent!!,
+                        ssn = incompleteQuote.ssn!!
                 )
                 return completeQuote
                 completeQuoteRepository.save(completeQuote)
@@ -170,7 +179,8 @@ class QuoteServiceImpl @Autowired constructor(
                             birthDate = incompleteQuote.birthDate!!,
                             livingSpace = incompleteQuote.livingSpace!!,
                             houseHoldSize = incompleteQuote.houseHoldSize!!,
-                            isStudent = incompleteQuote.isStudent!!
+                            isStudent = incompleteQuote.isStudent!!,
+                            ssn = incompleteQuote.ssn!!
                     )
 
                     completeQuoteRepository.save(completeQuote)

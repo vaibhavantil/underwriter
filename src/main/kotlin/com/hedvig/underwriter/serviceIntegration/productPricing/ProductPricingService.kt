@@ -1,8 +1,10 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 
 interface ProductPricingService {
-    fun getQuotePrice(quotePriceDto: QuotePriceDto): QuotePriceResponseDto
+    fun quotePrice(quotePriceDto: QuotePriceDto): QuotePriceResponseDto
+
+    fun createProduct()
 }

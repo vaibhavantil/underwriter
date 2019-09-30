@@ -33,20 +33,21 @@ class CompleteQuote (
         val productType: ProductType = ProductType.UNKNOWN,
 
         @Enumerated(EnumType.STRING)
-        var lineOfBusiness: LineOfBusiness,
+        val lineOfBusiness: LineOfBusiness,
         var price: BigDecimal?,
 
         @field:Type(type = "jsonb")
         @field:Column(columnDefinition = "jsonb")
-        var completeQuoteData: CompleteQuoteData,
+        val completeQuoteData: CompleteQuoteData,
 
         @Enumerated(EnumType.STRING)
-        var quoteInitiatedFrom: QuoteInitiatedFrom,
+        val quoteInitiatedFrom: QuoteInitiatedFrom,
 
-        var birthDate: LocalDate,
-        var livingSpace: Int,
-        var houseHoldSize: Int,
-        var isStudent: Boolean
+        val birthDate: LocalDate,
+        val livingSpace: Int,
+        val houseHoldSize: Int,
+        val isStudent: Boolean,
+        val ssn: String
     ) {
 
     override fun hashCode(): Int {

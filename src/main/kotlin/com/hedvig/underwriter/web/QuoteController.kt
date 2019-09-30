@@ -2,7 +2,7 @@ package com.hedvig.underwriter.web
 
 import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.Dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteResponseDto
 import org.springframework.beans.factory.annotation.Autowired

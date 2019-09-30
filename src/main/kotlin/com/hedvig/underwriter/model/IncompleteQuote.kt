@@ -37,7 +37,8 @@ class IncompleteQuote (
         var birthDate: LocalDate?,
         var livingSpace: Int?,
         var houseHoldSize: Int?,
-        var isStudent: Boolean?
+        var isStudent: Boolean?,
+        var ssn: String?
 ) {
 
         override fun hashCode(): Int {
@@ -72,7 +73,8 @@ class IncompleteQuote (
                         birthDate = incompleteQuoteDto.birthDate,
                         livingSpace = incompleteQuoteDto.livingSpace,
                         houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent
+                        isStudent = incompleteQuoteDto.isStudent,
+                        ssn = incompleteQuoteDto.ssn
                 )
 
                 private fun home(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
@@ -90,7 +92,8 @@ class IncompleteQuote (
                         birthDate = incompleteQuoteDto.birthDate,
                         livingSpace = incompleteQuoteDto.livingSpace,
                         houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent
+                        isStudent = incompleteQuoteDto.isStudent,
+                        ssn = incompleteQuoteDto.ssn
                 )
 
                 private fun genericQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
@@ -103,7 +106,8 @@ class IncompleteQuote (
                         birthDate = incompleteQuoteDto.birthDate,
                         livingSpace = incompleteQuoteDto.livingSpace,
                         houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent
+                        isStudent = incompleteQuoteDto.isStudent,
+                        ssn = incompleteQuoteDto.ssn
                 )
 
                 fun from(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote {

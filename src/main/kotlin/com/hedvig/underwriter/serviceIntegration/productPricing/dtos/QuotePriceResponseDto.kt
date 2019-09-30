@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.serviceIntegration.productPricing.Dtos
+package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import java.math.BigDecimal
 

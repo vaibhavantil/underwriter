@@ -15,21 +15,22 @@ data class IncompleteQuoteDto (
         val birthDate: LocalDate?,
         val livingSpace: Int?,
         val houseHoldSize: Int?,
-        val isStudent: Boolean?
+        val isStudent: Boolean?,
+        val ssn: String?
 )
 
 data class IncompleteQuoteDataDto(
-    val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto?,
-    val incompleteHomeQuoteDataDto: IncompleteHomeQuoteDataDto?
+        val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto?,
+        val incompleteHomeQuoteDataDto: IncompleteHomeQuoteDataDto?
 )
 
 data class IncompleteHouseQuoteDataDto(
-    val street: String?,
-    val zipcode: String?,
-    val city: String?,
-    val livingSpace: Int?,
-    val personalNumber: String?,
-    val householdSize: Int?
+        val street: String?,
+        val zipcode: String?,
+        val city: String?,
+        val livingSpace: Int?,
+        val personalNumber: String?,
+        val householdSize: Int?
 )
 
 data class IncompleteHomeQuoteDataDto(

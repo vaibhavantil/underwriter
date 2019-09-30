@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.serviceIntegration.productPricing.Dtos;
+package com.hedvig.underwriter.serviceIntegration.productPricing.dtos;
 
 data class Address (
         val street: String,
