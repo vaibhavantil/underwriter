@@ -1,25 +1,27 @@
 package com.hedvig.underwriter.service
 
+import com.hedvig.underwriter.model.CompleteQuote
+import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Flag
-import com.hedvig.underwriter.utils.Helpers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class DebtCheckerImpl @Autowired constructor (val memberService: MemberService, val helpers: Helpers): DebtChecker {
-    override fun checkDebt(ssn: String): Flag {
+class DebtCheckerImpl @Autowired constructor (val memberService: MemberService): DebtChecker {
+    override fun passesDebtCheck(completeQuote: CompleteQuote): Boolean {
         try {
-            memberService.checkPersonDebt(ssn)
-            val personStatus = memberService.getPersonStatus(ssn)
+            memberService.checkPersonDebt(completeQuote.ssn)
+            val personStatus = memberService.getPersonStatus(completeQuote.ssn)
             if (personStatus.whitelisted) {
-                return Flag.GREEN
+                return true
             }
-            return personStatus.flag
+            completeQuote.reasonQuoteCannotBeCompleted += "fails debt check"
+            return personStatus.flag == Flag.GREEN
 
         } catch(ex: Exception) {
-            helpers.logger.error("Error getting debt status from member-service", ex)
-            return Flag.GREEN
+            logger.error("Error getting debt status from member-service", ex)
+            return false
         }
     }
 }

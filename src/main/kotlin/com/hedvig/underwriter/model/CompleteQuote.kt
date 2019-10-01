@@ -1,5 +1,10 @@
 package com.hedvig.underwriter.model
 
+import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.UwGuidelinesChecker
+import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.GenericGenerator
@@ -47,7 +52,10 @@ class CompleteQuote (
         val livingSpace: Int,
         val houseHoldSize: Int,
         val isStudent: Boolean,
-        val ssn: String
+        val ssn: String,
+
+        @ElementCollection(targetClass=String::class)
+        var reasonQuoteCannotBeCompleted: List<String> = listOf()
     ) {
 
     override fun hashCode(): Int {
@@ -60,6 +68,57 @@ class CompleteQuote (
             other == null -> false
             IncompleteQuote::class.isInstance(other) && this.id == (other as IncompleteQuote).id -> true
             else -> false
+        }
+    }
+
+    fun passedUnderwritingGuidelines(uwGuidelinesChecker: UwGuidelinesChecker): Boolean {
+        return if (this.completeQuoteData is CompleteQuoteData.Home) {
+            uwGuidelinesChecker.meetsHomeUwGuidelines(this)
+        } else {
+            uwGuidelinesChecker.meetsHouseUwGuidelines(this)
+        }
+    }
+
+    fun passedDebtCheck(debtChecker: DebtChecker): Boolean {
+        return debtChecker.passesDebtCheck(this)
+    }
+
+    fun setPriceRetrievedFromProductPricing(productPricingService: ProductPricingService) {
+        when {
+            this.completeQuoteData is CompleteQuoteData.Home -> {
+                this.price = productPricingService.priceFromProductPricingForHomeQuote(homeQuotePriceDto(this)).price
+            }
+            this.completeQuoteData is CompleteQuoteData.House ->  {
+                this.price = productPricingService.priceFromProductPricingForHouseQuote(houseQuotePriceDto(this)).price
+            }
+            else -> throw RuntimeException("Cannot calculate price as incorrect product type - product type is ${this.productType}")
+        }
+
+    }
+    companion object {
+        private fun homeQuotePriceDto(completeQuote: CompleteQuote): HomeQuotePriceDto {
+            if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
+                return HomeQuotePriceDto(
+                        birthDate = completeQuote.birthDate,
+                        livingSpace = completeQuote.livingSpace,
+                        houseHoldSize = completeQuote.houseHoldSize,
+                        zipCode = completeQuote.completeQuoteData.zipCode,
+                        floor = completeQuote.completeQuoteData.floor,
+                        houseType = completeQuote.lineOfBusiness,
+                        isStudent = completeQuote.isStudent
+                )
+            }
+            throw RuntimeException("missing data cannot create home quote price dto")
+        }
+
+        private fun houseQuotePriceDto(completeQuote: CompleteQuote): HouseQuotePriceDto {
+            if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
+                //  TODO: complete
+                return HouseQuotePriceDto(
+                        birthDate = completeQuote.birthDate
+                )
+            }
+            throw RuntimeException("missing data cannot create house quote price dto")
         }
     }
 }

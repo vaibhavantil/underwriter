@@ -20,8 +20,8 @@ import java.time.LocalDate
 import java.util.*
 
 @RunWith(SpringRunner::class)
-@WebMvcTest(controllers = [QuoteController::class], secure = false)
-internal class QuoteControllerTest {
+@WebMvcTest(controllers = [QuoteBuilderController::class], secure = false)
+internal class QuoteBuilderControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -74,7 +74,8 @@ internal class QuoteControllerTest {
                 birthDate = LocalDate.parse("1990-05-05"),
                 livingSpace = 50,
                 houseHoldSize = 3,
-                isStudent = false
+                isStudent = false,
+                ssn = "189003042342"
                 )
 
         Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))
@@ -109,7 +110,8 @@ internal class QuoteControllerTest {
                 birthDate = LocalDate.parse("1990-05-05"),
                 livingSpace = 50,
                 houseHoldSize = 3,
-                isStudent = false
+                isStudent = false,
+                ssn = "189003042342"
         )
 
         Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))

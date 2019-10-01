@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.utils.Helpers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -10,15 +9,15 @@ import org.springframework.web.client.RestClientResponseException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient, val helpers: Helpers): MemberService {
+class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient): MemberService {
 
     override fun checkPersonDebt(ssn: String) {
         try {
             this.client.checkPersonDebt(ssn)
         } catch (e: RestClientResponseException) {
-            helpers.logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn)
         } catch (e: FeignException) {
-            helpers.logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn)
         }
     }
 

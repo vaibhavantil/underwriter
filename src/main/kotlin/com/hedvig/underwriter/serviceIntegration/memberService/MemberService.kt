@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory
 
 
 interface MemberService {
+    val logger: Logger
+        get() = LoggerFactory.getLogger("MemberService")
+
     fun createMember(): String?
 
     fun checkPersonDebt(ssn: String)

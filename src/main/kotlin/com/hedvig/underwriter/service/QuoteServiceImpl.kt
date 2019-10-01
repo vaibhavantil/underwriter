@@ -4,16 +4,13 @@ import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Flag
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.lang.NullPointerException
-import java.math.BigDecimal
-import java.time.Instant
 import java.util.*
 
 @Service
@@ -24,7 +21,7 @@ class QuoteServiceImpl @Autowired constructor(
         val uwGuidelinesChecker: UwGuidelinesChecker,
         val memberService: MemberService,
         val debtChecker: DebtChecker
-): QuoteService {
+) : QuoteService {
     override fun createIncompleteQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
         val incompleteQuote = incompleteQuoteRepository.save(IncompleteQuote.from(incompleteQuoteDto))
         return IncompleteQuoteResponseDto(incompleteQuote.id!!, incompleteQuote.productType, incompleteQuote.quoteInitiatedFrom)
@@ -70,121 +67,26 @@ class QuoteServiceImpl @Autowired constructor(
         return incompleteQuoteRepository.findById(id)
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): QuotePriceResponseDto {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): QuotePriceResponseDto  {
         val incompleteQuote = getIncompleteQuote(incompleteQuoteId)
-        try {
-            val nullableCompleteQuote = createQuoteWithInfoCompleteAwaitingPriceAndUnderwritingChecks(incompleteQuote)
-                    ?:return QuotePriceResponseDto(BigDecimal(0))
+        val completeQuote = incompleteQuote.complete()
 
-            val completeQuote = nullableCompleteQuote
+        val debtCheckPassed = completeQuote.passedDebtCheck(debtChecker)
+        val uwGuidelinesPassed = completeQuote.passedUnderwritingGuidelines(uwGuidelinesChecker)
 
-            val quoteMeetsUWGuidelines: Boolean
-            quoteMeetsUWGuidelines = if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
-                uwGuidelinesChecker.meetsHomeUwGuidelines(completeQuote)
-            } else {
-                uwGuidelinesChecker.meetsHouseUwGuidelines(completeQuote)
-            }
-
-                val debtFlag: Flag = debtChecker.checkDebt(incompleteQuote.ssn!!)
-
-                if (quoteMeetsUWGuidelines && debtFlag == Flag.GREEN) {
-                    val quotePriceResponseDto = getQuotePriceDto(completeQuote)!!
-
-                    completeQuote.price = quotePriceResponseDto.price
-                    completeQuoteRepository.save(completeQuote)
-                    return quotePriceResponseDto
-                } else if(debtFlag != Flag.GREEN) {
-                    throw NullPointerException("Failed Debt Check")
-                }
-                else {
-                    throw NullPointerException("Failed underwriting guideline")
-                }
-            } catch (exception: Exception) {
-            throw NullPointerException("Cannot create quote, info missing $exception")
+        if(debtCheckPassed && uwGuidelinesPassed) {
+            completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
+            completeQuoteRepository.save(completeQuote)
+            return QuotePriceResponseDto(completeQuote.price)
         }
-
-        return QuotePriceResponseDto(BigDecimal(0))
+        completeQuoteRepository.save(completeQuote)
+        throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
     }
 
     private fun getIncompleteQuote(quoteId: UUID): IncompleteQuote {
         val optionalQuote: Optional<IncompleteQuote> = incompleteQuoteRepository.findById(quoteId)
         if (!optionalQuote.isPresent) throw NullPointerException("No Incomplete quote found with id $quoteId")
         return optionalQuote.get()
-    }
-
-    private fun getQuotePriceDto(completeQuote: CompleteQuote): QuotePriceResponseDto? {
-
-        if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
-            val quotePriceDto = QuotePriceDto(
-                    birthDate = completeQuote.birthDate,
-                    livingSpace = completeQuote.livingSpace,
-                    houseHoldSize = completeQuote.houseHoldSize,
-                    zipCode = (completeQuote.completeQuoteData as CompleteQuoteData.Home).zipCode,
-                    floor = (completeQuote.completeQuoteData as CompleteQuoteData.Home).floor,
-                    houseType = completeQuote.lineOfBusiness,
-                    isStudent = completeQuote.isStudent
-            )
-            val quotePriceResponseDto: QuotePriceResponseDto? = productPricingService.quotePrice(quotePriceDto)
-            return quotePriceResponseDto
-        }
-        return QuotePriceResponseDto(BigDecimal(0))
-    }
-
-    private fun createQuoteWithInfoCompleteAwaitingPriceAndUnderwritingChecks(incompleteQuote: IncompleteQuote): CompleteQuote? {
-
-        if (incompleteQuote.incompleteQuoteData is IncompleteQuoteData.House) {
-
-                val completeQuote = CompleteQuote(
-                        incompleteQuote = incompleteQuote,
-                        quoteState = incompleteQuote.quoteState,
-                        quoteCreatedAt = Instant.now(),
-                        productType = incompleteQuote.productType,
-                        lineOfBusiness = incompleteQuote.lineOfBusiness!!,
-                        price = null,
-                        completeQuoteData = CompleteQuoteData.House(incompleteQuote.incompleteQuoteData.street!!,
-                                incompleteQuote.incompleteQuoteData.zipcode!!,
-                                incompleteQuote.incompleteQuoteData.city!!,
-                                incompleteQuote.incompleteQuoteData.livingSpace!!,
-                                incompleteQuote.incompleteQuoteData.householdSize!!
-                        ),
-                        quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom!!,
-                        birthDate = incompleteQuote.birthDate!!,
-                        livingSpace = incompleteQuote.livingSpace!!,
-                        houseHoldSize = incompleteQuote.houseHoldSize!!,
-                        isStudent = incompleteQuote.isStudent!!,
-                        ssn = incompleteQuote.ssn!!
-                )
-                return completeQuote
-                completeQuoteRepository.save(completeQuote)
-
-            }
-
-            else if (incompleteQuote.incompleteQuoteData is IncompleteQuoteData.Home) {
-                    val completeQuote = CompleteQuote(
-                            incompleteQuote = incompleteQuote,
-                            quoteState = incompleteQuote.quoteState,
-                            quoteCreatedAt = Instant.now(),
-                            productType = incompleteQuote.productType,
-                            lineOfBusiness = incompleteQuote.lineOfBusiness!!,
-                            price = null,
-                            completeQuoteData = CompleteQuoteData.Home(
-                                    incompleteQuote.incompleteQuoteData.address!!,
-                                    incompleteQuote.incompleteQuoteData.numberOfRooms!!,
-                                    incompleteQuote.incompleteQuoteData.zipCode!!,
-                                    incompleteQuote.incompleteQuoteData.floor!!
-                            ),
-                            quoteInitiatedFrom = incompleteQuote.quoteInitiatedFrom!!,
-                            birthDate = incompleteQuote.birthDate!!,
-                            livingSpace = incompleteQuote.livingSpace!!,
-                            houseHoldSize = incompleteQuote.houseHoldSize!!,
-                            isStudent = incompleteQuote.isStudent!!,
-                            ssn = incompleteQuote.ssn!!
-                    )
-
-                    completeQuoteRepository.save(completeQuote)
-                    return completeQuote
-            }
-        return null
     }
 }
 

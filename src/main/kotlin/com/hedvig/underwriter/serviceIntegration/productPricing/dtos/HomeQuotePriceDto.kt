@@ -3,7 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos;
 import com.hedvig.underwriter.model.LineOfBusiness;
 import java.time.LocalDate
 
-data class QuotePriceDto (
+data class HomeQuotePriceDto (
         var birthDate: LocalDate,
         var livingSpace: Int,
         var houseHoldSize: Int,

@@ -54,6 +54,59 @@ class IncompleteQuote (
                 }
         }
 
+        fun complete(): CompleteQuote {
+                return when {
+                        this.incompleteQuoteData is IncompleteQuoteData.House -> {
+
+                                CompleteQuote(
+                                        incompleteQuote = this,
+                                        quoteState = this.quoteState,
+                                        quoteCreatedAt = Instant.now(),
+                                        productType = this.productType,
+                                        lineOfBusiness = this.lineOfBusiness!!,
+                                        price = null,
+                                        completeQuoteData = CompleteQuoteData.House(this.incompleteQuoteData.street!!,
+                                                this.incompleteQuoteData.zipcode!!,
+                                                this.incompleteQuoteData.city!!,
+                                                this.incompleteQuoteData.livingSpace!!,
+                                                this.incompleteQuoteData.householdSize!!
+                                        ),
+                                        quoteInitiatedFrom = this.quoteInitiatedFrom!!,
+                                        birthDate = this.birthDate!!,
+                                        livingSpace = this.livingSpace!!,
+                                        houseHoldSize = this.houseHoldSize!!,
+                                        isStudent = this.isStudent!!,
+                                        ssn = this.ssn!!
+                                )
+
+                        }
+                        this.incompleteQuoteData is IncompleteQuoteData.Home -> {
+                                CompleteQuote(
+                                        incompleteQuote = this,
+                                        quoteState = this.quoteState,
+                                        quoteCreatedAt = Instant.now(),
+                                        productType = this.productType,
+                                        lineOfBusiness = this.lineOfBusiness!!,
+                                        price = null,
+                                        completeQuoteData = CompleteQuoteData.Home(
+                                                this.incompleteQuoteData.address!!,
+                                                this.incompleteQuoteData.numberOfRooms!!,
+                                                this.incompleteQuoteData.zipCode!!,
+                                                this.incompleteQuoteData.floor!!
+                                        ),
+                                        quoteInitiatedFrom = this.quoteInitiatedFrom!!,
+                                        birthDate = this.birthDate!!,
+                                        livingSpace = this.livingSpace!!,
+                                        houseHoldSize = this.houseHoldSize!!,
+                                        isStudent = this.isStudent!!,
+                                        ssn = this.ssn!!
+                                )
+                        }
+                        this.incompleteQuoteData == null -> throw NullPointerException("Incomplete quote data cannot be null")
+                        else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.incompleteQuoteData::class}")
+                }
+        }
+
         companion object {
 
                 private fun house(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
@@ -95,24 +148,10 @@ class IncompleteQuote (
                         ssn = incompleteQuoteDto.ssn
                 )
 
-                private fun genericQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
-                        quoteState = incompleteQuoteDto.quoteState,
-                        createdAt = Instant.now(),
-                        productType = ProductType.UNKNOWN,
-                        lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
-                        quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
-                        incompleteQuoteData = null,
-                        birthDate = incompleteQuoteDto.birthDate,
-                        livingSpace = incompleteQuoteDto.livingSpace,
-                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent,
-                        ssn = incompleteQuoteDto.ssn
-                )
-
                 fun from(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote {
                         if(incompleteQuoteDto.productType == ProductType.HOUSE) return house(incompleteQuoteDto)
                         if(incompleteQuoteDto.productType == ProductType.HOME) return home(incompleteQuoteDto)
-                        return genericQuote(incompleteQuoteDto)
+                        throw RuntimeException("cannot create a incomplete quote with product type ${incompleteQuoteDto.productType}")
                 }
 
         }

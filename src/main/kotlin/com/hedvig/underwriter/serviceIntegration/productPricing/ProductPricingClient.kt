@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
@@ -16,8 +17,11 @@ import javax.validation.Valid
         url = "\${hedvig.product-pricing.url:product-pricing}")
 interface ProductPricingClient {
 
-    @PostMapping("/insurance/getQuotePrice")
-    fun quotePrice(@Valid @RequestBody req: QuotePriceDto): ResponseEntity<QuotePriceResponseDto>
+    @PostMapping("/insurance/getHomeQuotePrice")
+    fun priceFromProductPricingForHomeQuote(@Valid @RequestBody req: HomeQuotePriceDto): ResponseEntity<QuotePriceResponseDto>
+
+    @PostMapping("/insurance/getHouseQuotePrice")
+    fun priceFromProductPricingForHouseQuote(@Valid @RequestBody req: HouseQuotePriceDto): ResponseEntity<QuotePriceResponseDto>
 
     @PostMapping("/insurance/createProduct")
     fun createProduct()
