@@ -1,15 +1,17 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
+import com.hedvig.underwriter.web.Dtos.SignedQuoteResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 
 @Service
 @EnableFeignClients
-class ProductPricingServiceImpl @Autowired constructor(val productPricingClient: ProductPricingClient): ProductPricingService {
+class ProductPricingServiceImpl @Autowired constructor(
+        val productPricingClient: ProductPricingClient
+): ProductPricingService {
+
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
         val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body?.price
         return QuotePriceResponseDto(price)
@@ -20,7 +22,10 @@ class ProductPricingServiceImpl @Autowired constructor(val productPricingClient:
         return QuotePriceResponseDto(price)
     }
 
-    override fun createProduct() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
+        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequest, memberId)
+        val signedQuote = rapioProductCreatedResponseDto.body
+        return signedQuote!!
     }
 }
+

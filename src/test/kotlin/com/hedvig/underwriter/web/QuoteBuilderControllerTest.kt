@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.web;
 
 import com.hedvig.underwriter.model.*
+import com.hedvig.underwriter.service.QuoteBuilderService
 import com.hedvig.underwriter.service.QuoteService;
 import org.junit.Test;
 import org.junit.runner.RunWith
@@ -27,7 +28,7 @@ internal class QuoteBuilderControllerTest {
     private lateinit var mockMvc: MockMvc
 
     @MockBean
-    lateinit var quoteService:QuoteService
+    lateinit var quoteService: QuoteBuilderService
 
     val createQuoteRequestJson = """
         {
@@ -78,7 +79,11 @@ internal class QuoteBuilderControllerTest {
                 livingSpace = 50,
                 houseHoldSize = 3,
                 isStudent = false,
-                ssn = "189003042342"
+                ssn = "189003042342",
+                firstName = null,
+                id = UUID.randomUUID(),
+                lastName = null,
+                currentInsurer = null
                 )
 
         Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))
@@ -117,7 +122,11 @@ internal class QuoteBuilderControllerTest {
                 livingSpace = 50,
                 houseHoldSize = 3,
                 isStudent = false,
-                ssn = "189003042342"
+                ssn = "189003042342",
+                firstName = null,
+                id = UUID.randomUUID(),
+                lastName = null,
+                currentInsurer = null
         )
 
         Mockito.`when`(quoteService.findIncompleteQuoteById(uuid))

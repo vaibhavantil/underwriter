@@ -39,8 +39,3 @@ data class Home(
         @get:JsonProperty(value="isStudent")
         val isStudent: Boolean?
 ) : IncompleteQuoteData()
-
-
-
-
-

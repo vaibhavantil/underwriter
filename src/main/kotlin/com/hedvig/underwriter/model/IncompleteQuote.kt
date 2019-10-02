@@ -35,6 +35,9 @@ class IncompleteQuote (
         var incompleteQuoteData: IncompleteQuoteData? = null,
         @Enumerated(EnumType.STRING)
         var quoteInitiatedFrom: QuoteInitiatedFrom?,
+        var firstName: String?,
+        var lastName: String?,
+        var currentInsurer: String?,
         var birthDate: LocalDate?,
         var livingSpace: Int?,
         var houseHoldSize: Int?,
@@ -68,6 +71,9 @@ class IncompleteQuote (
                                         price = null,
                                         completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
+                                        firstName = this.firstName!!,
+                                        lastName = this.lastName!!,
+                                        currentInsurer = this.currentInsurer!!,
                                         birthDate = this.birthDate!!,
                                         livingSpace = this.livingSpace!!,
                                         houseHoldSize = this.houseHoldSize!!,
@@ -86,6 +92,9 @@ class IncompleteQuote (
                                         price = null,
                                         completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
+                                        firstName = this.firstName!!,
+                                        lastName = this.lastName!!,
+                                        currentInsurer = this.currentInsurer!!,
                                         birthDate = this.birthDate!!,
                                         livingSpace = this.livingSpace!!,
                                         houseHoldSize = this.houseHoldSize!!,
@@ -111,7 +120,11 @@ class IncompleteQuote (
                                 livingSpace = incompleteQuoteDto.incompleteQuoteDataDto.livingSpace,
                                 houseHoldSize = incompleteQuoteDto.incompleteQuoteDataDto.householdSize,
                                 isStudent = null, //(incompleteQuoteDto.incompleteQuoteDataDto).isStudent,
-                                ssn = incompleteQuoteDto.ssn
+                                ssn = incompleteQuoteDto.ssn,
+                                currentInsurer = null,
+                                firstName = null,
+                                lastName = null,
+                                id = UUID.randomUUID()
                         )
                 }
 

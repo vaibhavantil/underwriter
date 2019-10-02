@@ -3,8 +3,10 @@ package com.hedvig.underwriter.model
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.UwGuidelinesChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.GenericGenerator
@@ -47,7 +49,9 @@ class CompleteQuote (
 
         @Enumerated(EnumType.STRING)
         val quoteInitiatedFrom: QuoteInitiatedFrom,
-
+        var firstName: String,
+        var lastName: String,
+        var currentInsurer: String,
         val birthDate: LocalDate,
         val livingSpace: Int,
         val houseHoldSize: Int,
@@ -69,6 +73,29 @@ class CompleteQuote (
             IncompleteQuote::class.isInstance(other) && this.id == (other as IncompleteQuote).id -> true
             else -> false
         }
+    }
+
+    fun memberIsOver30(): Boolean {
+        val dateToday = LocalDate.now()
+        val date30YearsAgo = dateToday.minusYears(30)
+        return this.birthDate.isBefore(date30YearsAgo)
+    }
+
+    fun ssnIsValid(): Boolean {
+        val trimmedInput = ssn.trim().replace("-",  "").replace(" ", "")
+
+        if (trimmedInput.length != 12) {
+            reasonQuoteCannotBeCompleted += "ssn not valid"
+            return false
+        }
+
+        try {
+            LocalDate.parse(trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(4, 6) + "-" + trimmedInput.substring(6, 8))
+        } catch(exception: Exception) {
+            reasonQuoteCannotBeCompleted += "ssn not valid"
+            return false
+        }
+        return true
     }
 
     fun passedUnderwritingGuidelines(uwGuidelinesChecker: UwGuidelinesChecker): Boolean {
@@ -95,6 +122,36 @@ class CompleteQuote (
         }
 
     }
+
+    fun getRapioQuoteRequestDto(): RapioQuoteRequestDto {
+        return when {
+            this.completeQuoteData is CompleteQuoteData.Home -> {
+                RapioQuoteRequestDto(
+                        this.price!!,
+                        this.firstName,
+                        this.lastName,
+                        this.birthDate,
+                        this.isStudent,
+                        Address(
+                                this.completeQuoteData.street,
+                                this.completeQuoteData.city,
+                                this.completeQuoteData.zipCode,
+                                0
+                        ),
+                        this.livingSpace.toFloat(),
+                        this.lineOfBusiness,
+                        this.currentInsurer,
+                        this.houseHoldSize
+                )
+
+            }
+//            this.completeQuoteData is CompleteQuoteData.House -> {
+//
+//            }
+            else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.completeQuoteData::class}")
+        }
+    }
+
     companion object {
         private fun homeQuotePriceDto(completeQuote: CompleteQuote): HomeQuotePriceDto {
             if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {

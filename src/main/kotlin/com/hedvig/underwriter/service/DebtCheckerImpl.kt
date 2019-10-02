@@ -16,12 +16,15 @@ class DebtCheckerImpl @Autowired constructor (val memberService: MemberService):
             if (personStatus.whitelisted) {
                 return true
             }
-            completeQuote.reasonQuoteCannotBeCompleted += "fails debt check"
+            if (personStatus.flag == Flag.RED) {
+                completeQuote.reasonQuoteCannotBeCompleted += "fails debt check"
+                return false
+            }
             return personStatus.flag == Flag.GREEN
 
         } catch(ex: Exception) {
             logger.error("Error getting debt status from member-service", ex)
-            return false
+            return true
         }
     }
 }
