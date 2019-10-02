@@ -103,7 +103,6 @@ class CompleteQuote (
                         livingSpace = completeQuote.livingSpace,
                         houseHoldSize = completeQuote.houseHoldSize,
                         zipCode = completeQuote.completeQuoteData.zipCode,
-                        floor = completeQuote.completeQuoteData.floor,
                         houseType = completeQuote.lineOfBusiness,
                         isStudent = completeQuote.isStudent
                 )

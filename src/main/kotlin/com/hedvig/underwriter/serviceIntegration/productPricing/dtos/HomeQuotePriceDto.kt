@@ -8,7 +8,6 @@ data class HomeQuotePriceDto (
         var livingSpace: Int,
         var houseHoldSize: Int,
         var zipCode: String,
-        var floor: Int,
         var houseType: LineOfBusiness,
         var isStudent: Boolean
 )

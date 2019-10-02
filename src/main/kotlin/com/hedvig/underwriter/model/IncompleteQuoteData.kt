@@ -1,30 +1,45 @@
 package com.hedvig.underwriter.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = IncompleteQuoteData.Home::class, name = "home"),
-        JsonSubTypes.Type(value = IncompleteQuoteData.House::class, name = "house")
+        JsonSubTypes.Type(value = Home::class, name = "home"),
+        JsonSubTypes.Type(value = House::class, name = "house")
 )
+
 sealed class IncompleteQuoteData {
-     data class House (
-             var street: String?,
-             var zipcode: String?,
-             var city: String?,
-             var livingSpace: Int?,
-             var householdSize: Int?
-     ): IncompleteQuoteData()
+    fun productType():ProductType {
+        return when (this) {
+            is House -> ProductType.HOUSE
+            is Home -> ProductType.HOME
+        }
+    }
 
-     data class Home(
-             var address: String?,
-            var numberOfRooms: Int?,
-             var zipCode: String?,
-             var floor: Int?
-     ): IncompleteQuoteData()
+    abstract val householdSize: Int?
+    abstract val livingSpace: Int?
+}
 
- }
+data class House(
+        var street: String?,
+        var zipcode: String?,
+        var city: String?,
+        override var livingSpace: Int?,
+        override var householdSize: Int?
+) : IncompleteQuoteData()
+
+data class Home(
+        val address: String?,
+        override val livingSpace: Int?,
+        val zipCode: String?,
+        val floor: Int?,
+        override val householdSize: Int?,
+        @get:JsonProperty(value="isStudent")
+        val isStudent: Boolean?
+) : IncompleteQuoteData()
+
 
 
 

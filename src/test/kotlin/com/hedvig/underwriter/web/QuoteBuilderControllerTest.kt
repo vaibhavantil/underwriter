@@ -63,11 +63,14 @@ internal class QuoteBuilderControllerTest {
                 createdAt = Instant.now(),
                 quoteState = QuoteState.INCOMPLETE,
                 productType = ProductType.HOME,
-                incompleteQuoteData = IncompleteQuoteData.Home(
+                incompleteQuoteData = Home(
                         address = "123 Baker street",
-                        numberOfRooms = 3,
+                        //numberOfRooms = 3,
                         zipCode = "11216",
-                        floor = 1
+                        floor = 1,
+                        householdSize = 1,
+                        isStudent = null,
+                        livingSpace = null
                 ),
                 lineOfBusiness = LineOfBusiness.RENT,
                 quoteInitiatedFrom = QuoteInitiatedFrom.APP,
@@ -95,15 +98,18 @@ internal class QuoteBuilderControllerTest {
 
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
-        val incompleteQuote: IncompleteQuote = IncompleteQuote(
+        val incompleteQuote = IncompleteQuote(
                 createdAt = Instant.now(),
                 quoteState = QuoteState.INCOMPLETE,
                 productType = ProductType.HOME,
-                incompleteQuoteData = IncompleteQuoteData.Home(
+                incompleteQuoteData = Home(
                         address = "123 Baker street",
-                        numberOfRooms = 3,
+                        //numberOfRooms = 3,
                         zipCode = "11216",
-                        floor = 1
+                        floor = 1,
+                        livingSpace = null,
+                        isStudent = null,
+                        householdSize = null
                 ),
                 lineOfBusiness = LineOfBusiness.RENT,
                 quoteInitiatedFrom = QuoteInitiatedFrom.APP,

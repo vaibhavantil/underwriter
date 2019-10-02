@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
+import com.hedvig.underwriter.web.Dtos.PostIncompleteQuoteRequest
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.GenericGenerator
@@ -31,7 +32,7 @@ class IncompleteQuote (
 
         @field:Type(type="jsonb")
         @field:Column(columnDefinition = "jsonb")
-        val incompleteQuoteData: IncompleteQuoteData? = null,
+        var incompleteQuoteData: IncompleteQuoteData? = null,
         @Enumerated(EnumType.STRING)
         var quoteInitiatedFrom: QuoteInitiatedFrom?,
         var birthDate: LocalDate?,
@@ -55,8 +56,8 @@ class IncompleteQuote (
         }
 
         fun complete(): CompleteQuote {
-                return when {
-                        this.incompleteQuoteData is IncompleteQuoteData.House -> {
+                return when(this.incompleteQuoteData) {
+                        is House -> {
 
                                 CompleteQuote(
                                         incompleteQuote = this,
@@ -65,12 +66,7 @@ class IncompleteQuote (
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
-                                        completeQuoteData = CompleteQuoteData.House(this.incompleteQuoteData.street!!,
-                                                this.incompleteQuoteData.zipcode!!,
-                                                this.incompleteQuoteData.city!!,
-                                                this.incompleteQuoteData.livingSpace!!,
-                                                this.incompleteQuoteData.householdSize!!
-                                        ),
+                                        completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
                                         birthDate = this.birthDate!!,
                                         livingSpace = this.livingSpace!!,
@@ -80,7 +76,7 @@ class IncompleteQuote (
                                 )
 
                         }
-                        this.incompleteQuoteData is IncompleteQuoteData.Home -> {
+                        is Home -> {
                                 CompleteQuote(
                                         incompleteQuote = this,
                                         quoteState = this.quoteState,
@@ -88,12 +84,7 @@ class IncompleteQuote (
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
-                                        completeQuoteData = CompleteQuoteData.Home(
-                                                this.incompleteQuoteData.address!!,
-                                                this.incompleteQuoteData.numberOfRooms!!,
-                                                this.incompleteQuoteData.zipCode!!,
-                                                this.incompleteQuoteData.floor!!
-                                        ),
+                                        completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
                                         birthDate = this.birthDate!!,
                                         livingSpace = this.livingSpace!!,
@@ -102,56 +93,26 @@ class IncompleteQuote (
                                         ssn = this.ssn!!
                                 )
                         }
-                        this.incompleteQuoteData == null -> throw NullPointerException("Incomplete quote data cannot be null")
-                        else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.incompleteQuoteData::class}")
+                        null -> throw NullPointerException("Incomplete quote data cannot be null")
                 }
         }
 
         companion object {
 
-                private fun house(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
-                        quoteState = incompleteQuoteDto.quoteState,
-                        createdAt = Instant.now(),
-                        productType = ProductType.HOUSE,
-                        lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
-                        quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
-                        incompleteQuoteData = IncompleteQuoteData.House(
-                                street = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.street,
-                                zipcode = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.zipcode,
-                                city = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.city,
-                                livingSpace = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.livingSpace,
-                                householdSize = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHouseQuoteDataDto?.householdSize
-                        ),
-                        birthDate = incompleteQuoteDto.birthDate,
-                        livingSpace = incompleteQuoteDto.livingSpace,
-                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent,
-                        ssn = incompleteQuoteDto.ssn
-                )
-
-                private fun home(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote = IncompleteQuote (
-                        quoteState = incompleteQuoteDto.quoteState,
-                        createdAt = Instant.now(),
-                        productType = ProductType.HOME,
-                        lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
-                        quoteInitiatedFrom = incompleteQuoteDto.quoteInitiatedFrom,
-                        incompleteQuoteData = IncompleteQuoteData.Home(
-                                address = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.address,
-                                numberOfRooms = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.numberOfRooms,
-                                zipCode = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.zipCode,
-                                floor = incompleteQuoteDto.incompleteQuoteDataDto?.incompleteHomeQuoteDataDto?.floor
-                        ),
-                        birthDate = incompleteQuoteDto.birthDate,
-                        livingSpace = incompleteQuoteDto.livingSpace,
-                        houseHoldSize = incompleteQuoteDto.houseHoldSize,
-                        isStudent = incompleteQuoteDto.isStudent,
-                        ssn = incompleteQuoteDto.ssn
-                )
-
-                fun from(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuote {
-                        if(incompleteQuoteDto.productType == ProductType.HOUSE) return house(incompleteQuoteDto)
-                        if(incompleteQuoteDto.productType == ProductType.HOME) return home(incompleteQuoteDto)
-                        throw RuntimeException("cannot create a incomplete quote with product type ${incompleteQuoteDto.productType}")
+                fun from(incompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuote {
+                        return IncompleteQuote(
+                                quoteState = QuoteState.INCOMPLETE,
+                                createdAt = Instant.now(),
+                                productType = incompleteQuoteDto.incompleteQuoteDataDto!!.productType(),
+                                lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
+                                quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER,
+                                incompleteQuoteData = incompleteQuoteDto.incompleteQuoteDataDto,
+                                birthDate = LocalDate.now(),
+                                livingSpace = incompleteQuoteDto.incompleteQuoteDataDto.livingSpace,
+                                houseHoldSize = incompleteQuoteDto.incompleteQuoteDataDto.householdSize,
+                                isStudent = null, //(incompleteQuoteDto.incompleteQuoteDataDto).isStudent,
+                                ssn = incompleteQuoteDto.ssn
+                        )
                 }
 
         }

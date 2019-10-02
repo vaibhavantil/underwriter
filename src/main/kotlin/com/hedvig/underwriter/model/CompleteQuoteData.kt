@@ -11,16 +11,27 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 sealed class CompleteQuoteData {
     data class House (
             val street: String,
-            val zipcode: String,
+            val zipCode: String,
             val city: String,
             val livingSpace: Int,
             val householdSize: Int
     ): CompleteQuoteData()
 
     data class Home(
-            val address: String,
-            val numberOfRooms: Int,
+            val street: String,
             val zipCode: String,
-            val floor: Int
+            val city: String,
+            val livingSpace: Int,
+            val householdSize: Int
     ): CompleteQuoteData()
+
+
+    companion object {
+        fun of(data: IncompleteQuoteData) : CompleteQuoteData {
+            return when (data) {
+                is com.hedvig.underwriter.model.House -> House(data.street!!, data.zipcode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
+                is com.hedvig.underwriter.model.Home -> Home(data.address!!, "", "", data.livingSpace!!, data.householdSize!!)
+            }
+        }
+    }
 }

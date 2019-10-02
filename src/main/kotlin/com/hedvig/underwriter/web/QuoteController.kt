@@ -15,12 +15,6 @@ import javax.validation.Valid
 @RequestMapping("/_/v1/quote")
 class QuoteController @Autowired constructor(val quoteService: QuoteService) {
 
-    @PostMapping("/{incompleteQuoteId}/completeQuote")
-    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<QuotePriceResponseDto> {
-        val quote = quoteService.createCompleteQuote(incompleteQuoteId)
-        return ResponseEntity.ok(quote)
-    }
-
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID) {
 
