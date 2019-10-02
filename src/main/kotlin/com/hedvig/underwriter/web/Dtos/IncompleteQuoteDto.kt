@@ -12,6 +12,9 @@ data class IncompleteQuoteDto (
         val lineOfBusiness: LineOfBusiness?,
         val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
         val quoteInitiatedFrom: QuoteInitiatedFrom?,
+        var firstName: String?,
+        var lastName: String?,
+        var currentInsurer: String?,
         val birthDate: LocalDate?,
         val livingSpace: Int?,
         val houseHoldSize: Int?,
@@ -34,9 +37,10 @@ data class IncompleteHouseQuoteDataDto(
 )
 
 data class IncompleteHomeQuoteDataDto(
-        val address: String?,
-        val numberOfRooms: Int?,
-        val zipCode: String?,
-        val floor: Int?
+        var street: String?,
+        var city: String?,
+        var zipCode: String?,
+        var floor: Int?,
+        var numberOfRooms: Int?
 )
 

@@ -11,17 +11,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 sealed class IncompleteQuoteData {
      data class House (
              var street: String?,
-             var zipcode: String?,
+             var zipCode: String?,
              var city: String?,
              var livingSpace: Int?,
              var householdSize: Int?
      ): IncompleteQuoteData()
 
      data class Home(
-             var address: String?,
-            var numberOfRooms: Int?,
+             var street: String?,
+             var city: String?,
              var zipCode: String?,
-             var floor: Int?
+             var floor: Int?,
+             var numberOfRooms: Int?
      ): IncompleteQuoteData()
 
  }

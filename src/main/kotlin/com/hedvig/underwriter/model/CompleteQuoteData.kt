@@ -11,16 +11,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 sealed class CompleteQuoteData {
     data class House (
             val street: String,
-            val zipcode: String,
+            val zipCode: String,
             val city: String,
             val livingSpace: Int,
             val householdSize: Int
     ): CompleteQuoteData()
 
     data class Home(
-            val address: String,
-            val numberOfRooms: Int,
-            val zipCode: String,
-            val floor: Int
+            var street: String,
+            var city: String,
+            var zipCode: String,
+            var floor: Int,
+            var numberOfRooms: Int
     ): CompleteQuoteData()
 }
