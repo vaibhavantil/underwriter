@@ -20,11 +20,12 @@ sealed class IncompleteQuoteData {
 
     abstract val householdSize: Int?
     abstract val livingSpace: Int?
+//    add abstract vals
 }
 
 data class IncompleteHouseData(
         var street: String?,
-        var zipcode: String?,
+        var zipCode: String?,
         var city: String?,
         override var livingSpace: Int?,
         override var householdSize: Int?

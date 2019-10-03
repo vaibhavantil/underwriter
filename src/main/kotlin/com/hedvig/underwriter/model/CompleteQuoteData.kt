@@ -29,7 +29,7 @@ sealed class CompleteQuoteData {
     companion object {
         fun of(data: IncompleteQuoteData) : CompleteQuoteData {
             return when (data) {
-                is IncompleteHouseData -> CompleteHouseData(data.street!!, data.zipcode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
+                is IncompleteHouseData -> CompleteHouseData(data.street!!, data.zipCode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
                 is IncompleteHomeData -> CompleteHomeData(data.street!!, data.zipCode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
             }
         }

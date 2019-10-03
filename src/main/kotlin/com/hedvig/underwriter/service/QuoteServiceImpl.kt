@@ -38,6 +38,8 @@ class QuoteServiceImpl @Autowired constructor(
     }
 
     override fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto {
+//        change state of imcomplete quote and save to repo
+
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
 
@@ -59,6 +61,9 @@ class QuoteServiceImpl @Autowired constructor(
             val completeQuote = getCompleteQuote(completeQuoteId)
             val memberId = memberService.createMember()
             val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(), memberId!!).id
+//            go to memberservice and pass ssn
+//            change state of completeQuote and save to repo
+            //memberService.signQuote(completeQuote.ssn)
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
