@@ -29,8 +29,8 @@ sealed class CompleteQuoteData {
     companion object {
         fun of(data: IncompleteQuoteData) : CompleteQuoteData {
             return when (data) {
-                is com.hedvig.underwriter.model.House -> House(data.street!!, data.zipcode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
-                is com.hedvig.underwriter.model.Home -> Home(data.address!!, "", "", data.livingSpace!!, data.householdSize!!)
+                is com.hedvig.underwriter.model.House -> House(data.street!!, data.zipCode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
+                is com.hedvig.underwriter.model.Home -> Home(data.street!!, data.zipCode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
             }
         }
     }

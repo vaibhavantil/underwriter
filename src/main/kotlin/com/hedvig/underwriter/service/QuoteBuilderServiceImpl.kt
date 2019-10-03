@@ -26,16 +26,17 @@ class QuoteBuilderServiceImpl @Autowired constructor(
         if (incompleteincompleteQuoteDto.lineOfBusiness != null) incompleteQuote.lineOfBusiness = incompleteincompleteQuoteDto.lineOfBusiness
         if (incompleteincompleteQuoteDto.quoteInitiatedFrom != null) incompleteQuote.quoteInitiatedFrom = incompleteincompleteQuoteDto.quoteInitiatedFrom
         if (incompleteincompleteQuoteDto.birthDate != null) incompleteQuote.birthDate = incompleteincompleteQuoteDto.birthDate
-        if (incompleteincompleteQuoteDto.livingSpace != null) incompleteQuote.livingSpace = incompleteincompleteQuoteDto.livingSpace
-        if (incompleteincompleteQuoteDto.houseHoldSize != null) incompleteQuote.houseHoldSize = incompleteincompleteQuoteDto.houseHoldSize
         if (incompleteincompleteQuoteDto.isStudent != null) incompleteQuote.isStudent = incompleteincompleteQuoteDto.isStudent
         if (incompleteincompleteQuoteDto.ssn != null) incompleteQuote.ssn = incompleteincompleteQuoteDto.ssn
+        if (incompleteincompleteQuoteDto.firstName != null) incompleteQuote.firstName = incompleteincompleteQuoteDto.firstName
+        if (incompleteincompleteQuoteDto.lastName != null) incompleteQuote.lastName = incompleteincompleteQuoteDto.lastName
+        if (incompleteincompleteQuoteDto.currentInsurer != null) incompleteQuote.currentInsurer = incompleteincompleteQuoteDto.currentInsurer
 
         if (incompleteincompleteQuoteDto.incompleteQuoteDataDto != null && incompleteQuote.incompleteQuoteData is House) {
             val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto? = incompleteincompleteQuoteDto.incompleteQuoteDataDto.incompleteHouseQuoteDataDto
             val incompleteHouseQuoteData: House = incompleteQuote.incompleteQuoteData as House
 
-            if (incompleteHouseQuoteDataDto?.zipcode != null) incompleteHouseQuoteData.zipcode = incompleteHouseQuoteDataDto.zipcode
+            if (incompleteHouseQuoteDataDto?.zipCode != null) incompleteHouseQuoteData.zipCode = incompleteHouseQuoteDataDto.zipCode
             if (incompleteHouseQuoteDataDto?.city != null) incompleteHouseQuoteData.city = incompleteHouseQuoteDataDto.city
             if (incompleteHouseQuoteDataDto?.street != null) incompleteHouseQuoteData.street = incompleteHouseQuoteDataDto.street
             if (incompleteHouseQuoteDataDto?.householdSize != null) incompleteHouseQuoteData.householdSize = incompleteHouseQuoteDataDto.householdSize
@@ -46,9 +47,11 @@ class QuoteBuilderServiceImpl @Autowired constructor(
             val incommingData: IncompleteHomeQuoteDataDto? = incompleteincompleteQuoteDto.incompleteQuoteDataDto.incompleteHomeQuoteDataDto
             var incompleteHomeQuoteData: Home = incompleteQuote.incompleteQuoteData as Home
 
-            //if (incompleteHomeQuoteDataDto?.numberOfRooms != null) incompleteHomeQuoteData.numberOfRooms = incompleteHomeQuoteDataDto.numberOfRooms
-            if (incommingData?.street != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(address  = incommingData.street)
+            if (incommingData?.street != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(street = incommingData.street)
             if (incommingData?.zipCode != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(zipCode = incommingData.zipCode)
+            if (incommingData?.city != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(city  = incommingData.city)
+            if (incommingData?.livingSpace != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(livingSpace = incommingData.livingSpace)
+            if (incommingData?.houseHoldSize != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(householdSize = incommingData.houseHoldSize)
             if (incommingData?.floor != null) incompleteHomeQuoteData = incompleteHomeQuoteData.copy(floor = incommingData.floor)
             incompleteQuote.incompleteQuoteData = incompleteHomeQuoteData
         }
