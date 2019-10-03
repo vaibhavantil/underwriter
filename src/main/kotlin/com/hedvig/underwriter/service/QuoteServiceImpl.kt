@@ -5,6 +5,8 @@ import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
@@ -63,7 +65,12 @@ class QuoteServiceImpl @Autowired constructor(
             val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(), memberId!!).id
 //            go to memberservice and pass ssn
 //            change state of completeQuote and save to repo
-            memberService.signQuote(completeQuote.ssn)
+
+            val quoteRequest = UnderwriterSignQuoteRequest(
+                    ssn = completeQuote.ssn
+            )
+
+            memberService.signQuote(quoteRequest, memberId)
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)

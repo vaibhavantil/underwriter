@@ -2,11 +2,11 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PathVariable
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import org.springframework.web.bind.annotation.GetMapping
-
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
+import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 
 @Headers("Accept: application/json;charset=utf-8")
@@ -23,5 +23,11 @@ interface MemberServiceClient {
 
     @PostMapping("/_/debt/check/{ssn}")
     fun checkPersonDebt(@PathVariable("ssn") ssn: String): ResponseEntity<Void>
+
+    @PostMapping("/v2/member/sign/underwriter")
+    fun signQuote(@Valid @RequestBody underwriterSignQuoteRequest: UnderwriterSignQuoteRequest,
+                  @RequestHeader(value = "hedvig.token") memberId: String
+    ): ResponseEntity<UnderwriterQuoteSignResponse>
+
 }
 

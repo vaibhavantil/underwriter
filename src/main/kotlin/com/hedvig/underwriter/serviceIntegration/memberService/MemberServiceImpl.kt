@@ -1,15 +1,24 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 import feign.FeignException
 import org.springframework.web.client.RestClientResponseException
+import java.lang.RuntimeException
 
 @Service
 @EnableFeignClients
 class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient): MemberService {
+
+    override fun signQuote(signRequest: UnderwriterSignQuoteRequest, memberId: String):UnderwriterQuoteSignResponse {
+        this.client.signQuote(signRequest, memberId)
+        val sign = this.client.signQuote(signRequest, memberId).body
+            if (sign != null) return sign else throw RuntimeException("Cannot sign quote")
+    }
 
     override fun checkPersonDebt(ssn: String) {
         try {
