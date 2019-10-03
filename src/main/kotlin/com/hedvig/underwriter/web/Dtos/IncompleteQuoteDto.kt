@@ -40,7 +40,6 @@ data class IncompleteHomeQuoteDataDto(
         var street: String?,
         var city: String?,
         var zipCode: String?,
-        var floor: Int?,
         var numberOfRooms: Int?
 )
 

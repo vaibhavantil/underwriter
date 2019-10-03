@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.Dtos.PostIncompleteQuoteRequest
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
@@ -60,7 +59,7 @@ class IncompleteQuote (
 
         fun complete(): CompleteQuote {
                 return when(this.incompleteQuoteData) {
-                        is House -> {
+                        is IncompleteHouseData -> {
 
                                 CompleteQuote(
                                         incompleteQuote = this,
@@ -82,7 +81,7 @@ class IncompleteQuote (
                                 )
 
                         }
-                        is Home -> {
+                        is IncompleteHomeData -> {
                                 CompleteQuote(
                                         incompleteQuote = this,
                                         quoteState = this.quoteState,
@@ -92,13 +91,13 @@ class IncompleteQuote (
                                         price = null,
                                         completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
-                                        firstName = this.firstName!!,
-                                        lastName = this.lastName!!,
-                                        currentInsurer = this.currentInsurer!!,
+                                        firstName = this.firstName,
+                                        lastName = this.lastName,
+                                        currentInsurer = this.currentInsurer,
                                         birthDate = this.birthDate!!,
                                         livingSpace = this.livingSpace!!,
                                         houseHoldSize = this.houseHoldSize!!,
-                                        isStudent = this.isStudent!!,
+                                        isStudent = this.isStudent?:false,
                                         ssn = this.ssn!!
                                 )
                         }

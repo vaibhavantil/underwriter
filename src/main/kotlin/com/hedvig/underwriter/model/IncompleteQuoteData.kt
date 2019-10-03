@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = Home::class, name = "home"),
-        JsonSubTypes.Type(value = House::class, name = "house")
+        JsonSubTypes.Type(value = IncompleteHomeData::class, name = "home"),
+        JsonSubTypes.Type(value = IncompleteHouseData::class, name = "house")
 )
 
 sealed class IncompleteQuoteData {
     fun productType():ProductType {
         return when (this) {
-            is House -> ProductType.HOUSE
-            is Home -> ProductType.HOME
+            is IncompleteHouseData -> ProductType.HOUSE
+            is IncompleteHomeData -> ProductType.HOME
         }
     }
 
@@ -22,7 +22,7 @@ sealed class IncompleteQuoteData {
     abstract val livingSpace: Int?
 }
 
-data class House(
+data class IncompleteHouseData(
         var street: String?,
         var zipcode: String?,
         var city: String?,
@@ -30,12 +30,13 @@ data class House(
         override var householdSize: Int?
 ) : IncompleteQuoteData()
 
-data class Home(
-        val address: String?,
-        override val livingSpace: Int?,
+data class IncompleteHomeData(
+        val street: String?,
+        val city: String?,
         val zipCode: String?,
-        val floor: Int?,
         override val householdSize: Int?,
+        override val livingSpace: Int?,
+
         @get:JsonProperty(value="isStudent")
         val isStudent: Boolean?
 ) : IncompleteQuoteData()

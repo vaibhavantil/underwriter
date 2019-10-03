@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = CompleteQuoteData.Home::class, name = "home"),
-        JsonSubTypes.Type(value = CompleteQuoteData.House::class, name = "house")
+        JsonSubTypes.Type(value = CompleteQuoteData.CompleteHomeData::class, name = "home"),
+        JsonSubTypes.Type(value = CompleteQuoteData.CompleteHouseData::class, name = "house")
 )
 sealed class CompleteQuoteData {
-    data class House (
+    data class CompleteHouseData (
             val street: String,
             val zipCode: String,
             val city: String,
@@ -17,7 +17,7 @@ sealed class CompleteQuoteData {
             val householdSize: Int
     ): CompleteQuoteData()
 
-    data class Home(
+    data class CompleteHomeData(
             val street: String,
             val zipCode: String,
             val city: String,
@@ -29,8 +29,8 @@ sealed class CompleteQuoteData {
     companion object {
         fun of(data: IncompleteQuoteData) : CompleteQuoteData {
             return when (data) {
-                is com.hedvig.underwriter.model.House -> House(data.street!!, data.zipcode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
-                is com.hedvig.underwriter.model.Home -> Home(data.address!!, "", "", data.livingSpace!!, data.householdSize!!)
+                is IncompleteHouseData -> CompleteHouseData(data.street!!, data.zipcode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
+                is IncompleteHomeData -> CompleteHomeData(data.street!!, data.zipCode!!, data.city!!, data.livingSpace!!, data.householdSize!!)
             }
         }
     }

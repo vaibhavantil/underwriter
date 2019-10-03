@@ -13,6 +13,6 @@ data class RapioQuoteRequestDto(
         val address: Address,
         var livingSpace: Float,
         var houseType: LineOfBusiness,
-        val currentInsurer: String,
+        val currentInsurer: String?,
         var houseHoldSize: Int
 )
