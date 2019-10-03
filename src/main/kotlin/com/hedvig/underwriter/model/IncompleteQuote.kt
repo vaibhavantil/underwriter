@@ -23,8 +23,8 @@ class IncompleteQuote (
         @field:GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
         var id: UUID? = null,
         @Enumerated(EnumType.STRING)
-        val quoteState: QuoteState = QuoteState.INCOMPLETE,
-        val createdAt: Instant,
+        val quoteState: QuoteState? = QuoteState.INCOMPLETE,
+        val createdAt: Instant?,
         @Enumerated(EnumType.STRING)
         val productType: ProductType = ProductType.UNKNOWN,
         @Enumerated(EnumType.STRING)
@@ -39,8 +39,6 @@ class IncompleteQuote (
         var lastName: String?,
         var currentInsurer: String?,
         var birthDate: LocalDate?,
-        var livingSpace: Int?,
-        var houseHoldSize: Int?,
         var isStudent: Boolean?,
         var ssn: String?
 ) {
@@ -59,24 +57,25 @@ class IncompleteQuote (
         }
 
         fun complete(): CompleteQuote {
-                return when(this.incompleteQuoteData) {
+                val incompleteData = this.incompleteQuoteData
+                return when(incompleteData) {
                         is House -> {
 
                                 CompleteQuote(
                                         incompleteQuote = this,
-                                        quoteState = this.quoteState,
+                                        quoteState = this.quoteState!!,
                                         quoteCreatedAt = Instant.now(),
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
-                                        completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
+                                        completeQuoteData = CompleteQuoteData.of(incompleteData),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
                                         firstName = this.firstName!!,
                                         lastName = this.lastName!!,
                                         currentInsurer = this.currentInsurer!!,
                                         birthDate = this.birthDate!!,
-                                        livingSpace = this.livingSpace!!,
-                                        houseHoldSize = this.houseHoldSize!!,
+                                        livingSpace = incompleteData.livingSpace!!,
+                                        houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent!!,
                                         ssn = this.ssn!!
                                 )
@@ -85,19 +84,19 @@ class IncompleteQuote (
                         is Home -> {
                                 CompleteQuote(
                                         incompleteQuote = this,
-                                        quoteState = this.quoteState,
+                                        quoteState = this.quoteState!!,
                                         quoteCreatedAt = Instant.now(),
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
-                                        completeQuoteData = CompleteQuoteData.of(this.incompleteQuoteData!!),
+                                        completeQuoteData = CompleteQuoteData.of(incompleteData!!),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
                                         firstName = this.firstName!!,
                                         lastName = this.lastName!!,
                                         currentInsurer = this.currentInsurer!!,
                                         birthDate = this.birthDate!!,
-                                        livingSpace = this.livingSpace!!,
-                                        houseHoldSize = this.houseHoldSize!!,
+                                        livingSpace = incompleteData.livingSpace!!,
+                                        houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent!!,
                                         ssn = this.ssn!!
                                 )
@@ -117,8 +116,6 @@ class IncompleteQuote (
                                 quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER,
                                 incompleteQuoteData = incompleteQuoteDto.incompleteQuoteDataDto,
                                 birthDate = LocalDate.now(),
-                                livingSpace = incompleteQuoteDto.incompleteQuoteDataDto.livingSpace,
-                                houseHoldSize = incompleteQuoteDto.incompleteQuoteDataDto.householdSize,
                                 isStudent = null, //(incompleteQuoteDto.incompleteQuoteDataDto).isStudent,
                                 ssn = incompleteQuoteDto.ssn,
                                 currentInsurer = null,

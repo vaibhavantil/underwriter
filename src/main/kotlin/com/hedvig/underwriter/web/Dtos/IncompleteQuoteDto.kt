@@ -29,7 +29,7 @@ data class IncompleteQuoteDataDto(
 
 data class IncompleteHouseQuoteDataDto(
         val street: String?,
-        val zipcode: String?,
+        val zipCode: String?,
         val city: String?,
         val livingSpace: Int?,
         val personalNumber: String?,
@@ -38,9 +38,10 @@ data class IncompleteHouseQuoteDataDto(
 
 data class IncompleteHomeQuoteDataDto(
         var street: String?,
-        var city: String?,
         var zipCode: String?,
-        var floor: Int?,
-        var numberOfRooms: Int?
+        var city: String?,
+        var livingSpace: Int?,
+        var houseHoldSize: Int?,
+        var floor: Int?
 )
 

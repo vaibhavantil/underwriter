@@ -20,20 +20,22 @@ sealed class IncompleteQuoteData {
 
     abstract val householdSize: Int?
     abstract val livingSpace: Int?
+//    add abstract vals
 }
 
 data class House(
         var street: String?,
-        var zipcode: String?,
+        var zipCode: String?,
         var city: String?,
         override var livingSpace: Int?,
         override var householdSize: Int?
 ) : IncompleteQuoteData()
 
 data class Home(
-        val address: String?,
+        val street: String?,
         override val livingSpace: Int?,
         val zipCode: String?,
+        val city: String?,
         val floor: Int?,
         override val householdSize: Int?,
         @get:JsonProperty(value="isStudent")
