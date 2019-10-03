@@ -16,8 +16,6 @@ data class IncompleteQuoteDto (
         var lastName: String?,
         var currentInsurer: String?,
         val birthDate: LocalDate?,
-        val livingSpace: Int?,
-        val houseHoldSize: Int?,
         val isStudent: Boolean?,
         val ssn: String?
 )
@@ -32,6 +30,7 @@ data class IncompleteHouseQuoteDataDto(
         val zipCode: String?,
         val city: String?,
         val livingSpace: Int?,
+        val houseHoldSize: Int?,
         val personalNumber: String?,
         val householdSize: Int?
 )

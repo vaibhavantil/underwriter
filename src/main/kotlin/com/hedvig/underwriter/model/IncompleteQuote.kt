@@ -23,8 +23,8 @@ class IncompleteQuote (
         @field:GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
         var id: UUID? = null,
         @Enumerated(EnumType.STRING)
-        val quoteState: QuoteState? = QuoteState.INCOMPLETE,
-        val createdAt: Instant?,
+        val quoteState: QuoteState = QuoteState.INCOMPLETE,
+        val createdAt: Instant,
         @Enumerated(EnumType.STRING)
         val productType: ProductType = ProductType.UNKNOWN,
         @Enumerated(EnumType.STRING)
@@ -63,7 +63,7 @@ class IncompleteQuote (
 
                                 CompleteQuote(
                                         incompleteQuote = this,
-                                        quoteState = this.quoteState!!,
+                                        quoteState = this.quoteState,
                                         quoteCreatedAt = Instant.now(),
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
@@ -82,9 +82,9 @@ class IncompleteQuote (
 
                         }
                         is Home -> {
-                                CompleteQuote(
+                                val completeQuote = CompleteQuote(
                                         incompleteQuote = this,
-                                        quoteState = this.quoteState!!,
+                                        quoteState = this.quoteState,
                                         quoteCreatedAt = Instant.now(),
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
@@ -100,6 +100,7 @@ class IncompleteQuote (
                                         isStudent = this.isStudent!!,
                                         ssn = this.ssn!!
                                 )
+                                completeQuote
                         }
                         null -> throw NullPointerException("Incomplete quote data cannot be null")
                 }
