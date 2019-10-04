@@ -63,7 +63,7 @@ class QuoteServiceImpl @Autowired constructor(
             val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(), memberId!!).id
 //            go to memberservice and pass ssn
 //            change state of completeQuote and save to repo
-            memberService.signQuote(completeQuote.ssn)
+            //memberService.signQuote(completeQuote.ssn)
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)

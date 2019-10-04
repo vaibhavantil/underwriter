@@ -2,7 +2,6 @@ package com.hedvig.underwriter.web;
 
 import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.service.QuoteBuilderService
-import com.hedvig.underwriter.service.QuoteService;
 import org.junit.Test;
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -64,12 +63,11 @@ internal class QuoteBuilderControllerTest {
                 createdAt = Instant.now(),
                 quoteState = QuoteState.INCOMPLETE,
                 productType = ProductType.HOME,
-                incompleteQuoteData = Home(
+                incompleteQuoteData = IncompleteHomeData(
                         street = "123 Baker street",
                         city = "Stockholm",
                         //numberOfRooms = 3,
                         zipCode = "11216",
-                        floor = 1,
                         householdSize = 1,
                         isStudent = null,
                         livingSpace = null
@@ -106,15 +104,14 @@ internal class QuoteBuilderControllerTest {
                 createdAt = Instant.now(),
                 quoteState = QuoteState.INCOMPLETE,
                 productType = ProductType.HOME,
-                incompleteQuoteData = Home(
+                incompleteQuoteData = IncompleteHomeData(
                         street = "123 Baker street",
-                        city = "Stockholm",
                         //numberOfRooms = 3,
                         zipCode = "11216",
-                        floor = 1,
                         livingSpace = null,
                         isStudent = null,
-                        householdSize = null
+                        householdSize = null,
+                        city = null
                 ),
                 lineOfBusiness = LineOfBusiness.RENT,
                 quoteInitiatedFrom = QuoteInitiatedFrom.APP,

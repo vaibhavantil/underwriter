@@ -4,7 +4,6 @@ import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.web.Dtos.CompleteQuoteResponseDto
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.service.QuoteBuilderService
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.Dtos.IncompleteQuoteResponseDto
@@ -22,6 +21,13 @@ class QuoteBuilderController @Autowired constructor(
         val quoteService: QuoteService
 ) {
 
+    @PostMapping("/")
+    fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: PostIncompleteQuoteRequest): ResponseEntity<IncompleteQuoteResponseDto> {
+        val quote = quoteBuilderService.createIncompleteQuote(incompleteQuoteDto)
+
+        return ResponseEntity.ok(quote)
+    }
+
     @GetMapping("/{id}")
     fun getIncompleteQuote(@PathVariable id: UUID): ResponseEntity<IncompleteQuote> {
         val optionalQuote:Optional<IncompleteQuote> = quoteBuilderService.findIncompleteQuoteById(id)
@@ -33,22 +39,15 @@ class QuoteBuilderController @Autowired constructor(
         return ResponseEntity.ok(incompleteQuote)
     }
 
-    @PostMapping("/")
-    fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: PostIncompleteQuoteRequest): ResponseEntity<IncompleteQuoteResponseDto> {
-        val quote = quoteBuilderService.createIncompleteQuote(incompleteQuoteDto)
-
-        return ResponseEntity.ok(quote)
-    }
-
     @PatchMapping("/{id}")
     fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteDto> {
         quoteBuilderService.updateIncompleteQuoteData(incompleteQuoteDto, id)
         return ResponseEntity.ok(incompleteQuoteDto)
     }
 
-    @PostMapping("/{incompleteQuoteId}/completeQuote")
-    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<CompleteQuoteResponseDto> {
-        val quote = quoteService.createCompleteQuote(incompleteQuoteId)
+    @PostMapping("/{id}/completeQuote")
+    fun createCompleteQuote(@Valid @PathVariable id: UUID): ResponseEntity<CompleteQuoteResponseDto> {
+        val quote = quoteService.createCompleteQuote(id)
         return ResponseEntity.ok(quote)
     }
 }
