@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.Dtos.PostIncompleteQuoteRequest
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import com.vladmihalcea.hibernate.type.json.JsonStringType
@@ -59,7 +58,8 @@ class IncompleteQuote (
         fun complete(): CompleteQuote {
                 val incompleteData = this.incompleteQuoteData
                 return when(incompleteData) {
-                        is House -> {
+                        is IncompleteHouseData -> {
+
 
                                 CompleteQuote(
                                         incompleteQuote = this,
@@ -81,7 +81,7 @@ class IncompleteQuote (
                                 )
 
                         }
-                        is Home -> {
+                        is IncompleteHomeData -> {
                                 val completeQuote = CompleteQuote(
                                         incompleteQuote = this,
                                         quoteState = this.quoteState,
@@ -89,15 +89,15 @@ class IncompleteQuote (
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
-                                        completeQuoteData = CompleteQuoteData.of(incompleteData!!),
+                                        completeQuoteData = CompleteQuoteData.of(incompleteData),
                                         quoteInitiatedFrom = this.quoteInitiatedFrom!!,
-                                        firstName = this.firstName!!,
-                                        lastName = this.lastName!!,
-                                        currentInsurer = this.currentInsurer!!,
+                                        firstName = this.firstName,
+                                        lastName = this.lastName,
+                                        currentInsurer = this.currentInsurer,
                                         birthDate = this.birthDate!!,
                                         livingSpace = incompleteData.livingSpace!!,
                                         houseHoldSize = incompleteData.householdSize!!,
-                                        isStudent = this.isStudent!!,
+                                        isStudent = this.isStudent?:false,
                                         ssn = this.ssn!!
                                 )
                                 completeQuote

@@ -49,9 +49,9 @@ class CompleteQuote (
 
         @Enumerated(EnumType.STRING)
         val quoteInitiatedFrom: QuoteInitiatedFrom,
-        var firstName: String,
-        var lastName: String,
-        var currentInsurer: String,
+        var firstName: String?,
+        var lastName: String?,
+        var currentInsurer: String?,
         val birthDate: LocalDate,
         val livingSpace: Int,
         val houseHoldSize: Int,
@@ -99,7 +99,7 @@ class CompleteQuote (
     }
 
     fun passedUnderwritingGuidelines(uwGuidelinesChecker: UwGuidelinesChecker): Boolean {
-        return if (this.completeQuoteData is CompleteQuoteData.Home) {
+        return if (this.completeQuoteData is CompleteQuoteData.CompleteHomeData) {
             uwGuidelinesChecker.meetsHomeUwGuidelines(this)
         } else {
             uwGuidelinesChecker.meetsHouseUwGuidelines(this)
@@ -112,10 +112,10 @@ class CompleteQuote (
 
     fun setPriceRetrievedFromProductPricing(productPricingService: ProductPricingService) {
         when {
-            this.completeQuoteData is CompleteQuoteData.Home -> {
+            this.completeQuoteData is CompleteQuoteData.CompleteHomeData -> {
                 this.price = productPricingService.priceFromProductPricingForHomeQuote(homeQuotePriceDto(this)).price
             }
-            this.completeQuoteData is CompleteQuoteData.House ->  {
+            this.completeQuoteData is CompleteQuoteData.CompleteHouseData ->  {
                 this.price = productPricingService.priceFromProductPricingForHouseQuote(houseQuotePriceDto(this)).price
             }
             else -> throw RuntimeException("Cannot calculate price as incorrect product type - product type is ${this.productType}")
@@ -125,11 +125,11 @@ class CompleteQuote (
 
     fun getRapioQuoteRequestDto(): RapioQuoteRequestDto {
         return when {
-            this.completeQuoteData is CompleteQuoteData.Home -> {
+            this.completeQuoteData is CompleteQuoteData.CompleteHomeData -> {
                 RapioQuoteRequestDto(
                         this.price!!,
-                        this.firstName,
-                        this.lastName,
+                        this.firstName!!,
+                        this.lastName!!,
                         this.birthDate,
                         this.isStudent,
                         Address(
@@ -145,16 +145,13 @@ class CompleteQuote (
                 )
 
             }
-//            this.completeQuoteData is CompleteQuoteData.House -> {
-//
-//            }
             else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.completeQuoteData::class}")
         }
     }
 
     companion object {
         private fun homeQuotePriceDto(completeQuote: CompleteQuote): HomeQuotePriceDto {
-            if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
+            if (completeQuote.completeQuoteData is CompleteQuoteData.CompleteHomeData) {
                 return HomeQuotePriceDto(
                         birthDate = completeQuote.birthDate,
                         livingSpace = completeQuote.livingSpace,
@@ -168,7 +165,7 @@ class CompleteQuote (
         }
 
         private fun houseQuotePriceDto(completeQuote: CompleteQuote): HouseQuotePriceDto {
-            if (completeQuote.completeQuoteData is CompleteQuoteData.Home) {
+            if (completeQuote.completeQuoteData is CompleteQuoteData.CompleteHomeData) {
                 //  TODO: complete
                 return HouseQuotePriceDto(
                         birthDate = completeQuote.birthDate
