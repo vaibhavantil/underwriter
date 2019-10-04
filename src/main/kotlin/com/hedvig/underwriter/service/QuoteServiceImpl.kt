@@ -5,9 +5,7 @@ import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -57,10 +55,16 @@ class QuoteServiceImpl @Autowired constructor(
         throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
     }
 
-    override fun signQuote(completeQuoteId: UUID): SignedQuoteResponseDto {
-//        TODO: complete
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
+            if (body.name != null) {
+                completeQuote.firstName = body.name.firstName
+                completeQuote.lastName = body.name.lastName
+            }
+            if (body.startDateWithZone != null) {
+                completeQuote.startDate = body.startDateWithZone.date
+            }
             val memberId = memberService.createMember()
             val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(), memberId!!).id
 //            go to memberservice and pass ssn

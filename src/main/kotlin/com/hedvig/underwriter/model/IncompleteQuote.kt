@@ -77,7 +77,8 @@ class IncompleteQuote (
                                         livingSpace = incompleteData.livingSpace!!,
                                         houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent!!,
-                                        ssn = this.ssn!!
+                                        ssn = this.ssn!!,
+                                        startDate = null
                                 )
 
                         }
@@ -98,7 +99,8 @@ class IncompleteQuote (
                                         livingSpace = incompleteData.livingSpace!!,
                                         houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent?:false,
-                                        ssn = this.ssn!!
+                                        ssn = this.ssn!!,
+                                        startDate = null
                                 )
                                 completeQuote
                         }
