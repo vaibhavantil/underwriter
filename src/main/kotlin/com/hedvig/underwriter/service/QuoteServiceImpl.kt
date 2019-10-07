@@ -2,12 +2,11 @@ package com.hedvig.underwriter.service
 
 import com.hedvig.underwriter.model.CompleteQuote
 import com.hedvig.underwriter.model.IncompleteQuote
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
 import com.hedvig.underwriter.repository.IncompleteQuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +39,6 @@ class QuoteServiceImpl @Autowired constructor(
     }
 
     override fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto {
-//        change state of imcomplete quote and save to repo
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -54,28 +52,32 @@ class QuoteServiceImpl @Autowired constructor(
             return CompleteQuoteResponseDto(completeQuote.id, completeQuote.price)
         }
         completeQuoteRepository.save(completeQuote)
+
+        incompleteQuote.quoteState = QuoteState.QUOTED
+        incompleteQuoteRepository.save(incompleteQuote)
+
         throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
     }
 
-    override fun signQuote(completeQuoteId: UUID): SignedQuoteResponseDto {
-//        TODO: complete
+    override fun signQuote(completeQuoteId: UUID, request: ChooseActiveFromDto): SignedQuoteResponseDto {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
             val memberId = memberService.createMember()
-            val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(), memberId!!).id
-//            go to memberservice and pass ssn
-//            change state of completeQuote and save to repo
 
-            val quoteRequest = UnderwriterSignQuoteRequest(
-                    ssn = completeQuote.ssn
-            )
+            val rapioRequestDto = completeQuote.getRapioQuoteRequestDto(request.activeFrom)
 
-            memberService.signQuote(quoteRequest, memberId)
+            memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
+
+            val signedQuoteId = productPricingService.createProduct(rapioRequestDto, memberId!!).id
+
+            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+
+            completeQuote.quoteState = QuoteState.SIGNED
+
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
+
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }
     }
-
-
 }

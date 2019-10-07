@@ -22,7 +22,7 @@ class IncompleteQuote (
         @field:GenericGenerator(name = "UUID",strategy = "org.hibernate.id.UUIDGenerator")
         var id: UUID? = null,
         @Enumerated(EnumType.STRING)
-        val quoteState: QuoteState = QuoteState.INCOMPLETE,
+        var quoteState: QuoteState = QuoteState.INCOMPLETE,
         val createdAt: Instant,
         @Enumerated(EnumType.STRING)
         val productType: ProductType = ProductType.UNKNOWN,
@@ -37,7 +37,6 @@ class IncompleteQuote (
         var firstName: String?,
         var lastName: String?,
         var currentInsurer: String?,
-        var birthDate: LocalDate?,
         var isStudent: Boolean?,
         var ssn: String?
 ) {
@@ -73,7 +72,6 @@ class IncompleteQuote (
                                         firstName = this.firstName!!,
                                         lastName = this.lastName!!,
                                         currentInsurer = this.currentInsurer!!,
-                                        birthDate = this.birthDate!!,
                                         livingSpace = incompleteData.livingSpace!!,
                                         houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent!!,
@@ -94,7 +92,6 @@ class IncompleteQuote (
                                         firstName = this.firstName,
                                         lastName = this.lastName,
                                         currentInsurer = this.currentInsurer,
-                                        birthDate = this.birthDate!!,
                                         livingSpace = incompleteData.livingSpace!!,
                                         houseHoldSize = incompleteData.householdSize!!,
                                         isStudent = this.isStudent?:false,
@@ -116,7 +113,6 @@ class IncompleteQuote (
                                 lineOfBusiness = incompleteQuoteDto.lineOfBusiness,
                                 quoteInitiatedFrom = QuoteInitiatedFrom.PARTNER,
                                 incompleteQuoteData = incompleteQuoteDto.incompleteQuoteDataDto,
-                                birthDate = LocalDate.now(),
                                 isStudent = null, //(incompleteQuoteDto.incompleteQuoteDataDto).isStudent,
                                 ssn = incompleteQuoteDto.ssn,
                                 currentInsurer = null,

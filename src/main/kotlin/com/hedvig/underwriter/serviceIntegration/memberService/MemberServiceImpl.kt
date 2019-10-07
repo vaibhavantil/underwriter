@@ -2,7 +2,8 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -13,10 +14,12 @@ import java.lang.RuntimeException
 @Service
 @EnableFeignClients
 class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient): MemberService {
+    override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
+        this.client.updateMemberSsn(memberId, request)
+    }
 
-    override fun signQuote(signRequest: UnderwriterSignQuoteRequest, memberId: String):UnderwriterQuoteSignResponse {
-        this.client.signQuote(signRequest, memberId)
-        val sign = this.client.signQuote(signRequest, memberId).body
+    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest):UnderwriterQuoteSignResponse {
+        val sign = this.client.signQuote(memberId, request).body
             if (sign != null) return sign else throw RuntimeException("Cannot sign quote")
     }
 
@@ -37,6 +40,6 @@ class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient):
 
     override fun createMember(): String {
         val memberId = this.client.createMember().body
-        return memberId?.substring(12..20) ?: throw NullPointerException("couldn't create member")
+        return memberId!!.memberId
     }
 }

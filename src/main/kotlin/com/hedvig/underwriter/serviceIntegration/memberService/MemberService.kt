@@ -2,7 +2,9 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterSignQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateContactInformationRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -17,5 +19,7 @@ interface MemberService {
 
     fun getPersonStatus(ssn: String): PersonStatusDto
 
-    fun signQuote(signRequest: UnderwriterSignQuoteRequest, memberId: String): UnderwriterQuoteSignResponse
+    fun signQuote(memberId: Long, underwriterQuoteSignRequest: UnderwriterQuoteSignRequest): UnderwriterQuoteSignResponse
+
+    fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest)
 }

@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 import com.hedvig.underwriter.model.LineOfBusiness
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class RapioQuoteRequestDto(
         val currentTotalPrice: BigDecimal,
@@ -14,5 +15,10 @@ data class RapioQuoteRequestDto(
         var livingSpace: Float,
         var houseType: LineOfBusiness,
         val currentInsurer: String?,
-        var houseHoldSize: Int
+        var houseHoldSize: Int,
+        var activeFrom: LocalDateTime,
+        val ssn: String,
+        var emailAddress: String,
+        var phoneNumber: String
 )
+

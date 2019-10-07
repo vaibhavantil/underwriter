@@ -24,7 +24,7 @@ interface ProductPricingClient {
     fun priceFromProductPricingForHouseQuote(@Valid @RequestBody req: HouseQuotePriceDto
     ): ResponseEntity<QuotePriceResponseDto>
 
-    @PostMapping("/insurance/createRapioProduct")
+    @PostMapping("/_/insurance/createRapioProduct")
     fun createProduct(
             @Valid @RequestBody req: RapioQuoteRequestDto,
             @RequestHeader(value = "hedvig.token") memberId: String

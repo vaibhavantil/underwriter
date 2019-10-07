@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
-import com.hedvig.underwriter.web.Dtos.SignedQuoteResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -22,8 +21,8 @@ class ProductPricingServiceImpl @Autowired constructor(
         return QuotePriceResponseDto(price)
     }
 
-    override fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
-        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequest, memberId)
+    override fun createProduct(rapioQuoteRequestDto: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
+        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequestDto, memberId)
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }

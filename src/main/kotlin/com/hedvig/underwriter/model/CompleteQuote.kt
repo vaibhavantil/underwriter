@@ -2,6 +2,8 @@ package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.UwGuidelinesChecker
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.AddressMemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateContactInformationRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
@@ -16,6 +18,7 @@ import org.hibernate.annotations.TypeDefs
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -33,7 +36,7 @@ class CompleteQuote (
         val incompleteQuote: IncompleteQuote,
 
         @Enumerated(EnumType.STRING)
-        val quoteState: QuoteState = QuoteState.QUOTED,
+        var quoteState: QuoteState = QuoteState.QUOTED,
         val quoteCreatedAt: Instant,
 
         @Enumerated(EnumType.STRING)
@@ -52,7 +55,6 @@ class CompleteQuote (
         var firstName: String?,
         var lastName: String?,
         var currentInsurer: String?,
-        val birthDate: LocalDate,
         val livingSpace: Int,
         val houseHoldSize: Int,
         val isStudent: Boolean,
@@ -75,11 +77,21 @@ class CompleteQuote (
         }
     }
 
+    fun birthDateFromSsn(): LocalDate {
+        val trimmedInput = ssn!!.trim().replace("-",  "").replace(" ", "")
+        return LocalDate.parse(trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(4, 6) + "-" + trimmedInput.substring(6, 8))
+    }
+
     fun memberIsOver30(): Boolean {
         val dateToday = LocalDate.now()
         val date30YearsAgo = dateToday.minusYears(30)
-        return this.birthDate.isBefore(date30YearsAgo)
+        try {
+            return this.birthDateFromSsn().isBefore(date30YearsAgo)
+        } catch(exception: Exception) {
+            throw RuntimeException("BirthDate cannot be calculated, ssn appears to be incorrect" + exception)
+        }
     }
+
 
     fun ssnIsValid(): Boolean {
         val trimmedInput = ssn.trim().replace("-",  "").replace(" ", "")
@@ -123,14 +135,14 @@ class CompleteQuote (
 
     }
 
-    fun getRapioQuoteRequestDto(): RapioQuoteRequestDto {
+    fun getRapioQuoteRequestDto(activeFrom: LocalDateTime): RapioQuoteRequestDto {
         return when {
             this.completeQuoteData is CompleteQuoteData.CompleteHomeData -> {
                 RapioQuoteRequestDto(
                         this.price!!,
                         this.firstName!!,
                         this.lastName!!,
-                        this.birthDate,
+                        this.birthDateFromSsn(),
                         this.isStudent,
                         Address(
                                 this.completeQuoteData.street,
@@ -141,7 +153,11 @@ class CompleteQuote (
                         this.livingSpace.toFloat(),
                         this.lineOfBusiness,
                         this.currentInsurer,
-                        this.houseHoldSize
+                        this.houseHoldSize,
+                        activeFrom,
+                        this.ssn,
+                        "alex@hedvig.com",
+                        "46793006151"
                 )
 
             }
@@ -153,7 +169,7 @@ class CompleteQuote (
         private fun homeQuotePriceDto(completeQuote: CompleteQuote): HomeQuotePriceDto {
             if (completeQuote.completeQuoteData is CompleteQuoteData.CompleteHomeData) {
                 return HomeQuotePriceDto(
-                        birthDate = completeQuote.birthDate,
+                        birthDate = completeQuote.birthDateFromSsn(),
                         livingSpace = completeQuote.livingSpace,
                         houseHoldSize = completeQuote.houseHoldSize,
                         zipCode = completeQuote.completeQuoteData.zipCode,
@@ -168,7 +184,7 @@ class CompleteQuote (
             if (completeQuote.completeQuoteData is CompleteQuoteData.CompleteHomeData) {
                 //  TODO: complete
                 return HouseQuotePriceDto(
-                        birthDate = completeQuote.birthDate
+                        birthDate = completeQuote.birthDateFromSsn()
                 )
             }
             throw RuntimeException("missing data cannot create house quote price dto")
