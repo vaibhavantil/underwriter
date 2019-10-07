@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import com.hedvig.underwriter.model.CompleteQuote
+import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.repository.CompleteQuoteRepository
@@ -66,17 +67,20 @@ class QuoteServiceImpl @Autowired constructor(
                 completeQuote.firstName = body.name.firstName
                 completeQuote.lastName = body.name.lastName
             }
-            if (body.startDateWithZone != null) {
-                completeQuote.startDate = body.startDateWithZone.date
-            }
-            val memberId = memberService.createMember()
 
-            val activeFrom = body.startDateWithZone!!.date.atStartOfDay().atZone(body.startDateWithZone.timeZone)
-            val rapioRequestDto = completeQuote.getRapioQuoteRequestDto(activeFrom.toLocalDateTime())
+            when {
+                body.startDateWithZone != null -> {
+                    val startDateWithZone: DateWithZone = body.startDateWithZone
+                    completeQuote.startDate = startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime()
+                }
+                else -> completeQuote.startDate = null
+            }
+
+            val memberId = memberService.createMember()
 
             memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
 
-            val signedQuoteId = productPricingService.createProduct(rapioRequestDto, memberId!!).id
+            val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
 
             memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
 

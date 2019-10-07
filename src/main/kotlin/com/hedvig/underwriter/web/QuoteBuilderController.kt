@@ -1,16 +1,16 @@
 package com.hedvig.underwriter.web
 
+import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.web.Dtos.CompleteQuoteResponseDto
 
 import com.hedvig.underwriter.service.QuoteBuilderService
-import com.hedvig.underwriter.web.Dtos.IncompleteQuoteDto
-import com.hedvig.underwriter.web.Dtos.IncompleteQuoteResponseDto
-import com.hedvig.underwriter.web.Dtos.PostIncompleteQuoteRequest
+import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.*
 import javax.validation.Valid
 
@@ -24,7 +24,6 @@ class QuoteBuilderController @Autowired constructor(
     @PostMapping("/")
     fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: PostIncompleteQuoteRequest): ResponseEntity<IncompleteQuoteResponseDto> {
         val quote = quoteBuilderService.createIncompleteQuote(incompleteQuoteDto)
-
         return ResponseEntity.ok(quote)
     }
 

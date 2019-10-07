@@ -2,8 +2,6 @@ package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.UwGuidelinesChecker
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.AddressMemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateContactInformationRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
@@ -59,7 +57,7 @@ class CompleteQuote (
         val houseHoldSize: Int,
         val isStudent: Boolean,
         val ssn: String,
-        var startDate: LocalDate?,
+        var startDate: LocalDateTime?,
 
         @ElementCollection(targetClass=String::class)
         var reasonQuoteCannotBeCompleted: List<String> = listOf()
@@ -136,7 +134,7 @@ class CompleteQuote (
 
     }
 
-    fun getRapioQuoteRequestDto(activeFrom: LocalDateTime): RapioQuoteRequestDto {
+    fun getRapioQuoteRequestDto(email: String): RapioQuoteRequestDto {
         return when {
             this.completeQuoteData is CompleteQuoteData.CompleteHomeData -> {
                 RapioQuoteRequestDto(
@@ -155,9 +153,9 @@ class CompleteQuote (
                         this.lineOfBusiness,
                         this.currentInsurer,
                         this.houseHoldSize,
-                        activeFrom,
+                        this.startDate,
                         this.ssn,
-                        "alex@hedvig.com",
+                        email,
                         "46793006151"
                 )
 

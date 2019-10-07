@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.web.Dtos
 
-import java.time.LocalDate
-import java.time.ZoneId
+import com.hedvig.underwriter.model.DateWithZone
+import com.hedvig.underwriter.model.Name
 
 data class SignQuoteRequest (
         val name: Name?,
@@ -9,12 +9,3 @@ data class SignQuoteRequest (
         val email: String
 )
 
-data class DateWithZone (
-        val date: LocalDate,
-        val timeZone: ZoneId
-)
-
-data class Name (
-        val firstName: String,
-        val lastName: String
-)

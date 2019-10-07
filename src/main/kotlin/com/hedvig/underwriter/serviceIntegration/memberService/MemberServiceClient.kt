@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
         url = "\${hedvig.member-service.url:member-service}")
 interface MemberServiceClient {
 
-    @PostMapping("/v2/member/helloHedvig")
+    @PostMapping("v2/member/helloHedvig")
     fun createMember(): ResponseEntity<HelloHedvigResponseDto>
 
     @GetMapping("/_/person/status/{ssn}")

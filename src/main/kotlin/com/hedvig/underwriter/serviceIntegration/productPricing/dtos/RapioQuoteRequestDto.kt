@@ -16,7 +16,7 @@ data class RapioQuoteRequestDto(
         var houseType: LineOfBusiness,
         val currentInsurer: String?,
         var houseHoldSize: Int,
-        var activeFrom: LocalDateTime,
+        var activeFrom: LocalDateTime?,
         val ssn: String,
         var emailAddress: String,
         var phoneNumber: String
