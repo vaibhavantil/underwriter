@@ -10,7 +10,7 @@ interface QuoteService {
 
     fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto
 
-    fun signQuote(completeQuoteId: UUID, request: ChooseActiveFromDto): SignedQuoteResponseDto
+    fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto
 
     fun getCompleteQuote(completeQuoteId: UUID): CompleteQuote
 }

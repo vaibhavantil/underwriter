@@ -59,6 +59,7 @@ class CompleteQuote (
         val houseHoldSize: Int,
         val isStudent: Boolean,
         val ssn: String,
+        var startDate: LocalDate?,
 
         @ElementCollection(targetClass=String::class)
         var reasonQuoteCannotBeCompleted: List<String> = listOf()

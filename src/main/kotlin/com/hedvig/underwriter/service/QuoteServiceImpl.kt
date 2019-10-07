@@ -59,12 +59,20 @@ class QuoteServiceImpl @Autowired constructor(
         throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
     }
 
-    override fun signQuote(completeQuoteId: UUID, request: ChooseActiveFromDto): SignedQuoteResponseDto {
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
+            if (body.name != null) {
+                completeQuote.firstName = body.name.firstName
+                completeQuote.lastName = body.name.lastName
+            }
+            if (body.startDateWithZone != null) {
+                completeQuote.startDate = body.startDateWithZone.date
+            }
             val memberId = memberService.createMember()
 
-            val rapioRequestDto = completeQuote.getRapioQuoteRequestDto(request.activeFrom)
+            val activeFrom = body.startDateWithZone!!.date.atStartOfDay().atZone(body.startDateWithZone.timeZone)
+            val rapioRequestDto = completeQuote.getRapioQuoteRequestDto(activeFrom.toLocalDateTime())
 
             memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
 
