@@ -10,15 +10,14 @@ data class RapioQuoteRequestDto(
         val firstName: String,
         val lastName: String,
         var birthDate: LocalDate,
-        var isStudent: Boolean,
+        val isStudent: Boolean,
         val address: Address,
-        var livingSpace: Float,
-        var houseType: LineOfBusiness,
+        val livingSpace: Float,
+        val houseType: LineOfBusiness,
         val currentInsurer: String?,
-        var houseHoldSize: Int,
-        var activeFrom: LocalDateTime?,
+        val houseHoldSize: Int,
+        val activeFrom: LocalDateTime?,
         val ssn: String,
-        var emailAddress: String,
-        var phoneNumber: String
+        val emailAddress: String,
+        val phoneNumber: String
 )
-

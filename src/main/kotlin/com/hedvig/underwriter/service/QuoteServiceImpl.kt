@@ -71,7 +71,8 @@ class QuoteServiceImpl @Autowired constructor(
             when {
                 body.startDateWithZone != null -> {
                     val startDateWithZone: DateWithZone = body.startDateWithZone
-                    completeQuote.startDate = startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime()
+                    completeQuote.startDate =
+                            startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime()
                 }
                 else -> completeQuote.startDate = null
             }
@@ -80,11 +81,13 @@ class QuoteServiceImpl @Autowired constructor(
 
             memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
 
-            val signedQuoteId = productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
+            val signedQuoteId =
+                    productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
 
             memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
 
             completeQuote.quoteState = QuoteState.SIGNED
+            completeQuoteRepository.save(completeQuote)
 
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
 
