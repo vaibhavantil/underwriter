@@ -25,7 +25,6 @@ class QuoteBuilderServiceImpl @Autowired constructor(
 
         if (incompleteincompleteQuoteDto.lineOfBusiness != null) incompleteQuote.lineOfBusiness = incompleteincompleteQuoteDto.lineOfBusiness
         if (incompleteincompleteQuoteDto.quoteInitiatedFrom != null) incompleteQuote.quoteInitiatedFrom = incompleteincompleteQuoteDto.quoteInitiatedFrom
-        if (incompleteincompleteQuoteDto.birthDate != null) incompleteQuote.birthDate = incompleteincompleteQuoteDto.birthDate
         if (incompleteincompleteQuoteDto.isStudent != null) incompleteQuote.isStudent = incompleteincompleteQuoteDto.isStudent
         if (incompleteincompleteQuoteDto.ssn != null) incompleteQuote.ssn = incompleteincompleteQuoteDto.ssn
         if (incompleteincompleteQuoteDto.firstName != null) incompleteQuote.firstName = incompleteincompleteQuoteDto.firstName

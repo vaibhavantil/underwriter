@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-public interface IncompleteQuoteRepository: CrudRepository<IncompleteQuote, UUID> {
+interface IncompleteQuoteRepository: CrudRepository<IncompleteQuote, UUID> {
 
 }

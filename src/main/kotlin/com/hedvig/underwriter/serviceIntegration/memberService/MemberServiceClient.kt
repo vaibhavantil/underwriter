@@ -1,12 +1,13 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PathVariable
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import org.springframework.web.bind.annotation.GetMapping
-
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
+import org.springframework.web.bind.annotation.*
 
 
 @Headers("Accept: application/json;charset=utf-8")
@@ -15,13 +16,21 @@ import org.springframework.web.bind.annotation.GetMapping
         url = "\${hedvig.member-service.url:member-service}")
 interface MemberServiceClient {
 
-    @PostMapping("/member/helloHedvig")
-    fun createMember(): ResponseEntity<String>
+    @PostMapping("v2/member/helloHedvig")
+    fun createMember(): ResponseEntity<HelloHedvigResponseDto>
 
     @GetMapping("/_/person/status/{ssn}")
     fun personStatus(@PathVariable("ssn") ssn: String): ResponseEntity<PersonStatusDto>
 
     @PostMapping("/_/debt/check/{ssn}")
     fun checkPersonDebt(@PathVariable("ssn") ssn: String): ResponseEntity<Void>
+
+    @PostMapping("/v2/member/sign/underwriter")
+    fun signQuote(@RequestHeader(value = "hedvig.token") memberId: Long,
+            @RequestBody underwriterQuoteSignRequest: UnderwriterQuoteSignRequest
+    ): ResponseEntity<UnderwriterQuoteSignResponse>
+
+    @PostMapping("/_/member/{memberId}/updateSSN")
+    fun updateMemberSsn(@PathVariable memberId: Long, @RequestBody request: UpdateSsnRequest)
 }
 
