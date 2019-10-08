@@ -4,6 +4,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   jpa:
+    open-in-view: false
     generate-ddl: true
     properties:
       hibernate:
@@ -13,3 +14,4 @@ spring:
     ddl-auto: update
   datasource:
     url: jdbc:postgresql://localhost:5432/underwriter
+
