@@ -4,7 +4,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -24,7 +23,7 @@ interface ProductPricingClient {
     fun priceFromProductPricingForHouseQuote(@Valid @RequestBody req: HouseQuotePriceDto
     ): ResponseEntity<QuotePriceResponseDto>
 
-    @PostMapping("/insurance/createRapioProduct")
+    @PostMapping("/_/insurance/createRapioProduct")
     fun createProduct(
             @Valid @RequestBody req: RapioQuoteRequestDto,
             @RequestHeader(value = "hedvig.token") memberId: String

@@ -3,15 +3,13 @@ package com.hedvig.underwriter.web
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.web.Dtos.CompleteQuoteResponseDto
+import com.hedvig.underwriter.web.Dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.Dtos.SignedQuoteResponseDto
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.validation.Valid
 
@@ -29,10 +27,9 @@ class QuoteController @Autowired constructor(
         return ResponseEntity.ok(quote)
     }
 
-    @PostMapping("/{completeQuoteId}/signQuote")
-    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID): ResponseEntity<SignedQuoteResponseDto> {
-        val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId)
+    @PostMapping("/{completeQuoteId}/sign")
+    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto> {
+        val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
         return ResponseEntity.ok(signedQuoteResponseDto)
-
     }
 }
