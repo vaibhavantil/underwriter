@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: underwriter
+  cloud:
+    config:
+      allow-override: false
+  autoconfigure:
+    exclude:
+    - org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration
+---
+spring:
+  profiles: test, development, unittest
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+      secrets:
+        enabled: false
+  autoconfigure:
+    exclude:
+    - org.springframework.cloud.kubernetes.discovery.KubernetesDiscoveryClientAutoConfiguration
+    - org.springframework.cloud.kubernetes.KubernetesAutoConfiguration
+    - org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration
