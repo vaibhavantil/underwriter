@@ -12,9 +12,12 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
+import javax.transaction.Transactional
 
+@Transactional
 @Service
 class QuoteServiceImpl @Autowired constructor(
         val incompleteQuoteRepository: IncompleteQuoteRepository,
@@ -47,17 +50,19 @@ class QuoteServiceImpl @Autowired constructor(
         val debtCheckPassed = completeQuote.passedDebtCheck(debtChecker)
         val uwGuidelinesPassed = completeQuote.passedUnderwritingGuidelines(uwGuidelinesChecker)
 
-        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed) {
+        if(!completeQuote.memberIsOver30()) completeQuote.reasonQuoteCannotBeCompleted += "member is younger than 18"
+
+        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
             completeQuoteRepository.save(completeQuote)
-            return CompleteQuoteResponseDto(completeQuote.id, completeQuote.price)
+            return CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price, null)
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
 
-        throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
+        return CompleteQuoteResponseDto("Cannot complete quote" , BigDecimal(0.0), completeQuote.reasonQuoteCannotBeCompleted)
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {

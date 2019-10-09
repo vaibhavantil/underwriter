@@ -8,4 +8,3 @@ data class SignQuoteRequest (
         val startDateWithZone: DateWithZone?,
         val email: String
 )
-
