@@ -62,7 +62,7 @@ class QuoteServiceImpl @Autowired constructor(
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
 
-        return CompleteQuoteResponseDto("Cannot complete quote" , BigDecimal(0.0), completeQuote.reasonQuoteCannotBeCompleted)
+        return CompleteQuoteResponseDto("Cannot complete quote" , BigDecimal(0.0), "quote cannot be calculated, underwriting guidelines are breached")
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {

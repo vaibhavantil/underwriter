@@ -6,5 +6,5 @@ import java.util.*
 data class CompleteQuoteResponseDto (
         val id: String?,
         val price: BigDecimal?,
-        val reasonQuoteCannotBeCompleted: List<String>?
+        val reasonQuoteCannotBeCompleted: String?
 )
