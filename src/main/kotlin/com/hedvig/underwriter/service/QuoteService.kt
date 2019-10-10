@@ -1,12 +1,12 @@
 package com.hedvig.underwriter.service
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.CompleteQuote
 import com.hedvig.underwriter.web.Dtos.*
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
+
 interface QuoteService {
-    fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto
+    fun createCompleteQuote(incompleteQuoteId: UUID): Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto>
 
     fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto
 

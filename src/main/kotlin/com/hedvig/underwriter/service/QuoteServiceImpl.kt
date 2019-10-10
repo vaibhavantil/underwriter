@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.service
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.CompleteQuote
 import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.IncompleteQuote
@@ -12,7 +13,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 import javax.transaction.Transactional
@@ -42,7 +42,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto> {
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -55,14 +55,14 @@ class QuoteServiceImpl @Autowired constructor(
         if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
             completeQuoteRepository.save(completeQuote)
-            return CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price, null)
+            return Either.left(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
-
-        return CompleteQuoteResponseDto("Cannot complete quote" , BigDecimal(0.0), "quote cannot be calculated, underwriting guidelines are breached")
+        
+        return Either.right(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {

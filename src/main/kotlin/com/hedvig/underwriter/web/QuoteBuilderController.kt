@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.web
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.IncompleteQuote
 import com.hedvig.underwriter.service.QuoteService
@@ -45,7 +46,7 @@ class QuoteBuilderController @Autowired constructor(
     }
 
     @PostMapping("/{id}/completeQuote")
-    fun createCompleteQuote(@Valid @PathVariable id: UUID): ResponseEntity<CompleteQuoteResponseDto> {
+    fun createCompleteQuote(@Valid @PathVariable id: UUID): ResponseEntity<Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto>> {
         val quote = quoteService.createCompleteQuote(id)
         return ResponseEntity.ok(quote)
     }
