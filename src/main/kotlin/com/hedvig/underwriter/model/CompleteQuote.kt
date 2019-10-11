@@ -52,7 +52,7 @@ class CompleteQuote (
         val quoteInitiatedFrom: QuoteInitiatedFrom,
         var firstName: String?,
         var lastName: String?,
-        var currentInsurer: String?,
+        var currentInsurer: String? = "",
         val livingSpace: Int,
         val houseHoldSize: Int,
         val isStudent: Boolean,
@@ -86,6 +86,16 @@ class CompleteQuote (
         val date30YearsAgo = dateToday.minusYears(30)
         try {
             return this.birthDateFromSsn().isBefore(date30YearsAgo)
+        } catch(exception: Exception) {
+            throw RuntimeException("BirthDate cannot be calculated, ssn appears to be incorrect" + exception)
+        }
+    }
+
+    fun memberIsOlderThan18(): Boolean {
+        val dateToday = LocalDate.now()
+        val date18YearsAgo = dateToday.minusYears(18)
+        try {
+            return this.birthDateFromSsn().isBefore(date18YearsAgo)
         } catch(exception: Exception) {
             throw RuntimeException("BirthDate cannot be calculated, ssn appears to be incorrect" + exception)
         }

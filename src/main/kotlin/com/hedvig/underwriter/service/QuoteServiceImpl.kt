@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.service
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.CompleteQuote
 import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.IncompleteQuote
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
+import javax.transaction.Transactional
 
+@Transactional
 @Service
 class QuoteServiceImpl @Autowired constructor(
         val incompleteQuoteRepository: IncompleteQuoteRepository,
@@ -39,7 +42,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): CompleteQuoteResponseDto {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -47,17 +50,19 @@ class QuoteServiceImpl @Autowired constructor(
         val debtCheckPassed = completeQuote.passedDebtCheck(debtChecker)
         val uwGuidelinesPassed = completeQuote.passedUnderwritingGuidelines(uwGuidelinesChecker)
 
-        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed) {
+        if(!completeQuote.memberIsOver30()) completeQuote.reasonQuoteCannotBeCompleted += "member is younger than 18"
+
+        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
             completeQuoteRepository.save(completeQuote)
-            return CompleteQuoteResponseDto(completeQuote.id, completeQuote.price)
+            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
 
-        throw RuntimeException("${completeQuote.reasonQuoteCannotBeCompleted}")
+        return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {

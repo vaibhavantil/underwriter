@@ -15,11 +15,11 @@ import javax.validation.Valid
         url = "\${hedvig.product-pricing.url:product-pricing}")
 interface ProductPricingClient {
 
-    @PostMapping("/insurance/getHomeQuotePrice")
+    @PostMapping("/_/insurance/getHomeQuotePrice")
     fun priceFromProductPricingForHomeQuote(@Valid @RequestBody req: HomeQuotePriceDto
     ): ResponseEntity<QuotePriceResponseDto>
 
-    @PostMapping("/insurance/getHouseQuotePrice")
+    @PostMapping("/_/insurance/getHouseQuotePrice")
     fun priceFromProductPricingForHouseQuote(@Valid @RequestBody req: HouseQuotePriceDto
     ): ResponseEntity<QuotePriceResponseDto>
 
