@@ -6,7 +6,7 @@ import com.hedvig.underwriter.web.Dtos.*
 import java.util.*
 
 interface QuoteService {
-    fun createCompleteQuote(incompleteQuoteId: UUID): Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto>
+    fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto>
 
     fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto
 

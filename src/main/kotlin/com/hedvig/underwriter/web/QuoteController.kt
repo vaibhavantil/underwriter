@@ -23,10 +23,15 @@ class QuoteController @Autowired constructor(
         val productPricingService: ProductPricingService
 ) {
 
+
     @PostMapping("/{incompleteQuoteId}/completeQuote")
-    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto>> {
-        val quote = quoteService.createCompleteQuote(incompleteQuoteId)
-        return ResponseEntity.ok(quote)
+    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
+        val quoteOrError = quoteService.createCompleteQuote(incompleteQuoteId)
+
+        return when(quoteOrError) {
+            is Either.Left -> ResponseEntity.status(402).body(quoteOrError.a)
+            is Either.Right -> ResponseEntity.ok(quoteOrError.b)
+        }
     }
 
     @PostMapping("/{completeQuoteId}/sign")

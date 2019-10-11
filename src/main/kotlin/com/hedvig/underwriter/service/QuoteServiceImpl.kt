@@ -42,7 +42,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<CompleteQuoteResponseDto, ErrorQuoteResponseDto> {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -55,14 +55,14 @@ class QuoteServiceImpl @Autowired constructor(
         if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
             completeQuoteRepository.save(completeQuote)
-            return Either.left(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
+            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
-        
-        return Either.right(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
+
+        return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
