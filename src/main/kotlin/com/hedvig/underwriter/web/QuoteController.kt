@@ -26,11 +26,10 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{incompleteQuoteId}/completeQuote")
     fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
-        val quoteOrError = quoteService.createCompleteQuote(incompleteQuoteId)
 
-        return when(quoteOrError) {
+        return when(val quoteOrError = quoteService.createCompleteQuote(incompleteQuoteId)) {
             is Either.Left -> ResponseEntity.status(402).body(quoteOrError.a)
-            is Either.Right -> ResponseEntity.ok(quoteOrError.b)
+            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
         }
     }
 
