@@ -44,4 +44,13 @@ class QuoteBuilderController @Autowired constructor(
         quoteBuilderService.updateIncompleteQuoteData(incompleteQuoteDto, id)
         return ResponseEntity.ok(incompleteQuoteDto)
     }
+
+    @PostMapping("/{incompleteQuoteId}/completeQuote")
+    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
+
+        return when(val quoteOrError = quoteService.createCompleteQuote(incompleteQuoteId)) {
+            is Either.Left -> ResponseEntity.status(402).body(quoteOrError.a)
+            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
+        }
+    }
 }
