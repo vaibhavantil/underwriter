@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
+import arrow.core.extensions.either.applicative.map
+import arrow.core.left
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -34,7 +36,7 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/sign")
-    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto> {
+    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
         val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
         return ResponseEntity.ok(signedQuoteResponseDto)
     }

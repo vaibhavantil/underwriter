@@ -65,7 +65,7 @@ class QuoteServiceImpl @Autowired constructor(
         return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Any {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
             if (body.name != null) {
@@ -89,13 +89,21 @@ class QuoteServiceImpl @Autowired constructor(
             val signedQuoteId =
                     productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
 
-            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+            val memberServiceSignedQuote =
+                    memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
 
-            completeQuote.quoteState = QuoteState.SIGNED
-            completeQuoteRepository.save(completeQuote)
+            return when(memberServiceSignedQuote) {
+                is Either.Left -> {
+                    memberServiceSignedQuote.a
+                }
+                is Either.Right -> {
 
-            return SignedQuoteResponseDto(signedQuoteId, Instant.now())
+                    completeQuote.quoteState = QuoteState.SIGNED
+                    completeQuoteRepository.save(completeQuote)
 
+                    return SignedQuoteResponseDto(signedQuoteId, Instant.now())
+                }
+            }
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }

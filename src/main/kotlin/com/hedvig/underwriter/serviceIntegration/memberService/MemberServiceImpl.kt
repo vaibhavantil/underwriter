@@ -1,8 +1,12 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
+import arrow.core.Either
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.web.Dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
@@ -13,14 +17,26 @@ import java.lang.RuntimeException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient): MemberService {
+class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
+                                               val objectMapper: ObjectMapper): MemberService {
+
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
     }
 
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest):UnderwriterQuoteSignResponse {
-        val sign = this.client.signQuote(memberId, request).body
-            if (sign != null) return sign else throw RuntimeException("Cannot sign quote")
+    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorQuoteResponseDto, UnderwriterQuoteSignResponse> {
+        try {
+            val response = this.client.signQuote(memberId, request)
+            if (response.statusCode.is2xxSuccessful) {
+                return Either.right(response.body!!)
+            }
+        } catch (ex: FeignException) {
+            if (ex.status() == 402) {
+                val error = objectMapper.readValue<ErrorQuoteResponseDto>(ex.contentUTF8())
+                return Either.left(error)
+            }
+        }
+        throw RuntimeException("Couldn't sign member")
     }
 
     override fun checkPersonDebt(ssn: String) {
