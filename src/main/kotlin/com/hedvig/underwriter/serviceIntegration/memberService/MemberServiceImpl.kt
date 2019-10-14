@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 import feign.FeignException
+import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClientResponseException
 import java.lang.RuntimeException
 
@@ -27,16 +28,14 @@ class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
     override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorQuoteResponseDto, UnderwriterQuoteSignResponse> {
         try {
             val response = this.client.signQuote(memberId, request)
-            if (response.statusCode.is2xxSuccessful) {
-                return Either.right(response.body!!)
-            }
+            return Either.right(response.body!!)
         } catch (ex: FeignException) {
             if (ex.status() == 402) {
                 val error = objectMapper.readValue<ErrorQuoteResponseDto>(ex.contentUTF8())
                 return Either.left(error)
             }
         }
-        throw RuntimeException("Couldn't sign member")
+        throw RuntimeException("Cannot sign quote")
     }
 
     override fun checkPersonDebt(ssn: String) {

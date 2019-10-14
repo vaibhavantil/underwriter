@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.web
 
+import arrow.core.Either
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.Dtos.SignQuoteRequest
@@ -18,7 +19,10 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
-        val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
-        return ResponseEntity.ok(signedQuoteResponseDto)
+
+        return when(val signedQuoteOrError = quoteService.signQuote(completeQuoteId, body)) {
+            is Either.Left -> ResponseEntity.status(402).body(signedQuoteOrError.a)
+            is Either.Right -> ResponseEntity.status(200).body(signedQuoteOrError.b)
+        }
     }
 }

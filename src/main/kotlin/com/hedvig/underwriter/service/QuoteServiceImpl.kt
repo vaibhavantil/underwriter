@@ -13,7 +13,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.Instant
+import java.time.*
 import java.util.*
 import javax.transaction.Transactional
 
@@ -55,7 +55,8 @@ class QuoteServiceImpl @Autowired constructor(
         if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
             completeQuoteRepository.save(completeQuote)
-            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
+            val dateValidTo =
+            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!,  LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC)))
         }
         completeQuoteRepository.save(completeQuote)
 
@@ -65,7 +66,7 @@ class QuoteServiceImpl @Autowired constructor(
         return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Any {
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorQuoteResponseDto, SignedQuoteResponseDto> {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
             if (body.name != null) {
@@ -90,18 +91,18 @@ class QuoteServiceImpl @Autowired constructor(
                     productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
 
             val memberServiceSignedQuote =
-                    memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+                    this.memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
 
             return when(memberServiceSignedQuote) {
                 is Either.Left -> {
-                    memberServiceSignedQuote.a
+                    Either.Left(memberServiceSignedQuote.a)
                 }
                 is Either.Right -> {
 
                     completeQuote.quoteState = QuoteState.SIGNED
                     completeQuoteRepository.save(completeQuote)
 
-                    return SignedQuoteResponseDto(signedQuoteId, Instant.now())
+                    Either.Right(SignedQuoteResponseDto(signedQuoteId, Instant.now()))
                 }
             }
         } catch(exception: Exception) {
