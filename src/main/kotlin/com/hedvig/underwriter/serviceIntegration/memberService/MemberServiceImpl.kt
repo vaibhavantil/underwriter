@@ -30,7 +30,7 @@ class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
             val response = this.client.signQuote(memberId, request)
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
-            if (ex.status() == 402) {
+            if (ex.status() == 422) {
                 val error = objectMapper.readValue<ErrorQuoteResponseDto>(ex.contentUTF8())
                 return Either.left(error)
             }

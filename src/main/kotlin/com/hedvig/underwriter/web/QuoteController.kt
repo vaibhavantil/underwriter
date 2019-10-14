@@ -21,7 +21,7 @@ class QuoteController @Autowired constructor(
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
 
         return when(val signedQuoteOrError = quoteService.signQuote(completeQuoteId, body)) {
-            is Either.Left -> ResponseEntity.status(402).body(signedQuoteOrError.a)
+            is Either.Left -> ResponseEntity.status(422).body(signedQuoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(signedQuoteOrError.b)
         }
     }
