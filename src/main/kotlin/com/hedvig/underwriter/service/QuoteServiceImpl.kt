@@ -42,7 +42,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -54,19 +54,19 @@ class QuoteServiceImpl @Autowired constructor(
 
         if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
+            completeQuote.quoteValidUntil = LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC)
             completeQuoteRepository.save(completeQuote)
-            val dateValidTo =
-            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!,  LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC)))
+            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!, completeQuote.quoteValidUntil))
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
 
-        return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
+        return Either.left(ErrorResponseDto(ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES, "quote cannot be calculated, underwriting guidelines are breached"))
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorQuoteResponseDto, SignedQuoteResponseDto> {
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto> {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
             if (body.name != null) {
@@ -92,6 +92,10 @@ class QuoteServiceImpl @Autowired constructor(
 
             val memberServiceSignedQuote =
                     this.memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+
+            if (Instant.now().isAfter(completeQuote.quoteValidUntil)) {
+                return Either.Left(ErrorResponseDto(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "cannot sign quote it has expired"))
+            }
 
             return when(memberServiceSignedQuote) {
                 is Either.Left -> {

@@ -1,11 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import arrow.core.Either
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
-import com.hedvig.underwriter.web.Dtos.ErrorQuoteResponseDto
-import feign.FeignException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service

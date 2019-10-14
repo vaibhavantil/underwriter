@@ -6,13 +6,12 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.ErrorQuoteResponseDto
+import com.hedvig.underwriter.web.Dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 import feign.FeignException
-import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestClientResponseException
 import java.lang.RuntimeException
 
@@ -25,13 +24,13 @@ class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
         this.client.updateMemberSsn(memberId, request)
     }
 
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorQuoteResponseDto, UnderwriterQuoteSignResponse> {
+    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
         try {
             val response = this.client.signQuote(memberId, request)
             return Either.right(response.body!!)
         } catch (ex: FeignException) {
             if (ex.status() == 422) {
-                val error = objectMapper.readValue<ErrorQuoteResponseDto>(ex.contentUTF8())
+                val error = objectMapper.readValue<ErrorResponseDto>(ex.contentUTF8())
                 return Either.left(error)
             }
         }

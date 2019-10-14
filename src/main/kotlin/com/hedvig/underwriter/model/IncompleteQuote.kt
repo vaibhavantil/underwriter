@@ -9,6 +9,8 @@ import org.hibernate.annotations.TypeDef
 import org.hibernate.annotations.TypeDefs
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 import javax.persistence.*
 
@@ -64,6 +66,7 @@ class IncompleteQuote (
                                         incompleteQuote = this,
                                         quoteState = this.quoteState,
                                         quoteCreatedAt = Instant.now(),
+                                        quoteValidUntil = null,
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
@@ -85,6 +88,7 @@ class IncompleteQuote (
                                         incompleteQuote = this,
                                         quoteState = this.quoteState,
                                         quoteCreatedAt = Instant.now(),
+                                        quoteValidUntil = null,
                                         productType = this.productType,
                                         lineOfBusiness = this.lineOfBusiness!!,
                                         price = null,
