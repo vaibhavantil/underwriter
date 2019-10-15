@@ -1,17 +1,13 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.CompleteQuote
-import com.hedvig.underwriter.model.DateWithZone
-import com.hedvig.underwriter.model.IncompleteQuote
-import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.repository.CompleteQuoteRepository
-import com.hedvig.underwriter.repository.IncompleteQuoteRepository
+import arrow.core.Left
+import arrow.core.Right
+import com.hedvig.underwriter.model.*
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.web.Dtos.*
-import org.springframework.beans.factory.annotation.Autowired
+import com.hedvig.underwriter.web.dtos.*
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -19,80 +15,88 @@ import javax.transaction.Transactional
 
 @Transactional
 @Service
-class QuoteServiceImpl @Autowired constructor(
-        val incompleteQuoteRepository: IncompleteQuoteRepository,
-        val completeQuoteRepository: CompleteQuoteRepository,
-        val quoteBuilderService: QuoteBuilderService,
-        val debtChecker: DebtChecker,
-        val uwGuidelinesChecker: UwGuidelinesChecker,
-        val memberService: MemberService,
-        val productPricingService: ProductPricingService
+class QuoteServiceImpl(
+    val debtChecker: DebtChecker,
+    val memberService: MemberService,
+    val productPricingService: ProductPricingService,
+    val quoteRepository: QuoteRepository
 ) : QuoteService {
 
-    override fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto {
-        val incompleteQuote = incompleteQuoteRepository.save(IncompleteQuote.from(incompleteincompleteQuoteDto))
-        return IncompleteQuoteResponseDto(incompleteQuote.id!!, incompleteQuote.productType, incompleteQuote.quoteInitiatedFrom)
+    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID) {
+        val quote = quoteRepository.load(id)
+        quote!!.update(incompleteQuoteDto)
+        quoteRepository.save(quote)
+    }
+
+    override fun createQuote(incompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto {
+        val quote = Quote(
+            UUID.randomUUID(),
+            QuoteState.INCOMPLETE,
+            Instant.now(),
+            incompleteQuoteDto.productType,
+            QuoteInitiatedFrom.PARTNER,
+            HomeData()
+        )
+
+        quote.update(incompleteQuoteDto)
+        quoteRepository.insert(quote)
+
+        return IncompleteQuoteResponseDto(quote.id, quote.productType, quote.initiatedFrom)
     }
 
 
-    override fun getCompleteQuote(completeQuoteId: UUID): CompleteQuote {
-        val optionalQuote: Optional<CompleteQuote> = completeQuoteRepository.findById(completeQuoteId)
-        if (!optionalQuote.isPresent) throw RuntimeException("No complete quote found with id $completeQuoteId")
-        return optionalQuote.get()
-
+    override fun getQuote(completeQuoteId: UUID): Quote {
+        return quoteRepository.load(completeQuoteId)
+            ?: throw RuntimeException("No complete quote found with id $completeQuoteId")
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
+    override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
 
-        val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
-        val completeQuote = incompleteQuote.complete()
+        val quote = quoteRepository.load(incompleteQuoteId)
 
-        val debtCheckPassed = completeQuote.passedDebtCheck(debtChecker)
-        val uwGuidelinesPassed = completeQuote.passedUnderwritingGuidelines(uwGuidelinesChecker)
+        val completeQuote = quote!!.complete(debtChecker, productPricingService)
 
-        if(!completeQuote.memberIsOver30()) completeQuote.reasonQuoteCannotBeCompleted += "member is younger than 18"
-
-        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
-            completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
-            completeQuoteRepository.save(completeQuote)
-            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
+        return when(completeQuote) {
+            is Either.Left -> Left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
+            is Either.Right -> {
+                quoteRepository.save(completeQuote.b)
+                Right(CompleteQuoteResponseDto(completeQuote.b.id, completeQuote.b.price!!))
+            }
         }
-        completeQuoteRepository.save(completeQuote)
-
-        incompleteQuote.quoteState = QuoteState.QUOTED
-        incompleteQuoteRepository.save(incompleteQuote)
-
-        return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
     }
 
     override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
         try {
-            val completeQuote = getCompleteQuote(completeQuoteId)
-            if (body.name != null) {
-                completeQuote.firstName = body.name.firstName
-                completeQuote.lastName = body.name.lastName
-            }
+            val quote = getQuote(completeQuoteId)
+            val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
+                quote.copy( data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+            } else { quote }
 
-            when {
+            val updatedStartTime = when {
                 body.startDateWithZone != null -> {
                     val startDateWithZone: DateWithZone = body.startDateWithZone
-                    completeQuote.startDate =
-                            startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime()
+                    updatedName.copy(startDate =
+                            startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime())
                 }
-                else -> completeQuote.startDate = null
+                else -> updatedName.copy(startDate = null)
             }
 
             val memberId = memberService.createMember()
 
-            memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
+            if(updatedStartTime.data is PersonPolicyHolder<*>) {
+                memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = updatedStartTime.data.ssn!!))
+            }
 
             val signedQuoteId =
-                    productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
+                    productPricingService.createProduct(updatedStartTime.getRapioQuoteRequestDto(body.email), memberId).id
 
-            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+            if(updatedStartTime.data is PersonPolicyHolder<*>) {
+                memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(updatedStartTime.data.ssn!!))
+            }
 
-            completeQuote.quoteState = QuoteState.SIGNED
-            completeQuoteRepository.save(completeQuote)
+
+            val signedQuote = updatedStartTime.copy(state = QuoteState.SIGNED)
+            quoteRepository.save(signedQuote)
 
             return SignedQuoteResponseDto(signedQuoteId, Instant.now())
 

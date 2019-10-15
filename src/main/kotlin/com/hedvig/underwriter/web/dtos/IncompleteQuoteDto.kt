@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.web.Dtos;
+package com.hedvig.underwriter.web.dtos;
 
 import com.hedvig.underwriter.model.*;
 
@@ -6,18 +6,18 @@ import java.time.Instant;
 import java.time.LocalDate
 
 data class IncompleteQuoteDto (
-        val quoteState: QuoteState,
-        val createdAt: Instant,
-        val productType: ProductType,
-        val lineOfBusiness: LineOfBusiness?,
-        val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
-        val quoteInitiatedFrom: QuoteInitiatedFrom?,
-        var firstName: String?,
-        var lastName: String?,
-        var currentInsurer: String?,
-        val birthDate: LocalDate?,
-        val isStudent: Boolean?,
-        val ssn: String?
+    val quoteState: QuoteState,
+    val createdAt: Instant,
+    val productType: ProductType,
+    val homeProductSubType: HomeProductSubType?,
+    val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
+    val quoteInitiatedFrom: QuoteInitiatedFrom?,
+    var firstName: String?,
+    var lastName: String?,
+    var currentInsurer: String?,
+    val birthDate: LocalDate?,
+    val isStudent: Boolean?,
+    val ssn: String?
 )
 
 data class IncompleteQuoteDataDto(

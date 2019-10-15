@@ -12,17 +12,17 @@ class ProductPricingServiceImpl @Autowired constructor(
 ): ProductPricingService {
 
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
-        val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body?.price
+        val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
     }
 
     override fun priceFromProductPricingForHomeQuote(homeQuotePriceDto: HomeQuotePriceDto): QuotePriceResponseDto {
-        val price = this.productPricingClient.priceFromProductPricingForHomeQuote(homeQuotePriceDto).body?.price
+        val price = this.productPricingClient.priceFromProductPricingForHomeQuote(homeQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
     }
 
-    override fun createProduct(rapioQuoteRequestDto: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
-        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequestDto, memberId)
+    override fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
+        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequest, memberId)
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }

@@ -1,8 +1,6 @@
-package com.hedvig.underwriter.web.Dtos
+package com.hedvig.underwriter.web.dtos
 
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 data class ChooseActiveFromDto (
         val activeFrom: LocalDateTime

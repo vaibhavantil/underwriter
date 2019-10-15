@@ -3,7 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
+import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service

@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.web.Dtos
+package com.hedvig.underwriter.web.dtos
 
 data class UnderwriterQuoteSignRequest(
         val ssn: String

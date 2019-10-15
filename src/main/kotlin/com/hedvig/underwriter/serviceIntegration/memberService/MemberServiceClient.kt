@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
+import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import org.springframework.web.bind.annotation.*
 
 

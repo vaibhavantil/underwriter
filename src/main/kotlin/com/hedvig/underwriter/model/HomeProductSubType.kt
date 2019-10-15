@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.model
 
-enum class LineOfBusiness {
+enum class HomeProductSubType {
     BRF,
     RENT,
     RENT_BRF,

@@ -15,4 +15,5 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/underwriter
     username: postgres
+  liquibase.change-log: classpath:/db/changelog/changelog-master.yml
 

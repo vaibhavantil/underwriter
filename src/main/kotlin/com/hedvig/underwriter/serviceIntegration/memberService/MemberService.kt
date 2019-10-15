@@ -2,9 +2,8 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateContactInformationRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
+import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -13,7 +12,7 @@ interface MemberService {
     val logger: Logger
         get() = LoggerFactory.getLogger("MemberService")
 
-    fun createMember(): String?
+    fun createMember(): String
 
     fun checkPersonDebt(ssn: String)
 

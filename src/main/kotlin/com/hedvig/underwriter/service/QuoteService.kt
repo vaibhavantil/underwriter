@@ -1,16 +1,16 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.CompleteQuote
-import com.hedvig.underwriter.web.Dtos.*
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.web.dtos.*
 import java.util.*
 
 interface QuoteService {
-    fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto>
-
-    fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto
+    fun completeQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto>
 
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto
 
-    fun getCompleteQuote(completeQuoteId: UUID): CompleteQuote
+    fun getQuote(completeQuoteId: UUID): Quote
+    fun createQuote(incompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto
+    fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID)
 }
