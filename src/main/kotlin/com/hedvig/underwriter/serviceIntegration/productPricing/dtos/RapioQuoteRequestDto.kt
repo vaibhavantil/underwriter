@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.hedvig.underwriter.model.LineOfBusiness
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,5 +20,6 @@ data class RapioQuoteRequestDto(
         val activeFrom: LocalDateTime?,
         val ssn: String,
         val emailAddress: String,
-        val phoneNumber: String
+        val phoneNumber: String,
+        val quoteInitiatedFrom: QuoteInitiatedFrom
 )
