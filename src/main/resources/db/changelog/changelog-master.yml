@@ -1,5 +1,5 @@
 databaseChangeLog:
-  - logicalFilePath: changelog.xml
-  #- include:
-  #    file: ./migrations/20190904-1056-create-start.sql
-  #    relativeToChangelogFile: true
+#  - logicalFilePath: changelog.xml
+  - include:
+      file: ./migrations/20191014-1600-palmens-test.sql
+      relativeToChangelogFile: true
