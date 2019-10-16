@@ -36,6 +36,7 @@ class CompleteQuote (
         @Enumerated(EnumType.STRING)
         var quoteState: QuoteState = QuoteState.QUOTED,
         val quoteCreatedAt: Instant,
+        var quoteValidUntil: Instant?,
 
         @Enumerated(EnumType.STRING)
         val productType: ProductType = ProductType.UNKNOWN,

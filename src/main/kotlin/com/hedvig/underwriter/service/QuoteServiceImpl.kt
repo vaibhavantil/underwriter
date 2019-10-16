@@ -13,7 +13,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.web.Dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.Instant
+import java.time.*
 import java.util.*
 import javax.transaction.Transactional
 
@@ -42,7 +42,7 @@ class QuoteServiceImpl @Autowired constructor(
 
     }
 
-    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
+    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
 
         val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
         val completeQuote = incompleteQuote.complete()
@@ -54,18 +54,19 @@ class QuoteServiceImpl @Autowired constructor(
 
         if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
             completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
+            completeQuote.quoteValidUntil = LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC)
             completeQuoteRepository.save(completeQuote)
-            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!))
+            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!, completeQuote.quoteValidUntil))
         }
         completeQuoteRepository.save(completeQuote)
 
         incompleteQuote.quoteState = QuoteState.QUOTED
         incompleteQuoteRepository.save(incompleteQuote)
 
-        return Either.left(ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached"))
+        return Either.left(ErrorResponseDto(ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES, "quote cannot be calculated, underwriting guidelines are breached"))
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
+    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto> {
         try {
             val completeQuote = getCompleteQuote(completeQuoteId)
             if (body.name != null) {
@@ -89,13 +90,25 @@ class QuoteServiceImpl @Autowired constructor(
             val signedQuoteId =
                     productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
 
-            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
+            val memberServiceSignedQuote =
+                    this.memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
 
-            completeQuote.quoteState = QuoteState.SIGNED
-            completeQuoteRepository.save(completeQuote)
+            if (Instant.now().isAfter(completeQuote.quoteValidUntil)) {
+                return Either.Left(ErrorResponseDto(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "cannot sign quote it has expired"))
+            }
 
-            return SignedQuoteResponseDto(signedQuoteId, Instant.now())
+            return when(memberServiceSignedQuote) {
+                is Either.Left -> {
+                    Either.Left(memberServiceSignedQuote.a)
+                }
+                is Either.Right -> {
 
+                    completeQuote.quoteState = QuoteState.SIGNED
+                    completeQuoteRepository.save(completeQuote)
+
+                    Either.Right(SignedQuoteResponseDto(signedQuoteId, Instant.now()))
+                }
+            }
         } catch(exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }

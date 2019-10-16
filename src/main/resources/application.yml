@@ -15,4 +15,5 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/underwriter
     username: postgres
+  jackson.deserialization.read-unknown-enum-values-using-default-value: true
 
