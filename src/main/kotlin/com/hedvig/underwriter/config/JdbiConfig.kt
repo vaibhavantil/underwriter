@@ -10,21 +10,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class JdbiConfig(
-    private val dataSource: DataSource
-) {
+class JdbiConfig {
     @Bean
-    fun jdbi(): Jdbi {
-        return Jdbi.create(dataSource)
-            .installPlugin(PostgresPlugin())
-            .installPlugin(KotlinPlugin())
-            .installPlugin(KotlinSqlObjectPlugin())
-            .installPlugin(SqlObjectPlugin())
-            // .registerColumnMapper(MoneyMapper())
-            // .registerArgument(MoneyArgumentFactory())
-            // .registerColumnMapper(MonthMapper())
-            // .registerArgument(MonthArgumentFactory())
-            // .registerColumnMapper(YearMapper())
-            // .registerArgument(YearArgumentFactory())
-    }
+    fun jdbi(dataSource: DataSource): Jdbi = Jdbi.create(dataSource).install()
 }
+
+fun Jdbi.install(): Jdbi = this.installPlugin(PostgresPlugin())
+    .installPlugin(KotlinPlugin())
+    .installPlugin(KotlinSqlObjectPlugin())
+    .installPlugin(SqlObjectPlugin())
