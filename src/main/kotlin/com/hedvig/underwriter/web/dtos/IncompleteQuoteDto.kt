@@ -1,11 +1,13 @@
-package com.hedvig.underwriter.web.dtos;
+package com.hedvig.underwriter.web.dtos
 
-import com.hedvig.underwriter.model.*;
-
-import java.time.Instant;
+import com.hedvig.underwriter.model.HomeProductSubType
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteState
+import java.time.Instant
 import java.time.LocalDate
 
-data class IncompleteQuoteDto (
+data class IncompleteQuoteDto(
     val quoteState: QuoteState,
     val createdAt: Instant,
     val productType: ProductType,
@@ -21,26 +23,25 @@ data class IncompleteQuoteDto (
 )
 
 data class IncompleteQuoteDataDto(
-        val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto?,
-        val incompleteHomeQuoteDataDto: IncompleteHomeQuoteDataDto?
+    val incompleteHouseQuoteDataDto: IncompleteHouseQuoteDataDto?,
+    val incompleteHomeQuoteDataDto: IncompleteHomeQuoteDataDto?
 )
 
 data class IncompleteHouseQuoteDataDto(
-        val street: String?,
-        val zipCode: String?,
-        val city: String?,
-        val livingSpace: Int?,
-        val houseHoldSize: Int?,
-        val personalNumber: String?,
-        val householdSize: Int?
+    val street: String?,
+    val zipCode: String?,
+    val city: String?,
+    val livingSpace: Int?,
+    val houseHoldSize: Int?,
+    val personalNumber: String?,
+    val householdSize: Int?
 )
 
 data class IncompleteHomeQuoteDataDto(
-        var street: String?,
-        var zipCode: String?,
-        var city: String?,
-        var livingSpace: Int?,
-        var houseHoldSize: Int?,
-        var floor: Int?
+    var street: String?,
+    var zipCode: String?,
+    var city: String?,
+    var livingSpace: Int?,
+    var houseHoldSize: Int?,
+    var floor: Int?
 )
-

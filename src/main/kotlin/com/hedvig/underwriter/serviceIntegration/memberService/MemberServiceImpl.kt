@@ -4,21 +4,21 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatus
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import feign.FeignException
+import java.lang.RuntimeException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
-import feign.FeignException
 import org.springframework.web.client.RestClientResponseException
-import java.lang.RuntimeException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient): MemberService {
+class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient) : MemberService {
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
     }
 
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest):UnderwriterQuoteSignResponse {
+    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): UnderwriterQuoteSignResponse {
         val sign = this.client.signQuote(memberId, request).body
             if (sign != null) return sign else throw RuntimeException("Cannot sign quote")
     }

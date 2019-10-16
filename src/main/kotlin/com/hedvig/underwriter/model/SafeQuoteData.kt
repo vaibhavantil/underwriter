@@ -9,22 +9,21 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         JsonSubTypes.Type(value = SafeQuoteData.HouseData::class, name = "house")
 )
 sealed class SafeQuoteData {
-    data class HouseData (
-            val street: String,
-            val zipCode: String,
-            val city: String,
-            val livingSpace: Int,
-            val householdSize: Int
-    ): SafeQuoteData()
+    data class HouseData(
+        val street: String,
+        val zipCode: String,
+        val city: String,
+        val livingSpace: Int,
+        val householdSize: Int
+    ) : SafeQuoteData()
 
     data class HomeData(
-            val street: String,
-            val zipCode: String,
-            val city: String,
-            val livingSpace: Int,
-            val householdSize: Int
-    ): SafeQuoteData()
-
+        val street: String,
+        val zipCode: String,
+        val city: String,
+        val livingSpace: Int,
+        val householdSize: Int
+    ) : SafeQuoteData()
 
     companion object
 }

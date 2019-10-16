@@ -1,9 +1,9 @@
-package com.hedvig.underwriter.serviceIntegration.productPricing.dtos;
+package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.HomeProductSubType;
+import com.hedvig.underwriter.model.HomeProductSubType
 import java.time.LocalDate
 
-data class HomeQuotePriceDto (
+data class HomeQuotePriceDto(
     var birthDate: LocalDate,
     var livingSpace: Int,
     var houseHoldSize: Int,

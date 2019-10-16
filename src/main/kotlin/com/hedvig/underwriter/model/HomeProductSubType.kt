@@ -11,4 +11,3 @@ enum class HomeProductSubType {
     LODGER,
     UNKNOWN
 }
-

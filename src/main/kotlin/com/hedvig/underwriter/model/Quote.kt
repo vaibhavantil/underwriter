@@ -15,7 +15,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 fun String.birthDateFromSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
@@ -80,7 +80,7 @@ data class Quote(
     }
 
     fun update(incompleteQuoteDto: PostIncompleteQuoteRequest) {
-        //FIX update logic
+        // FIX update logic
     }
 
     fun complete(
@@ -88,7 +88,7 @@ data class Quote(
         productPricingService: ProductPricingService
     ): Either<MutableList<String>, Quote> {
 
-        val quoteData = this.data;
+        val quoteData = this.data
         val errorStrings = mutableListOf<String>()
 
         errorStrings.addAll(quoteData.passUwGuidelines())
@@ -99,7 +99,7 @@ data class Quote(
             if (!quoteData.ssnIsValid())
                 errorStrings.add("invalid ssn")
 
-            if(errorStrings.isEmpty()) {
+            if (errorStrings.isEmpty()) {
                 errorStrings.addAll(debtChecker.passesDebtCheck(quoteData))
             }
         }
@@ -112,7 +112,7 @@ data class Quote(
     }
 
     fun update(incompleteQuoteDto: IncompleteQuoteDto) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     companion object {
@@ -141,9 +141,3 @@ data class Quote(
         }
     }
 }
-
-
-
-
-
-

@@ -22,7 +22,6 @@ sealed class QuoteData {
     abstract fun passUwGuidelines(): List<String>
 }
 
-
 interface PersonPolicyHolder<T : QuoteData> {
     val ssn: String?
     val firstName: String?
@@ -40,7 +39,7 @@ interface PersonPolicyHolder<T : QuoteData> {
         val trimmedInput = ssn!!.trim().replace("-", "").replace(" ", "")
 
         if (trimmedInput.length != 12) {
-            //reasonQuoteCannotBeCompleted += "ssn not valid"
+            // reasonQuoteCannotBeCompleted += "ssn not valid"
             return false
         }
 
@@ -52,7 +51,7 @@ interface PersonPolicyHolder<T : QuoteData> {
                 ) + "-" + trimmedInput.substring(6, 8)
             )
         } catch (exception: Exception) {
-            //reasonQuoteCannotBeCompleted += "ssn not valid"
+            // reasonQuoteCannotBeCompleted += "ssn not valid"
             return false
         }
         return true
@@ -101,7 +100,6 @@ data class HomeData(
     override fun updateName(firstName: String, lastName: String): HomeData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
-
 
     override fun passUwGuidelines(): List<String> {
         val errors = mutableListOf<String>()

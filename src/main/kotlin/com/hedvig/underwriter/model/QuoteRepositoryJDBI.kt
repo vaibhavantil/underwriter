@@ -1,10 +1,10 @@
 package com.hedvig.underwriter.model
 
+import java.util.UUID
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.onDemand
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Profile("runtime")
 @Component

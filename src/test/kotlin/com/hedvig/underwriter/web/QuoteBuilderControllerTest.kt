@@ -1,7 +1,14 @@
-package com.hedvig.underwriter.web;
+package com.hedvig.underwriter.web
 
-import com.hedvig.underwriter.model.*
+import com.hedvig.underwriter.model.HomeProductSubType
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SafeQuoteData
 import com.hedvig.underwriter.service.QuoteService
+import java.time.Instant
+import java.util.UUID
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,8 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.Instant
-import java.util.*
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteBuilderController::class], secure = false)
@@ -68,7 +73,7 @@ internal class QuoteBuilderControllerTest {
             safeQuoteData = SafeQuoteData.HomeData(
                         street = "123 Baker street",
                         city = "Stockholm",
-                        //numberOfRooms = 3,
+                        // numberOfRooms = 3,
                         zipCode = "11216",
                         householdSize = 1,
                 livingSpace = 33
@@ -94,7 +99,7 @@ internal class QuoteBuilderControllerTest {
                 .andExpect(status().is2xxSuccessful)
                 .andExpect(jsonPath("quoteState").value("INCOMPLETE"))
                 .andExpect(jsonPath("productType").value("HOME"))
-                .andExpect(jsonPath("incompleteQuoteData.numberOfRooms").value(3));
+                .andExpect(jsonPath("incompleteQuoteData.numberOfRooms").value(3))
     }
 
     @Ignore
@@ -109,7 +114,7 @@ internal class QuoteBuilderControllerTest {
                 productType = ProductType.HOME,
                 safeQuoteData = SafeQuoteData.HomeData(
                         street = "123 Baker street",
-                        //numberOfRooms = 3,
+                        // numberOfRooms = 3,
                         zipCode = "11216",
                         livingSpace = 33,
                         householdSize = 4,
@@ -139,5 +144,4 @@ internal class QuoteBuilderControllerTest {
     fun shouldNotCompleteQuoteIfDataIsIncomplete() {
 //        TODO
     }
-
 }

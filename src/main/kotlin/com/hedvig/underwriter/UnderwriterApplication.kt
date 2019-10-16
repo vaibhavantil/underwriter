@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class UnderwriterApplication
 
 fun main(args: Array<String>) {
-	runApplication<UnderwriterApplication>(*args)
+    runApplication<UnderwriterApplication>(*args)
 }

@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.model
 
+import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
-import java.util.*
 
 interface QuoteJDBIDao {
 
