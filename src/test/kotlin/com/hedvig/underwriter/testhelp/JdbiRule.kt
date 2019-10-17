@@ -1,7 +1,10 @@
 package com.hedvig.underwriter.testhelp
 
-import com.hedvig.underwriter.testhelp.EmbeddedPostgresSingleton.embeddedPostgres
 import com.hedvig.underwriter.config.install
+import com.hedvig.underwriter.testhelp.EmbeddedPostgresSingleton.embeddedPostgres
+import java.sql.SQLException
+import java.util.Locale
+import javax.sql.DataSource
 import liquibase.Contexts
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory.getInstance
@@ -13,9 +16,6 @@ import org.jdbi.v3.core.Jdbi
 import org.junit.rules.ExternalResource
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.stereotype.Component
-import java.sql.SQLException
-import java.util.Locale
-import javax.sql.DataSource
 
 @ComponentScan
 @Component

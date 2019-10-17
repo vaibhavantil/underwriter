@@ -1,21 +1,26 @@
 package com.hedvig.underwriter.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = HomeData::class, name = "home"),
+    JsonSubTypes.Type(value = ApartmentData::class, name = "home"),
     JsonSubTypes.Type(value = HouseData::class, name = "house")
 )
 sealed class QuoteData {
+    abstract val isComplete: Boolean
+    abstract val id: UUID
+
     fun productType(): ProductType {
         return when (this) {
             is HouseData -> ProductType.HOUSE
-            is HomeData -> ProductType.HOME
+            is ApartmentData -> ProductType.HOME
         }
     }
 
@@ -67,6 +72,7 @@ interface HomeInsurance {
 }
 
 data class HouseData(
+    override val id: UUID,
     override val ssn: String?,
     override val firstName: String?,
     override val lastName: String?,
@@ -77,12 +83,20 @@ data class HouseData(
     override var livingSpace: Int?,
     override var householdSize: Int?
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<HouseData> {
+    @get:JsonIgnore
+    override val isComplete: Boolean
+        get() = when (null) {
+            ssn, firstName, lastName, street, zipCode, householdSize, livingSpace -> false
+            else -> true
+        }
+
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
 
     override fun passUwGuidelines() = listOf("You shall not pass!")
 }
 
-data class HomeData(
+data class ApartmentData(
+    override val id: UUID,
     override val ssn: String? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
@@ -93,11 +107,20 @@ data class HomeData(
     override val householdSize: Int? = null,
     override val livingSpace: Int? = null,
 
-    @get:JsonProperty(value = "isStudent")
-    val isStudent: Boolean = false,
     val subType: HomeProductSubType? = null
-) : QuoteData(), HomeInsurance, PersonPolicyHolder<HomeData> {
-    override fun updateName(firstName: String, lastName: String): HomeData {
+) : QuoteData(), HomeInsurance, PersonPolicyHolder<ApartmentData> {
+    @get:JsonIgnore
+    override val isComplete: Boolean
+        get() = when (null) {
+            ssn, firstName, lastName, street, zipCode, householdSize, livingSpace, subType -> false
+            else -> true
+        }
+
+    @get:JsonProperty(value = "isStudent")
+    val isStudent: Boolean
+        get() = subType == HomeProductSubType.STUDENT_BRF || subType == HomeProductSubType.STUDENT_RENT
+
+    override fun updateName(firstName: String, lastName: String): ApartmentData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
 

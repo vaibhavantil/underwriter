@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.config
 
+import javax.sql.DataSource
 import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
@@ -7,7 +8,6 @@ import liquibase.resource.ClassLoaderResourceAccessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import javax.sql.DataSource
 
 @Configuration
 class LiquibaseConfig {

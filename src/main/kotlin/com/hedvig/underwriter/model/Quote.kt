@@ -10,11 +10,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePr
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
-import com.hedvig.underwriter.web.dtos.PostIncompleteQuoteRequest
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 fun String.birthDateFromSsn(): LocalDate {
@@ -27,50 +25,114 @@ fun String.birthDateFromSsn(): LocalDate {
     )
 }
 
+data class DatabaseQuote(
+    val id: UUID,
+    val createdAt: Instant,
+    val quotedAt: Instant?,
+    val signedAt: Instant?,
+    val validity: Long,
+    val productType: ProductType = ProductType.UNKNOWN,
+    val initiatedFrom: QuoteInitiatedFrom,
+
+    val currentInsurer: String? = "",
+
+    val startDate: LocalDate? = null,
+
+    val price: BigDecimal? = null,
+    val quoteApartmentDataId: UUID?,
+    val quoteHouseDataId: UUID?
+) {
+
+    companion object {
+        fun from(quote: Quote) =
+            DatabaseQuote(
+                id = quote.id,
+                quoteApartmentDataId = when (quote.data) {
+                    is ApartmentData -> quote.data.id
+                    else -> null
+                },
+                quoteHouseDataId = when (quote.data) {
+                    is HouseData -> quote.data.id
+                    else -> null
+                },
+                createdAt = quote.createdAt,
+                quotedAt = quote.quotedAt,
+                signedAt = quote.signedAt,
+                validity = quote.validity,
+                price = quote.price,
+                currentInsurer = quote.currentInsurer,
+                initiatedFrom = quote.initiatedFrom,
+                productType = quote.productType,
+                startDate = quote.startDate
+            )
+    }
+}
+
+const val ONE_DAY = 86_400L
+
 data class Quote(
     val id: UUID,
-    val state: QuoteState = QuoteState.QUOTED,
     val createdAt: Instant,
+    val price: BigDecimal? = null,
     val productType: ProductType = ProductType.UNKNOWN,
     val initiatedFrom: QuoteInitiatedFrom,
 
     val data: QuoteData,
 
-    val currentInsurer: String? = "",
+    val currentInsurer: String? = null,
 
-    val startDate: LocalDateTime? = null,
+    val startDate: LocalDate? = null,
 
-    val price: BigDecimal? = null
+    val quotedAt: Instant? = null,
+    val signedAt: Instant? = null,
+    val validity: Long = ONE_DAY * 30
 ) {
+    val isComplete: Boolean
+        get() = when {
+            price == null -> false
+            productType == ProductType.UNKNOWN -> false
+            !data.isComplete -> false
+            currentInsurer == null -> false
+            else -> true
+        }
+    val state: QuoteState
+        get() = when (signedAt) {
+            null -> when {
+                createdAt.plusSeconds(validity).isAfter(Instant.now()) -> QuoteState.EXPIRED
+                !isComplete -> QuoteState.INCOMPLETE
+                else -> QuoteState.QUOTED
+            }
+            else -> QuoteState.SIGNED
+        }
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
         return when (this.data) {
-            is HomeData -> productPricingService.priceFromProductPricingForHomeQuote(homeQuotePriceDto(this)).price
+            is ApartmentData -> productPricingService.priceFromProductPricingForHomeQuote(homeQuotePriceDto(this)).price
             is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(houseQuotePriceDto(this)).price
         }
     }
 
     fun getRapioQuoteRequestDto(email: String): RapioQuoteRequestDto {
-        return when {
-            this.data is HomeData -> {
+        return when (val data = this.data) {
+            is ApartmentData -> {
                 RapioQuoteRequestDto(
                     this.price!!,
-                    this.data.firstName!!,
-                    this.data.lastName!!,
-                    this.data.ssn!!.birthDateFromSsn(),
+                    data.firstName!!,
+                    data.lastName!!,
+                    data.ssn!!.birthDateFromSsn(),
                     false,
                     Address(
-                        this.data.street!!,
-                        this.data.city!!,
-                        this.data.zipCode!!,
+                        data.street!!,
+                        data.city!!,
+                        data.zipCode!!,
                         0
                     ),
-                    this.data.livingSpace!!.toFloat(),
-                    this.data.subType!!,
-                    this.currentInsurer,
-                    this.data.householdSize!!,
-                    this.startDate,
-                    this.data.ssn,
+                    data.livingSpace!!.toFloat(),
+                    data.subType!!,
+                    currentInsurer,
+                    data.householdSize!!,
+                    startDate?.atStartOfDay(),
+                    data.ssn,
                     email,
                     ""
                 )
@@ -79,14 +141,20 @@ data class Quote(
         }
     }
 
-    fun update(incompleteQuoteDto: PostIncompleteQuoteRequest) {
-        // FIX update logic
-    }
+    fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote = this.copy(
+        data = when (data) {
+            is ApartmentData -> data.copy(
+                firstName = incompleteQuoteDto.firstName ?: data.firstName,
+                lastName = incompleteQuoteDto.lastName ?: data.lastName
+            )
+            is HouseData -> TODO()
+        }
+    )
 
     fun complete(
         debtChecker: DebtChecker,
         productPricingService: ProductPricingService
-    ): Either<MutableList<String>, Quote> {
+    ): Either<List<String>, Quote> {
 
         val quoteData = this.data
         val errorStrings = mutableListOf<String>()
@@ -104,37 +172,41 @@ data class Quote(
             }
         }
 
+        // TODO store errors on quote somehow
         if (errorStrings.isEmpty()) {
-            return Right(this.copy(price = getPriceRetrievedFromProductPricing(productPricingService), state = QuoteState.QUOTED))
+            return Right(
+                this.copy(
+                    price = getPriceRetrievedFromProductPricing(productPricingService),
+                    quotedAt = Instant.now()
+                )
+            )
         }
 
         return Left(errorStrings)
     }
 
-    fun update(incompleteQuoteDto: IncompleteQuoteDto) {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
-    }
-
     companion object {
         private fun homeQuotePriceDto(quote: Quote): HomeQuotePriceDto {
-            if (quote.data is HomeData) {
+            val quote = quote.data
+            if (quote is ApartmentData) {
                 return HomeQuotePriceDto(
-                    birthDate = quote.data.ssn!!.birthDateFromSsn(),
-                    livingSpace = quote.data.livingSpace!!,
-                    houseHoldSize = quote.data.householdSize!!,
-                    zipCode = quote.data.zipCode!!,
-                    houseType = quote.data.subType!!,
-                    isStudent = quote.data.isStudent
+                    birthDate = quote.ssn!!.birthDateFromSsn(),
+                    livingSpace = quote.livingSpace!!,
+                    houseHoldSize = quote.householdSize!!,
+                    zipCode = quote.zipCode!!,
+                    houseType = quote.subType!!,
+                    isStudent = quote.isStudent
                 )
             }
             throw RuntimeException("missing data cannot create home quote price dto")
         }
 
         private fun houseQuotePriceDto(completeQuote: Quote): HouseQuotePriceDto {
-            if (completeQuote.data is HouseData) {
+            val completeQuoteData = completeQuote.data
+            if (completeQuoteData is HouseData) {
                 //  TODO: complete
                 return HouseQuotePriceDto(
-                    birthDate = completeQuote.data.ssn!!.birthDateFromSsn()
+                    birthDate = completeQuoteData.ssn!!.birthDateFromSsn()
                 )
             }
             throw RuntimeException("missing data cannot create house quote price dto")

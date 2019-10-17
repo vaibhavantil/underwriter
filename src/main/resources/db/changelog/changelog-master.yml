@@ -1,5 +1,5 @@
 databaseChangeLog:
 #  - logicalFilePath: changelog.xml
   - include:
-      file: ./migrations/20191014-1600-palmens-test.sql
+      file: ./migrations/20191016-1600-create-quotes.sql
       relativeToChangelogFile: true

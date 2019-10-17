@@ -1,9 +1,12 @@
 package com.hedvig.underwriter.web
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import java.util.UUID
@@ -24,6 +27,20 @@ class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
     val memberService: MemberService
 ) {
+    @PostMapping
+    fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteResponseDto> {
+        val quote = quoteService.createQuote(incompleteQuoteDto)
+        return ResponseEntity.ok(quote)
+    }
+
+    @PostMapping("/{incompleteQuoteId}/completeQuote")
+    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
+
+        return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId)) {
+            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
+            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
+        }
+    }
 
     @GetMapping("/{id}")
     fun getQuote(@PathVariable id: UUID): ResponseEntity<Quote> {
@@ -34,13 +51,22 @@ class QuoteController @Autowired constructor(
 
     @PatchMapping("/{id}")
     fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteDto> {
-        quoteService.updateQuote(incompleteQuoteDto, id)
-        return ResponseEntity.ok(incompleteQuoteDto)
+        throw TODO("Idk what to do with this /palmen")
+//        return try {
+//            quoteService.updateQuote(incompleteQuoteDto, id)
+//            ResponseEntity.ok(incompleteQuoteDto)
+//        } catch (e: QuoteNotFoundException) {
+//            ResponseEntity.notFound().build()
+//        }
     }
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto> {
-        val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
-        return ResponseEntity.ok(signedQuoteResponseDto)
+        return try {
+            val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
+            ResponseEntity.ok(signedQuoteResponseDto)
+        } catch (e: QuoteNotFoundException) {
+            ResponseEntity.notFound().build()
+        }
     }
 }

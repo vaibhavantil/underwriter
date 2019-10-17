@@ -3,22 +3,17 @@ package com.hedvig.underwriter.web.dtos
 import com.hedvig.underwriter.model.HomeProductSubType
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
-import com.hedvig.underwriter.model.QuoteState
-import java.time.Instant
 import java.time.LocalDate
 
 data class IncompleteQuoteDto(
-    val quoteState: QuoteState,
-    val createdAt: Instant,
     val productType: ProductType,
     val homeProductSubType: HomeProductSubType?,
     val incompleteQuoteDataDto: IncompleteQuoteDataDto?,
     val quoteInitiatedFrom: QuoteInitiatedFrom?,
-    var firstName: String?,
-    var lastName: String?,
-    var currentInsurer: String?,
+    val firstName: String?,
+    val lastName: String?,
+    val currentInsurer: String?,
     val birthDate: LocalDate?,
-    val isStudent: Boolean?,
     val ssn: String?
 )
 
