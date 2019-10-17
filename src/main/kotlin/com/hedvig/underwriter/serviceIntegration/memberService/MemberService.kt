@@ -19,7 +19,10 @@ interface MemberService {
 
     fun getPersonStatus(ssn: String): PersonStatusDto
 
-    fun signQuote(memberId: Long, underwriterQuoteSignRequest: UnderwriterQuoteSignRequest): Either<ErrorResponseDto, UnderwriterQuoteSignResponse>
+    fun signQuote(
+        memberId: Long,
+        underwriterQuoteSignRequest: UnderwriterQuoteSignRequest
+    ): Either<ErrorResponseDto, UnderwriterQuoteSignResponse>
 
     fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest)
 }

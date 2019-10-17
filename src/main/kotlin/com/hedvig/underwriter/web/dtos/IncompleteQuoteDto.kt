@@ -1,8 +1,6 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
-import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import java.time.LocalDate
 
 data class IncompleteQuoteDto(

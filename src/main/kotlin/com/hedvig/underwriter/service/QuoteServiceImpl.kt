@@ -21,9 +21,9 @@ import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
-import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.UUID
+import org.springframework.stereotype.Service
 
 @Service
 class QuoteServiceImpl(

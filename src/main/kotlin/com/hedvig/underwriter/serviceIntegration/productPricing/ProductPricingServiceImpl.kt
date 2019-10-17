@@ -25,7 +25,10 @@ class ProductPricingServiceImpl @Autowired constructor(
         return QuotePriceResponseDto(price)
     }
 
-    override fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto {
+    override fun createProduct(
+        rapioQuoteRequest: RapioQuoteRequestDto,
+        memberId: String
+    ): RapioProductCreatedResponseDto {
         val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequest, memberId)
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!

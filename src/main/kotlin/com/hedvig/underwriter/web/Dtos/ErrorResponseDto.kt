@@ -3,8 +3,8 @@ package com.hedvig.underwriter.web.Dtos
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 
 data class ErrorResponseDto(
-        val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
-        val errorMessage: String
+    val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
+    val errorMessage: String
 )
 
 enum class ErrorCodes {

@@ -33,12 +33,14 @@ interface QuoteDao {
     @SqlQuery("""SELECT * FROM quote_apartment_data WHERE id = :id""")
     fun findApartmentQuoteData(@Bind id: UUID): ApartmentData?
 
-    @SqlUpdate("""
+    @SqlUpdate(
+        """
             INSERT INTO quote_house_data
             (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space)
             VALUES
             (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace)
-    """)
+    """
+    )
     fun insert(@BindBean data: HouseData)
 
     @SqlQuery(
@@ -48,7 +50,8 @@ interface QuoteDao {
     )
     fun findHouseQuoteData(@Bind id: UUID): HouseData?
 
-    @SqlUpdate("""
+    @SqlUpdate(
+        """
         UPDATE quotes
             SET
                 quoted_at = :quotedAt,
@@ -63,10 +66,12 @@ interface QuoteDao {
                 quote_house_data_id = :quoteHouseDataId
             WHERE
                 id = :id
-    """)
+    """
+    )
     fun update(@BindBean quote: DatabaseQuote)
 
-    @SqlUpdate("""
+    @SqlUpdate(
+        """
         UPDATE quote_apartment_data 
             SET
                 ssn = :ssn,
@@ -80,10 +85,12 @@ interface QuoteDao {
                 sub_type = :subType
             WHERE
                 id = :id
-    """)
+    """
+    )
     fun update(@BindBean quote: ApartmentData)
 
-    @SqlUpdate("""
+    @SqlUpdate(
+        """
         UPDATE quote_house_data
         SET
             ssn = :ssn,
@@ -96,6 +103,7 @@ interface QuoteDao {
             living_space = :livingSpace
         WHERE
             id = :id
-    """)
+    """
+    )
     fun update(@BindBean quote: HouseData)
 }

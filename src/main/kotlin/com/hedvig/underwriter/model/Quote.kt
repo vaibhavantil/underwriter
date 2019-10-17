@@ -166,7 +166,7 @@ data class Quote(
                     city = apartmentData.city ?: newQuoteData.city,
                     householdSize = apartmentData.householdSize ?: newQuoteData.householdSize,
                     livingSpace = apartmentData.livingSpace ?: newQuoteData.livingSpace,
-                    subType = newQuoteData.subType //TODO
+                    subType = newQuoteData.subType // TODO
                 )
             )
         }

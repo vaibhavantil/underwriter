@@ -1,4 +1,5 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
+
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -15,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestHeader
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
-        name = "memberServiceClient",
-        url = "\${hedvig.member-service.url:member-service}")
+    name = "memberServiceClient",
+    url = "\${hedvig.member-service.url:member-service}"
+)
 interface MemberServiceClient {
 
     @PostMapping("v2/member/helloHedvig")

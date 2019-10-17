@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestHeader
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
-        name = "productPricingClient",
-        url = "\${hedvig.product-pricing.url:product-pricing}")
+    name = "productPricingClient",
+    url = "\${hedvig.product-pricing.url:product-pricing}"
+)
 interface ProductPricingClient {
 
     @PostMapping("/_/insurance/getHomeQuotePrice")

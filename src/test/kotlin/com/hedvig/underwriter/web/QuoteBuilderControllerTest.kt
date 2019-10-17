@@ -7,6 +7,8 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import java.time.Instant
+import java.util.UUID
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,8 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.Instant
-import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)
@@ -70,10 +70,10 @@ internal class QuoteBuilderControllerTest {
             createdAt = Instant.now(),
             productType = ProductType.APARTMENT,
             data = ApartmentData(
-                id=UUID.randomUUID(),
+                id = UUID.randomUUID(),
                 street = "123 Baker street",
                 city = "Stockholm",
-                //numberOfRooms = 3,
+                // numberOfRooms = 3,
                 zipCode = "11216",
                 householdSize = 1,
                 livingSpace = 33,
@@ -117,7 +117,7 @@ internal class QuoteBuilderControllerTest {
                 subType = ApartmentProductSubType.BRF,
                 firstName = "null",
                 lastName = "null",
-                id=UUID.randomUUID()
+                id = UUID.randomUUID()
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
 

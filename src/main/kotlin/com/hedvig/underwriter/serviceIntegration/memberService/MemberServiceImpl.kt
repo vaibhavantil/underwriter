@@ -16,15 +16,19 @@ import org.springframework.web.client.RestClientResponseException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
-                                               val objectMapper: ObjectMapper): MemberService {
+class MemberServiceImpl @Autowired constructor(
+    val client: MemberServiceClient,
+    val objectMapper: ObjectMapper
+) : MemberService {
 
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
     }
 
-
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
+    override fun signQuote(
+        memberId: Long,
+        request: UnderwriterQuoteSignRequest
+    ): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
         try {
             val response = this.client.signQuote(memberId, request)
             return Either.right(response.body!!)
