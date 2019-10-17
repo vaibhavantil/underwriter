@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
@@ -9,8 +10,6 @@ import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
-import java.util.UUID
-import javax.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/_/v1/quote")
@@ -61,9 +62,9 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/sign")
-    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<SignedQuoteResponseDto> {
+    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
         return try {
-            val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body)
+            val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body).getOrHandle { it }
             ResponseEntity.ok(signedQuoteResponseDto)
         } catch (e: QuoteNotFoundException) {
             ResponseEntity.notFound().build()

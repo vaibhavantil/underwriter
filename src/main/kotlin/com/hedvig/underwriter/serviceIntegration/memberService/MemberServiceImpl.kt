@@ -1,11 +1,14 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
+import arrow.core.Either
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.web.Dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.lang.RuntimeException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -13,14 +16,25 @@ import org.springframework.web.client.RestClientResponseException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient) : MemberService {
+class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
+                                               val objectMapper: ObjectMapper): MemberService {
+
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
     }
 
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): UnderwriterQuoteSignResponse {
-        val sign = this.client.signQuote(memberId, request).body
-            if (sign != null) return sign else throw RuntimeException("Cannot sign quote")
+
+    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
+        try {
+            val response = this.client.signQuote(memberId, request)
+            return Either.right(response.body!!)
+        } catch (ex: FeignException) {
+            if (ex.status() == 422) {
+                val error = objectMapper.readValue<ErrorResponseDto>(ex.contentUTF8())
+                return Either.left(error)
+            }
+        }
+        throw RuntimeException("Cannot sign quote")
     }
 
     override fun checkPersonDebt(ssn: String) {

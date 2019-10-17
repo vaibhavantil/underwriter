@@ -9,3 +9,5 @@ spring:
     username: postgres
   liquibase.change-log: classpath:/db/changelog/changelog-master.yml
   liquibase.enabled: false
+  jackson.deserialization.read-unknown-enum-values-using-default-value: true
+

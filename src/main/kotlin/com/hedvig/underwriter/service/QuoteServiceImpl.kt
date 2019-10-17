@@ -1,26 +1,29 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import arrow.core.Right
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.web.Dtos.ErrorCodes
+import com.hedvig.underwriter.web.Dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
-import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.UUID
-import org.springframework.stereotype.Service
 
 @Service
 class QuoteServiceImpl(
@@ -54,13 +57,19 @@ class QuoteServiceImpl(
         return quoteRepository.find(completeQuoteId)
     }
 
-    override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorQuoteResponseDto, CompleteQuoteResponseDto> {
+    override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quote =
-            quoteRepository.find(incompleteQuoteId) ?: return Either.left(ErrorQuoteResponseDto("No such quote"))
+            quoteRepository.find(incompleteQuoteId)
+                ?: return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "No such quote"))
 
         return quote.complete(debtChecker, productPricingService)
             .bimap(
-                { ErrorQuoteResponseDto("quote cannot be calculated, underwriting guidelines are breached") },
+                {
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached"
+                    )
+                },
                 { completeQuote ->
                     quoteRepository.update(completeQuote)
                     CompleteQuoteResponseDto(id = completeQuote.id, price = completeQuote.price!!)
@@ -68,10 +77,23 @@ class QuoteServiceImpl(
             )
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto {
+    override fun signQuote(
+        completeQuoteId: UUID,
+        body: SignQuoteRequest
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
         try {
             val quote = getQuote(completeQuoteId)
                 ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+
+            if (quote.state == QuoteState.EXPIRED) {
+                return Either.Left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
+                        "cannot sign quote it has expired"
+                    )
+                )
+            }
+
             val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
                 quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
             } else {
@@ -103,7 +125,7 @@ class QuoteServiceImpl(
             val signedQuote = updatedStartTime.copy(signedAt = Instant.now())
             quoteRepository.update(signedQuote)
 
-            return SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!)
+            return Right(SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!))
         } catch (exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }
