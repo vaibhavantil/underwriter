@@ -16,6 +16,6 @@ interface QuoteService {
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): SignedQuoteResponseDto
 
     fun getQuote(completeQuoteId: UUID): Quote?
-    fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
+    fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
     fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID)
 }

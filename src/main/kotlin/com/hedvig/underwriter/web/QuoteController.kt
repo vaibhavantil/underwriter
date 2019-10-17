@@ -29,7 +29,7 @@ class QuoteController @Autowired constructor(
 ) {
     @PostMapping
     fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteResponseDto> {
-        val quote = quoteService.createQuote(incompleteQuoteDto)
+        val quote = quoteService.createApartmentQuote(incompleteQuoteDto)
         return ResponseEntity.ok(quote)
     }
 

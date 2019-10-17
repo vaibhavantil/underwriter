@@ -19,7 +19,7 @@ class QuoteRepositoryImplTest {
             createdAt = Instant.now(),
             quotedAt = Instant.now().plusSeconds(1),
             signedAt = Instant.now().plusSeconds(2),
-            productType = ProductType.HOME,
+            productType = ProductType.APARTMENT,
             data = ApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -48,7 +48,7 @@ class QuoteRepositoryImplTest {
             createdAt = Instant.now(),
             quotedAt = Instant.now().plusSeconds(1),
             signedAt = Instant.now().plusSeconds(2),
-            productType = ProductType.HOME,
+            productType = ProductType.APARTMENT,
             data = ApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -87,7 +87,7 @@ class QuoteRepositoryImplTest {
             createdAt = Instant.now(),
             quotedAt = Instant.now().plusSeconds(1),
             signedAt = Instant.now().plusSeconds(2),
-            productType = ProductType.HOME,
+            productType = ProductType.APARTMENT,
             data = HouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -115,7 +115,7 @@ class QuoteRepositoryImplTest {
             createdAt = Instant.now(),
             quotedAt = Instant.now().plusSeconds(1),
             signedAt = Instant.now().plusSeconds(2),
-            productType = ProductType.HOME,
+            productType = ProductType.APARTMENT,
             data = HouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",

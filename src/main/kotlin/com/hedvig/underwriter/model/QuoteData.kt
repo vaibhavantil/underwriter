@@ -20,7 +20,7 @@ sealed class QuoteData {
     fun productType(): ProductType {
         return when (this) {
             is HouseData -> ProductType.HOUSE
-            is ApartmentData -> ProductType.HOME
+            is ApartmentData -> ProductType.APARTMENT
         }
     }
 

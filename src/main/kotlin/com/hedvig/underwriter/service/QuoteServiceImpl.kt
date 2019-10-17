@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.PersonPolicyHolder
+import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
@@ -35,11 +36,11 @@ class QuoteServiceImpl(
         quoteRepository.update(quote)
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+    override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            productType = incompleteQuoteDto.productType,
+            productType = ProductType.APARTMENT,
             initiatedFrom = QuoteInitiatedFrom.PARTNER,
             data = ApartmentData(UUID.randomUUID())
         )

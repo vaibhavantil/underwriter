@@ -6,10 +6,8 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import java.time.LocalDate
 
 data class IncompleteQuoteDto(
-    val productType: ProductType,
     val apartmentProductSubType: ApartmentProductSubType?,
     val incompleteQuoteData: IncompleteQuoteDataDto?,
-    val quoteInitiatedFrom: QuoteInitiatedFrom?,
     val firstName: String?,
     val lastName: String?,
     val currentInsurer: String?,
@@ -19,7 +17,7 @@ data class IncompleteQuoteDto(
 
 data class IncompleteQuoteDataDto(
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
-    val incompleteApartmentQuoteData: IncompleteHomeQuoteDataDto?
+    val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?
 )
 
 data class IncompleteHouseQuoteDataDto(
@@ -31,11 +29,11 @@ data class IncompleteHouseQuoteDataDto(
     val householdSize: Int?
 )
 
-data class IncompleteHomeQuoteDataDto(
-    var street: String?,
-    var zipCode: String?,
-    var city: String?,
-    var livingSpace: Int?,
-    var houseHoldSize: Int?,
-    var floor: Int?
+data class IncompleteApartmentQuoteDataDto(
+    val street: String?,
+    val zipCode: String?,
+    val city: String?,
+    val livingSpace: Int?,
+    val householdSize: Int?,
+    val floor: Int?
 )

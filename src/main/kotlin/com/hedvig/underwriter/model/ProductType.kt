@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.model
 
 enum class ProductType {
-    HOME,
+    APARTMENT,
     HOUSE,
     OBJECT,
     UNKNOWN

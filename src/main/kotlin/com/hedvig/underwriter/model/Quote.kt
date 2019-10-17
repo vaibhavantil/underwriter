@@ -98,7 +98,7 @@ data class Quote(
     val state: QuoteState
         get() = when (signedAt) {
             null -> when {
-                createdAt.plusSeconds(validity).isAfter(Instant.now()) -> QuoteState.EXPIRED
+                createdAt.plusSeconds(validity).isBefore(Instant.now()) -> QuoteState.EXPIRED
                 !isComplete -> QuoteState.INCOMPLETE
                 else -> QuoteState.QUOTED
             }
@@ -141,15 +141,52 @@ data class Quote(
         }
     }
 
-    fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote = this.copy(
-        data = when (data) {
-            is ApartmentData -> data.copy(
-                firstName = incompleteQuoteDto.firstName ?: data.firstName,
-                lastName = incompleteQuoteDto.lastName ?: data.lastName
+    fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
+        var newQuote = copy(
+            data = when (data) {
+                is ApartmentData -> data.copy(
+                    ssn = incompleteQuoteDto.ssn ?: data.ssn,
+                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
+                    lastName = incompleteQuoteDto.lastName ?: data.lastName
+                )
+                is HouseData -> data.copy(
+                    ssn = incompleteQuoteDto.ssn ?: data.ssn,
+                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
+                    lastName = incompleteQuoteDto.lastName ?: data.lastName
+                )
+            }
+        )
+        if (incompleteQuoteDto.incompleteQuoteData?.incompleteApartmentQuoteData != null) {
+            val apartmentData = incompleteQuoteDto.incompleteQuoteData.incompleteApartmentQuoteData
+            val newQuoteData: ApartmentData = newQuote.data as ApartmentData
+            newQuote = newQuote.copy(
+                data = newQuoteData.copy(
+                    street = apartmentData.street ?: newQuoteData.street,
+                    zipCode = apartmentData.zipCode ?: newQuoteData.zipCode,
+                    city = apartmentData.city ?: newQuoteData.city,
+                    householdSize = apartmentData.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = apartmentData.livingSpace ?: newQuoteData.livingSpace,
+                    subType = newQuoteData.subType //TODO
+                )
             )
-            is HouseData -> TODO()
         }
-    )
+
+        if (incompleteQuoteDto.incompleteQuoteData?.incompleteHouseQuoteData != null) {
+            val houseData = incompleteQuoteDto.incompleteQuoteData.incompleteHouseQuoteData
+            val newQuoteData: HouseData = newQuote.data as HouseData
+            newQuote = newQuote.copy(
+                data = newQuoteData.copy(
+                    street = houseData.street ?: newQuoteData.street,
+                    zipCode = houseData.zipCode ?: newQuoteData.zipCode,
+                    city = houseData.city ?: newQuoteData.city,
+                    householdSize = houseData.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = houseData.livingSpace ?: newQuoteData.livingSpace
+                )
+            )
+        }
+
+        return newQuote
+    }
 
     fun complete(
         debtChecker: DebtChecker,
@@ -187,15 +224,15 @@ data class Quote(
 
     companion object {
         private fun homeQuotePriceDto(quote: Quote): ApartmentQuotePriceDto {
-            val quote = quote.data
-            if (quote is ApartmentData) {
+            val quoteData = quote.data
+            if (quoteData is ApartmentData) {
                 return ApartmentQuotePriceDto(
-                    birthDate = quote.ssn!!.birthDateFromSsn(),
-                    livingSpace = quote.livingSpace!!,
-                    houseHoldSize = quote.householdSize!!,
-                    zipCode = quote.zipCode!!,
-                    houseType = quote.subType!!,
-                    isStudent = quote.isStudent
+                    birthDate = quoteData.ssn!!.birthDateFromSsn(),
+                    livingSpace = quoteData.livingSpace!!,
+                    houseHoldSize = quoteData.householdSize!!,
+                    zipCode = quoteData.zipCode!!,
+                    houseType = quoteData.subType!!,
+                    isStudent = quoteData.isStudent
                 )
             }
             throw RuntimeException("missing data cannot create home quote price dto")
