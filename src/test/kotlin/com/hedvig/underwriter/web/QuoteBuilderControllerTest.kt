@@ -1,6 +1,11 @@
-package com.hedvig.underwriter.web;
+package com.hedvig.underwriter.web
 
-import com.hedvig.underwriter.model.*
+import com.hedvig.underwriter.model.HomeData
+import com.hedvig.underwriter.model.HomeProductSubType
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.QuoteService
 import org.junit.Ignore
 import org.junit.Test
@@ -17,7 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteBuilderController::class], secure = false)
@@ -46,9 +51,9 @@ internal class QuoteBuilderControllerTest {
     @Test
     fun createIncompleteQuote() {
         val request = post("/_/v1/quote/create")
-                .content(createQuoteRequestJson)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
+            .content(createQuoteRequestJson)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
 
         val result = mockMvc.perform(request)
 
@@ -62,39 +67,38 @@ internal class QuoteBuilderControllerTest {
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         val incompleteQuote = Quote(
-                createdAt = Instant.now(),
-                state = QuoteState.INCOMPLETE,
-                productType = ProductType.HOME,
-            safeQuoteData = SafeQuoteData.HomeData(
-                        street = "123 Baker street",
-                        city = "Stockholm",
-                        //numberOfRooms = 3,
-                        zipCode = "11216",
-                        householdSize = 1,
-                livingSpace = 33
-                ),
-                homeProductSubTypes = HomeProductSubType.RENT,
-                initiatedFrom = QuoteInitiatedFrom.APP,
+            createdAt = Instant.now(),
+            state = QuoteState.INCOMPLETE,
+            productType = ProductType.HOME,
+            data = HomeData(
+                street = "123 Baker street",
+                city = "Stockholm",
+                //numberOfRooms = 3,
+                zipCode = "11216",
+                householdSize = 1,
+                livingSpace = 33,
+                subType = HomeProductSubType.RENT,
                 isStudent = false,
-                ssn = "189003042342",
-            firstName = "Simeone",
-                id = UUID.randomUUID(),
-            lastName = "null",
-            currentInsurer = null,
-            houseHoldSize = 1,
-            livingSpace = 33
-                )
+                firstName = "Simeone",
+                lastName = "null",
+                ssn = "189003042342"
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            id = UUID.randomUUID(),
+            currentInsurer = null
+        )
 
         Mockito.`when`(quoteService.getQuote(uuid))
             .thenReturn(incompleteQuote)
 
         mockMvc
-                .perform(
-                        get("/_/v1/quote/71919787-70d2-4614-bd4a-26427861991d"))
-                .andExpect(status().is2xxSuccessful)
-                .andExpect(jsonPath("quoteState").value("INCOMPLETE"))
-                .andExpect(jsonPath("productType").value("HOME"))
-                .andExpect(jsonPath("incompleteQuoteData.numberOfRooms").value(3));
+            .perform(
+                get("/_/v1/quote/71919787-70d2-4614-bd4a-26427861991d")
+            )
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("quoteState").value("INCOMPLETE"))
+            .andExpect(jsonPath("productType").value("HOME"))
+            .andExpect(jsonPath("incompleteQuoteData.numberOfRooms").value(3))
     }
 
     @Ignore
@@ -104,34 +108,35 @@ internal class QuoteBuilderControllerTest {
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         val incompleteQuote = Quote(
-                createdAt = Instant.now(),
-                state = QuoteState.INCOMPLETE,
-                productType = ProductType.HOME,
-                safeQuoteData = SafeQuoteData.HomeData(
-                        street = "123 Baker street",
-                        //numberOfRooms = 3,
-                        zipCode = "11216",
-                        livingSpace = 33,
-                        householdSize = 4,
-                        city = "nul"
-                ),
-                homeProductSubTypes = HomeProductSubType.RENT,
-                initiatedFrom = QuoteInitiatedFrom.APP,
+            createdAt = Instant.now(),
+            state = QuoteState.INCOMPLETE,
+            productType = ProductType.HOME,
+            data =
+            HomeData(
+                street = "123 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "nul",
+                subType = HomeProductSubType.BRF,
                 isStudent = false,
-                ssn = "189003042342",
                 firstName = "null",
-                id = UUID.randomUUID(),
-                lastName = "null",
-                currentInsurer = null
+                lastName = "null"
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+
+            id = UUID.randomUUID(),
+            currentInsurer = null
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))
-                .thenReturn(incompleteQuote)
+            .thenReturn(incompleteQuote)
 
         mockMvc
-                .perform(
-                        post("/_/v1/quote/71919787-70d2-4614-bd4a-26427861991d/completeQuote"))
-                .andExpect(status().is2xxSuccessful)
+            .perform(
+                post("/_/v1/quote/71919787-70d2-4614-bd4a-26427861991d/completeQuote")
+            )
+            .andExpect(status().is2xxSuccessful)
     }
 
     @Ignore
@@ -139,5 +144,4 @@ internal class QuoteBuilderControllerTest {
     fun shouldNotCompleteQuoteIfDataIsIncomplete() {
 //        TODO
     }
-
 }
