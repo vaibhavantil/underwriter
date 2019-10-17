@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
@@ -20,8 +20,8 @@ class ProductPricingServiceImpl @Autowired constructor(
         return QuotePriceResponseDto(price)
     }
 
-    override fun priceFromProductPricingForHomeQuote(homeQuotePriceDto: HomeQuotePriceDto): QuotePriceResponseDto {
-        val price = this.productPricingClient.priceFromProductPricingForHomeQuote(homeQuotePriceDto).body!!.price
+    override fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto {
+        val price = this.productPricingClient.priceFromProductPricingForHomeQuote(apartmentQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
     }
 

@@ -6,7 +6,7 @@ import arrow.core.Right
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
@@ -107,7 +107,7 @@ data class Quote(
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
         return when (this.data) {
-            is ApartmentData -> productPricingService.priceFromProductPricingForHomeQuote(homeQuotePriceDto(this)).price
+            is ApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(homeQuotePriceDto(this)).price
             is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(houseQuotePriceDto(this)).price
         }
     }
@@ -186,10 +186,10 @@ data class Quote(
     }
 
     companion object {
-        private fun homeQuotePriceDto(quote: Quote): HomeQuotePriceDto {
+        private fun homeQuotePriceDto(quote: Quote): ApartmentQuotePriceDto {
             val quote = quote.data
             if (quote is ApartmentData) {
-                return HomeQuotePriceDto(
+                return ApartmentQuotePriceDto(
                     birthDate = quote.ssn!!.birthDateFromSsn(),
                     livingSpace = quote.livingSpace!!,
                     houseHoldSize = quote.householdSize!!,

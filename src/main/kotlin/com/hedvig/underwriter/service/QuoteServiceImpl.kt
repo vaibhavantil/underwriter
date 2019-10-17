@@ -2,7 +2,6 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.DateWithZone
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -79,11 +78,9 @@ class QuoteServiceImpl(
             }
 
             val updatedStartTime = when {
-                body.startDateWithZone != null -> {
-                    val startDateWithZone: DateWithZone = body.startDateWithZone
+                body.startDate != null -> {
                     updatedName.copy(
-                        startDate =
-                        startDateWithZone.date
+                        startDate = body.startDate
                     )
                 }
                 else -> updatedName.copy(startDate = null)

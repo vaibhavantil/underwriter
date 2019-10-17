@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HomeQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
@@ -21,7 +21,7 @@ interface ProductPricingClient {
 
     @PostMapping("/_/insurance/getHomeQuotePrice")
     fun priceFromProductPricingForHomeQuote(
-        @Valid @RequestBody req: HomeQuotePriceDto
+        @Valid @RequestBody req: ApartmentQuotePriceDto
     ): ResponseEntity<QuotePriceResponseDto>
 
     @PostMapping("/_/insurance/getHouseQuotePrice")

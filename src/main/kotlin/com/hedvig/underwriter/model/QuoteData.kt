@@ -107,7 +107,7 @@ data class ApartmentData(
     override val householdSize: Int? = null,
     override val livingSpace: Int? = null,
 
-    val subType: HomeProductSubType? = null
+    val subType: ApartmentProductSubType? = null
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<ApartmentData> {
     @get:JsonIgnore
     override val isComplete: Boolean
@@ -118,7 +118,7 @@ data class ApartmentData(
 
     @get:JsonProperty(value = "isStudent")
     val isStudent: Boolean
-        get() = subType == HomeProductSubType.STUDENT_BRF || subType == HomeProductSubType.STUDENT_RENT
+        get() = subType == ApartmentProductSubType.STUDENT_BRF || subType == ApartmentProductSubType.STUDENT_RENT
 
     override fun updateName(firstName: String, lastName: String): ApartmentData {
         return this.copy(firstName = firstName, lastName = lastName)
@@ -128,7 +128,7 @@ data class ApartmentData(
         val errors = mutableListOf<String>()
 
         when (this.subType) {
-            HomeProductSubType.STUDENT_RENT, HomeProductSubType.STUDENT_BRF -> {
+            ApartmentProductSubType.STUDENT_RENT, ApartmentProductSubType.STUDENT_BRF -> {
                 if (this.householdSize!! > 2) errors.add("breaches underwriting guideline household size must be less than 2")
                 if (this.livingSpace!! > 50) errors.add("breaches underwriting guideline living space must be less than 50sqm")
                 if (this.ssn!!.birthDateFromSsn().until(

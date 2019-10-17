@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.HomeProductSubType
+import com.hedvig.underwriter.model.ApartmentProductSubType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -13,7 +13,7 @@ data class RapioQuoteRequestDto(
     val isStudent: Boolean,
     val address: Address,
     val livingSpace: Float,
-    val houseType: HomeProductSubType,
+    val houseType: ApartmentProductSubType,
     val currentInsurer: String?,
     val houseHoldSize: Int,
     val activeFrom: LocalDateTime?,

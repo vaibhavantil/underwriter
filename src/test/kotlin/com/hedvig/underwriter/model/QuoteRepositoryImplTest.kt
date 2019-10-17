@@ -30,7 +30,7 @@ class QuoteRepositoryImplTest {
                 householdSize = 4,
                 city = "London",
                 id = UUID.randomUUID(),
-                subType = HomeProductSubType.BRF
+                subType = ApartmentProductSubType.BRF
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             id = UUID.randomUUID(),
@@ -59,7 +59,7 @@ class QuoteRepositoryImplTest {
                 householdSize = 4,
                 city = "London",
                 id = UUID.randomUUID(),
-                subType = HomeProductSubType.BRF
+                subType = ApartmentProductSubType.BRF
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             id = UUID.randomUUID(),

@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.model
 
-enum class HomeProductSubType {
+enum class ApartmentProductSubType {
     BRF,
     RENT,
     RENT_BRF,
