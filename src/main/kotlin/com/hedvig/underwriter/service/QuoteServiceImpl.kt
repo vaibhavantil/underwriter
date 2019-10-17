@@ -10,6 +10,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -30,7 +31,8 @@ class QuoteServiceImpl(
     val debtChecker: DebtChecker,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
-    val quoteRepository: QuoteRepository
+    val quoteRepository: QuoteRepository,
+    val customerIOClient: CustomerIO
 ) : QuoteService {
 
     override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID) {
