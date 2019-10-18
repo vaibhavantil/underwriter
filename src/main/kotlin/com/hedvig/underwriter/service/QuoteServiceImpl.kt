@@ -15,12 +15,14 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import org.slf4j.LoggerFactory.getLogger
 import java.time.Instant
 import java.util.UUID
 import org.springframework.stereotype.Service
@@ -32,13 +34,25 @@ class QuoteServiceImpl(
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository
 ) : QuoteService {
+    val logger = getLogger(QuoteServiceImpl::class.java)!!
 
-    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Quote {
+    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote> {
         val quote = quoteRepository
             .find(id)
-            ?.update(incompleteQuoteDto)
-            ?: throw QuoteNotFoundException("No such quote $id")
-        return quoteRepository.update(quote)
+            ?: return Either.Left(
+                ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id")
+            )
+
+        if (quote.state != QuoteState.INCOMPLETE && quote.state != QuoteState.QUOTED) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.INVALID_STATE,
+                    "quote must be incomplete or quoted to update but was really ${quote.state}"
+                )
+            )
+        }
+
+        return Either.Right(quoteRepository.update(quote.update(incompleteQuoteDto)))
     }
 
     override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
@@ -64,9 +78,22 @@ class QuoteServiceImpl(
             quoteRepository.find(incompleteQuoteId)
                 ?: return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "No such quote"))
 
+        if (quote.state != QuoteState.INCOMPLETE) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.INVALID_STATE,
+                    "quote must be completable but was really ${quote.state}"
+                )
+            )
+        }
+
         return quote.complete(debtChecker, productPricingService)
             .bimap(
-                {
+                { breachedUnderwritingGuidelines ->
+                    logger.error(
+                        "Underwriting guidelines breached for incomplete quote $incompleteQuoteId: {}",
+                        breachedUnderwritingGuidelines
+                    )
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
                         "quote cannot be calculated, underwriting guidelines are breached"
@@ -92,6 +119,15 @@ class QuoteServiceImpl(
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
                         "cannot sign quote it has expired"
+                    )
+                )
+            }
+
+            if (quote.state == QuoteState.SIGNED) {
+                return Either.left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                        "quote is already signed"
                     )
                 )
             }

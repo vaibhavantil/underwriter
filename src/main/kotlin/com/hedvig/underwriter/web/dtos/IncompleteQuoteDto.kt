@@ -4,19 +4,14 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import java.time.LocalDate
 
 data class IncompleteQuoteDto(
-    val apartmentProductSubType: ApartmentProductSubType?,
-    val incompleteQuoteData: IncompleteQuoteDataDto?,
     val firstName: String?,
     val lastName: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
-    val ssn: String?
-)
-
-data class IncompleteQuoteDataDto(
+    val ssn: String?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?
-)
+    )
 
 data class IncompleteHouseQuoteDataDto(
     val street: String?,
@@ -33,5 +28,6 @@ data class IncompleteApartmentQuoteDataDto(
     val city: String?,
     val livingSpace: Int?,
     val householdSize: Int?,
-    val floor: Int?
+    val floor: Int?,
+    val subType: ApartmentProductSubType?
 )

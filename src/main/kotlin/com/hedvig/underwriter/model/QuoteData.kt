@@ -127,19 +127,26 @@ data class ApartmentData(
     override fun passUwGuidelines(): List<String> {
         val errors = mutableListOf<String>()
 
+        if (this.householdSize!! < 1) {
+            errors.add("breaches underwriting guideline household size, must be at least 1")
+        }
+        if (this.livingSpace!! < 1) {
+            errors.add("breaches underwriting guidline living space, must be at least 1")
+        }
+
         when (this.subType) {
             ApartmentProductSubType.STUDENT_RENT, ApartmentProductSubType.STUDENT_BRF -> {
                 if (this.householdSize!! > 2) errors.add("breaches underwriting guideline household size must be less than 2")
-                if (this.livingSpace!! > 50) errors.add("breaches underwriting guideline living space must be less than 50sqm")
+                if (this.livingSpace!! > 50) errors.add("breaches underwriting guideline living space must be less than or equal to 50sqm")
                 if (this.ssn!!.birthDateFromSsn().until(
                         LocalDate.now(),
                         ChronoUnit.YEARS
                     ) > 30
-                ) errors.add("breaches underwriting guidelines member must be under 30")
+                ) errors.add("breaches underwriting guidelines member must be 30 years old or younger")
             }
             else -> {
-                if (this.householdSize!! > 6) errors.add("breaches underwriting guideline household size must be less than 6")
-                if (this.livingSpace!! > 250) errors.add("breaches underwriting guideline living space must be less than 250sqm")
+                if (this.householdSize!! > 6) errors.add("breaches underwriting guideline household size must be less than or equal to 6")
+                if (this.livingSpace!! > 250) errors.add("breaches underwriting guideline living space must be less than or equal to 250sqm")
             }
         }
 

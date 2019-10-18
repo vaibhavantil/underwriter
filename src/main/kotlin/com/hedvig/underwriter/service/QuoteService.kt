@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
@@ -16,5 +17,5 @@ interface QuoteService {
 
     fun getQuote(completeQuoteId: UUID): Quote?
     fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
-    fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Quote
+    fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote>
 }

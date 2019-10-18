@@ -149,7 +149,7 @@ data class Quote(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
                     lastName = incompleteQuoteDto.lastName ?: data.lastName,
-                    subType = incompleteQuoteDto.apartmentProductSubType ?: data.subType
+                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
                 )
                 is HouseData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
@@ -158,8 +158,8 @@ data class Quote(
                 )
             }
         )
-        if (incompleteQuoteDto.incompleteQuoteData?.incompleteApartmentQuoteData != null) {
-            val apartmentData = incompleteQuoteDto.incompleteQuoteData.incompleteApartmentQuoteData
+        if (incompleteQuoteDto.incompleteApartmentQuoteData != null) {
+            val apartmentData = incompleteQuoteDto.incompleteApartmentQuoteData
             val newQuoteData: ApartmentData = newQuote.data as ApartmentData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -173,8 +173,8 @@ data class Quote(
             )
         }
 
-        if (incompleteQuoteDto.incompleteQuoteData?.incompleteHouseQuoteData != null) {
-            val houseData = incompleteQuoteDto.incompleteQuoteData.incompleteHouseQuoteData
+        if (incompleteQuoteDto.incompleteHouseQuoteData != null) {
+            val houseData = incompleteQuoteDto.incompleteHouseQuoteData
             val newQuoteData: HouseData = newQuote.data as HouseData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -211,7 +211,6 @@ data class Quote(
             }
         }
 
-        // TODO store errors on quote somehow
         if (errorStrings.isEmpty()) {
             return Right(
                 this.copy(
