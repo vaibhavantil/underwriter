@@ -33,10 +33,12 @@ class QuoteServiceImpl(
     val quoteRepository: QuoteRepository
 ) : QuoteService {
 
-    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID) {
-        val quote = quoteRepository.find(id) ?: throw QuoteNotFoundException("No such quote $id")
-        quote.update(incompleteQuoteDto)
-        quoteRepository.update(quote)
+    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Quote {
+        val quote = quoteRepository
+            .find(id)
+            ?.update(incompleteQuoteDto)
+            ?: throw QuoteNotFoundException("No such quote $id")
+        return quoteRepository.update(quote)
     }
 
     override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {

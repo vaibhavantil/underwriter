@@ -6,5 +6,5 @@ interface QuoteRepository {
     fun find(quoteId: UUID): Quote?
     fun insert(quote: Quote)
     fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?): Quote?
-    fun update(updatedQuote: Quote)
+    fun update(updatedQuote: Quote): Quote
 }

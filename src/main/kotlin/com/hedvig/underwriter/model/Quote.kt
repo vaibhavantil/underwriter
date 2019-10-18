@@ -134,7 +134,8 @@ data class Quote(
                     startDate?.atStartOfDay(),
                     data.ssn,
                     email,
-                    ""
+                    "",
+                    initiatedFrom
                 )
             }
             else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
@@ -147,7 +148,8 @@ data class Quote(
                 is ApartmentData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = incompleteQuoteDto.lastName ?: data.lastName
+                    lastName = incompleteQuoteDto.lastName ?: data.lastName,
+                    subType = incompleteQuoteDto.apartmentProductSubType ?: data.subType
                 )
                 is HouseData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
