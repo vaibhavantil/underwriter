@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
@@ -32,7 +33,7 @@ class QuoteServiceImpl(
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository,
-    val customerIOClient: CustomerIO
+    val customerIOClient: CustomerIO?
 ) : QuoteService {
 
     override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID) {
@@ -46,7 +47,8 @@ class QuoteServiceImpl(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
             productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.PARTNER,
+            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = ApartmentData(UUID.randomUUID())
         )
 
@@ -122,6 +124,10 @@ class QuoteServiceImpl(
 
             if (updatedStartTime.data is PersonPolicyHolder<*>) {
                 memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(updatedStartTime.data.ssn!!))
+            }
+
+            if (updatedStartTime.attributedTo != Partner.HEDVIG) {
+                customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
             }
 
             val signedQuote = updatedStartTime.copy(signedAt = Instant.now())

@@ -2,6 +2,7 @@ package com.hedvig.underwriter.web
 
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -83,6 +84,7 @@ internal class QuoteBuilderControllerTest {
                 ssn = "189003042342"
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.COMPRICER,
             id = UUID.randomUUID(),
             currentInsurer = null
         )
@@ -120,7 +122,7 @@ internal class QuoteBuilderControllerTest {
                 id = UUID.randomUUID()
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
-
+            attributedTo = Partner.COMPRICER,
             id = UUID.randomUUID(),
             currentInsurer = null
         )

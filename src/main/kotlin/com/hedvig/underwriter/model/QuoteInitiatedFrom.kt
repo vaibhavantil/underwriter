@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.model
 
 enum class QuoteInitiatedFrom {
-    PARTNER,
+    RAPIO,
     WEBONBOARDING,
     APP
 }

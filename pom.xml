@@ -172,6 +172,17 @@
             <artifactId>kotlin-logging</artifactId>
             <version>1.7.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.ninja-squad</groupId>
+            <artifactId>springmockk</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
+            <version>1.9.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

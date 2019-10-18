@@ -33,6 +33,7 @@ data class DatabaseQuote(
     val validity: Long,
     val productType: ProductType = ProductType.UNKNOWN,
     val initiatedFrom: QuoteInitiatedFrom,
+    val attributedTo: Partner,
 
     val currentInsurer: String? = "",
 
@@ -62,6 +63,7 @@ data class DatabaseQuote(
                 price = quote.price,
                 currentInsurer = quote.currentInsurer,
                 initiatedFrom = quote.initiatedFrom,
+                attributedTo = quote.attributedTo,
                 productType = quote.productType,
                 startDate = quote.startDate
             )
@@ -76,7 +78,7 @@ data class Quote(
     val price: BigDecimal? = null,
     val productType: ProductType = ProductType.UNKNOWN,
     val initiatedFrom: QuoteInitiatedFrom,
-
+    val attributedTo: Partner,
     val data: QuoteData,
 
     val currentInsurer: String? = null,

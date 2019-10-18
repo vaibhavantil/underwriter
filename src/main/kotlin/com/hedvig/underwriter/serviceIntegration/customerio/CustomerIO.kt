@@ -2,11 +2,13 @@ package com.hedvig.underwriter.serviceIntegration.customerio
 
 import com.hedvig.underwriter.model.Partner
 import mu.KotlinLogging
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
+@ConditionalOnProperty(value = ["customerio.username"], matchIfMissing = false)
 @Component
 @EnableFeignClients
 class CustomerIO(val customerIOClient: CustomerIOClient) {

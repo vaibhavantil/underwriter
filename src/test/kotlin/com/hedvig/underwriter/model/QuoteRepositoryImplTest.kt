@@ -33,6 +33,7 @@ class QuoteRepositoryImplTest {
                 subType = ApartmentProductSubType.BRF
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null
         )
@@ -62,6 +63,7 @@ class QuoteRepositoryImplTest {
                 subType = ApartmentProductSubType.BRF
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null
         )
@@ -100,6 +102,7 @@ class QuoteRepositoryImplTest {
                 id = UUID.randomUUID()
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null
         )
@@ -128,6 +131,7 @@ class QuoteRepositoryImplTest {
                 id = UUID.randomUUID()
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null
         )
