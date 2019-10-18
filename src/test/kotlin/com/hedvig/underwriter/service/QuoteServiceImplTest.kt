@@ -79,6 +79,7 @@ class QuoteServiceImplTest {
         )
 
         every { quoteRepository.find(any()) } returns quote
+        every { quoteRepository.update(any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(
@@ -122,6 +123,7 @@ class QuoteServiceImplTest {
         )
 
         every { quoteRepository.find(any()) } returns quote
+        every { quoteRepository.update(any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(

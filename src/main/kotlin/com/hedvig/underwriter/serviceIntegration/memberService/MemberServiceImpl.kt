@@ -45,9 +45,9 @@ class MemberServiceImpl @Autowired constructor(
         try {
             this.client.checkPersonDebt(ssn)
         } catch (e: RestClientResponseException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
         } catch (e: FeignException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
         }
     }
 

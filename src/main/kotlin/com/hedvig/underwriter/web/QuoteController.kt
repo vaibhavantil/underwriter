@@ -35,7 +35,6 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{incompleteQuoteId}/completeQuote")
     fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
-
         return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
@@ -50,14 +49,11 @@ class QuoteController @Autowired constructor(
     }
 
     @PatchMapping("/{id}")
-    fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteDto> {
-        throw TODO("Idk what to do with this /palmen")
-//        return try {
-//            quoteService.updateQuote(incompleteQuoteDto, id)
-//            ResponseEntity.ok(incompleteQuoteDto)
-//        } catch (e: QuoteNotFoundException) {
-//            ResponseEntity.notFound().build()
-//        }
+    fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody @Valid incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<Any> {
+        return when (val quoteOrError = quoteService.updateQuote(incompleteQuoteDto, id)) {
+            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
+            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
+        }
     }
 
     @PostMapping("/{completeQuoteId}/sign")

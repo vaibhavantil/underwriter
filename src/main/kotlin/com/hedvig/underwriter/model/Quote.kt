@@ -41,7 +41,8 @@ data class DatabaseQuote(
 
     val price: BigDecimal? = null,
     val quoteApartmentDataId: UUID?,
-    val quoteHouseDataId: UUID?
+    val quoteHouseDataId: UUID?,
+    val memberId: String?
 ) {
 
     companion object {
@@ -65,7 +66,8 @@ data class DatabaseQuote(
                 initiatedFrom = quote.initiatedFrom,
                 attributedTo = quote.attributedTo,
                 productType = quote.productType,
-                startDate = quote.startDate
+                startDate = quote.startDate,
+                memberId = quote.memberId
             )
     }
 }
@@ -87,22 +89,22 @@ data class Quote(
 
     val quotedAt: Instant? = null,
     val signedAt: Instant? = null,
-    val validity: Long = ONE_DAY * 30
+    val validity: Long = ONE_DAY * 30,
+    val memberId: String? = null
 ) {
     val isComplete: Boolean
         get() = when {
             price == null -> false
             productType == ProductType.UNKNOWN -> false
             !data.isComplete -> false
-            currentInsurer == null -> false
             else -> true
         }
     val state: QuoteState
         get() = when (signedAt) {
             null -> when {
                 createdAt.plusSeconds(validity).isBefore(Instant.now()) -> QuoteState.EXPIRED
-                !isComplete -> QuoteState.INCOMPLETE
-                else -> QuoteState.QUOTED
+                quotedAt != null -> QuoteState.QUOTED
+                else -> QuoteState.INCOMPLETE
             }
             else -> QuoteState.SIGNED
         }
@@ -136,7 +138,8 @@ data class Quote(
                     startDate?.atStartOfDay(),
                     data.ssn,
                     email,
-                    ""
+                    "",
+                    initiatedFrom
                 )
             }
             else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
@@ -149,7 +152,8 @@ data class Quote(
                 is ApartmentData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = incompleteQuoteDto.lastName ?: data.lastName
+                    lastName = incompleteQuoteDto.lastName ?: data.lastName,
+                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
                 )
                 is HouseData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
@@ -158,8 +162,8 @@ data class Quote(
                 )
             }
         )
-        if (incompleteQuoteDto.incompleteQuoteData?.incompleteApartmentQuoteData != null) {
-            val apartmentData = incompleteQuoteDto.incompleteQuoteData.incompleteApartmentQuoteData
+        if (incompleteQuoteDto.incompleteApartmentQuoteData != null) {
+            val apartmentData = incompleteQuoteDto.incompleteApartmentQuoteData
             val newQuoteData: ApartmentData = newQuote.data as ApartmentData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -173,8 +177,8 @@ data class Quote(
             )
         }
 
-        if (incompleteQuoteDto.incompleteQuoteData?.incompleteHouseQuoteData != null) {
-            val houseData = incompleteQuoteDto.incompleteQuoteData.incompleteHouseQuoteData
+        if (incompleteQuoteDto.incompleteHouseQuoteData != null) {
+            val houseData = incompleteQuoteDto.incompleteHouseQuoteData
             val newQuoteData: HouseData = newQuote.data as HouseData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -211,7 +215,6 @@ data class Quote(
             }
         }
 
-        // TODO store errors on quote somehow
         if (errorStrings.isEmpty()) {
             return Right(
                 this.copy(

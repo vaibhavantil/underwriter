@@ -40,7 +40,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             productType = databaseQuote.productType,
             startDate = databaseQuote.startDate,
             quotedAt = databaseQuote.quotedAt,
-            signedAt = databaseQuote.signedAt
+            signedAt = databaseQuote.signedAt,
+            memberId = databaseQuote.memberId
         )
     }
 
@@ -54,8 +55,9 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             return@inTransaction modifiedQuote
         }
 
-    override fun update(updatedQuote: Quote) = jdbi.useTransaction<RuntimeException> { h ->
+    override fun update(updatedQuote: Quote): Quote = jdbi.inTransaction<Quote, RuntimeException> { h ->
         update(updatedQuote, h)
+        find(updatedQuote.id, h)!!
     }
 
     private fun update(updatedQuote: Quote, h: Handle) {
