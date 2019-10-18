@@ -3,17 +3,11 @@
 spring:
   main:
     allow-bean-definition-overriding: true
-  jpa:
-    open-in-view: false
-    generate-ddl: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        order_by.default_null_ordering: last
-    hibernate:
-    ddl-auto: update
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/underwriter
     username: postgres
+  liquibase.change-log: classpath:/db/changelog/changelog-master.yml
+  liquibase.enabled: false
   jackson.deserialization.read-unknown-enum-values-using-default-value: true
 

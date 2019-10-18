@@ -1,115 +1,194 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.CompleteQuote
-import com.hedvig.underwriter.model.DateWithZone
-import com.hedvig.underwriter.model.IncompleteQuote
+import arrow.core.Right
+import arrow.core.flatMap
+import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.PersonPolicyHolder
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.repository.CompleteQuoteRepository
-import com.hedvig.underwriter.repository.IncompleteQuoteRepository
+import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
+import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.web.Dtos.*
-import org.springframework.beans.factory.annotation.Autowired
+import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import java.time.Instant
+import java.util.UUID
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import java.time.*
-import java.util.*
-import javax.transaction.Transactional
 
-@Transactional
 @Service
-class QuoteServiceImpl @Autowired constructor(
-        val incompleteQuoteRepository: IncompleteQuoteRepository,
-        val completeQuoteRepository: CompleteQuoteRepository,
-        val quoteBuilderService: QuoteBuilderService,
-        val debtChecker: DebtChecker,
-        val uwGuidelinesChecker: UwGuidelinesChecker,
-        val memberService: MemberService,
-        val productPricingService: ProductPricingService
+class QuoteServiceImpl(
+    val debtChecker: DebtChecker,
+    val memberService: MemberService,
+    val productPricingService: ProductPricingService,
+    val quoteRepository: QuoteRepository
 ) : QuoteService {
+    val logger = getLogger(QuoteServiceImpl::class.java)!!
 
-    override fun createIncompleteQuote(incompleteincompleteQuoteDto: PostIncompleteQuoteRequest): IncompleteQuoteResponseDto {
-        val incompleteQuote = incompleteQuoteRepository.save(IncompleteQuote.from(incompleteincompleteQuoteDto))
-        return IncompleteQuoteResponseDto(incompleteQuote.id!!, incompleteQuote.productType, incompleteQuote.quoteInitiatedFrom)
-    }
+    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote> {
+        val quote = quoteRepository
+            .find(id)
+            ?: return Either.Left(
+                ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id")
+            )
 
-
-    override fun getCompleteQuote(completeQuoteId: UUID): CompleteQuote {
-        val optionalQuote: Optional<CompleteQuote> = completeQuoteRepository.findById(completeQuoteId)
-        if (!optionalQuote.isPresent) throw RuntimeException("No complete quote found with id $completeQuoteId")
-        return optionalQuote.get()
-
-    }
-
-    override fun createCompleteQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-
-        val incompleteQuote = quoteBuilderService.getIncompleteQuote(incompleteQuoteId)
-        val completeQuote = incompleteQuote.complete()
-
-        val debtCheckPassed = completeQuote.passedDebtCheck(debtChecker)
-        val uwGuidelinesPassed = completeQuote.passedUnderwritingGuidelines(uwGuidelinesChecker)
-
-        if(!completeQuote.memberIsOver30()) completeQuote.reasonQuoteCannotBeCompleted += "member is younger than 18"
-
-        if(completeQuote.ssnIsValid() && debtCheckPassed && uwGuidelinesPassed && completeQuote.memberIsOlderThan18()) {
-            completeQuote.setPriceRetrievedFromProductPricing(productPricingService)
-            completeQuote.quoteValidUntil = LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC)
-            completeQuoteRepository.save(completeQuote)
-            return Either.right(CompleteQuoteResponseDto(completeQuote.id.toString(), completeQuote.price!!, completeQuote.quoteValidUntil))
+        if (quote.state != QuoteState.INCOMPLETE && quote.state != QuoteState.QUOTED) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.INVALID_STATE,
+                    "quote must be incomplete or quoted to update but was really ${quote.state}"
+                )
+            )
         }
-        completeQuoteRepository.save(completeQuote)
 
-        incompleteQuote.quoteState = QuoteState.QUOTED
-        incompleteQuoteRepository.save(incompleteQuote)
+        try {
+            val result = quoteRepository.modify(quote.id) {
+                var result: Either<List<String>, Quote> = Either.Right(quote.update(incompleteQuoteDto))
+                if (quote.state == QuoteState.QUOTED) {
+                    result = result.flatMap { quote -> quote.complete(debtChecker, productPricingService) }
+                }
+                when (result) {
+                    is Either.Left -> throw QuoteCompletionFailedException("Unable to complete quote: " + result.a)
+                    is Either.Right -> result.b
+                }
+            }!!
 
-        return Either.left(ErrorResponseDto(ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES, "quote cannot be calculated, underwriting guidelines are breached"))
+            return Either.Right(result)
+        } catch (e: QuoteCompletionFailedException) {
+            logger.error(e.message, e)
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.UNKNOWN_ERROR_CODE,
+                    "unable to update quote"
+                )
+            )
+        }
     }
 
-    override fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto> {
-        try {
-            val completeQuote = getCompleteQuote(completeQuoteId)
-            if (body.name != null) {
-                completeQuote.firstName = body.name.firstName
-                completeQuote.lastName = body.name.lastName
-            }
+    override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            productType = ProductType.APARTMENT,
+            initiatedFrom = QuoteInitiatedFrom.PARTNER,
+            data = ApartmentData(UUID.randomUUID())
+        )
 
-            when {
-                body.startDateWithZone != null -> {
-                    val startDateWithZone: DateWithZone = body.startDateWithZone
-                    completeQuote.startDate =
-                            startDateWithZone.date.atStartOfDay().atZone(startDateWithZone.timeZone).toLocalDateTime()
+        quoteRepository.insert(quote.update(incompleteQuoteDto))
+
+        return IncompleteQuoteResponseDto(quote.id, quote.productType, quote.initiatedFrom)
+    }
+
+    override fun getQuote(completeQuoteId: UUID): Quote? {
+        return quoteRepository.find(completeQuoteId)
+    }
+
+    override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        val quote =
+            quoteRepository.find(incompleteQuoteId)
+                ?: return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "No such quote"))
+
+        if (quote.state != QuoteState.INCOMPLETE) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.INVALID_STATE,
+                    "quote must be completable but was really ${quote.state}"
+                )
+            )
+        }
+
+        return quote.complete(debtChecker, productPricingService)
+            .bimap(
+                { breachedUnderwritingGuidelines ->
+                    logger.error(
+                        "Underwriting guidelines breached for incomplete quote $incompleteQuoteId: {}",
+                        breachedUnderwritingGuidelines
+                    )
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached"
+                    )
+                },
+                { completeQuote ->
+                    quoteRepository.update(completeQuote)
+                    CompleteQuoteResponseDto(id = completeQuote.id, price = completeQuote.price!!)
                 }
-                else -> completeQuote.startDate = null
+            )
+    }
+
+    override fun signQuote(
+        completeQuoteId: UUID,
+        body: SignQuoteRequest
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
+        try {
+            val quote = getQuote(completeQuoteId)
+                ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+
+            if (quote.state == QuoteState.EXPIRED) {
+                return Either.Left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
+                        "cannot sign quote it has expired"
+                    )
+                )
             }
 
-            val memberId = memberService.createMember()
+            if (quote.state == QuoteState.SIGNED) {
+                return Either.left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                        "quote is already signed"
+                    )
+                )
+            }
 
-            memberService.updateMemberSsn(memberId!!.toLong(), UpdateSsnRequest(ssn = completeQuote.ssn))
+            val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
+                quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+            } else {
+                quote
+            }
+
+            val updatedStartTime = when {
+                body.startDate != null -> {
+                    updatedName.copy(
+                        startDate = body.startDate
+                    )
+                }
+                else -> updatedName.copy(startDate = null)
+            }
+
+            val memberId = quote.memberId ?: memberService.createMember()
+
+            val quoteWithMember = quoteRepository.update(updatedStartTime.copy(memberId = memberId))
+
+            if (quoteWithMember.data is PersonPolicyHolder<*>) {
+                memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
+            }
 
             val signedQuoteId =
-                    productPricingService.createProduct(completeQuote.getRapioQuoteRequestDto(body.email), memberId).id
+                productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
 
-            val memberServiceSignedQuote =
-                    this.memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(completeQuote.ssn))
-
-            if (Instant.now().isAfter(completeQuote.quoteValidUntil)) {
-                return Either.Left(ErrorResponseDto(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "cannot sign quote it has expired"))
+            if (quoteWithMember.data is PersonPolicyHolder<*>) {
+                memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
             }
 
-            return when(memberServiceSignedQuote) {
-                is Either.Left -> {
-                    Either.Left(memberServiceSignedQuote.a)
-                }
-                is Either.Right -> {
+            val signedQuote = quoteWithMember.copy(signedAt = Instant.now())
+            quoteRepository.update(signedQuote)
 
-                    completeQuote.quoteState = QuoteState.SIGNED
-                    completeQuoteRepository.save(completeQuote)
-
-                    Either.Right(SignedQuoteResponseDto(signedQuoteId, Instant.now()))
-                }
-            }
-        } catch(exception: Exception) {
+            return Right(SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!))
+        } catch (exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }
     }

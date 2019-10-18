@@ -6,25 +6,29 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.ErrorResponseDto
-import com.hedvig.underwriter.web.Dtos.UnderwriterQuoteSignRequest
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import feign.FeignException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
-import feign.FeignException
 import org.springframework.web.client.RestClientResponseException
-import java.lang.RuntimeException
 
 @Service
 @EnableFeignClients
-class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
-                                               val objectMapper: ObjectMapper): MemberService {
+class MemberServiceImpl @Autowired constructor(
+    val client: MemberServiceClient,
+    val objectMapper: ObjectMapper
+) : MemberService {
 
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
     }
 
-    override fun signQuote(memberId: Long, request: UnderwriterQuoteSignRequest): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
+    override fun signQuote(
+        memberId: Long,
+        request: UnderwriterQuoteSignRequest
+    ): Either<ErrorResponseDto, UnderwriterQuoteSignResponse> {
         try {
             val response = this.client.signQuote(memberId, request)
             return Either.right(response.body!!)
@@ -41,9 +45,9 @@ class MemberServiceImpl @Autowired constructor(val client: MemberServiceClient,
         try {
             this.client.checkPersonDebt(ssn)
         } catch (e: RestClientResponseException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
         } catch (e: FeignException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn)
+            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
         }
     }
 
