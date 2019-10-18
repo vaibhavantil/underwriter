@@ -39,7 +39,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             productType = databaseQuote.productType,
             startDate = databaseQuote.startDate,
             quotedAt = databaseQuote.quotedAt,
-            signedAt = databaseQuote.signedAt
+            signedAt = databaseQuote.signedAt,
+            memberId = databaseQuote.memberId
         )
     }
 

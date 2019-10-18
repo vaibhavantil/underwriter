@@ -2,6 +2,8 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.flatMap
+import arrow.core.right
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
@@ -9,6 +11,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -52,7 +55,28 @@ class QuoteServiceImpl(
             )
         }
 
-        return Either.Right(quoteRepository.update(quote.update(incompleteQuoteDto)))
+        try {
+            val result = quoteRepository.modify(quote.id) {
+                var result: Either<List<String>, Quote> = Either.Right(quote.update(incompleteQuoteDto))
+                if (quote.state == QuoteState.QUOTED) {
+                    result = result.flatMap { quote -> quote.complete(debtChecker, productPricingService) }
+                }
+                when (result) {
+                    is Either.Left -> throw QuoteCompletionFailedException("Unable to complete quote: " + result.a)
+                    is Either.Right -> result.b
+                }
+            }!!
+
+            return Either.Right(result)
+        } catch (e: QuoteCompletionFailedException) {
+            logger.error(e.message, e)
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.UNKNOWN_ERROR_CODE,
+                    "unable to update quote"
+                )
+            )
+        }
     }
 
     override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
@@ -147,20 +171,22 @@ class QuoteServiceImpl(
                 else -> updatedName.copy(startDate = null)
             }
 
-            val memberId = memberService.createMember()
+            val memberId = quote.memberId ?: memberService.createMember()
 
-            if (updatedStartTime.data is PersonPolicyHolder<*>) {
-                memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = updatedStartTime.data.ssn!!))
+            val quoteWithMember = quoteRepository.update(updatedStartTime.copy(memberId = memberId))
+
+            if (quoteWithMember.data is PersonPolicyHolder<*>) {
+                memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
             }
 
             val signedQuoteId =
-                productPricingService.createProduct(updatedStartTime.getRapioQuoteRequestDto(body.email), memberId).id
+                productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
 
-            if (updatedStartTime.data is PersonPolicyHolder<*>) {
-                memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(updatedStartTime.data.ssn!!))
+            if (quoteWithMember.data is PersonPolicyHolder<*>) {
+                memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
             }
 
-            val signedQuote = updatedStartTime.copy(signedAt = Instant.now())
+            val signedQuote = quoteWithMember.copy(signedAt = Instant.now())
             quoteRepository.update(signedQuote)
 
             return Right(SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!))

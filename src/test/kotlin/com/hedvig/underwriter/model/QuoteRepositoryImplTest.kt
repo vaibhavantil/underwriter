@@ -34,7 +34,8 @@ class QuoteRepositoryImplTest {
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            memberId = "123456"
         )
         quoteDao.insert(quote)
         assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
@@ -72,7 +73,8 @@ class QuoteRepositoryImplTest {
             data = (quote.data as ApartmentData).copy(
                 firstName = "John",
                 lastName = "Watson"
-            )
+            ),
+            memberId = "123456"
         )
         quoteDao.update(updatedQuote)
 
@@ -101,7 +103,8 @@ class QuoteRepositoryImplTest {
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            memberId = "123456"
         )
         quoteDao.insert(quote)
         assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
@@ -139,7 +142,8 @@ class QuoteRepositoryImplTest {
             data = (quote.data as HouseData).copy(
                 firstName = "John",
                 lastName = "Watson"
-            )
+            ),
+            memberId = "123456"
         )
         quoteDao.update(updatedQuote)
 

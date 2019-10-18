@@ -49,7 +49,7 @@ class QuoteController @Autowired constructor(
     }
 
     @PatchMapping("/{id}")
-    fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<Any> {
+    fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody @Valid incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<Any> {
         return when (val quoteOrError = quoteService.updateQuote(incompleteQuoteDto, id)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)

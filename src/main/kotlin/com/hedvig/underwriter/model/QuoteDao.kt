@@ -10,9 +10,9 @@ interface QuoteDao {
     @SqlUpdate(
         """
             INSERT INTO quotes 
-            (id, created_at, quoted_at, signed_at, validity, product_type, initiated_from, current_insurer, start_date, price, quote_apartment_data_id, quote_house_data_id)
+            (id, created_at, quoted_at, signed_at, validity, product_type, initiated_from, current_insurer, start_date, price, quote_apartment_data_id, quote_house_data_id, member_id)
             VALUES
-            (:id, :createdAt, :quotedAt, :signedAt, :validity, :productType, :initiatedFrom, :currentInsurer, :startDate, :price, :quoteApartmentDataId, :quoteHouseDataId)
+            (:id, :createdAt, :quotedAt, :signedAt, :validity, :productType, :initiatedFrom, :currentInsurer, :startDate, :price, :quoteApartmentDataId, :quoteHouseDataId, :memberId)
     """
     )
     fun insert(@BindBean quote: DatabaseQuote)
@@ -63,7 +63,8 @@ interface QuoteDao {
                 start_date = :startDate,
                 price = :price,
                 quote_apartment_data_id = :quoteApartmentDataId,
-                quote_house_data_id = :quoteHouseDataId
+                quote_house_data_id = :quoteHouseDataId,
+                member_id = :memberId
             WHERE
                 id = :id
     """

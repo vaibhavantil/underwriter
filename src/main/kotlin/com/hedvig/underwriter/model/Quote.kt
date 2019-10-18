@@ -14,6 +14,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.system.measureTimeMillis
 
 fun String.birthDateFromSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
@@ -40,7 +41,8 @@ data class DatabaseQuote(
 
     val price: BigDecimal? = null,
     val quoteApartmentDataId: UUID?,
-    val quoteHouseDataId: UUID?
+    val quoteHouseDataId: UUID?,
+    val memberId: String?
 ) {
 
     companion object {
@@ -63,7 +65,8 @@ data class DatabaseQuote(
                 currentInsurer = quote.currentInsurer,
                 initiatedFrom = quote.initiatedFrom,
                 productType = quote.productType,
-                startDate = quote.startDate
+                startDate = quote.startDate,
+                memberId = quote.memberId
             )
     }
 }
@@ -85,22 +88,22 @@ data class Quote(
 
     val quotedAt: Instant? = null,
     val signedAt: Instant? = null,
-    val validity: Long = ONE_DAY * 30
+    val validity: Long = ONE_DAY * 30,
+    val memberId: String? = null
 ) {
     val isComplete: Boolean
         get() = when {
             price == null -> false
             productType == ProductType.UNKNOWN -> false
             !data.isComplete -> false
-            currentInsurer == null -> false
             else -> true
         }
     val state: QuoteState
         get() = when (signedAt) {
             null -> when {
                 createdAt.plusSeconds(validity).isBefore(Instant.now()) -> QuoteState.EXPIRED
-                !isComplete -> QuoteState.INCOMPLETE
-                else -> QuoteState.QUOTED
+                quotedAt != null -> QuoteState.QUOTED
+                else -> QuoteState.INCOMPLETE
             }
             else -> QuoteState.SIGNED
         }
