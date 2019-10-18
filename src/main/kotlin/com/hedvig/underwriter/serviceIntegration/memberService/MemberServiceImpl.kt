@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
-import com.hedvig.underwriter.web.Dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
 import org.springframework.beans.factory.annotation.Autowired

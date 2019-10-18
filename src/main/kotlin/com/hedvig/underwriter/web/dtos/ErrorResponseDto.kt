@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.web.Dtos
+package com.hedvig.underwriter.web.dtos
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 
