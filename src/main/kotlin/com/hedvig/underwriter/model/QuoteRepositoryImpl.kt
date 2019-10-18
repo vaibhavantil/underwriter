@@ -36,6 +36,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             price = databaseQuote.price,
             currentInsurer = databaseQuote.currentInsurer,
             initiatedFrom = databaseQuote.initiatedFrom,
+            attributedTo = databaseQuote.attributedTo,
             productType = databaseQuote.productType,
             startDate = databaseQuote.startDate,
             quotedAt = databaseQuote.quotedAt,

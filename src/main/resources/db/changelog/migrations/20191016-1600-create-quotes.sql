@@ -15,7 +15,7 @@ CREATE TABLE quote_apartment_data (
     sub_type varchar(20) NULL
 );
 
-CREATE TABLE quote_house_data (
+CREATE TABLE quote_house_data(
     id uuid PRIMARY KEY,
     ssn varchar(12) NULL,
     first_name varchar(100) NULL,

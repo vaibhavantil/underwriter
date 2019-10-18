@@ -4,5 +4,8 @@ databaseChangeLog:
       file: ./migrations/20191016-1600-create-quotes.sql
       relativeToChangelogFile: true
   - include:
+      file: ./migrations/20191018-1021-add-partner-attribution.sql
+      relativeToChangelogFile: true
+  - include:
       file: ./migrations/20191018-1100-add-quote-member-id.sql
       relativeToChangelogFile: true

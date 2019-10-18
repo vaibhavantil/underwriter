@@ -9,10 +9,10 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 interface QuoteDao {
     @SqlUpdate(
         """
-            INSERT INTO quotes 
-            (id, created_at, quoted_at, signed_at, validity, product_type, initiated_from, current_insurer, start_date, price, quote_apartment_data_id, quote_house_data_id, member_id)
+            INSERT INTO quotes
+            (id, created_at, quoted_at, signed_at, validity, product_type, initiated_from, attributed_to, current_insurer, start_date, price, quote_apartment_data_id, quote_house_data_id, member_id)
             VALUES
-            (:id, :createdAt, :quotedAt, :signedAt, :validity, :productType, :initiatedFrom, :currentInsurer, :startDate, :price, :quoteApartmentDataId, :quoteHouseDataId, :memberId)
+            (:id, :createdAt, :quotedAt, :signedAt, :validity, :productType, :initiatedFrom, :attributedTo, :currentInsurer, :startDate, :price, :quoteApartmentDataId, :quoteHouseDataId, :memberId)
     """
     )
     fun insert(@BindBean quote: DatabaseQuote)
@@ -59,6 +59,7 @@ interface QuoteDao {
                 created_at = :createdAt,
                 product_type = :productType,
                 initiated_from = :initiatedFrom,
+                attributed_to = :attributedTo,
                 current_insurer = :currentInsurer,
                 start_date = :startDate,
                 price = :price,

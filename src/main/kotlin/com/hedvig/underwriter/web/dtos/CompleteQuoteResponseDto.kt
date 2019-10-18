@@ -6,4 +6,5 @@ import java.util.UUID
 data class CompleteQuoteResponseDto(
     val id: UUID,
     val price: BigDecimal
+    // val validTo: Instant
 )

@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
@@ -12,6 +13,7 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -33,7 +35,8 @@ class QuoteServiceImpl(
     val debtChecker: DebtChecker,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
-    val quoteRepository: QuoteRepository
+    val quoteRepository: QuoteRepository,
+    val customerIOClient: CustomerIO?
 ) : QuoteService {
     val logger = getLogger(QuoteServiceImpl::class.java)!!
 
@@ -82,7 +85,8 @@ class QuoteServiceImpl(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
             productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.PARTNER,
+            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = ApartmentData(UUID.randomUUID())
         )
 
@@ -184,7 +188,12 @@ class QuoteServiceImpl(
                 memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
             }
 
+            if (quoteWithMember.attributedTo != Partner.HEDVIG) {
+                customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
+            }
+
             val signedQuote = quoteWithMember.copy(signedAt = Instant.now())
+
             quoteRepository.update(signedQuote)
 
             return Right(SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!))
