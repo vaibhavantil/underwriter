@@ -14,7 +14,6 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.system.measureTimeMillis
 
 fun String.birthDateFromSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")

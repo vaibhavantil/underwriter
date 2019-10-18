@@ -3,7 +3,6 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
-import arrow.core.right
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
@@ -18,16 +17,15 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
-import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
-import org.slf4j.LoggerFactory.getLogger
 import java.time.Instant
 import java.util.UUID
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
 @Service

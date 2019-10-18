@@ -11,7 +11,7 @@ data class IncompleteQuoteDto(
     val ssn: String?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?
-    )
+)
 
 data class IncompleteHouseQuoteDataDto(
     val street: String?,
