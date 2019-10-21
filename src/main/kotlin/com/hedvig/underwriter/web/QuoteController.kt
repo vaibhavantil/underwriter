@@ -58,11 +58,9 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
-        return try {
-            val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body).getOrHandle { it }
-            ResponseEntity.ok(signedQuoteResponseDto)
-        } catch (e: QuoteNotFoundException) {
-            ResponseEntity.notFound().build()
+        return when (val quoteOrError = quoteService.signQuote(completeQuoteId, body)) {
+            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
+            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
         }
     }
 }
