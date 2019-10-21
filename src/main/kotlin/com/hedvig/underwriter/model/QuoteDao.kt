@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.model
 
+import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
@@ -9,13 +10,38 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 interface QuoteDao {
     @SqlUpdate(
         """
-            INSERT INTO quotes
-            (id, created_at, quoted_at, signed_at, validity, product_type, initiated_from, attributed_to, current_insurer, start_date, price, quote_apartment_data_id, quote_house_data_id, member_id)
-            VALUES
-            (:id, :createdAt, :quotedAt, :signedAt, :validity, :productType, :initiatedFrom, :attributedTo, :currentInsurer, :startDate, :price, :quoteApartmentDataId, :quoteHouseDataId, :memberId)
+            INSERT INTO quote_revisions (
+                master_quote_id,
+                timestamp,
+                validity,
+                product_type,
+                state,
+                attributed_to,
+                current_insurer,
+                start_date,
+                price,
+                quote_apartment_data_id,
+                quote_house_data_id,
+                member_id
+            )
+            VALUES (
+                :masterQuoteId,
+                :timestamp,
+                :validity,
+                :productType,
+                :state,
+                :attributedTo,
+                :currentInsurer,
+                :startDate,
+                :price,
+                :quoteApartmentDataId,
+                :quoteHouseDataId,
+                :memberId
+            )
+            RETURNING id
     """
     )
-    fun insert(@BindBean quote: DatabaseQuote)
+    fun insert(@BindBean quote: DatabaseQuote, @Bind timestamp: Instant): Int
 
     @SqlUpdate(
         """
@@ -27,7 +53,22 @@ interface QuoteDao {
     )
     fun insert(@BindBean quoteData: ApartmentData)
 
-    @SqlQuery("""SELECT * FROM "quotes" WHERE id = :quoteId;""")
+    @SqlQuery(
+        """
+            SELECT
+            DISTINCT ON (qr.master_quote_id)
+
+            qr.*,
+            mq.created_at,
+            mq.initiated_from
+
+            FROM quote_revisions qr
+            INNER JOIN master_quotes mq
+                ON mq.id = qr.master_quote_id
+            WHERE qr.master_quote_id = :quoteId
+            ORDER BY qr.master_quote_id ASC, qr.id DESC
+        """
+    )
     fun find(@Bind quoteId: UUID): DatabaseQuote?
 
     @SqlQuery("""SELECT * FROM quote_apartment_data WHERE id = :id""")
@@ -49,28 +90,6 @@ interface QuoteDao {
     """
     )
     fun findHouseQuoteData(@Bind id: UUID): HouseData?
-
-    @SqlUpdate(
-        """
-        UPDATE quotes
-            SET
-                quoted_at = :quotedAt,
-                signed_at = :signedAt,
-                created_at = :createdAt,
-                product_type = :productType,
-                initiated_from = :initiatedFrom,
-                attributed_to = :attributedTo,
-                current_insurer = :currentInsurer,
-                start_date = :startDate,
-                price = :price,
-                quote_apartment_data_id = :quoteApartmentDataId,
-                quote_house_data_id = :quoteHouseDataId,
-                member_id = :memberId
-            WHERE
-                id = :id
-    """
-    )
-    fun update(@BindBean quote: DatabaseQuote)
 
     @SqlUpdate(
         """
@@ -108,4 +127,15 @@ interface QuoteDao {
     """
     )
     fun update(@BindBean quote: HouseData)
+
+    @SqlUpdate(
+        """
+        INSERT INTO master_quotes (id, initiated_from, created_at) VALUES (:quoteId, :initiatedFrom, :createdAt)
+    """
+    )
+    fun insertMasterQuote(
+        @Bind quoteId: UUID,
+        @Bind initiatedFrom: QuoteInitiatedFrom,
+        @Bind createdAt: Instant = Instant.now()
+    )
 }

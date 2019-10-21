@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import java.time.Instant
@@ -86,7 +87,8 @@ internal class QuoteBuilderControllerTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            state = QuoteState.INCOMPLETE
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))
@@ -124,7 +126,8 @@ internal class QuoteBuilderControllerTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            state = QuoteState.INCOMPLETE
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))

@@ -15,10 +15,8 @@ class QuoteRepositoryImplTest {
     fun insertsAndFindsApartmentQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
+        val timestamp = Instant.now()
         val quote = Quote(
-            createdAt = Instant.now(),
-            quotedAt = Instant.now().plusSeconds(1),
-            signedAt = Instant.now().plusSeconds(2),
             productType = ProductType.APARTMENT,
             data = ApartmentData(
                 firstName = "Sherlock",
@@ -36,9 +34,11 @@ class QuoteRepositoryImplTest {
             attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null,
-            memberId = "123456"
-        )
-        quoteDao.insert(quote)
+            memberId = "123456",
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+            )
+        quoteDao.insert(quote, timestamp)
         assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
     }
 
@@ -46,10 +46,9 @@ class QuoteRepositoryImplTest {
     fun updatesApartmentQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
+        val timestamp = Instant.now()
         val quote = Quote(
-            createdAt = Instant.now(),
-            quotedAt = Instant.now().plusSeconds(1),
-            signedAt = Instant.now().plusSeconds(2),
+            createdAt = timestamp,
             productType = ProductType.APARTMENT,
             data = ApartmentData(
                 firstName = "Sherlock",
@@ -66,17 +65,18 @@ class QuoteRepositoryImplTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            state = QuoteState.QUOTED
         )
-        quoteDao.insert(quote)
+        quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
-            quotedAt = Instant.now().plusSeconds(4),
-            signedAt = Instant.now().plusSeconds(5),
             data = (quote.data as ApartmentData).copy(
+                id = UUID.randomUUID(),
                 firstName = "John",
                 lastName = "Watson"
             ),
-            memberId = "123456"
+            memberId = "123456",
+            state = QuoteState.SIGNED
         )
         quoteDao.update(updatedQuote)
 
@@ -87,10 +87,9 @@ class QuoteRepositoryImplTest {
     fun insertsAndFindsHouseQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
+        val timestamp = Instant.now()
         val quote = Quote(
-            createdAt = Instant.now(),
-            quotedAt = Instant.now().plusSeconds(1),
-            signedAt = Instant.now().plusSeconds(2),
+            createdAt = timestamp,
             productType = ProductType.APARTMENT,
             data = HouseData(
                 firstName = "Sherlock",
@@ -107,9 +106,10 @@ class QuoteRepositoryImplTest {
             attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
             currentInsurer = null,
-            memberId = "123456"
+            memberId = "123456",
+            state = QuoteState.SIGNED
         )
-        quoteDao.insert(quote)
+        quoteDao.insert(quote, timestamp)
         assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
     }
 
@@ -117,10 +117,9 @@ class QuoteRepositoryImplTest {
     fun updatesHouseQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
+        val timestamp = Instant.now()
         val quote = Quote(
-            createdAt = Instant.now(),
-            quotedAt = Instant.now().plusSeconds(1),
-            signedAt = Instant.now().plusSeconds(2),
+            createdAt = timestamp,
             productType = ProductType.APARTMENT,
             data = HouseData(
                 firstName = "Sherlock",
@@ -136,14 +135,15 @@ class QuoteRepositoryImplTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
             id = UUID.randomUUID(),
-            currentInsurer = null
+            currentInsurer = null,
+            state = QuoteState.QUOTED
         )
-        quoteDao.insert(quote)
+        quoteDao.insert(quote, timestamp)
 
         val updatedQuote = quote.copy(
-            quotedAt = Instant.now().plusSeconds(5),
-            signedAt = Instant.now().plusSeconds(6),
+            state = QuoteState.SIGNED,
             data = (quote.data as HouseData).copy(
+                id = UUID.randomUUID(),
                 firstName = "John",
                 lastName = "Watson"
             ),
