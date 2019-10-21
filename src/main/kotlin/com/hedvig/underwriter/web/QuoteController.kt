@@ -1,10 +1,8 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
-import arrow.core.getOrHandle
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
