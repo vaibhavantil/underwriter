@@ -1,10 +1,8 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
-import arrow.core.getOrHandle
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
@@ -58,11 +56,9 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
-        return try {
-            val signedQuoteResponseDto = quoteService.signQuote(completeQuoteId, body).getOrHandle { it }
-            ResponseEntity.ok(signedQuoteResponseDto)
-        } catch (e: QuoteNotFoundException) {
-            ResponseEntity.notFound().build()
+        return when (val errorOrQuote = quoteService.signQuote(completeQuoteId, body)) {
+            is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
+            is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
     }
 }
