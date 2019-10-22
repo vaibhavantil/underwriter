@@ -25,7 +25,7 @@ fun String.birthDateFromSsn(): LocalDate {
     )
 }
 
-data class DatabaseQuote(
+data class DatabaseQuoteRevision(
     val id: Int?,
     val masterQuoteId: UUID,
     val timestamp: Instant,
@@ -36,8 +36,8 @@ data class DatabaseQuote(
     val currentInsurer: String? = "",
     val startDate: LocalDate? = null,
     val price: BigDecimal? = null,
-    val quoteApartmentDataId: UUID?,
-    val quoteHouseDataId: UUID?,
+    val quoteApartmentDataId: Int?,
+    val quoteHouseDataId: Int?,
     val memberId: String?,
     val initiatedFrom: QuoteInitiatedFrom?,
     val createdAt: Instant?
@@ -45,7 +45,7 @@ data class DatabaseQuote(
 
     companion object {
         fun from(quote: Quote, id: Int? = null, timestamp: Instant = Instant.now()) =
-            DatabaseQuote(
+            DatabaseQuoteRevision(
                 id = id,
                 masterQuoteId = quote.id,
                 timestamp = timestamp,
@@ -57,11 +57,11 @@ data class DatabaseQuote(
                 startDate = quote.startDate,
                 price = quote.price,
                 quoteApartmentDataId = when (quote.data) {
-                    is ApartmentData -> quote.data.id
+                    is ApartmentData -> quote.data.internalId
                     else -> null
                 },
                 quoteHouseDataId = when (quote.data) {
-                    is HouseData -> quote.data.id
+                    is HouseData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,

@@ -4,6 +4,7 @@ import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 
@@ -38,20 +39,11 @@ interface QuoteDao {
                 :quoteHouseDataId,
                 :memberId
             )
-            RETURNING id
+            RETURNING *
     """
     )
-    fun insert(@BindBean quote: DatabaseQuote, @Bind timestamp: Instant): Int
-
-    @SqlUpdate(
-        """
-            INSERT INTO quote_apartment_data
-            (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space, sub_type)
-            VALUES
-            (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
-        """
-    )
-    fun insert(@BindBean quoteData: ApartmentData)
+    @GetGeneratedKeys("id")
+    fun insert(@BindBean quote: DatabaseQuoteRevision, @Bind timestamp: Instant): DatabaseQuoteRevision
 
     @SqlQuery(
         """
@@ -69,64 +61,42 @@ interface QuoteDao {
             ORDER BY qr.master_quote_id ASC, qr.id DESC
         """
     )
-    fun find(@Bind quoteId: UUID): DatabaseQuote?
-
-    @SqlQuery("""SELECT * FROM quote_apartment_data WHERE id = :id""")
-    fun findApartmentQuoteData(@Bind id: UUID): ApartmentData?
+    fun find(@Bind quoteId: UUID): DatabaseQuoteRevision?
 
     @SqlUpdate(
         """
-            INSERT INTO quote_house_data
+            INSERT INTO quote_revision_apartment_data
+            (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space, sub_type)
+            VALUES
+            (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
+            RETURNING *
+        """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean quoteData: ApartmentData): ApartmentData
+
+    @SqlQuery("""
+        SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
+    fun findApartmentQuoteData(@Bind id: Int): ApartmentData?
+
+    @SqlUpdate(
+        """
+            INSERT INTO quote_revision_house_data
             (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space)
             VALUES
             (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace)
+            RETURNING *
     """
     )
-    fun insert(@BindBean data: HouseData)
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: HouseData): HouseData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_house_data WHERE id = :id
+        SELECT * FROM quote_revision_house_data WHERE internal_id = :id
     """
     )
-    fun findHouseQuoteData(@Bind id: UUID): HouseData?
-
-    @SqlUpdate(
-        """
-        UPDATE quote_apartment_data 
-            SET
-                ssn = :ssn,
-                first_name = :firstName,
-                last_name = :lastName,
-                street = :street,
-                city = :city,
-                zip_code = :zipCode,
-                household_size = :householdSize,
-                living_space = :livingSpace,
-                sub_type = :subType
-            WHERE
-                id = :id
-    """
-    )
-    fun update(@BindBean quote: ApartmentData)
-
-    @SqlUpdate(
-        """
-        UPDATE quote_house_data
-        SET
-            ssn = :ssn,
-            first_name = :firstName,
-            last_name = :lastName,
-            street = :street,
-            city = :city,
-            zip_code = :zipCode,
-            household_size = :householdSize,
-            living_space = :livingSpace
-        WHERE
-            id = :id
-    """
-    )
-    fun update(@BindBean quote: HouseData)
+    fun findHouseQuoteData(@Bind id: Int): HouseData?
 
     @SqlUpdate(
         """

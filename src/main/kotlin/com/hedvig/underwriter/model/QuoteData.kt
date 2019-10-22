@@ -81,7 +81,9 @@ data class HouseData(
     override val zipCode: String?,
     override val city: String?,
     override var livingSpace: Int?,
-    override var householdSize: Int?
+    override var householdSize: Int?,
+    @JsonIgnore
+    val internalId: Int? = null
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<HouseData> {
     @get:JsonIgnore
     override val isComplete: Boolean
@@ -107,7 +109,9 @@ data class ApartmentData(
     override val householdSize: Int? = null,
     override val livingSpace: Int? = null,
 
-    val subType: ApartmentProductSubType? = null
+    val subType: ApartmentProductSubType? = null,
+    @JsonIgnore
+    val internalId: Int? = null
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<ApartmentData> {
     @get:JsonIgnore
     override val isComplete: Boolean

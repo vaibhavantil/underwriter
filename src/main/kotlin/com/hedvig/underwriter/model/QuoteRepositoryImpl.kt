@@ -14,12 +14,12 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         timestamp: Instant
     ) = jdbi.useTransaction<RuntimeException> { h ->
         val dao = h.attach<QuoteDao>()
-        when (quote.data) {
+        val quoteData: QuoteData = when (quote.data) {
             is ApartmentData -> dao.insert(quote.data)
             is HouseData -> dao.insert(quote.data)
         }
         dao.insertMasterQuote(quote.id, quote.initiatedFrom, timestamp)
-        val databaseQuote = DatabaseQuote.from(quote)
+        val databaseQuote = DatabaseQuoteRevision.from(quote.copy(data = quoteData))
         dao.insert(databaseQuote, timestamp)
     }
 
@@ -62,16 +62,16 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
 
     override fun update(updatedQuote: Quote, timestamp: Instant): Quote =
         jdbi.inTransaction<Quote, RuntimeException> { h ->
-        update(updatedQuote, timestamp, h)
-        find(updatedQuote.id, h)!!
-    }
+            update(updatedQuote, timestamp, h)
+            find(updatedQuote.id, h)!!
+        }
 
     private fun update(updatedQuote: Quote, timestamp: Instant, h: Handle) {
         val dao = h.attach<QuoteDao>()
-        when (updatedQuote.data) {
+        val quoteData: QuoteData = when (updatedQuote.data) {
             is ApartmentData -> dao.insert(updatedQuote.data)
             is HouseData -> dao.insert(updatedQuote.data)
         }
-        dao.insert(DatabaseQuote.from(updatedQuote), timestamp)
+        dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
     }
 }

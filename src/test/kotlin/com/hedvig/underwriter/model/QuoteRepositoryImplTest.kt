@@ -3,6 +3,8 @@ package com.hedvig.underwriter.model
 import com.hedvig.underwriter.testhelp.JdbiRule
 import java.time.Instant
 import java.util.UUID
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaGetter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +41,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.INCOMPLETE
             )
         quoteDao.insert(quote, timestamp)
-        assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
     }
 
     @Test
@@ -71,7 +73,6 @@ class QuoteRepositoryImplTest {
         quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
             data = (quote.data as ApartmentData).copy(
-                id = UUID.randomUUID(),
                 firstName = "John",
                 lastName = "Watson"
             ),
@@ -80,7 +81,7 @@ class QuoteRepositoryImplTest {
         )
         quoteDao.update(updatedQuote)
 
-        assertThat(quoteDao.find(quote.id)).isEqualTo(updatedQuote)
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
     }
 
     @Test
@@ -110,7 +111,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED
         )
         quoteDao.insert(quote, timestamp)
-        assertThat(quoteDao.find(quote.id)).isEqualTo(quote)
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
     }
 
     @Test
@@ -143,7 +144,6 @@ class QuoteRepositoryImplTest {
         val updatedQuote = quote.copy(
             state = QuoteState.SIGNED,
             data = (quote.data as HouseData).copy(
-                id = UUID.randomUUID(),
                 firstName = "John",
                 lastName = "Watson"
             ),
@@ -151,6 +151,27 @@ class QuoteRepositoryImplTest {
         )
         quoteDao.update(updatedQuote)
 
-        assertThat(quoteDao.find(quote.id)).isEqualTo(updatedQuote)
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    private fun assertQuotesDeepEqualExceptInternalId(
+        expected: Quote,
+        result: Quote?
+    ) {
+        expected::class.memberProperties.forEach { prop ->
+            if (prop.name == "data") {
+                prop.javaGetter!!.invoke(expected)::class.memberProperties.forEach { dataProp ->
+                    if (dataProp.name != "internalId") {
+                        assertThat(dataProp.javaGetter!!.invoke(expected.data)).isEqualTo(
+                            dataProp.javaGetter!!.invoke(
+                                result?.data
+                            )
+                        )
+                    }
+                }
+            } else {
+                assertThat(prop.javaGetter!!.invoke(expected)).isEqualTo(prop.javaGetter!!.invoke(result))
+            }
+        }
     }
 }
