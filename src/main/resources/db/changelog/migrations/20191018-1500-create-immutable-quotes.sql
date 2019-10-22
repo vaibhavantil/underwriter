@@ -56,4 +56,4 @@ CREATE TABLE quote_revisions (
     )
 )
 
---rollback DROP TABLE quotes_revisions; DROP TABLE master_quotes;
+--rollback DROP TABLE quotes_revisions; DROP TABLE quote_revision_house_data; DROP TABLE quote_revision_apartment_data; DROP TABLE master_quotes;
