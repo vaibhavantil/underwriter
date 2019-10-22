@@ -2,6 +2,8 @@
 
 --changeset palmenhq:20191016-1600-create-immutable-quotes.sql
 
+-- Create tables
+
 CREATE TABLE master_quotes (
     id uuid PRIMARY KEY,
     initiated_from varchar(20) NOT NULL,
@@ -54,6 +56,31 @@ CREATE TABLE quote_revisions (
          OR
         (quote_apartment_data_id IS NULL AND quote_house_data_id IS NOT NULL)
     )
-)
+);
 
---rollback DROP TABLE quotes_revisions; DROP TABLE quote_revision_house_data; DROP TABLE quote_revision_apartment_data; DROP TABLE master_quotes;
+-- Migrate existing data
+
+INSERT INTO master_quotes (id, initiated_from, created_at)
+SELECT id, initiated_from, created_at
+FROM quotes
+;
+
+INSERT INTO quote_revision_apartment_data (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space, sub_type)
+SELECT id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space, sub_type
+FROM quote_apartment_data
+;
+
+INSERT INTO quote_revisions (master_quote_id, timestamp, validity, product_type, state, attributed_to, current_insurer, start_date, price, quote_apartment_data_id, member_id)
+SELECT q.id, now(), q.validity, q.product_type,
+    CASE
+        WHEN (signed_at IS NOT NULL) THEN 'SIGNED'
+        WHEN (quoted_at IS NOT NULL) THEN 'QUOTED'
+        ELSE 'INCOMPLETE'
+    END
+, q.attributed_to, q.current_insurer, q.start_date, q.price, qrad.internal_id, q.member_id
+FROM quotes q
+LEFT JOIN quote_revision_apartment_data qrad
+    ON qrad.id = q.quote_apartment_data_id
+;
+
+--rollback DROP TABLE quote_revisions; DROP TABLE quote_revision_house_data; DROP TABLE quote_revision_apartment_data; DROP TABLE master_quotes;
