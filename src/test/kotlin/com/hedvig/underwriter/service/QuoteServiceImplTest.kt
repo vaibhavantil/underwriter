@@ -9,6 +9,7 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -56,13 +57,13 @@ class QuoteServiceImplTest {
 
         val quoteId = UUID.randomUUID()
         val quote = Quote(
-            quoteId,
-            Instant.now(),
-            BigDecimal.ZERO,
-            ProductType.APARTMENT,
-            QuoteInitiatedFrom.RAPIO,
-            Partner.COMPRICER,
-            ApartmentData(
+            id = quoteId,
+            createdAt = Instant.now(),
+            price = BigDecimal.ZERO,
+            productType = ProductType.APARTMENT,
+            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            attributedTo = Partner.COMPRICER,
+            data = ApartmentData(
                 UUID.randomUUID(),
                 ssn = "191212121212",
                 lastName = "",
@@ -74,12 +75,11 @@ class QuoteServiceImplTest {
                 firstName = "",
                 street = ""
             ),
-            null,
-            null
+            state = QuoteState.INCOMPLETE
         )
 
         every { quoteRepository.find(any()) } returns quote
-        every { quoteRepository.update(any()) } returnsArgument 0
+        every { quoteRepository.update(any(), any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(
@@ -95,18 +95,17 @@ class QuoteServiceImplTest {
 
     @Test
     fun givenPartnerIsHedvigDoNotSendPartnerIdToCustomerIO() {
-
         val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO)
 
         val quoteId = UUID.randomUUID()
         val quote = Quote(
-            quoteId,
-            Instant.now(),
-            BigDecimal.ZERO,
-            ProductType.APARTMENT,
-            QuoteInitiatedFrom.RAPIO,
-            Partner.HEDVIG,
-            ApartmentData(
+            id = quoteId,
+            createdAt = Instant.now(),
+            price = BigDecimal.ZERO,
+            productType = ProductType.APARTMENT,
+            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            attributedTo = Partner.HEDVIG,
+            data = ApartmentData(
                 UUID.randomUUID(),
                 ssn = "191212121212",
                 lastName = "",
@@ -118,12 +117,11 @@ class QuoteServiceImplTest {
                 firstName = "",
                 street = ""
             ),
-            null,
-            null
+            state = QuoteState.INCOMPLETE
         )
 
         every { quoteRepository.find(any()) } returns quote
-        every { quoteRepository.update(any()) } returnsArgument 0
+        every { quoteRepository.update(any(), any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(

@@ -81,16 +81,18 @@ class QuoteServiceImpl(
     }
 
     override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+        val now = Instant.now()
         val quote = Quote(
             id = UUID.randomUUID(),
-            createdAt = Instant.now(),
+            createdAt = now,
             productType = ProductType.APARTMENT,
             initiatedFrom = QuoteInitiatedFrom.RAPIO,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
-            data = ApartmentData(UUID.randomUUID())
+            data = ApartmentData(UUID.randomUUID()),
+            state = QuoteState.INCOMPLETE
         )
 
-        quoteRepository.insert(quote.update(incompleteQuoteDto))
+        quoteRepository.insert(quote.update(incompleteQuoteDto), now)
 
         return IncompleteQuoteResponseDto(quote.id, quote.productType, quote.initiatedFrom)
     }
@@ -192,11 +194,12 @@ class QuoteServiceImpl(
                 customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
             }
 
-            val signedQuote = quoteWithMember.copy(signedAt = Instant.now())
+            val signedAt = Instant.now()
+            val signedQuote = quoteWithMember.copy(state = QuoteState.SIGNED)
 
-            quoteRepository.update(signedQuote)
+            quoteRepository.update(signedQuote, signedAt)
 
-            return Right(SignedQuoteResponseDto(signedQuoteId, signedQuote.signedAt!!))
+            return Right(SignedQuoteResponseDto(signedQuoteId, signedAt))
         } catch (exception: Exception) {
             throw RuntimeException("could not create a signed quote", exception)
         }

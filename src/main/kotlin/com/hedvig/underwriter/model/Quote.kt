@@ -25,49 +25,48 @@ fun String.birthDateFromSsn(): LocalDate {
     )
 }
 
-data class DatabaseQuote(
-    val id: UUID,
-    val createdAt: Instant,
-    val quotedAt: Instant?,
-    val signedAt: Instant?,
+data class DatabaseQuoteRevision(
+    val id: Int?,
+    val masterQuoteId: UUID,
+    val timestamp: Instant,
     val validity: Long,
     val productType: ProductType = ProductType.UNKNOWN,
-    val initiatedFrom: QuoteInitiatedFrom,
+    val state: QuoteState,
     val attributedTo: Partner,
-
     val currentInsurer: String? = "",
-
     val startDate: LocalDate? = null,
-
     val price: BigDecimal? = null,
-    val quoteApartmentDataId: UUID?,
-    val quoteHouseDataId: UUID?,
-    val memberId: String?
+    val quoteApartmentDataId: Int?,
+    val quoteHouseDataId: Int?,
+    val memberId: String?,
+    val initiatedFrom: QuoteInitiatedFrom?,
+    val createdAt: Instant?
 ) {
 
     companion object {
-        fun from(quote: Quote) =
-            DatabaseQuote(
-                id = quote.id,
+        fun from(quote: Quote, id: Int? = null, timestamp: Instant = Instant.now()) =
+            DatabaseQuoteRevision(
+                id = id,
+                masterQuoteId = quote.id,
+                timestamp = timestamp,
+                validity = quote.validity,
+                productType = quote.productType,
+                state = quote.state,
+                attributedTo = quote.attributedTo,
+                currentInsurer = quote.currentInsurer,
+                startDate = quote.startDate,
+                price = quote.price,
                 quoteApartmentDataId = when (quote.data) {
-                    is ApartmentData -> quote.data.id
+                    is ApartmentData -> quote.data.internalId
                     else -> null
                 },
                 quoteHouseDataId = when (quote.data) {
-                    is HouseData -> quote.data.id
+                    is HouseData -> quote.data.internalId
                     else -> null
                 },
+                memberId = quote.memberId,
                 createdAt = quote.createdAt,
-                quotedAt = quote.quotedAt,
-                signedAt = quote.signedAt,
-                validity = quote.validity,
-                price = quote.price,
-                currentInsurer = quote.currentInsurer,
-                initiatedFrom = quote.initiatedFrom,
-                attributedTo = quote.attributedTo,
-                productType = quote.productType,
-                startDate = quote.startDate,
-                memberId = quote.memberId
+                initiatedFrom = quote.initiatedFrom
             )
     }
 }
@@ -79,6 +78,7 @@ data class Quote(
     val createdAt: Instant,
     val price: BigDecimal? = null,
     val productType: ProductType = ProductType.UNKNOWN,
+    val state: QuoteState,
     val initiatedFrom: QuoteInitiatedFrom,
     val attributedTo: Partner,
     val data: QuoteData,
@@ -87,8 +87,6 @@ data class Quote(
 
     val startDate: LocalDate? = null,
 
-    val quotedAt: Instant? = null,
-    val signedAt: Instant? = null,
     val validity: Long = ONE_DAY * 30,
     val memberId: String? = null
 ) {
@@ -98,15 +96,6 @@ data class Quote(
             productType == ProductType.UNKNOWN -> false
             !data.isComplete -> false
             else -> true
-        }
-    val state: QuoteState
-        get() = when (signedAt) {
-            null -> when {
-                createdAt.plusSeconds(validity).isBefore(Instant.now()) -> QuoteState.EXPIRED
-                quotedAt != null -> QuoteState.QUOTED
-                else -> QuoteState.INCOMPLETE
-            }
-            else -> QuoteState.SIGNED
         }
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
@@ -219,7 +208,7 @@ data class Quote(
             return Right(
                 this.copy(
                     price = getPriceRetrievedFromProductPricing(productPricingService),
-                    quotedAt = Instant.now()
+                    state = QuoteState.QUOTED
                 )
             )
         }
