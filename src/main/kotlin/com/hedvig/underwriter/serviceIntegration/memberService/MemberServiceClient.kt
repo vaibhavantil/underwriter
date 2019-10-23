@@ -1,9 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.*
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
@@ -38,4 +35,7 @@ interface MemberServiceClient {
 
     @PostMapping("/_/member/{memberId}/updateSSN")
     fun updateMemberSsn(@PathVariable memberId: Long, @RequestBody request: UpdateSsnRequest)
+
+    @GetMapping("/v2/member/sign/signedSSN")
+    fun checkSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): SsnAlreadySignedMemberResponse
 }

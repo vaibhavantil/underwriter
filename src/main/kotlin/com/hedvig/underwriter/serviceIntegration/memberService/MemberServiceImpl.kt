@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.SsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -20,6 +21,10 @@ class MemberServiceImpl @Autowired constructor(
     val client: MemberServiceClient,
     val objectMapper: ObjectMapper
 ) : MemberService {
+
+    override fun ssnAlreadySignedMemberEntity(ssn: String): SsnAlreadySignedMemberResponse {
+        return this.client.checkSsnAlreadySignedMemberEntity(ssn)
+    }
 
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
