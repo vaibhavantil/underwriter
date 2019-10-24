@@ -37,5 +37,5 @@ interface MemberServiceClient {
     fun updateMemberSsn(@PathVariable memberId: Long, @RequestBody request: UpdateSsnRequest)
 
     @GetMapping("/v2/member/sign/signedSSN")
-    fun checkSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): SsnAlreadySignedMemberResponse
+    fun checkIsSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): IsSsnAlreadySignedMemberResponse
 }

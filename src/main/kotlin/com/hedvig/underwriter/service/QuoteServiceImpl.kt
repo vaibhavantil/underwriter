@@ -154,8 +154,8 @@ class QuoteServiceImpl(
 
             when (quote.data) {
                 is ApartmentData -> {
-                    val memberAlreadySigned = memberService.ssnAlreadySignedMemberEntity(quote.data.ssn!!)
-                    if(memberAlreadySigned.ssnAlreadyMember) {
+                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                    if (memberAlreadySigned.ssnAlreadySignedMember) {
                         return Either.Left(
                             ErrorResponseDto(
                                 ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
@@ -165,8 +165,8 @@ class QuoteServiceImpl(
                     }
                 }
                 is HouseData -> {
-                    val memberAlreadySigned = memberService.ssnAlreadySignedMemberEntity(quote.data.ssn!!)
-                    if(memberAlreadySigned.ssnAlreadyMember) {
+                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                    if (memberAlreadySigned.ssnAlreadySignedMember) {
                         return Either.Left(
                             ErrorResponseDto(
                                 ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,

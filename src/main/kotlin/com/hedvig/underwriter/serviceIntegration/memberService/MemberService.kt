@@ -1,10 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import arrow.core.Either
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.SsnAlreadySignedMemberResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.*
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import org.slf4j.Logger
@@ -27,5 +24,5 @@ interface MemberService {
 
     fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest)
 
-    fun ssnAlreadySignedMemberEntity(ssn: String): SsnAlreadySignedMemberResponse
+    fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse
 }
