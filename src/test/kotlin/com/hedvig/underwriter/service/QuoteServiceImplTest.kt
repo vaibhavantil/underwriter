@@ -11,6 +11,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
@@ -88,7 +89,7 @@ class QuoteServiceImplTest {
             )
         } returns RapioProductCreatedResponseDto(UUID.randomUUID())
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
-
+        every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.setPartnerCode("1234", Partner.COMPRICER) }
     }
@@ -132,7 +133,7 @@ class QuoteServiceImplTest {
             )
         } returns RapioProductCreatedResponseDto(UUID.randomUUID())
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
-
+        every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify(exactly = 0) { customerIO.setPartnerCode(any(), any()) }
     }
