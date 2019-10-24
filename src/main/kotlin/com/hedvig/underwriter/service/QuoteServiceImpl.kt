@@ -3,7 +3,15 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
-import com.hedvig.underwriter.model.*
+import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.Partner
+import com.hedvig.underwriter.model.PersonPolicyHolder
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
