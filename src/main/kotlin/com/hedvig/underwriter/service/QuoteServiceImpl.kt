@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.ProductType
@@ -38,6 +39,7 @@ class QuoteServiceImpl(
     val quoteRepository: QuoteRepository,
     val customerIOClient: CustomerIO?
 ) : QuoteService {
+
     val logger = getLogger(QuoteServiceImpl::class.java)!!
 
     override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote> {
@@ -158,6 +160,31 @@ class QuoteServiceImpl(
                         "quote is already signed"
                     )
                 )
+            }
+
+            when (quote.data) {
+                is ApartmentData -> {
+                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                    if (memberAlreadySigned.ssnAlreadySignedMember) {
+                        return Either.Left(
+                            ErrorResponseDto(
+                                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                                "quote is already signed"
+                            )
+                        )
+                    }
+                }
+                is HouseData -> {
+                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                    if (memberAlreadySigned.ssnAlreadySignedMember) {
+                        return Either.Left(
+                            ErrorResponseDto(
+                                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                                "quote is already signed"
+                            )
+                        )
+                    }
+                }
             }
 
             val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {

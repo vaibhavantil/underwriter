@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -38,4 +39,7 @@ interface MemberServiceClient {
 
     @PostMapping("/_/member/{memberId}/updateSSN")
     fun updateMemberSsn(@PathVariable memberId: Long, @RequestBody request: UpdateSsnRequest)
+
+    @GetMapping("/v2/member/sign/signedSSN")
+    fun checkIsSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): IsSsnAlreadySignedMemberResponse
 }

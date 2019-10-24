@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import arrow.core.Either
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -25,4 +26,6 @@ interface MemberService {
     ): Either<ErrorResponseDto, UnderwriterQuoteSignResponse>
 
     fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest)
+
+    fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse
 }
