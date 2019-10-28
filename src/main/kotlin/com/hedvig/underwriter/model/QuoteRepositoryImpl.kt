@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
+
     override fun insert(
         quote: Quote,
         timestamp: Instant
@@ -33,6 +34,33 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
             databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
             else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) for quote $quoteId}")
+        }!!
+        return Quote(
+            id = databaseQuote.masterQuoteId,
+            validity = databaseQuote.validity,
+            productType = databaseQuote.productType,
+            state = databaseQuote.state,
+            attributedTo = databaseQuote.attributedTo,
+            currentInsurer = databaseQuote.currentInsurer,
+            startDate = databaseQuote.startDate,
+            price = databaseQuote.price,
+            data = quoteData,
+            memberId = databaseQuote.memberId,
+            initiatedFrom = databaseQuote.initiatedFrom!!,
+            createdAt = databaseQuote.createdAt!!
+        )
+    }
+
+    override fun findByMemberId(memberId: String): Quote? =
+        jdbi.inTransaction<Quote?, RuntimeException> { h -> findByMemberId(memberId, h) }
+
+    fun findByMemberId(memberId: String, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuote = dao.findByMemberId(memberId) ?: return null
+        val quoteData: QuoteData = when {
+            databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
+            databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
+            else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) for quote ${databaseQuote.id}}")
         }!!
         return Quote(
             id = databaseQuote.masterQuoteId,

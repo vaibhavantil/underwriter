@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
@@ -43,6 +44,12 @@ class QuoteController @Autowired constructor(
     fun getQuote(@PathVariable id: UUID): ResponseEntity<Quote> {
         val optionalQuote = quoteService.getQuote(id) ?: return ResponseEntity.notFound().build()
 
+        return ResponseEntity.ok(optionalQuote)
+    }
+
+    @GetMapping("/member/{memberId}")
+    fun getQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+        val optionalQuote = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(optionalQuote)
     }
 
