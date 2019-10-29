@@ -47,10 +47,10 @@ class QuoteController @Autowired constructor(
         return ResponseEntity.ok(optionalQuote)
     }
 
-    @GetMapping("/member/{memberId}")
+    @GetMapping("/members/{memberId}")
     fun getQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
-        val optionalQuote = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(optionalQuote)
+        val quoteDto = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(quoteDto)
     }
 
     @PatchMapping("/{id}")

@@ -217,7 +217,7 @@ data class Quote(
         return Left(errorStrings)
     }
 
-    fun getQuoteDto(): QuoteDto {
+    fun toQuoteDto(): QuoteDto {
         when (this.data) {
             is ApartmentData -> {
                 return QuoteDto(
