@@ -10,7 +10,7 @@ import java.util.UUID
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ApartmentData::class, name = "home"),
+    JsonSubTypes.Type(value = ApartmentData::class, name = "apartment"),
     JsonSubTypes.Type(value = HouseData::class, name = "house")
 )
 sealed class QuoteData {
