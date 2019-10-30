@@ -23,7 +23,9 @@ interface QuoteDao {
                 price,
                 quote_apartment_data_id,
                 quote_house_data_id,
-                member_id
+                member_id,
+                originating_product_id,
+                signed_product_id
             )
             VALUES (
                 :masterQuoteId,
@@ -37,7 +39,9 @@ interface QuoteDao {
                 :price,
                 :quoteApartmentDataId,
                 :quoteHouseDataId,
-                :memberId
+                :memberId,
+                :originatingProductId,
+                :signedProductId
             )
             RETURNING *
     """
@@ -101,9 +105,41 @@ interface QuoteDao {
     @SqlUpdate(
         """
             INSERT INTO quote_revision_house_data
-            (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space)
+            (
+                id,
+                ssn,
+                first_name,
+                last_name,
+                street,
+                city,
+                zip_code,
+                household_size,
+                living_space,
+                ancillary_area,
+                year_of_construction,
+                number_of_bathrooms,
+                extra_buildings,
+                is_subleted,
+                floor
+            )
             VALUES
-            (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace)
+            (
+                :id,
+                :ssn,
+                :firstName,
+                :lastName,
+                :street,
+                :city,
+                :zipCode,
+                :householdSize,
+                :livingSpace,
+                :ancillaryArea,
+                :yearOfConstruction,
+                :numberOfBathrooms,
+                :extraBuildings,
+                :isSubleted,
+                :floor
+            )
             RETURNING *
     """
     )

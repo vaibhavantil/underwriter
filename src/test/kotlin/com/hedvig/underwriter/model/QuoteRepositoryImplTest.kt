@@ -1,11 +1,15 @@
 package com.hedvig.underwriter.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.hedvig.underwriter.testhelp.JdbiRule
 import java.time.Instant
 import java.util.UUID
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
 import org.assertj.core.api.Assertions.assertThat
+import org.jdbi.v3.jackson2.Jackson2Config
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,13 +17,24 @@ class QuoteRepositoryImplTest {
     @get:Rule
     val jdbiRule = JdbiRule.create()
 
+    @Before
+    fun setUp() {
+        jdbiRule.jdbi.getConfig(Jackson2Config::class.java).mapper =
+            ObjectMapper().registerModule(KotlinModule())
+    }
+
     @Test
     fun insertsAndFindsApartmentQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
         val timestamp = Instant.now()
         val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
             productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             data = ApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -32,14 +47,11 @@ class QuoteRepositoryImplTest {
                 id = UUID.randomUUID(),
                 subType = ApartmentProductSubType.BRF
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            id = UUID.randomUUID(),
             currentInsurer = null,
             memberId = "123456",
-            createdAt = timestamp,
-            state = QuoteState.INCOMPLETE
-            )
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
+        )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
     }
@@ -50,8 +62,12 @@ class QuoteRepositoryImplTest {
 
         val timestamp = Instant.now()
         val quote = Quote(
+            id = UUID.randomUUID(),
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             data = ApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -64,11 +80,7 @@ class QuoteRepositoryImplTest {
                 id = UUID.randomUUID(),
                 subType = ApartmentProductSubType.BRF
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            id = UUID.randomUUID(),
-            currentInsurer = null,
-            state = QuoteState.QUOTED
+            currentInsurer = null
         )
         quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
@@ -77,7 +89,9 @@ class QuoteRepositoryImplTest {
                 lastName = "Watson"
             ),
             memberId = "123456",
-            state = QuoteState.SIGNED
+            state = QuoteState.SIGNED,
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
         )
         quoteDao.update(updatedQuote)
 
@@ -90,8 +104,12 @@ class QuoteRepositoryImplTest {
 
         val timestamp = Instant.now()
         val quote = Quote(
+            id = UUID.randomUUID(),
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
+            state = QuoteState.SIGNED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             data = HouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -101,14 +119,22 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 householdSize = 4,
                 city = "London",
-                id = UUID.randomUUID()
+                id = UUID.randomUUID(),
+                ancillaryArea = 42,
+                yearOfConstruction = 1995,
+                extraBuildings = listOf(
+                    ExtraBuilding(
+                        type = "ATTEFALL",
+                        area = 20,
+                        displayName = "Foo",
+                        hasWaterConnected = false
+                    )
+                ),
+                numberOfBathrooms = 2,
+                isSubleted = false
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            id = UUID.randomUUID(),
             currentInsurer = null,
-            memberId = "123456",
-            state = QuoteState.SIGNED
+            memberId = "123456"
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -181,8 +207,12 @@ class QuoteRepositoryImplTest {
 
         val timestamp = Instant.now()
         val quote = Quote(
+            id = UUID.randomUUID(),
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
             data = HouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
@@ -192,13 +222,21 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 householdSize = 4,
                 city = "London",
-                id = UUID.randomUUID()
+                id = UUID.randomUUID(),
+                ancillaryArea = 42,
+                yearOfConstruction = 1995,
+                extraBuildings = listOf(
+                    ExtraBuilding(
+                        type = "ATTEFALL",
+                        area = 20,
+                        displayName = "Foo",
+                        hasWaterConnected = false
+                    )
+                ),
+                numberOfBathrooms = 2,
+                isSubleted = false
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            id = UUID.randomUUID(),
-            currentInsurer = null,
-            state = QuoteState.QUOTED
+            currentInsurer = null
         )
         quoteDao.insert(quote, timestamp)
 

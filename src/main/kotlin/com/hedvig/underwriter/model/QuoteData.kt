@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDto
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+import org.jdbi.v3.json.Json
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -82,6 +84,15 @@ data class HouseData(
     override val city: String?,
     override var livingSpace: Int?,
     override var householdSize: Int?,
+    val ancillaryArea: Int?,
+    val yearOfConstruction: Int?,
+    val numberOfBathrooms: Int?,
+    @Json
+    @get:Json
+    val extraBuildings: List<ExtraBuilding>,
+    @get:JvmName("getIsSubleted")
+    val isSubleted: Boolean?,
+    val floor: Int = 0,
     @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<HouseData> {
@@ -156,4 +167,20 @@ data class ApartmentData(
 
         return errors
     }
+}
+
+data class ExtraBuilding(
+    val type: String,
+    val area: Int,
+    val hasWaterConnected: Boolean,
+    val displayName: String?
+) {
+    fun toDto(): ExtraBuildingDto =
+        ExtraBuildingDto(
+            id = null,
+            type = type,
+            area = area,
+            hasWaterConnected = hasWaterConnected,
+            displayName = displayName
+        )
 }

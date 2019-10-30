@@ -50,17 +50,19 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         }!!
         return Quote(
             id = databaseQuote.masterQuoteId,
-            validity = databaseQuote.validity,
+            createdAt = databaseQuote.createdAt!!,
+            price = databaseQuote.price,
             productType = databaseQuote.productType,
             state = databaseQuote.state,
+            initiatedFrom = databaseQuote.initiatedFrom!!,
             attributedTo = databaseQuote.attributedTo,
+            data = quoteData,
             currentInsurer = databaseQuote.currentInsurer,
             startDate = databaseQuote.startDate,
-            price = databaseQuote.price,
-            data = quoteData,
+            validity = databaseQuote.validity,
             memberId = databaseQuote.memberId,
-            initiatedFrom = databaseQuote.initiatedFrom!!,
-            createdAt = databaseQuote.createdAt!!
+            originatingProductId = databaseQuote.originatingProductId,
+            signedProductId = databaseQuote.signedProductId
         )
     }
 

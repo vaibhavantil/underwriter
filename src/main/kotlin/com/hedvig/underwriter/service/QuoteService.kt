@@ -14,6 +14,7 @@ import java.util.UUID
 interface QuoteService {
     fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
+    fun activateQuote(completeQuoteId: UUID): Either<ErrorResponseDto, Quote>
 
     fun getQuote(completeQuoteId: UUID): Quote?
     fun getQuoteFromMemberId(memberId: String): QuoteDto?

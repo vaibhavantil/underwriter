@@ -3,6 +3,7 @@ package com.hedvig.underwriter.web.dtos
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import java.time.LocalDate
+import java.util.UUID
 
 data class IncompleteQuoteDto(
     val firstName: String?,
@@ -12,7 +13,9 @@ data class IncompleteQuoteDto(
     val ssn: String?,
     val quotingPartner: Partner?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
-    val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?
+    val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
+    val memberId: String? = null,
+    val originatingProductId: UUID? = null
 )
 
 data class IncompleteHouseQuoteDataDto(

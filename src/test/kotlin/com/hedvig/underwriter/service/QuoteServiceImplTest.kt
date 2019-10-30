@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.service
 
+import arrow.core.Either
 import arrow.core.Right
+import arrow.core.getOrElse
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Name
@@ -15,6 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
@@ -25,6 +28,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +67,7 @@ class QuoteServiceImplTest {
             createdAt = Instant.now(),
             price = BigDecimal.ZERO,
             productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.RAPIO,
             attributedTo = Partner.COMPRICER,
             data = ApartmentData(
@@ -76,8 +81,7 @@ class QuoteServiceImplTest {
                 subType = ApartmentProductSubType.BRF,
                 firstName = "",
                 street = ""
-            ),
-            state = QuoteState.INCOMPLETE
+            )
         )
 
         every { quoteRepository.find(any()) } returns quote
@@ -106,6 +110,7 @@ class QuoteServiceImplTest {
             createdAt = Instant.now(),
             price = BigDecimal.ZERO,
             productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.RAPIO,
             attributedTo = Partner.HEDVIG,
             data = ApartmentData(
@@ -119,8 +124,7 @@ class QuoteServiceImplTest {
                 subType = ApartmentProductSubType.BRF,
                 firstName = "",
                 street = ""
-            ),
-            state = QuoteState.INCOMPLETE
+            )
         )
 
         every { quoteRepository.find(any()) } returns quote
@@ -136,5 +140,61 @@ class QuoteServiceImplTest {
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify(exactly = 0) { customerIO.setPartnerCode(any(), any()) }
+    }
+
+    @Test
+    fun activatesQuoteByCreatingModifiedProduct() {
+        val service = QuoteServiceImpl(
+            debtChecker = debtChecker,
+            memberService = memberService,
+            productPricingService = productPricingService,
+            quoteRepository = quoteRepository,
+            customerIOClient = customerIO
+        )
+
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            memberId = "12345",
+            createdAt = Instant.now(),
+            price = BigDecimal.ZERO,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            attributedTo = Partner.HEDVIG,
+            data = ApartmentData(
+                UUID.randomUUID(),
+                ssn = "191212121212",
+                lastName = "Last",
+                livingSpace = 2,
+                city = "Storstan",
+                zipCode = "12345",
+                householdSize = 3,
+                subType = ApartmentProductSubType.BRF,
+                firstName = "First",
+                street = "Storgatan 1"
+            ),
+            originatingProductId = UUID.randomUUID()
+        )
+
+        val createdProductResponse = ModifiedProductCreatedDto(productId = UUID.randomUUID())
+
+        every { quoteRepository.find(quote.id) } returns quote
+        val signedQuote = quote.copy(
+            signedProductId = createdProductResponse.productId,
+            state = QuoteState.SIGNED
+        )
+        every {
+            quoteRepository.update(
+                match { passedQuote -> passedQuote.id == quote.id },
+                any()
+            )
+        } returns signedQuote
+        every { productPricingService.createModifiedProductFromQuote(any()) } returns createdProductResponse
+
+        val result = service.activateQuote(quote.id)
+
+        assertThat(result).isInstanceOf(Either.Right::class.java)
+        assertThat(result.getOrElse { null }).isEqualTo(signedQuote)
+        verify(exactly = 1) { productPricingService.createModifiedProductFromQuote(any()) }
     }
 }

@@ -40,7 +40,9 @@ data class DatabaseQuoteRevision(
     val quoteHouseDataId: Int?,
     val memberId: String?,
     val initiatedFrom: QuoteInitiatedFrom?,
-    val createdAt: Instant?
+    val createdAt: Instant?,
+    val originatingProductId: UUID?,
+    val signedProductId: UUID?
 ) {
 
     companion object {
@@ -66,7 +68,9 @@ data class DatabaseQuoteRevision(
                 },
                 memberId = quote.memberId,
                 createdAt = quote.createdAt,
-                initiatedFrom = quote.initiatedFrom
+                initiatedFrom = quote.initiatedFrom,
+                originatingProductId = quote.originatingProductId,
+                signedProductId = quote.signedProductId
             )
     }
 }
@@ -88,7 +92,9 @@ data class Quote(
     val startDate: LocalDate? = null,
 
     val validity: Long = ONE_DAY * 30,
-    val memberId: String? = null
+    val memberId: String? = null,
+    val originatingProductId: UUID? = null,
+    val signedProductId: UUID? = null
 ) {
     val isComplete: Boolean
         get() = when {
