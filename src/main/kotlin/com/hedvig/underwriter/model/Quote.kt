@@ -217,46 +217,6 @@ data class Quote(
         return Left(errorStrings)
     }
 
-    fun toQuoteDto(): QuoteDto {
-        when (this.data) {
-            is ApartmentData -> {
-                return QuoteDto(
-                    id = this.id,
-                    createdAt = this.createdAt,
-                    price = this.price,
-                    productType = this.productType,
-                    state = this.state,
-                    initiatedFrom = this.initiatedFrom,
-                    attributedTo = this.attributedTo,
-                    data = this.data,
-                    currentInsurer = this.currentInsurer,
-                    startDate = this.startDate,
-                    validity = this.validity,
-                    memberId = this.memberId,
-                    isComplete = this.isComplete
-                )
-            }
-
-            is HouseData -> {
-                return QuoteDto(
-                    id = this.id,
-                    createdAt = this.createdAt,
-                    price = this.price,
-                    productType = this.productType,
-                    state = this.state,
-                    initiatedFrom = this.initiatedFrom,
-                    attributedTo = this.attributedTo,
-                    data = this.data,
-                    currentInsurer = this.currentInsurer,
-                    startDate = this.startDate,
-                    validity = this.validity,
-                    memberId = this.memberId,
-                    isComplete = this.isComplete
-                )
-            }
-        }
-    }
-
     companion object {
         private fun homeQuotePriceDto(quote: Quote): ApartmentQuotePriceDto {
             val quoteData = quote.data

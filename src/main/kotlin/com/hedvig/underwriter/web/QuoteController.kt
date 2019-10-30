@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/_/v1/quote")
+@RequestMapping(
+    "/_/v1/quote", // Deprecated
+    "/_/v1/quotes"
+)
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
     val memberService: MemberService
@@ -47,8 +50,8 @@ class QuoteController @Autowired constructor(
         return ResponseEntity.ok(optionalQuote)
     }
 
-    @GetMapping("/members/{memberId}")
-    fun getQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+    @GetMapping("/members/{memberId}/latestQuote")
+    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
         val quoteDto = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(quoteDto)
     }
