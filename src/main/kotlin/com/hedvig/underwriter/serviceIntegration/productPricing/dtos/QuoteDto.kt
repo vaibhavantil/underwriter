@@ -107,5 +107,3 @@ sealed class QuoteData {
         var livingSpace: Int?
     ) : QuoteData()
 }
-
-
