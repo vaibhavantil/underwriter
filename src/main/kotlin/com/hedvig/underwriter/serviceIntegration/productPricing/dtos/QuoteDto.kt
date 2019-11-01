@@ -31,7 +31,7 @@ data class QuoteDto(
     val isComplete: Boolean
 ) {
     companion object {
-        fun toQuoteDto(quote: Quote): QuoteDto {
+        fun fromQuoteDto(quote: Quote): QuoteDto {
             when (quote.data) {
                 is ApartmentData -> {
                     return QuoteDto(

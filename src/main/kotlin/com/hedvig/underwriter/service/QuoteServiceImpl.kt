@@ -104,7 +104,7 @@ class QuoteServiceImpl(
 
     override fun getQuoteFromMemberId(memberId: String): QuoteDto? {
         val quote = quoteRepository.findByMemberId(memberId)
-        return QuoteDto.toQuoteDto(quote!!)
+        return QuoteDto.fromQuoteDto(quote!!)
     }
 
     override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
