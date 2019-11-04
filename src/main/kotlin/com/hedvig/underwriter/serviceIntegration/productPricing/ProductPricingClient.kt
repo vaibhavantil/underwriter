@@ -1,6 +1,11 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import feign.Headers
 import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
