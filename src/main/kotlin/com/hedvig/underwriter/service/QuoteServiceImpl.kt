@@ -19,6 +19,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -31,6 +32,7 @@ import java.time.Instant
 import java.util.UUID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class QuoteServiceImpl(
@@ -214,6 +216,16 @@ class QuoteServiceImpl(
 
             if (quoteWithMember.data is PersonPolicyHolder<*>) {
                 memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
+            }
+
+            quote.attributedTo.campaignCode?.let { campaignCode ->
+                productPricingService.redeemCampaign(
+                    RedeemCampaignDto(
+                        memberId,
+                        campaignCode,
+                        LocalDate.now()
+                    )
+                )
             }
 
             val signedQuoteId =

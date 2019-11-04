@@ -1,10 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -14,7 +10,6 @@ import org.springframework.stereotype.Service
 class ProductPricingServiceImpl @Autowired constructor(
     val productPricingClient: ProductPricingClient
 ) : ProductPricingService {
-
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
         val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
@@ -33,4 +28,7 @@ class ProductPricingServiceImpl @Autowired constructor(
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }
+
+    override fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto) =
+        this.productPricingClient.redeemCampaign(redeemCampaignDto)
 }

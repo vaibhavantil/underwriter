@@ -1,10 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.*
 import feign.Headers
 import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
@@ -36,4 +32,9 @@ interface ProductPricingClient {
         @RequestHeader(value = "hedvig.token") memberId: String
 
     ): ResponseEntity<RapioProductCreatedResponseDto>
+
+    @PostMapping("/i/campaign/member/redeemCampaign")
+    fun redeemCampaign(
+        @Valid @RequestBody req: RedeemCampaignDto
+    )
 }
