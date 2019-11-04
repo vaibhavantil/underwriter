@@ -230,7 +230,7 @@ class QuoteServiceImpl(
                     )
                 )
                 if (response.statusCode.isError) {
-                    logger.error("Failed to redeem $campaignCode for parnter ${quote.attributedTo} with status code ${response.statusCodeValue} and reason ${response.statusCode.reasonPhrase} ")
+                    logger.error("Failed to redeem $campaignCode for parnter ${quote.attributedTo} with status code ${response.statusCodeValue} and reason ${response.statusCode.reasonPhrase}")
                 }
             }
 
