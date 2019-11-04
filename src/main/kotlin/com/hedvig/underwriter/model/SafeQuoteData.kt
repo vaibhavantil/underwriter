@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = SafeQuoteData.HomeData::class, name = "home"),
+    JsonSubTypes.Type(value = SafeQuoteData.HomeData::class, name = "apartment"),
     JsonSubTypes.Type(value = SafeQuoteData.HouseData::class, name = "house")
 )
 sealed class SafeQuoteData {

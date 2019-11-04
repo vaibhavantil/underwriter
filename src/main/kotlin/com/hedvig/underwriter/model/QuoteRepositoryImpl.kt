@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
+
     override fun insert(
         quote: Quote,
         timestamp: Instant
@@ -29,10 +30,23 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     fun find(quoteId: UUID, h: Handle): Quote? {
         val dao = h.attach<QuoteDao>()
         val databaseQuote = dao.find(quoteId) ?: return null
+        return findQuote(databaseQuote, dao)
+    }
+
+    override fun findByMemberId(memberId: String): Quote? =
+        jdbi.inTransaction<Quote?, RuntimeException> { h -> findByMemberId(memberId, h) }
+
+    fun findByMemberId(memberId: String, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuote = dao.findByMemberId(memberId) ?: return null
+        return findQuote(databaseQuote, dao)
+    }
+
+    fun findQuote(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
         val quoteData: QuoteData = when {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
             databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
-            else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) for quote $quoteId}")
+            else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
         return Quote(
             id = databaseQuote.masterQuoteId,

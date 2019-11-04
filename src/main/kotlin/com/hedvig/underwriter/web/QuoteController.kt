@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/_/v1/quote")
+@RequestMapping(
+    "/_/v1/quote", // Deprecated
+    "/_/v1/quotes"
+)
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
     val memberService: MemberService
@@ -44,6 +48,12 @@ class QuoteController @Autowired constructor(
         val optionalQuote = quoteService.getQuote(id) ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(optionalQuote)
+    }
+
+    @GetMapping("/members/{memberId}/latestQuote")
+    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+        val quoteDto = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(quoteDto)
     }
 
     @PatchMapping("/{id}")

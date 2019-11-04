@@ -18,6 +18,7 @@ import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -101,6 +102,11 @@ class QuoteServiceImpl(
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
         return quoteRepository.find(completeQuoteId)
+    }
+
+    override fun getQuoteFromMemberId(memberId: String): QuoteDto? {
+        val quote = quoteRepository.findByMemberId(memberId)
+        return QuoteDto.fromQuoteDto(quote!!)
     }
 
     override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
