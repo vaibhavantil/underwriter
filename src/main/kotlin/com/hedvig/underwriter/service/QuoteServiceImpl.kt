@@ -218,6 +218,9 @@ class QuoteServiceImpl(
                 memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
             }
 
+            val signedQuoteId =
+                productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
+
             quote.attributedTo.campaignCode?.let { campaignCode ->
                 productPricingService.redeemCampaign(
                     RedeemCampaignDto(
@@ -227,9 +230,6 @@ class QuoteServiceImpl(
                     )
                 )
             }
-
-            val signedQuoteId =
-                productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
 
             if (quoteWithMember.data is PersonPolicyHolder<*>) {
                 memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
