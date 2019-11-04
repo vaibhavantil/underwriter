@@ -6,6 +6,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
+import org.springframework.http.ResponseEntity
 
 interface ProductPricingService {
     fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto
@@ -14,5 +15,5 @@ interface ProductPricingService {
 
     fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto
 
-    fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto)
+    fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto): ResponseEntity<Void>
 }

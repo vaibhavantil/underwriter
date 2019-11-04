@@ -222,13 +222,16 @@ class QuoteServiceImpl(
                 productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
 
             quote.attributedTo.campaignCode?.let { campaignCode ->
-                productPricingService.redeemCampaign(
+                val response = productPricingService.redeemCampaign(
                     RedeemCampaignDto(
                         memberId,
                         campaignCode,
                         LocalDate.now()
                     )
                 )
+                if (response.statusCode.isError) {
+                    logger.error("Failed to redeem $campaignCode for parnter ${quote.attributedTo} with status code ${response.statusCodeValue} and reason ${response.statusCode.reasonPhrase} ")
+                }
             }
 
             if (quoteWithMember.data is PersonPolicyHolder<*>) {

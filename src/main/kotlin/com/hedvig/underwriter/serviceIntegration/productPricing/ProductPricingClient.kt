@@ -41,5 +41,5 @@ interface ProductPricingClient {
     @PostMapping("/i/campaign/member/redeemCampaign")
     fun redeemCampaign(
         @Valid @RequestBody req: RedeemCampaignDto
-    )
+    ): ResponseEntity<Void>
 }
