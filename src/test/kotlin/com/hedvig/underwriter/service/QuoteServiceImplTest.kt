@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.springframework.http.ResponseEntity
 
 @RunWith(MockitoJUnitRunner::class)
 class QuoteServiceImplTest {
@@ -88,6 +89,7 @@ class QuoteServiceImplTest {
                 any()
             )
         } returns RapioProductCreatedResponseDto(UUID.randomUUID())
+        every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
