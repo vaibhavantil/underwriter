@@ -86,7 +86,7 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createApartmentQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
             id = UUID.randomUUID(),
@@ -94,7 +94,11 @@ class QuoteServiceImpl(
             productType = ProductType.APARTMENT,
             initiatedFrom = QuoteInitiatedFrom.RAPIO,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
-            data = ApartmentData(UUID.randomUUID()),
+            data = when {
+                incompleteQuoteDto.incompleteApartmentQuoteData != null -> ApartmentData(UUID.randomUUID())
+                incompleteQuoteDto.incompleteHouseQuoteData != null -> HouseData(UUID.randomUUID())
+                else -> throw IllegalArgumentException("Must provide either house or apartment data")
+            },
             state = QuoteState.INCOMPLETE,
             memberId = incompleteQuoteDto.memberId,
             originatingProductId = incompleteQuoteDto.originatingProductId
@@ -243,7 +247,11 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun activateQuote(completeQuoteId: UUID): Either<ErrorResponseDto, Quote> {
+    override fun activateQuote(
+        completeQuoteId: UUID,
+        activationDate: LocalDate?,
+        previousProductTerminationDate: LocalDate?
+    ): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
@@ -252,7 +260,25 @@ class QuoteServiceImpl(
             Either.left(quoteNotSignableErrorDto)
         }
 
-        val result = productPricingService.createModifiedProductFromQuote(ModifyProductRequestDto.from(quote))
+        val finalActivationDate = activationDate ?: quote.startDate
+        val finalTerminationDate = previousProductTerminationDate ?: finalActivationDate
+
+        if (finalActivationDate == null) {
+            return Either.left(
+                ErrorResponseDto(
+                    errorCode = ErrorCodes.UNKNOWN_ERROR_CODE,
+                    errorMessage = "No activation date given"
+                )
+            )
+        }
+
+        val result = productPricingService.createModifiedProductFromQuote(
+            ModifyProductRequestDto.from(
+                quote,
+                activationDate = finalActivationDate,
+                previousInsuranceTerminationDate = finalTerminationDate!!
+            )
+        )
 
         val updatedQuote = quoteRepository.update(
             quote.copy(

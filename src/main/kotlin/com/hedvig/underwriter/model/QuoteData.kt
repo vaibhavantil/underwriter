@@ -75,23 +75,23 @@ interface HomeInsurance {
 
 data class HouseData(
     override val id: UUID,
-    override val ssn: String?,
-    override val firstName: String?,
-    override val lastName: String?,
+    override val ssn: String? = null,
+    override val firstName: String? = null,
+    override val lastName: String? = null,
 
-    override val street: String?,
-    override val zipCode: String?,
-    override val city: String?,
-    override var livingSpace: Int?,
-    override var householdSize: Int?,
-    val ancillaryArea: Int?,
-    val yearOfConstruction: Int?,
-    val numberOfBathrooms: Int?,
+    override val street: String? = null,
+    override val zipCode: String? = null,
+    override val city: String? = null,
+    override var livingSpace: Int? = null,
+    override var householdSize: Int? = null,
+    val ancillaryArea: Int? = null,
+    val yearOfConstruction: Int? = null,
+    val numberOfBathrooms: Int? = null,
     @Json
     @get:Json
-    val extraBuildings: List<ExtraBuilding>,
+    val extraBuildings: List<ExtraBuilding>? = null,
     @get:JvmName("getIsSubleted")
-    val isSubleted: Boolean?,
+    val isSubleted: Boolean? = null,
     val floor: Int = 0,
     @JsonIgnore
     val internalId: Int? = null
@@ -183,4 +183,14 @@ data class ExtraBuilding(
             hasWaterConnected = hasWaterConnected,
             displayName = displayName
         )
+
+    companion object {
+        fun from(extraBuildingDto: ExtraBuildingDto): ExtraBuilding =
+            ExtraBuilding(
+                type = extraBuildingDto.type,
+                area = extraBuildingDto.area,
+                hasWaterConnected = extraBuildingDto.hasWaterConnected,
+                displayName = extraBuildingDto.displayName
+            )
+    }
 }

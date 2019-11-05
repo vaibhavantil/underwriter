@@ -1,4 +1,4 @@
-#server.port: 5698
+server.port: 5698
 
 spring:
   main:

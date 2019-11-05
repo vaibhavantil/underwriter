@@ -157,7 +157,19 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 householdSize = 4,
                 city = "London",
-                id = UUID.randomUUID()
+                id = UUID.randomUUID(),
+                ancillaryArea = 42,
+                yearOfConstruction = 1995,
+                extraBuildings = listOf(
+                    ExtraBuilding(
+                        type = "ATTEFALL",
+                        area = 20,
+                        displayName = "Foo",
+                        hasWaterConnected = false
+                    )
+                ),
+                numberOfBathrooms = 2,
+                isSubleted = false
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,

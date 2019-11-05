@@ -191,10 +191,13 @@ class QuoteServiceImplTest {
         } returns signedQuote
         every { productPricingService.createModifiedProductFromQuote(any()) } returns createdProductResponse
 
-        val result = service.activateQuote(quote.id)
+        val result = service.activateQuote(
+            completeQuoteId = quote.id,
+            activationDate = LocalDate.now().plusDays(10)
+        )
 
         assertThat(result).isInstanceOf(Either.Right::class.java)
         assertThat(result.getOrElse { null }).isEqualTo(signedQuote)
-        verify(exactly = 1) { productPricingService.createModifiedProductFromQuote(any()) }
+        verify(exactly = 1) { productPricingService.createModifiedProductFromQuote(any()) } // FIXME better assertion?
     }
 }

@@ -3,6 +3,8 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Quote
+import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 data class ModifyProductRequestDto(
@@ -16,16 +18,23 @@ data class ModifyProductRequestDto(
     val houseType: String,
     val personsInHouseHold: Int,
     val safetyIncreasers: List<String> = emptyList(),
+    val activationDate: LocalDate,
+    val previousInsuranceTerminationDate: LocalDate,
+    val price: BigDecimal,
 
     val ancillaryArea: Int? = null,
     val yearOfConstruction: Int? = null,
     val numberOfBathrooms: Int? = null,
-    val extraBuildings: List<ExtraBuildingDto> = emptyList(),
+    val extraBuildings: List<ExtraBuildingDto>? = emptyList(),
     val isSubleted: Boolean = false,
     val floor: Int = 0
 ) {
     companion object {
-        fun from(quote: Quote): ModifyProductRequestDto =
+        fun from(
+            quote: Quote,
+            activationDate: LocalDate,
+            previousInsuranceTerminationDate: LocalDate
+        ): ModifyProductRequestDto =
             when (quote.data) {
                 is ApartmentData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
@@ -38,8 +47,12 @@ data class ModifyProductRequestDto(
                     zipCode = quote.data.zipCode!!,
                     livingSpace = quote.data.livingSpace!!.toFloat(),
                     houseType = quote.data.subType!!.toString(),
-                    personsInHouseHold = quote.data.householdSize!!
+                    personsInHouseHold = quote.data.householdSize!!,
+                    activationDate = activationDate,
+                    previousInsuranceTerminationDate = previousInsuranceTerminationDate,
+                    price = quote.price!!
                 )
+
                 is HouseData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
                         ?: throw IllegalArgumentException("Originating product id must be present to modify a product"),
@@ -55,10 +68,13 @@ data class ModifyProductRequestDto(
                     livingSpace = quote.data.livingSpace!!.toFloat(),
                     houseType = "HOUSE",
                     personsInHouseHold = quote.data.householdSize!!,
+                    price = quote.price!!,
+                    activationDate = activationDate,
+                    previousInsuranceTerminationDate = previousInsuranceTerminationDate,
                     ancillaryArea = quote.data.ancillaryArea,
                     yearOfConstruction = quote.data.yearOfConstruction,
                     numberOfBathrooms = quote.data.numberOfBathrooms,
-                    extraBuildings = quote.data.extraBuildings.map { extraBuilding -> extraBuilding.toDto() },
+                    extraBuildings = quote.data.extraBuildings?.map { extraBuilding -> extraBuilding.toDto() },
                     isSubleted = quote.data.isSubleted!!,
                     floor = quote.data.floor
                 )

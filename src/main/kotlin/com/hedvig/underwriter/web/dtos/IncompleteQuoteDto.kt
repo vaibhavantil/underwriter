@@ -2,6 +2,7 @@ package com.hedvig.underwriter.web.dtos
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDto
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,7 +25,13 @@ data class IncompleteHouseQuoteDataDto(
     val city: String?,
     val livingSpace: Int?,
     val personalNumber: String?,
-    val householdSize: Int?
+    val householdSize: Int?,
+    val ancillaryArea: Int?,
+    val yearOfConstruction: Int?,
+    val numberOfBathrooms: Int?,
+    val extraBuildings: List<ExtraBuildingDto>?,
+    val isSubleted: Boolean,
+    val floor: Int = 0
 )
 
 data class IncompleteApartmentQuoteDataDto(

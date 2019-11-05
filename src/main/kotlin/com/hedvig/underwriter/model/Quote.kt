@@ -158,30 +158,36 @@ data class Quote(
             }
         )
         if (incompleteQuoteDto.incompleteApartmentQuoteData != null) {
-            val apartmentData = incompleteQuoteDto.incompleteApartmentQuoteData
+            val apartmentRequest = incompleteQuoteDto.incompleteApartmentQuoteData
             val newQuoteData: ApartmentData = newQuote.data as ApartmentData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
-                    street = apartmentData.street ?: newQuoteData.street,
-                    zipCode = apartmentData.zipCode ?: newQuoteData.zipCode,
-                    city = apartmentData.city ?: newQuoteData.city,
-                    householdSize = apartmentData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = apartmentData.livingSpace ?: newQuoteData.livingSpace,
-                    subType = newQuoteData.subType // TODO
+                    street = apartmentRequest.street ?: newQuoteData.street,
+                    zipCode = apartmentRequest.zipCode ?: newQuoteData.zipCode,
+                    city = apartmentRequest.city ?: newQuoteData.city,
+                    householdSize = apartmentRequest.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = apartmentRequest.livingSpace ?: newQuoteData.livingSpace,
+                    subType = newQuoteData.subType
                 )
             )
         }
 
         if (incompleteQuoteDto.incompleteHouseQuoteData != null) {
-            val houseData = incompleteQuoteDto.incompleteHouseQuoteData
+            val houseRequest = incompleteQuoteDto.incompleteHouseQuoteData
             val newQuoteData: HouseData = newQuote.data as HouseData
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
-                    street = houseData.street ?: newQuoteData.street,
-                    zipCode = houseData.zipCode ?: newQuoteData.zipCode,
-                    city = houseData.city ?: newQuoteData.city,
-                    householdSize = houseData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = houseData.livingSpace ?: newQuoteData.livingSpace
+                    street = houseRequest.street ?: newQuoteData.street,
+                    zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
+                    city = houseRequest.city ?: newQuoteData.city,
+                    householdSize = houseRequest.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = houseRequest.livingSpace ?: newQuoteData.livingSpace,
+                    numberOfBathrooms = houseRequest.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
+                    isSubleted = houseRequest.isSubleted ?: newQuoteData.isSubleted,
+                    extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from) ?: newQuoteData.extraBuildings,
+                    ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
+                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction,
+                    floor = houseRequest.floor ?: newQuoteData.floor
                 )
             )
         }
