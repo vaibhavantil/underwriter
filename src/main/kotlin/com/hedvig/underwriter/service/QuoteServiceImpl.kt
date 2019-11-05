@@ -19,6 +19,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -28,6 +29,7 @@ import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
@@ -218,6 +220,19 @@ class QuoteServiceImpl(
 
             val signedQuoteId =
                 productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
+
+            quote.attributedTo.campaignCode?.let { campaignCode ->
+                val response = productPricingService.redeemCampaign(
+                    RedeemCampaignDto(
+                        memberId,
+                        campaignCode,
+                        LocalDate.now()
+                    )
+                )
+                if (response.statusCode.isError) {
+                    logger.error("Failed to redeem $campaignCode for partner ${quote.attributedTo} with response $response")
+                }
+            }
 
             if (quoteWithMember.data is PersonPolicyHolder<*>) {
                 memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
