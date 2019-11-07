@@ -141,7 +141,7 @@ class QuoteRepositoryImplTest {
     }
 
     @Test
-    fun insertsAndFindsHouseQuotesByMemberId() {
+    fun insertsAndFindsOneHouseQuoteByMemberId() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
         val timestamp = Instant.now()
@@ -179,11 +179,11 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED
         )
         quoteDao.insert(quote, timestamp)
-        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findByMemberId(quote.memberId!!))
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
     }
 
     @Test
-    fun insertsAndFindsApartmentQuotesByMemberId() {
+    fun insertsAndFindsOneApartmentQuoteByMemberId() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
         val timestamp = Instant.now()
@@ -210,7 +210,142 @@ class QuoteRepositoryImplTest {
             state = QuoteState.INCOMPLETE
         )
         quoteDao.insert(quote, timestamp)
-        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findByMemberId(quote.memberId!!))
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
+    }
+
+
+    @Test
+    fun insertsAndFindsHouseQuotesByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote1 = Quote(
+            id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            data = HouseData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                ancillaryArea = 42,
+                yearOfConstruction = 1995,
+                extraBuildings = listOf(
+                    ExtraBuilding(
+                        type = "ATTEFALL",
+                        area = 20,
+                        displayName = "Foo",
+                        hasWaterConnected = false
+                    )
+                ),
+                numberOfBathrooms = 2,
+                isSubleted = false
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            state = QuoteState.SIGNED
+        )
+        val quote2 = Quote(
+            id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            data = HouseData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                ancillaryArea = 42,
+                yearOfConstruction = 1995,
+                extraBuildings = listOf(
+                    ExtraBuilding(
+                        type = "ATTEFALL",
+                        area = 20,
+                        displayName = "Foo",
+                        hasWaterConnected = false
+                    )
+                ),
+                numberOfBathrooms = 2,
+                isSubleted = false
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            state = QuoteState.SIGNED
+        )
+        quoteDao.insert(quote1, timestamp)
+        quoteDao.insert(quote2, timestamp)
+        val result = quoteDao.findByMemberId(quote1.memberId!!)
+        assertQuotesDeepEqualExceptInternalId(quote1, result[0])
+        assertQuotesDeepEqualExceptInternalId(quote2, result[1])
+    }
+
+    @Test
+    fun insertsAndFindsApartmentQuotesByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote1 = Quote(
+            id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
+            productType = ProductType.APARTMENT,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+        )
+        val quote2 = Quote(
+            id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
+            productType = ProductType.APARTMENT,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+        )
+        quoteDao.insert(quote1, timestamp)
+        quoteDao.insert(quote2, timestamp)
+        val result = quoteDao.findByMemberId(quote1.memberId!!)
+        assertQuotesDeepEqualExceptInternalId(quote1, result[0])
+        assertQuotesDeepEqualExceptInternalId(quote2, result[1])
     }
 
     @Test

@@ -33,12 +33,21 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return findQuote(databaseQuote, dao)
     }
 
-    override fun findByMemberId(memberId: String): Quote? =
-        jdbi.inTransaction<Quote?, RuntimeException> { h -> findByMemberId(memberId, h) }
+    override fun findByMemberId(memberId: String): List<Quote> =
+        jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findByMemberId(memberId, h)}
 
-    fun findByMemberId(memberId: String, h: Handle): Quote? {
+    fun findByMemberId(memberId: String, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()
-        val databaseQuote = dao.findByMemberId(memberId) ?: return null
+        return dao.findByMemberId(memberId)
+            .mapNotNull { databaseQuote -> findQuote(databaseQuote, dao) }
+    }
+
+    override fun findOneByMemberId(memberId: String): Quote? =
+        jdbi.inTransaction<Quote?, RuntimeException> { h -> findOneByMemberId(memberId, h) }
+
+    fun findOneByMemberId(memberId: String, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuote = dao.findOneByMemberId(memberId) ?: return null
         return findQuote(databaseQuote, dao)
     }
 

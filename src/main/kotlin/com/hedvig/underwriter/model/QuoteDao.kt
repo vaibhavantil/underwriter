@@ -79,15 +79,34 @@ interface QuoteDao {
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean quoteData: ApartmentData): ApartmentData
 
-    @SqlQuery("""
-        SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
+    @SqlQuery("""SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
     fun findApartmentQuoteData(@Bind id: Int): ApartmentData?
 
     @SqlQuery(
         """
             SELECT
             DISTINCT ON (qr.master_quote_id)
+
+            qr.*, 
+            mq.created_at, 
+            mq.initiated_from 
             
+            FROM master_quotes mq
+            JOIN quote_revisions qr
+            ON qr.master_quote_id = mq.id 
+            
+            WHERE qr.member_id = :memberId
+            ORDER BY qr.master_quote_id ASC, qr.id DESC
+            LIMIT 1
+        """
+    )
+    fun findOneByMemberId(@Bind memberId: String): DatabaseQuoteRevision?
+
+    @SqlQuery(
+        """
+            SELECT
+            DISTINCT ON (qr.master_quote_id)
+
             qr.*, 
             mq.created_at, 
             mq.initiated_from 
@@ -100,7 +119,7 @@ interface QuoteDao {
             ORDER BY qr.master_quote_id ASC, qr.id DESC
         """
     )
-    fun findByMemberId(@Bind memberId: String): DatabaseQuoteRevision?
+    fun findByMemberId(@Bind memberId: String): List<DatabaseQuoteRevision>
 
     @SqlUpdate(
         """

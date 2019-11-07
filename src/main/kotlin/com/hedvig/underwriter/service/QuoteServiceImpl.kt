@@ -113,10 +113,14 @@ class QuoteServiceImpl(
         return quoteRepository.find(completeQuoteId)
     }
 
-    override fun getQuoteFromMemberId(memberId: String): QuoteDto? {
-        val quote = quoteRepository.findByMemberId(memberId)
-        return QuoteDto.fromQuoteDto(quote!!)
+    override fun getSingleQuoteForMemberId(memberId: String): QuoteDto? {
+        val quote = quoteRepository.findOneByMemberId(memberId)
+        return QuoteDto.fromQuote(quote!!)
     }
+
+    override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
+        quoteRepository.findByMemberId(memberId)
+            .map((QuoteDto)::fromQuote)
 
     override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quote =
@@ -282,7 +286,7 @@ class QuoteServiceImpl(
 
         val updatedQuote = quoteRepository.update(
             quote.copy(
-                signedProductId = result.productId,
+                signedProductId = result.id,
                 state = QuoteState.SIGNED
             )
         )

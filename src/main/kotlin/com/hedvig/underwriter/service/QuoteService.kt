@@ -22,7 +22,8 @@ interface QuoteService {
     ): Either<ErrorResponseDto, Quote>
 
     fun getQuote(completeQuoteId: UUID): Quote?
-    fun getQuoteFromMemberId(memberId: String): QuoteDto?
+    fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
+    fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
     fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote>
 }

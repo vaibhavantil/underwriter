@@ -1,6 +1,10 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
+import arrow.core.extensions.either.foldable.get
+import arrow.core.getOrElse
+import arrow.core.orNull
+import arrow.core.right
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -64,12 +68,6 @@ class QuoteController @Autowired constructor(
         }
     }
 
-    @GetMapping("/members/{memberId}/latestQuote")
-    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
-        val quoteDto = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(quoteDto)
-    }
-
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
         return when (val errorOrQuote = quoteService.signQuote(completeQuoteId, body)) {
@@ -82,8 +80,25 @@ class QuoteController @Autowired constructor(
     fun activateCompleteQuote(
         @PathVariable completeQuoteId: UUID,
         @Valid @RequestBody requestBody: ActivateQuoteRequestDto
-    ): ResponseEntity<Void> {
-        quoteService.activateQuote(completeQuoteId, requestBody.activationDate, requestBody.terminationDate)
-        return ResponseEntity.ok().build()
+    ): ResponseEntity<Any> {
+        val result =
+            quoteService.activateQuote(completeQuoteId, requestBody.activationDate, requestBody.terminationDate)
+
+        return when (result) {
+            is Either.Left -> ResponseEntity.status(422).body(result.a)
+            is Either.Right -> ResponseEntity.ok(result.b)
+            else -> throw IllegalStateException("Result should be either left or right but was ${result::class.java}")
+        }
+    }
+
+    @GetMapping("/members/{memberId}/latestQuote")
+    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+        val quoteDto = quoteService.getSingleQuoteForMemberId(memberId) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(quoteDto)
+    }
+
+    @GetMapping("/members/{memberId}")
+    fun getAllQuotesFromMemberId(@PathVariable memberId: String): ResponseEntity<List<QuoteDto>> {
+        return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
     }
 }

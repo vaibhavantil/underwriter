@@ -176,11 +176,11 @@ class QuoteServiceImplTest {
             originatingProductId = UUID.randomUUID()
         )
 
-        val createdProductResponse = ModifiedProductCreatedDto(productId = UUID.randomUUID())
+        val createdProductResponse = ModifiedProductCreatedDto(id = UUID.randomUUID())
 
         every { quoteRepository.find(quote.id) } returns quote
         val signedQuote = quote.copy(
-            signedProductId = createdProductResponse.productId,
+            signedProductId = createdProductResponse.id,
             state = QuoteState.SIGNED
         )
         every {
