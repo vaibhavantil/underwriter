@@ -29,7 +29,9 @@ data class QuoteDto(
     val startDate: LocalDate? = null,
     val validity: Long,
     val memberId: String? = null,
-    val isComplete: Boolean
+    val isComplete: Boolean,
+    val originatingProductId: UUID?,
+    val signedProductId: UUID?
 ) {
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
@@ -48,7 +50,9 @@ data class QuoteDto(
                         startDate = quote.startDate,
                         validity = quote.validity,
                         memberId = quote.memberId,
-                        isComplete = quote.isComplete
+                        isComplete = quote.isComplete,
+                        originatingProductId = quote.originatingProductId,
+                        signedProductId = quote.signedProductId
                     )
                 }
 
@@ -66,7 +70,9 @@ data class QuoteDto(
                         startDate = quote.startDate,
                         validity = quote.validity,
                         memberId = quote.memberId,
-                        isComplete = quote.isComplete
+                        isComplete = quote.isComplete,
+                        originatingProductId = quote.originatingProductId,
+                        signedProductId = quote.signedProductId
                     )
                 }
             }
