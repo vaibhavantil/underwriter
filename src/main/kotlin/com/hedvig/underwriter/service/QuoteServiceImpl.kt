@@ -115,7 +115,7 @@ class QuoteServiceImpl(
 
     override fun getSingleQuoteForMemberId(memberId: String): QuoteDto? {
         val quote = quoteRepository.findOneByMemberId(memberId)
-        return QuoteDto.fromQuote(quote!!)
+        return quote?.let((QuoteDto)::fromQuote)
     }
 
     override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
