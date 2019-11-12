@@ -1,10 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.ApartmentProductSubType
-import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType

@@ -213,7 +213,6 @@ class QuoteRepositoryImplTest {
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
     }
 
-
     @Test
     fun insertsAndFindsHouseQuotesByMemberId() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)

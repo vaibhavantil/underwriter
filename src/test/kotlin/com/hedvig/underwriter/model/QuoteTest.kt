@@ -3,11 +3,11 @@ package com.hedvig.underwriter.model
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Test
 
 class QuoteTest {
     @Test

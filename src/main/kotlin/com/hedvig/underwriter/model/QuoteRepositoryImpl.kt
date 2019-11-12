@@ -34,7 +34,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     }
 
     override fun findByMemberId(memberId: String): List<Quote> =
-        jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findByMemberId(memberId, h)}
+        jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findByMemberId(memberId, h) }
 
     fun findByMemberId(memberId: String, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()

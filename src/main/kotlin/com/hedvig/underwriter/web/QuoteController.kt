@@ -1,10 +1,6 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
-import arrow.core.extensions.either.foldable.get
-import arrow.core.getOrElse
-import arrow.core.orNull
-import arrow.core.right
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
