@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -214,22 +214,21 @@ data class ExtraBuilding(
     val hasWaterConnected: Boolean,
     val displayName: String?
 ) {
-    fun toDto(): ExtraBuildingDto =
-        ExtraBuildingDto(
+    fun toDto(): ExtraBuildingRequestDto =
+        ExtraBuildingRequestDto(
             id = null,
             type = type,
             area = area,
-            hasWaterConnected = hasWaterConnected,
-            displayName = displayName
+            hasWaterConnected = hasWaterConnected
         )
 
     companion object {
-        fun from(extraBuildingDto: ExtraBuildingDto): ExtraBuilding =
+        fun from(extraBuildingDto: ExtraBuildingRequestDto): ExtraBuilding =
             ExtraBuilding(
                 type = extraBuildingDto.type,
                 area = extraBuildingDto.area,
                 hasWaterConnected = extraBuildingDto.hasWaterConnected,
-                displayName = extraBuildingDto.displayName
+                displayName = null
             )
     }
 }

@@ -11,6 +11,6 @@ data class HouseQuotePriceDto(
     val ancillaryArea: Int,
     val yearOfConstruction: Year,
     val numberOfBathrooms: Int,
-    val extraBuildings: List<ExtraBuildingDto>,
+    val extraBuildings: List<ExtraBuildingRequestDto>,
     val isSubleted: Boolean
 )

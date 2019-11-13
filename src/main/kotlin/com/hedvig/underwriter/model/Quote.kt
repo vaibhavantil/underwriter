@@ -7,7 +7,7 @@ import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
@@ -300,9 +300,8 @@ data class Quote(
                     ancillaryArea = completeQuoteData.ancillaryArea!!,
                     numberOfBathrooms = completeQuoteData.numberOfBathrooms!!,
                     yearOfConstruction = Year.of(completeQuoteData.yearOfConstruction!!),
-                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding -> ExtraBuildingDto(
+                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding -> ExtraBuildingRequestDto(
                         id = null,
-                        displayName = extraBuilding.displayName,
                         hasWaterConnected = extraBuilding.hasWaterConnected,
                         area = extraBuilding.area,
                         type = extraBuilding.type

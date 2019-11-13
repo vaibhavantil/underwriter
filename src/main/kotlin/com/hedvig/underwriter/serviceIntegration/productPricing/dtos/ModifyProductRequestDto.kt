@@ -25,7 +25,7 @@ data class ModifyProductRequestDto(
     val ancillaryArea: Int? = null,
     val yearOfConstruction: Int? = null,
     val numberOfBathrooms: Int? = null,
-    val extraBuildings: List<ExtraBuildingDto>? = emptyList(),
+    val extraBuildings: List<ExtraBuildingRequestDto>? = emptyList(),
     val isSubleted: Boolean = false,
     val floor: Int = 0
 ) {

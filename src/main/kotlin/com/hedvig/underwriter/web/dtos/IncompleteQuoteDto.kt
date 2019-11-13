@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import java.time.LocalDate
 import java.util.UUID
 
@@ -32,7 +32,7 @@ data class IncompleteHouseQuoteDataDto(
     val ancillaryArea: Int?,
     val yearOfConstruction: Int?,
     val numberOfBathrooms: Int?,
-    val extraBuildings: List<ExtraBuildingDto>?,
+    val extraBuildings: List<ExtraBuildingRequestDto>?,
     @field:JsonProperty("subleted")
     val isSubleted: Boolean?,
     val floor: Int = 0
