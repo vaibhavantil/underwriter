@@ -1,10 +1,15 @@
 package com.hedvig.underwriter.extensions
 
+import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.CreateApartmentInput
 import com.hedvig.underwriter.graphql.type.CreateHouseInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
+import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
+import com.hedvig.underwriter.graphql.type.ExtraBuildingType
+import com.hedvig.underwriter.graphql.type.QuoteDetails
+import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
@@ -14,6 +19,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildi
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import java.lang.IllegalStateException
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -84,4 +90,53 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.RENT -> ApartmentProductSubType.RENT
     ApartmentType.STUDENT_BRF -> ApartmentProductSubType.STUDENT_BRF
     ApartmentType.BRF -> ApartmentProductSubType.BRF
+}
+
+fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService, locale: Locale) : QuoteDetails =
+    this.apartment?.let { apartment ->
+        QuoteDetails.ApartmentQuoteDetails(
+            street = apartment.street,
+            zipCode = apartment.zipCode,
+            householdSize = apartment.householdSize,
+            livingSpace = apartment.livingSpace,
+            type = apartment.type
+        )
+    } ?: this.house?.let { house ->
+        QuoteDetails.HouseQuoteDetails(
+            street = house.street,
+            zipCode = house.zipCode,
+            householdSize = house.householdSize,
+            livingSpace = house.livingSpace,
+            ancillarySpace = house.ancillarySpace,
+            extraBuildings = house.extraBuildings.map { extraBuildingInput ->
+                ExtraBuilding(
+                    type = extraBuildingInput.type,
+                    area = extraBuildingInput.area,
+                    hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                    displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                )
+
+            }
+        )
+    } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
+
+
+private fun ExtraBuildingType.getDisplayName(localizationService: LocalizationService, locale: Locale): String =
+    localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${this.name}") ?: getDefaultDisplayName(this)
+
+private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type) {
+    ExtraBuildingType.GARAGE -> "Garage"
+    ExtraBuildingType.CARPORT -> "Carport"
+    ExtraBuildingType.SHED -> "Skjul"
+    ExtraBuildingType.STOREHOUSE -> "Förråd"
+    ExtraBuildingType.FRIGGEBOD -> "Friggebod"
+    ExtraBuildingType.ATTEFALL -> "Attefallshus"
+    ExtraBuildingType.OUTHOUSE -> "Uthus"
+    ExtraBuildingType.GUESTHOUSE -> "Gästhus"
+    ExtraBuildingType.GAZEBO -> "Lusthus"
+    ExtraBuildingType.GREENHOUSE -> "Växthus"
+    ExtraBuildingType.SAUNA -> "Bastu"
+    ExtraBuildingType.BARN -> "Lada"
+    ExtraBuildingType.BOATHOUSE -> "Båthus"
+    ExtraBuildingType.OTHER -> "Övrigt"
 }

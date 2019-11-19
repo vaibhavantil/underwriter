@@ -2,11 +2,12 @@ package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.type.MonetaryAmountV2
 import java.time.Instant
+import java.util.*
 
 sealed class QuoteResult {
 
     data class Quote(
-        val id: String,
+        val id: UUID,
         val firstName: String,
         val lastName: String,
         val currentInsurer: String?,

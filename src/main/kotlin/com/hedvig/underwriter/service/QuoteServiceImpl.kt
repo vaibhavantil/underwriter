@@ -86,7 +86,7 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID?): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
             id = UUID.randomUUID(),
@@ -151,7 +151,12 @@ class QuoteServiceImpl(
                 },
                 { completeQuote ->
                     quoteRepository.update(completeQuote)
-                    CompleteQuoteResponseDto(id = completeQuote.id, price = completeQuote.price!!)
+
+                    CompleteQuoteResponseDto(
+                        id = completeQuote.id,
+                        price = completeQuote.price!!,
+                        validTo = completeQuote.createdAt.plusMillis(completeQuote.validity)
+                    )
                 }
             )
     }

@@ -24,3 +24,6 @@ graphiql:
     graphql: /graphql
   enabled: true
   pageTitle: Underwriter GraphiQL
+
+graphcms.project: Underwriter
+graphcms.url: https://api-euwest.graphcms.com/v1/cjmawd9hw036a01cuzmjhplka/master

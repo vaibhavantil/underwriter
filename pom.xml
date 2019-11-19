@@ -24,6 +24,17 @@
         <swagger.version>2.8.0</swagger.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-hedvig-hedvig-java</id>
+            <name>bintray</name>
+            <url>https://dl.bintray.com/hedvig/hedvig-java</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -190,11 +201,16 @@
         </dependency>
 
         <!-- GraphQL -->
-
         <dependency>
             <groupId>com.hedvig.graphql.commons</groupId>
             <artifactId>graphql-commons</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hedvig.localization</groupId>
+            <artifactId>localization</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

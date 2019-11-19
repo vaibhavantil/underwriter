@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.graphql.type
 
+import java.util.*
+
 data class CreateQuoteInput(
-    val id: String,
+    val id: UUID,
     val firstName: String,
     val lastName: String,
     val currentInsurer: String?,
