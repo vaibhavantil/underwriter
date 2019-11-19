@@ -188,6 +188,14 @@
             <artifactId>mockk</artifactId>
             <version>1.9.1</version>
         </dependency>
+
+        <!-- GraphQL -->
+
+        <dependency>
+            <groupId>com.hedvig.graphql.commons</groupId>
+            <artifactId>graphql-commons</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

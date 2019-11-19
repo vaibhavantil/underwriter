@@ -11,3 +11,16 @@ spring:
   liquibase.enabled: false
   jackson.deserialization.read-unknown-enum-values-using-default-value: true
 
+graphql:
+  servlet:
+    mapping: /graphql
+    enabled: true
+    corsEnabled: true
+    actuator-metrics: true
+
+graphiql:
+  mapping: /graphiql
+  endpoint:
+    graphql: /graphql
+  enabled: true
+  pageTitle: Underwriter GraphiQL
