@@ -145,7 +145,8 @@ class QuoteServiceImpl(
                     )
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached"
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
                     )
                 },
                 { completeQuote ->

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
 
 data class ErrorResponseDto(
     val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
-    val errorMessage: String
+    val errorMessage: String,
+    val breachedUnderwritingGuidelines: List<String>? = null
 )
 
 enum class ErrorCodes {
