@@ -9,12 +9,15 @@ import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType
 import com.hedvig.underwriter.graphql.type.QuoteDetails
-import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.ProductType.*
 import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDTO
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
@@ -92,7 +95,7 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.BRF -> ApartmentProductSubType.BRF
 }
 
-fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService, locale: Locale) : QuoteDetails =
+fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService, locale: Locale): QuoteDetails =
     this.apartment?.let { apartment ->
         QuoteDetails.ApartmentQuoteDetails(
             street = apartment.street,
@@ -140,3 +143,74 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
+
+
+fun CreateQuoteInput.toCalculateQuoteRequestDto(memberId: String) =
+    CalculateQuoteRequestDto(
+        memberId = memberId,
+        ssn = this.ssn,
+        firstName = this.firstName,
+        lastName = this.lastName,
+        birthDate = this.ssn.birthDateFromSsn(),
+        student = this.isStudent(),
+        address = this.toAddress(),
+        livingSpace = this.apartment?.livingSpace?.toFloat()
+            ?: this.house?.livingSpace?.toFloat()
+            ?: throw IllegalStateException("Creating CalculateQuoteRequestDto without `apartment` or `house` livingSpace"),
+        houseType = this.getProductPricingProductTypes(),
+        currentInsurer = this.currentInsurer,
+        personsInHouseHold = this.apartment?.householdSize
+            ?: this.house?.householdSize
+            ?: throw IllegalStateException("Creating CalculateQuoteRequestDto without `apartment` or `house` personsInHouseHold"),
+        ancillaryArea = this.house?.ancillarySpace,
+        yearOfConstruction = this.house?.yearOfConstruction,
+        numberOfBathrooms = this.house?.numberOfBathrooms,
+        extraBuildings = this.house?.extraBuildings?.map { extraBuildingInput ->
+            ExtraBuildingDTO(
+                extraBuildingInput.type,
+                extraBuildingInput.area,
+                extraBuildingInput.hasWaterConnected
+            )
+        },
+        isSubleted = this.house?.isSubleted
+    )
+
+fun CreateQuoteInput.isStudent() =
+    this.apartment?.let { apartment ->
+        when (apartment.type) {
+            ApartmentType.STUDENT_RENT,
+            ApartmentType.STUDENT_BRF -> true
+            else -> false
+        }
+    } ?: false
+
+fun CreateQuoteInput.getProductPricingProductTypes(): ProductPricingProductTypes =
+    this.apartment?.let { apartment ->
+        when (apartment.type) {
+            ApartmentType.STUDENT_RENT -> ProductPricingProductTypes.STUDENT_RENT
+            ApartmentType.RENT -> ProductPricingProductTypes.RENT
+            ApartmentType.STUDENT_BRF -> ProductPricingProductTypes.STUDENT_BRF
+            ApartmentType.BRF -> ProductPricingProductTypes.BRF
+        }
+    } ?: this.house?.let {
+        ProductPricingProductTypes.HOUSE
+    }
+    ?: throw IllegalStateException("Creating CalculateQuoteRequestDto without `apartment` or `house` ProductPricingProductTypes")
+
+
+fun CreateQuoteInput.toAddress() =
+    this.apartment?.let { apartment ->
+        Address(
+            street = apartment.street,
+            zipCode = apartment.zipCode,
+            city = null,
+            floor = null
+        )
+    } ?: this.house?.let { house ->
+        Address(
+            street = house.street,
+            zipCode = house.zipCode,
+            city = null,
+            floor = null
+        )
+    } ?: throw IllegalStateException("Creating address without `apartment` or `house`")

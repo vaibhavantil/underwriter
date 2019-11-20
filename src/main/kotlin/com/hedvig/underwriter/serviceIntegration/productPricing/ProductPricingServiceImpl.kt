@@ -1,9 +1,11 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service
 class ProductPricingServiceImpl @Autowired constructor(
     val productPricingClient: ProductPricingClient
 ) : ProductPricingService {
+
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
         val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
@@ -35,6 +38,11 @@ class ProductPricingServiceImpl @Autowired constructor(
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }
+
+    override fun createProduct(
+        calculateQuoteRequestDto: CalculateQuoteRequestDto,
+        memberId: String
+    ): ProductCreatedResponseDto = this.productPricingClient.createProduct(calculateQuoteRequestDto, memberId).body!!
 
     override fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto =
         productPricingClient.createModifiedProductFromQuote(quoteRequestDto, quoteRequestDto.memberId)
