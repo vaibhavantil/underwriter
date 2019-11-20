@@ -19,8 +19,6 @@ interface ProductPricingService {
 
     fun createProduct(rapioQuoteRequest: RapioQuoteRequestDto, memberId: String): RapioProductCreatedResponseDto
 
-    fun createProduct(calculateQuoteRequestDto: CalculateQuoteRequestDto, memberId: String): ProductCreatedResponseDto
-
     fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto
 
     fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto): ResponseEntity<Void>

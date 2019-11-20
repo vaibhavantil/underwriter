@@ -8,7 +8,6 @@ import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.type.MonetaryAmountV2
 import com.hedvig.underwriter.extensions.createQuoteResult
-import com.hedvig.underwriter.extensions.toCalculateQuoteRequestDto
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -17,10 +16,8 @@ import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
-import org.apache.tomcat.util.http.parser.AcceptLanguage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.lang.IllegalStateException
@@ -35,7 +32,7 @@ class Mutation @Autowired constructor(
 ) : GraphQLMutationResolver {
 
     fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
-        val quote = quoteService.createQuote(input.toIncompleteQuoteDto(), input.id)
+        val quote = quoteService.createQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id)
 
         return when (val quoteOrError = quoteService.completeQuote(quote.id)) {
             is Either.Left -> {
@@ -61,12 +58,6 @@ class Mutation @Autowired constructor(
             }
             is Either.Right -> {
                 val completeQuoteResponseDto = quoteOrError.b
-
-                env.getTokenOrNull()?.let { token ->
-                    productPricingService.createProduct(
-                        input.toCalculateQuoteRequestDto(token), token
-                    )
-                }
 
                 QuoteResult.Quote(
                     id = completeQuoteResponseDto.id,

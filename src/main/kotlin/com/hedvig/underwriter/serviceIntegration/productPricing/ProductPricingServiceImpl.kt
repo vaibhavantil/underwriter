@@ -39,11 +39,6 @@ class ProductPricingServiceImpl @Autowired constructor(
         return signedQuote!!
     }
 
-    override fun createProduct(
-        calculateQuoteRequestDto: CalculateQuoteRequestDto,
-        memberId: String
-    ): ProductCreatedResponseDto = this.productPricingClient.createProduct(calculateQuoteRequestDto, memberId).body!!
-
     override fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto =
         productPricingClient.createModifiedProductFromQuote(quoteRequestDto, quoteRequestDto.memberId)
 
