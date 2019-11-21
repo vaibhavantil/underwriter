@@ -75,8 +75,7 @@ class QuoteTest {
                     yearOfConstruction = null,
                     numberOfBathrooms = null,
                     ancillaryArea = null,
-                    extraBuildings = null,
-                    personalNumber = null
+                    extraBuildings = null
                 ),
                 originatingProductId = null,
                 quotingPartner = null,

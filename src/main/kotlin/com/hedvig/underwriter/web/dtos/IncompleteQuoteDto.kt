@@ -27,7 +27,6 @@ data class IncompleteHouseQuoteDataDto(
     val zipCode: String?,
     val city: String?,
     val livingSpace: Int?,
-    val personalNumber: String?, // fixme: Is this really related to HouseQuoteData ??
     val householdSize: Int?,
     val ancillaryArea: Int?,
     val yearOfConstruction: Int?,
@@ -35,7 +34,7 @@ data class IncompleteHouseQuoteDataDto(
     val extraBuildings: List<ExtraBuildingRequestDto>?,
     @field:JsonProperty("subleted")
     val isSubleted: Boolean?,
-    val floor: Int = 0 // fixme: Is this really related to HouseQuoteData ??
+    val floor: Int = 0
 )
 
 data class IncompleteApartmentQuoteDataDto(

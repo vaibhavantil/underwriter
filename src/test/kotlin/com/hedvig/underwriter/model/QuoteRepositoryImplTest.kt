@@ -124,7 +124,7 @@ class QuoteRepositoryImplTest {
                 yearOfConstruction = 1995,
                 extraBuildings = listOf(
                     ExtraBuilding(
-                        type = "ATTEFALL",
+                        type = ExtraBuildingType.ATTEFALL,
                         area = 20,
                         displayName = "Foo",
                         hasWaterConnected = false
@@ -162,7 +162,7 @@ class QuoteRepositoryImplTest {
                 yearOfConstruction = 1995,
                 extraBuildings = listOf(
                     ExtraBuilding(
-                        type = "ATTEFALL",
+                        type = ExtraBuildingType.ATTEFALL,
                         area = 20,
                         displayName = "Foo",
                         hasWaterConnected = false
@@ -236,7 +236,7 @@ class QuoteRepositoryImplTest {
                 yearOfConstruction = 1995,
                 extraBuildings = listOf(
                     ExtraBuilding(
-                        type = "ATTEFALL",
+                        type = ExtraBuildingType.ATTEFALL,
                         area = 20,
                         displayName = "Foo",
                         hasWaterConnected = false
@@ -269,7 +269,7 @@ class QuoteRepositoryImplTest {
                 yearOfConstruction = 1995,
                 extraBuildings = listOf(
                     ExtraBuilding(
-                        type = "ATTEFALL",
+                        type = ExtraBuildingType.ATTEFALL,
                         area = 20,
                         displayName = "Foo",
                         hasWaterConnected = false
@@ -373,7 +373,7 @@ class QuoteRepositoryImplTest {
                 yearOfConstruction = 1995,
                 extraBuildings = listOf(
                     ExtraBuilding(
-                        type = "ATTEFALL",
+                        type = ExtraBuildingType.ATTEFALL,
                         area = 20,
                         displayName = "Foo",
                         hasWaterConnected = false
