@@ -206,6 +206,13 @@
             <artifactId>graphql-commons</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.graphql-java-kickstart</groupId>
+            <artifactId>graphql-spring-boot-starter-test</artifactId>
+            <version>5.11.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- GraphQL -->
 
         <dependency>
             <groupId>com.hedvig.localization</groupId>
