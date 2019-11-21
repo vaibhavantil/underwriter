@@ -6,4 +6,4 @@ import org.springframework.stereotype.Component
 // This is unfortunately needed
 @Suppress("unused")
 @Component
-class Query : GraphQLQueryResolver {}
+class Query : GraphQLQueryResolver

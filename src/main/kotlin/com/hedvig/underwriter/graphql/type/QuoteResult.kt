@@ -2,7 +2,7 @@ package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 sealed class QuoteResult {
 
@@ -19,5 +19,4 @@ sealed class QuoteResult {
     data class UnderwritingLimitsHit(
         val limits: List<UnderwritingLimit>
     ) : QuoteResult()
-
 }

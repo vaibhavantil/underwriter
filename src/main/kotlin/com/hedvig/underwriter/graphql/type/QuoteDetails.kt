@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.graphql.type
 
-
 sealed class QuoteDetails {
     data class ApartmentQuoteDetails(
         val street: String,

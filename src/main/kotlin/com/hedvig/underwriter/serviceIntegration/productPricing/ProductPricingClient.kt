@@ -11,12 +11,12 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProduc
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import feign.Headers
+import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
-import javax.validation.Valid
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -60,4 +60,3 @@ interface ProductPricingClient {
         @Valid @RequestBody req: RedeemCampaignDto
     ): ResponseEntity<Void>
 }
-

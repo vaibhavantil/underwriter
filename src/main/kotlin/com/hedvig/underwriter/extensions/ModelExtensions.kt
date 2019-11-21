@@ -12,19 +12,14 @@ import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.model.ProductType.*
 import com.hedvig.underwriter.model.birthDateFromSsn
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDTO
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.lang.IllegalStateException
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 fun CreateQuoteInput.toIncompleteQuoteDto(
     quotingPartner: Partner? = null,
@@ -64,26 +59,41 @@ fun CreateHouseInput.toIncompleteHouseQuoteDataDto() = IncompleteHouseQuoteDataD
     isSubleted = this.isSubleted,
     extraBuildings = this.extraBuildings.toExtraBuilding(),
     numberOfBathrooms = this.numberOfBathrooms,
-    personalNumber = null,
     city = null
 )
 
 fun List<ExtraBuildingInput>.toExtraBuilding(): List<ExtraBuildingRequestDto> = this.map { extraBuildingInput ->
     ExtraBuildingRequestDto(
         id = null,
-        type = extraBuildingInput.type.toString(),
+        type = extraBuildingInput.type.toExtraBuildingType(),
         area = extraBuildingInput.area,
         hasWaterConnected = extraBuildingInput.hasWaterConnected
     )
 }
 
+private fun ExtraBuildingType.toExtraBuildingType() = when (this) {
+    ExtraBuildingType.GARAGE -> com.hedvig.underwriter.model.ExtraBuildingType.GARAGE
+    ExtraBuildingType.CARPORT -> com.hedvig.underwriter.model.ExtraBuildingType.CARPORT
+    ExtraBuildingType.SHED -> com.hedvig.underwriter.model.ExtraBuildingType.SHED
+    ExtraBuildingType.STOREHOUSE -> com.hedvig.underwriter.model.ExtraBuildingType.STOREHOUSE
+    ExtraBuildingType.FRIGGEBOD -> com.hedvig.underwriter.model.ExtraBuildingType.FRIGGEBOD
+    ExtraBuildingType.ATTEFALL -> com.hedvig.underwriter.model.ExtraBuildingType.ATTEFALL
+    ExtraBuildingType.OUTHOUSE -> com.hedvig.underwriter.model.ExtraBuildingType.OUTHOUSE
+    ExtraBuildingType.GUESTHOUSE -> com.hedvig.underwriter.model.ExtraBuildingType.GUESTHOUSE
+    ExtraBuildingType.GAZEBO -> com.hedvig.underwriter.model.ExtraBuildingType.GAZEBO
+    ExtraBuildingType.GREENHOUSE -> com.hedvig.underwriter.model.ExtraBuildingType.GREENHOUSE
+    ExtraBuildingType.SAUNA -> com.hedvig.underwriter.model.ExtraBuildingType.SAUNA
+    ExtraBuildingType.BARN -> com.hedvig.underwriter.model.ExtraBuildingType.BARN
+    ExtraBuildingType.BOATHOUSE -> com.hedvig.underwriter.model.ExtraBuildingType.BOATHOUSE
+    ExtraBuildingType.OTHER -> com.hedvig.underwriter.model.ExtraBuildingType.OTHER
+}
 
 fun CreateQuoteInput.getProductType(): ProductType =
     this.apartment?.let {
-        APARTMENT
+        ProductType.APARTMENT
     } ?: this.house?.let {
-        HOUSE
-    } ?: UNKNOWN
+        ProductType.HOUSE
+    } ?: ProductType.UNKNOWN
 
 fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.STUDENT_RENT -> ApartmentProductSubType.STUDENT_RENT
@@ -115,11 +125,9 @@ fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService,
                     hasWaterConnected = extraBuildingInput.hasWaterConnected,
                     displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
                 )
-
             }
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
-
 
 private fun ExtraBuildingType.getDisplayName(localizationService: LocalizationService, locale: Locale): String =
     localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${this.name}") ?: getDefaultDisplayName(this)

@@ -19,9 +19,9 @@ import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
+import java.lang.IllegalStateException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.lang.IllegalStateException
 
 @Suppress("unused")
 @Component
@@ -88,4 +88,3 @@ class Mutation @Autowired constructor(
         TODO()
     }
 }
-

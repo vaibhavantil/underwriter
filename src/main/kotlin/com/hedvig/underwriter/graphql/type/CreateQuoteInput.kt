@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-import java.util.*
+import java.util.UUID
 
 data class CreateQuoteInput(
     val id: UUID,
