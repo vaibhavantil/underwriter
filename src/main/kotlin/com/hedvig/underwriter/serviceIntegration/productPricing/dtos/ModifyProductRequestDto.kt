@@ -17,7 +17,6 @@ data class ModifyProductRequestDto(
     val livingSpace: Float,
     val houseType: String,
     val personsInHouseHold: Int,
-    val safetyIncreasers: List<String> = emptyList(),
     val activationDate: LocalDate,
     val previousInsuranceTerminationDate: LocalDate,
     val price: BigDecimal,
