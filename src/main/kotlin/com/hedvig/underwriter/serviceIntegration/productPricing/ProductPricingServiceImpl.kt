@@ -2,6 +2,8 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
@@ -33,6 +35,9 @@ class ProductPricingServiceImpl @Autowired constructor(
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }
+
+    override fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto =
+        productPricingClient.createModifiedProductFromQuote(quoteRequestDto, quoteRequestDto.memberId)
 
     override fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto) =
         this.productPricingClient.redeemCampaign(redeemCampaignDto)

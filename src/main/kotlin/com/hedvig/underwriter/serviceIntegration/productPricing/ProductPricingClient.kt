@@ -2,6 +2,8 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
@@ -37,6 +39,12 @@ interface ProductPricingClient {
         @RequestHeader(value = "hedvig.token") memberId: String
 
     ): ResponseEntity<RapioProductCreatedResponseDto>
+
+    @PostMapping("/_/insurance/quotes/createModifiedProduct")
+    fun createModifiedProductFromQuote(
+        @Valid @RequestBody quoteRequestDto: ModifyProductRequestDto,
+        @RequestHeader("hedvig.token") memberId: String
+    ): ModifiedProductCreatedDto
 
     @PostMapping("/i/campaign/member/redeemCampaign")
     fun redeemCampaign(

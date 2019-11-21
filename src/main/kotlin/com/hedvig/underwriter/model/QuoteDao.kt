@@ -23,7 +23,9 @@ interface QuoteDao {
                 price,
                 quote_apartment_data_id,
                 quote_house_data_id,
-                member_id
+                member_id,
+                originating_product_id,
+                signed_product_id
             )
             VALUES (
                 :masterQuoteId,
@@ -37,7 +39,9 @@ interface QuoteDao {
                 :price,
                 :quoteApartmentDataId,
                 :quoteHouseDataId,
-                :memberId
+                :memberId,
+                :originatingProductId,
+                :signedProductId
             )
             RETURNING *
     """
@@ -75,15 +79,34 @@ interface QuoteDao {
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean quoteData: ApartmentData): ApartmentData
 
-    @SqlQuery("""
-        SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
+    @SqlQuery("""SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
     fun findApartmentQuoteData(@Bind id: Int): ApartmentData?
 
     @SqlQuery(
         """
             SELECT
             DISTINCT ON (qr.master_quote_id)
+
+            qr.*, 
+            mq.created_at, 
+            mq.initiated_from 
             
+            FROM master_quotes mq
+            JOIN quote_revisions qr
+            ON qr.master_quote_id = mq.id 
+            
+            WHERE qr.member_id = :memberId
+            ORDER BY qr.master_quote_id ASC, qr.id DESC
+            LIMIT 1
+        """
+    )
+    fun findOneByMemberId(@Bind memberId: String): DatabaseQuoteRevision?
+
+    @SqlQuery(
+        """
+            SELECT
+            DISTINCT ON (qr.master_quote_id)
+
             qr.*, 
             mq.created_at, 
             mq.initiated_from 
@@ -96,14 +119,46 @@ interface QuoteDao {
             ORDER BY qr.master_quote_id ASC, qr.id DESC
         """
     )
-    fun findByMemberId(@Bind memberId: String): DatabaseQuoteRevision?
+    fun findByMemberId(@Bind memberId: String): List<DatabaseQuoteRevision>
 
     @SqlUpdate(
         """
             INSERT INTO quote_revision_house_data
-            (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space)
+            (
+                id,
+                ssn,
+                first_name,
+                last_name,
+                street,
+                city,
+                zip_code,
+                household_size,
+                living_space,
+                ancillary_area,
+                year_of_construction,
+                number_of_bathrooms,
+                extra_buildings,
+                is_subleted,
+                floor
+            )
             VALUES
-            (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace)
+            (
+                :id,
+                :ssn,
+                :firstName,
+                :lastName,
+                :street,
+                :city,
+                :zipCode,
+                :householdSize,
+                :livingSpace,
+                :ancillaryArea,
+                :yearOfConstruction,
+                :numberOfBathrooms,
+                :extraBuildings,
+                :isSubleted,
+                :floor
+            )
             RETURNING *
     """
     )

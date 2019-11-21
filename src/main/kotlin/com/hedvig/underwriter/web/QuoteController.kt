@@ -5,6 +5,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
@@ -31,11 +32,16 @@ class QuoteController @Autowired constructor(
 ) {
     @PostMapping
     fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteResponseDto> {
-        val quote = quoteService.createApartmentQuote(incompleteQuoteDto)
+        val quote = quoteService.createQuote(incompleteQuoteDto)
         return ResponseEntity.ok(quote)
     }
 
-    @PostMapping("/{incompleteQuoteId}/completeQuote")
+    @PostMapping(
+        path = [
+            "/{incompleteQuoteId}/completeQuote",
+            "/{incompleteQuoteId}/complete"
+        ]
+    )
     fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
         return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
@@ -48,12 +54,6 @@ class QuoteController @Autowired constructor(
         val optionalQuote = quoteService.getQuote(id) ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(optionalQuote)
-    }
-
-    @GetMapping("/members/{memberId}/latestQuote")
-    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
-        val quoteDto = quoteService.getQuoteFromMemberId(memberId) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(quoteDto)
     }
 
     @PatchMapping("/{id}")
@@ -70,5 +70,31 @@ class QuoteController @Autowired constructor(
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
+    }
+
+    @PostMapping("/{completeQuoteId}/activate")
+    fun activateCompleteQuote(
+        @PathVariable completeQuoteId: UUID,
+        @Valid @RequestBody requestBody: ActivateQuoteRequestDto
+    ): ResponseEntity<Any> {
+        val result =
+            quoteService.activateQuote(completeQuoteId, requestBody.activationDate, requestBody.terminationDate)
+
+        return when (result) {
+            is Either.Left -> ResponseEntity.status(422).body(result.a)
+            is Either.Right -> ResponseEntity.ok(result.b)
+            else -> throw IllegalStateException("Result should be either left or right but was ${result::class.java}")
+        }
+    }
+
+    @GetMapping("/members/{memberId}/latestQuote")
+    fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+        val quoteDto = quoteService.getSingleQuoteForMemberId(memberId) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(quoteDto)
+    }
+
+    @GetMapping("/members/{memberId}")
+    fun getAllQuotesFromMemberId(@PathVariable memberId: String): ResponseEntity<List<QuoteDto>> {
+        return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
     }
 }

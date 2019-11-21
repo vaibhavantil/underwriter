@@ -69,8 +69,12 @@ internal class QuoteBuilderControllerTest {
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         val incompleteQuote = Quote(
+            id = UUID.randomUUID(),
             createdAt = Instant.now(),
             productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.COMPRICER,
             data = ApartmentData(
                 id = UUID.randomUUID(),
                 street = "123 Baker street",
@@ -84,11 +88,7 @@ internal class QuoteBuilderControllerTest {
                 lastName = "null",
                 ssn = "189003042342"
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.COMPRICER,
-            id = UUID.randomUUID(),
-            currentInsurer = null,
-            state = QuoteState.INCOMPLETE
+            currentInsurer = null
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))
@@ -109,8 +109,12 @@ internal class QuoteBuilderControllerTest {
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         val incompleteQuote = Quote(
+            id = UUID.randomUUID(),
             createdAt = Instant.now(),
             productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.COMPRICER,
             data =
             ApartmentData(
                 street = "123 Baker street",
@@ -123,11 +127,7 @@ internal class QuoteBuilderControllerTest {
                 lastName = "null",
                 id = UUID.randomUUID()
             ),
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.COMPRICER,
-            id = UUID.randomUUID(),
-            currentInsurer = null,
-            state = QuoteState.INCOMPLETE
+            currentInsurer = null
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))

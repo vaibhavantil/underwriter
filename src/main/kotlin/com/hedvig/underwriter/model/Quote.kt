@@ -7,12 +7,14 @@ import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Year
 import java.util.UUID
 
 fun String.birthDateFromSsn(): LocalDate {
@@ -40,7 +42,9 @@ data class DatabaseQuoteRevision(
     val quoteHouseDataId: Int?,
     val memberId: String?,
     val initiatedFrom: QuoteInitiatedFrom?,
-    val createdAt: Instant?
+    val createdAt: Instant?,
+    val originatingProductId: UUID?,
+    val signedProductId: UUID?
 ) {
 
     companion object {
@@ -66,7 +70,9 @@ data class DatabaseQuoteRevision(
                 },
                 memberId = quote.memberId,
                 createdAt = quote.createdAt,
-                initiatedFrom = quote.initiatedFrom
+                initiatedFrom = quote.initiatedFrom,
+                originatingProductId = quote.originatingProductId,
+                signedProductId = quote.signedProductId
             )
     }
 }
@@ -88,7 +94,9 @@ data class Quote(
     val startDate: LocalDate? = null,
 
     val validity: Long = ONE_DAY * 30,
-    val memberId: String? = null
+    val memberId: String? = null,
+    val originatingProductId: UUID? = null,
+    val signedProductId: UUID? = null
 ) {
     val isComplete: Boolean
         get() = when {
@@ -137,6 +145,7 @@ data class Quote(
 
     fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
         var newQuote = copy(
+            productType = incompleteQuoteDto.productType ?: productType,
             data = when (data) {
                 is ApartmentData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
@@ -151,31 +160,78 @@ data class Quote(
                 )
             }
         )
-        if (incompleteQuoteDto.incompleteApartmentQuoteData != null) {
-            val apartmentData = incompleteQuoteDto.incompleteApartmentQuoteData
-            val newQuoteData: ApartmentData = newQuote.data as ApartmentData
+        if (
+            incompleteQuoteDto.productType == ProductType.APARTMENT ||
+            incompleteQuoteDto.incompleteApartmentQuoteData != null
+        ) {
+            val apartmentRequest = incompleteQuoteDto.incompleteApartmentQuoteData!!
+            val newQuoteData: ApartmentData = when {
+                newQuote.data is ApartmentData -> newQuote.data as ApartmentData
+                newQuote.data is HouseData -> {
+                    val houseData = newQuote.data as HouseData
+                    ApartmentData(
+                        id = houseData.id,
+                        firstName = houseData.firstName,
+                        lastName = houseData.lastName,
+                        ssn = houseData.ssn,
+                        street = houseData.street,
+                        zipCode = houseData.zipCode,
+                        city = houseData.city,
+                        householdSize = houseData.householdSize,
+                        livingSpace = houseData.livingSpace
+                    )
+                }
+                else -> ApartmentData(id = UUID.randomUUID())
+            }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
-                    street = apartmentData.street ?: newQuoteData.street,
-                    zipCode = apartmentData.zipCode ?: newQuoteData.zipCode,
-                    city = apartmentData.city ?: newQuoteData.city,
-                    householdSize = apartmentData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = apartmentData.livingSpace ?: newQuoteData.livingSpace,
-                    subType = newQuoteData.subType // TODO
+                    street = apartmentRequest.street ?: newQuoteData.street,
+                    zipCode = apartmentRequest.zipCode ?: newQuoteData.zipCode,
+                    city = apartmentRequest.city ?: newQuoteData.city,
+                    householdSize = apartmentRequest.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = apartmentRequest.livingSpace ?: newQuoteData.livingSpace,
+                    subType = apartmentRequest.subType ?: newQuoteData.subType
                 )
             )
         }
 
-        if (incompleteQuoteDto.incompleteHouseQuoteData != null) {
-            val houseData = incompleteQuoteDto.incompleteHouseQuoteData
-            val newQuoteData: HouseData = newQuote.data as HouseData
+        if (
+            incompleteQuoteDto.productType == ProductType.HOUSE ||
+            incompleteQuoteDto.incompleteHouseQuoteData != null
+        ) {
+            val houseRequest = incompleteQuoteDto.incompleteHouseQuoteData!!
+            val newQuoteData: HouseData = when {
+                newQuote.data is HouseData -> newQuote.data as HouseData
+                newQuote.data is ApartmentData -> {
+                    val apartmentData = newQuote.data as ApartmentData
+                    HouseData(
+                        id = apartmentData.id,
+                        firstName = apartmentData.firstName,
+                        lastName = apartmentData.lastName,
+                        ssn = apartmentData.ssn,
+                        street = apartmentData.street,
+                        zipCode = apartmentData.zipCode,
+                        city = apartmentData.city,
+                        householdSize = apartmentData.householdSize,
+                        livingSpace = apartmentData.livingSpace
+                    )
+                }
+                else -> HouseData(id = UUID.randomUUID())
+            }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
-                    street = houseData.street ?: newQuoteData.street,
-                    zipCode = houseData.zipCode ?: newQuoteData.zipCode,
-                    city = houseData.city ?: newQuoteData.city,
-                    householdSize = houseData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = houseData.livingSpace ?: newQuoteData.livingSpace
+                    street = houseRequest.street ?: newQuoteData.street,
+                    zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
+                    city = houseRequest.city ?: newQuoteData.city,
+                    householdSize = houseRequest.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = houseRequest.livingSpace ?: newQuoteData.livingSpace,
+                    numberOfBathrooms = houseRequest.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
+                    isSubleted = houseRequest.isSubleted ?: newQuoteData.isSubleted,
+                    extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from)
+                        ?: newQuoteData.extraBuildings,
+                    ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
+                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction,
+                    floor = houseRequest.floor
                 )
             )
         }
@@ -204,6 +260,7 @@ data class Quote(
             }
         }
 
+        // TODO add bypassing of underwriting guidelines
         if (errorStrings.isEmpty()) {
             return Right(
                 this.copy(
@@ -235,9 +292,21 @@ data class Quote(
         private fun houseQuotePriceDto(completeQuote: Quote): HouseQuotePriceDto {
             val completeQuoteData = completeQuote.data
             if (completeQuoteData is HouseData) {
-                //  TODO: complete
                 return HouseQuotePriceDto(
-                    birthDate = completeQuoteData.ssn!!.birthDateFromSsn()
+                    birthDate = completeQuoteData.ssn!!.birthDateFromSsn(),
+                    livingSpace = completeQuoteData.livingSpace!!,
+                    houseHoldSize = completeQuoteData.householdSize!!,
+                    zipCode = completeQuoteData.zipCode!!,
+                    ancillaryArea = completeQuoteData.ancillaryArea!!,
+                    numberOfBathrooms = completeQuoteData.numberOfBathrooms!!,
+                    yearOfConstruction = Year.of(completeQuoteData.yearOfConstruction!!),
+                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding -> ExtraBuildingRequestDto(
+                        id = null,
+                        hasWaterConnected = extraBuilding.hasWaterConnected,
+                        area = extraBuilding.area,
+                        type = extraBuilding.type
+                    ) },
+                    isSubleted = completeQuoteData.isSubleted!!
                 )
             }
             throw RuntimeException("missing data cannot create house quote price dto")

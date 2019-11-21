@@ -33,12 +33,21 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return findQuote(databaseQuote, dao)
     }
 
-    override fun findByMemberId(memberId: String): Quote? =
-        jdbi.inTransaction<Quote?, RuntimeException> { h -> findByMemberId(memberId, h) }
+    override fun findByMemberId(memberId: String): List<Quote> =
+        jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findByMemberId(memberId, h) }
 
-    fun findByMemberId(memberId: String, h: Handle): Quote? {
+    fun findByMemberId(memberId: String, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()
-        val databaseQuote = dao.findByMemberId(memberId) ?: return null
+        return dao.findByMemberId(memberId)
+            .mapNotNull { databaseQuote -> findQuote(databaseQuote, dao) }
+    }
+
+    override fun findOneByMemberId(memberId: String): Quote? =
+        jdbi.inTransaction<Quote?, RuntimeException> { h -> findOneByMemberId(memberId, h) }
+
+    fun findOneByMemberId(memberId: String, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuote = dao.findOneByMemberId(memberId) ?: return null
         return findQuote(databaseQuote, dao)
     }
 
@@ -50,17 +59,19 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         }!!
         return Quote(
             id = databaseQuote.masterQuoteId,
-            validity = databaseQuote.validity,
+            createdAt = databaseQuote.createdAt!!,
+            price = databaseQuote.price,
             productType = databaseQuote.productType,
             state = databaseQuote.state,
+            initiatedFrom = databaseQuote.initiatedFrom!!,
             attributedTo = databaseQuote.attributedTo,
+            data = quoteData,
             currentInsurer = databaseQuote.currentInsurer,
             startDate = databaseQuote.startDate,
-            price = databaseQuote.price,
-            data = quoteData,
+            validity = databaseQuote.validity,
             memberId = databaseQuote.memberId,
-            initiatedFrom = databaseQuote.initiatedFrom!!,
-            createdAt = databaseQuote.createdAt!!
+            originatingProductId = databaseQuote.originatingProductId,
+            signedProductId = databaseQuote.signedProductId
         )
     }
 
