@@ -26,6 +26,7 @@ data class ModifyProductRequestDto(
     val yearOfConstruction: Int? = null,
     val numberOfBathrooms: Int? = null,
     val extraBuildings: List<ExtraBuildingRequestDto>? = emptyList(),
+    @get:JvmName("getIsSubleted")
     val isSubleted: Boolean = false,
     val floor: Int = 0
 ) {
