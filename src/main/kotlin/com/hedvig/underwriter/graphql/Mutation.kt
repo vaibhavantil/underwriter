@@ -2,11 +2,11 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
-import com.hedvig.extensions.getAcceptLanguage
-import com.hedvig.extensions.getTokenOrNull
+import com.hedvig.graphql.commons.extensions.getAcceptLanguage
+import com.hedvig.graphql.commons.extensions.getTokenOrNull
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.type.MonetaryAmountV2
 import com.hedvig.underwriter.extensions.createQuoteResult
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
@@ -14,6 +14,7 @@ import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -32,7 +33,8 @@ class Mutation @Autowired constructor(
 ) : GraphQLMutationResolver {
 
     fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
-        val quote = quoteService.createQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id)
+        // TODO: let's discuss initiatedFrom!
+        val quote = quoteService.createQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id, initiatedFrom = QuoteInitiatedFrom.WEBONBOARDING)
 
         return when (val quoteOrError = quoteService.completeQuote(quote.id)) {
             is Either.Left -> {

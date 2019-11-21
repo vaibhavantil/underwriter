@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.type.MonetaryAmountV2
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import java.time.Instant
 import java.util.*
 

@@ -86,13 +86,13 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID?): IncompleteQuoteResponseDto {
+    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID?, initiatedFrom: QuoteInitiatedFrom): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
-            id = UUID.randomUUID(),
+            id = id ?: UUID.randomUUID(),
             createdAt = now,
             productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            initiatedFrom = initiatedFrom,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
                 incompleteQuoteDto.incompleteApartmentQuoteData != null -> ApartmentData(UUID.randomUUID())
