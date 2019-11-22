@@ -1,11 +1,11 @@
 package com.hedvig.underwriter.config
 
 import ch.qos.logback.access.tomcat.LogbackValve
+import javax.servlet.Filter
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import javax.servlet.Filter
 
 @Configuration
 class LogBackAccess {
@@ -28,5 +28,4 @@ class LogBackAccess {
 
         return tomcat
     }
-
 }
