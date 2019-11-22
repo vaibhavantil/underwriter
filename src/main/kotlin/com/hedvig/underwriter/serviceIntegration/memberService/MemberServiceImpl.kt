@@ -42,8 +42,8 @@ class MemberServiceImpl @Autowired constructor(
                 val error = objectMapper.readValue<ErrorResponseDto>(ex.contentUTF8())
                 return Either.left(error)
             }
+            throw RuntimeException("Un handled FeignException", ex)
         }
-        throw RuntimeException("Cannot sign quote")
     }
 
     override fun checkPersonDebt(ssn: String) {
