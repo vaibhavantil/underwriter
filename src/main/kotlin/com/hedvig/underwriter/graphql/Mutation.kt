@@ -23,7 +23,6 @@ import java.lang.IllegalStateException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-@Suppress("unused")
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
