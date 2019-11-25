@@ -49,6 +49,7 @@ class QuoteRepositoryImplTest {
             ),
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
             signedProductId = UUID.randomUUID()
         )
@@ -80,6 +81,7 @@ class QuoteRepositoryImplTest {
                 id = UUID.randomUUID(),
                 subType = ApartmentProductSubType.BRF
             ),
+            breachedUnderwritingGuidelines = null,
             currentInsurer = null
         )
         quoteDao.insert(quote, timestamp)
@@ -134,7 +136,8 @@ class QuoteRepositoryImplTest {
                 isSubleted = false
             ),
             currentInsurer = null,
-            memberId = "123456"
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -176,6 +179,7 @@ class QuoteRepositoryImplTest {
             id = UUID.randomUUID(),
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             state = QuoteState.SIGNED
         )
         quoteDao.insert(quote, timestamp)
@@ -206,6 +210,7 @@ class QuoteRepositoryImplTest {
             id = UUID.randomUUID(),
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             createdAt = timestamp,
             state = QuoteState.INCOMPLETE
         )
@@ -249,6 +254,7 @@ class QuoteRepositoryImplTest {
             attributedTo = Partner.HEDVIG,
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             state = QuoteState.SIGNED
         )
         val quote2 = Quote(
@@ -282,6 +288,7 @@ class QuoteRepositoryImplTest {
             attributedTo = Partner.HEDVIG,
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             state = QuoteState.SIGNED
         )
         quoteDao.insert(quote1, timestamp)
@@ -316,6 +323,7 @@ class QuoteRepositoryImplTest {
             currentInsurer = null,
             memberId = "123456",
             createdAt = timestamp,
+            breachedUnderwritingGuidelines = null,
             state = QuoteState.INCOMPLETE
         )
         val quote2 = Quote(
@@ -337,6 +345,7 @@ class QuoteRepositoryImplTest {
             attributedTo = Partner.HEDVIG,
             currentInsurer = null,
             memberId = "123456",
+            breachedUnderwritingGuidelines = null,
             createdAt = timestamp,
             state = QuoteState.INCOMPLETE
         )
@@ -382,6 +391,7 @@ class QuoteRepositoryImplTest {
                 numberOfBathrooms = 2,
                 isSubleted = false
             ),
+            breachedUnderwritingGuidelines = null,
             currentInsurer = null
         )
         quoteDao.insert(quote, timestamp)
@@ -397,6 +407,45 @@ class QuoteRepositoryImplTest {
         quoteDao.update(updatedQuote)
 
         assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun insertsAndUpdatesBreachedUnderwritingGuidelines() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
+        )
+        quoteDao.insert(quote, timestamp)
+        val breachedUnderwritingGuidelinesQuote = quote.copy(
+            breachedUnderwritingGuidelines = listOf("is too poor"),
+            underwritingGuidelinesBypassedBy = "blargh@hedvig.com"
+        )
+        quoteDao.update(breachedUnderwritingGuidelinesQuote)
+        assertQuotesDeepEqualExceptInternalId(breachedUnderwritingGuidelinesQuote, quoteDao.find(quote.id))
     }
 
     private fun assertQuotesDeepEqualExceptInternalId(

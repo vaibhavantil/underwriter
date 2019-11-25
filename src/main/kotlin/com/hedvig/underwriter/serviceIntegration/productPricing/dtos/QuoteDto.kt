@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
@@ -25,6 +26,8 @@ data class QuoteDto(
     val startDate: LocalDate? = null,
     val validity: Long,
     val memberId: String? = null,
+    val breachedUnderwritingGuidelines: List<String>?,
+    @get:JsonProperty("isComplete")
     val isComplete: Boolean,
     val originatingProductId: UUID?,
     val signedProductId: UUID?
@@ -46,6 +49,7 @@ data class QuoteDto(
                         startDate = quote.startDate,
                         validity = quote.validity,
                         memberId = quote.memberId,
+                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
                         isComplete = quote.isComplete,
                         originatingProductId = quote.originatingProductId,
                         signedProductId = quote.signedProductId
@@ -66,6 +70,7 @@ data class QuoteDto(
                         startDate = quote.startDate,
                         validity = quote.validity,
                         memberId = quote.memberId,
+                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
                         isComplete = quote.isComplete,
                         originatingProductId = quote.originatingProductId,
                         signedProductId = quote.signedProductId

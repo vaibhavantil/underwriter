@@ -24,6 +24,8 @@ interface QuoteDao {
                 quote_apartment_data_id,
                 quote_house_data_id,
                 member_id,
+                breached_underwriting_guidelines,
+                underwriting_guidelines_bypassed_by,
                 originating_product_id,
                 signed_product_id
             )
@@ -40,6 +42,8 @@ interface QuoteDao {
                 :quoteApartmentDataId,
                 :quoteHouseDataId,
                 :memberId,
+                :breachedUnderwritingGuidelines,
+                :underwritingGuidelinesBypassedBy,
                 :originatingProductId,
                 :signedProductId
             )

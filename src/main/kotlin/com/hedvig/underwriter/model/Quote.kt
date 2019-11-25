@@ -1,8 +1,6 @@
 package com.hedvig.underwriter.model
 
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
@@ -41,6 +39,8 @@ data class DatabaseQuoteRevision(
     val quoteApartmentDataId: Int?,
     val quoteHouseDataId: Int?,
     val memberId: String?,
+    val breachedUnderwritingGuidelines: List<String>?,
+    val underwritingGuidelinesBypassedBy: String?,
     val initiatedFrom: QuoteInitiatedFrom?,
     val createdAt: Instant?,
     val originatingProductId: UUID?,
@@ -69,6 +69,8 @@ data class DatabaseQuoteRevision(
                     else -> null
                 },
                 memberId = quote.memberId,
+                breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
+                underwritingGuidelinesBypassedBy = quote.underwritingGuidelinesBypassedBy,
                 createdAt = quote.createdAt,
                 initiatedFrom = quote.initiatedFrom,
                 originatingProductId = quote.originatingProductId,
@@ -94,6 +96,8 @@ data class Quote(
     val startDate: LocalDate? = null,
 
     val validity: Long = ONE_DAY * 30,
+    val breachedUnderwritingGuidelines: List<String>?,
+    val underwritingGuidelinesBypassedBy: String? = null,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val signedProductId: UUID? = null
@@ -241,36 +245,44 @@ data class Quote(
 
     fun complete(
         debtChecker: DebtChecker,
-        productPricingService: ProductPricingService
+        productPricingService: ProductPricingService,
+        underwritingGuidelinesBypassedBy: String? = null
     ): Either<List<String>, Quote> {
-
         val quoteData = this.data
-        val errorStrings = mutableListOf<String>()
+        val breachedUnderwritingGuidelines = mutableListOf<String>()
+        val bypassUnderwritingGuidelines = underwritingGuidelinesBypassedBy != null
 
-        errorStrings.addAll(quoteData.passUwGuidelines())
+        breachedUnderwritingGuidelines.addAll(quoteData.passUwGuidelines())
 
         if (quoteData is PersonPolicyHolder<*>) {
             if (quoteData.age() < 18)
-                errorStrings.add("member is younger than 18")
+                breachedUnderwritingGuidelines.add("member is younger than 18")
             if (!quoteData.ssnIsValid())
-                errorStrings.add("invalid ssn")
+                breachedUnderwritingGuidelines.add("invalid ssn")
 
-            if (errorStrings.isEmpty()) {
-                errorStrings.addAll(debtChecker.passesDebtCheck(quoteData))
+            if (breachedUnderwritingGuidelines.isEmpty()) {
+                breachedUnderwritingGuidelines.addAll(debtChecker.passesDebtCheck(quoteData))
             }
         }
 
-        // TODO add bypassing of underwriting guidelines
-        if (errorStrings.isEmpty()) {
-            return Right(
-                this.copy(
+        val newQuote = copy(data = quoteData, breachedUnderwritingGuidelines = breachedUnderwritingGuidelines)
+
+        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
+            return Either.right(newQuote.copy(
                     price = getPriceRetrievedFromProductPricing(productPricingService),
+                    underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
                     state = QuoteState.QUOTED
-                )
-            )
+            ))
         }
 
-        return Left(errorStrings)
+        if (breachedUnderwritingGuidelines.isEmpty()) {
+            return Either.right(newQuote.copy(
+                price = getPriceRetrievedFromProductPricing(productPricingService),
+                state = QuoteState.QUOTED
+            ))
+        }
+
+        return Either.left(breachedUnderwritingGuidelines)
     }
 
     companion object {
@@ -300,12 +312,14 @@ data class Quote(
                     ancillaryArea = completeQuoteData.ancillaryArea!!,
                     numberOfBathrooms = completeQuoteData.numberOfBathrooms!!,
                     yearOfConstruction = Year.of(completeQuoteData.yearOfConstruction!!),
-                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding -> ExtraBuildingRequestDto(
-                        id = null,
-                        hasWaterConnected = extraBuilding.hasWaterConnected,
-                        area = extraBuilding.area,
-                        type = extraBuilding.type
-                    ) },
+                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding ->
+                        ExtraBuildingRequestDto(
+                            id = null,
+                            hasWaterConnected = extraBuilding.hasWaterConnected,
+                            area = extraBuilding.area,
+                            type = extraBuilding.type
+                        )
+                    },
                     isSubleted = completeQuoteData.isSubleted!!
                 )
             }

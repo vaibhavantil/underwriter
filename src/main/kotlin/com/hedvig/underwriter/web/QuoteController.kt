@@ -11,6 +11,7 @@ import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import java.util.UUID
 import javax.validation.Valid
+import javax.validation.constraints.Email
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -42,8 +44,14 @@ class QuoteController @Autowired constructor(
             "/{incompleteQuoteId}/complete"
         ]
     )
-    fun createCompleteQuote(@Valid @PathVariable incompleteQuoteId: UUID): ResponseEntity<Any> {
-        return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId)) {
+    fun createCompleteQuote(
+        @Valid @PathVariable incompleteQuoteId: UUID,
+        @Valid
+        @Email
+        @RequestParam("underwritingGuidelinesBypassedBy")
+        underwritingGuidelinesBypassedBy: String?
+    ): ResponseEntity<Any> {
+        return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
         }
@@ -57,10 +65,17 @@ class QuoteController @Autowired constructor(
     }
 
     @PatchMapping("/{id}")
-    fun updateQuoteInfo(@PathVariable id: UUID, @RequestBody @Valid incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<Any> {
-        return when (val quoteOrError = quoteService.updateQuote(incompleteQuoteDto, id)) {
+    fun updateQuoteInfo(
+        @PathVariable id: UUID,
+        @RequestBody @Valid incompleteQuoteDto: IncompleteQuoteDto,
+        @Valid
+        @Email
+        @RequestParam("underwritingGuidelinesBypassedBy")
+        underwritingGuidelinesBypassedBy: String?
+    ): ResponseEntity<Any> {
+        return when (val quoteOrError = quoteService.updateQuote(incompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
-            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
+            is Either.Right -> ResponseEntity.status(200).body(QuoteDto.fromQuote(quoteOrError.b))
         }
     }
 
