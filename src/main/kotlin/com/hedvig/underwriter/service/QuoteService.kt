@@ -29,8 +29,8 @@ interface QuoteService {
     fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(
-        incompleteQuoteDto: IncompleteQuoteDto, 
-        id: UUID? = null, 
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID? = null,
         initiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.RAPIO
     ): IncompleteQuoteResponseDto
     fun updateQuote(
