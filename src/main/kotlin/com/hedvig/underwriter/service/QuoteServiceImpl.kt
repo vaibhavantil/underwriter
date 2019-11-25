@@ -2,7 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.flatMap
+import arrow.core.orNull
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
@@ -46,7 +46,11 @@ class QuoteServiceImpl(
 
     val logger = getLogger(QuoteServiceImpl::class.java)!!
 
-    override fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote> {
+    override fun updateQuote(
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, Quote> {
         val quote = quoteRepository
             .find(id)
             ?: return Either.Left(
@@ -63,15 +67,23 @@ class QuoteServiceImpl(
         }
 
         try {
-            val result = quoteRepository.modify(quote.id) {
-                var result: Either<List<String>, Quote> = Either.Right(quote.update(incompleteQuoteDto))
-                if (quote.state == QuoteState.QUOTED) {
-                    result = result.flatMap { quote -> quote.complete(debtChecker, productPricingService) }
+            val result = quoteRepository.modify(quote.id) { quoteToUpdate ->
+                var updated = quoteToUpdate!!.update(incompleteQuoteDto)
+
+                if (updated.state == QuoteState.QUOTED) {
+                    updated = updated.complete(
+                        debtChecker = debtChecker,
+                        productPricingService = productPricingService,
+                        underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
+                    )
+                        .bimap(
+                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { quote -> quote }
+                        )
+                        .orNull()!!
                 }
-                when (result) {
-                    is Either.Left -> throw QuoteCompletionFailedException("Unable to complete quote: " + result.a)
-                    is Either.Right -> result.b
-                }
+
+                updated
             }!!
 
             return Either.Right(result)
@@ -101,6 +113,7 @@ class QuoteServiceImpl(
             },
             state = QuoteState.INCOMPLETE,
             memberId = incompleteQuoteDto.memberId,
+            breachedUnderwritingGuidelines = null,
             originatingProductId = incompleteQuoteDto.originatingProductId
         )
 
@@ -122,7 +135,10 @@ class QuoteServiceImpl(
         quoteRepository.findByMemberId(memberId)
             .map((QuoteDto)::fromQuote)
 
-    override fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+    override fun completeQuote(
+        incompleteQuoteId: UUID,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quote =
             quoteRepository.find(incompleteQuoteId)
                 ?: return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "No such quote"))
@@ -136,7 +152,7 @@ class QuoteServiceImpl(
             )
         }
 
-        return quote.complete(debtChecker, productPricingService)
+        return quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
             .bimap(
                 { breachedUnderwritingGuidelines ->
                     logger.error(

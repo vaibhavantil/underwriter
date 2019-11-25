@@ -81,7 +81,8 @@ class QuoteServiceImplTest {
                 subType = ApartmentProductSubType.BRF,
                 firstName = "",
                 street = ""
-            )
+            ),
+            breachedUnderwritingGuidelines = null
         )
 
         every { quoteRepository.find(any()) } returns quote
@@ -113,6 +114,7 @@ class QuoteServiceImplTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.RAPIO,
             attributedTo = Partner.HEDVIG,
+            breachedUnderwritingGuidelines = null,
             data = ApartmentData(
                 UUID.randomUUID(),
                 ssn = "191212121212",
@@ -173,7 +175,8 @@ class QuoteServiceImplTest {
                 firstName = "First",
                 street = "Storgatan 1"
             ),
-            originatingProductId = UUID.randomUUID()
+            originatingProductId = UUID.randomUUID(),
+            breachedUnderwritingGuidelines = null
         )
 
         val createdProductResponse = ModifiedProductCreatedDto(id = UUID.randomUUID())

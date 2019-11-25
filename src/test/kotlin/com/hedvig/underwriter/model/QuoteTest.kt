@@ -1,8 +1,14 @@
 package com.hedvig.underwriter.model
 
+import arrow.core.Either
+import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import io.mockk.every
+import io.mockk.mockk
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
@@ -20,6 +26,7 @@ class QuoteTest {
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
             state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
@@ -55,6 +62,7 @@ class QuoteTest {
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
             state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
@@ -102,6 +110,7 @@ class QuoteTest {
             productType = ProductType.HOUSE,
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
+            breachedUnderwritingGuidelines = null,
             state = QuoteState.QUOTED,
             price = BigDecimal.valueOf(100)
         )
@@ -133,5 +142,82 @@ class QuoteTest {
         assertThat((updatedQuote.data as ApartmentData).ssn).isEqualTo("201212121213")
         assertThat((updatedQuote.data as ApartmentData).street).isEqualTo("Storgatan 2")
         assertThat((updatedQuote.data as ApartmentData).subType).isEqualTo(ApartmentProductSubType.BRF)
+    }
+
+    @Test
+    fun successfullyChecksUnderwritingGuidelines() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null
+        )
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf("fails debt check")
+
+        val result = quote.complete(debtChecker, productPricingService)
+        require(result is Either.Left)
+        assertThat(result.a).isEqualTo(listOf("fails debt check"))
+    }
+
+    @Test
+    fun successfullyBypassesUnderwritingGuidelines() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null
+        )
+
+        val breachedUnderwritingGuidelines = listOf("fails debt check")
+        val bypasser = "blargh@hedvig.com"
+        every { debtChecker.passesDebtCheck(any()) } returns breachedUnderwritingGuidelines
+        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns
+            QuotePriceResponseDto(BigDecimal.valueOf(100))
+
+        val result = quote.complete(debtChecker, productPricingService, bypasser)
+        require(result is Either.Right)
+        assertThat(result.b.breachedUnderwritingGuidelines).isEqualTo(breachedUnderwritingGuidelines)
+        assertThat(result.b.underwritingGuidelinesBypassedBy).isEqualTo(bypasser)
     }
 }
