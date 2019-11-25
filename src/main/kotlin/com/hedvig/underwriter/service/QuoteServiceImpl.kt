@@ -261,12 +261,24 @@ class QuoteServiceImpl(
             customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
         }
 
+        val signedAt = quoteWasSigned(quoteWithMember, signedProductId)
+
+        return Right(SignedQuoteResponseDto(signedProductId, signedAt))
+    }
+
+    override fun productSignedQuote(memberId: String, productId: UUID) {
+        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+            quoteWasSigned(quote, productId)
+        } ?: throw IllegalStateException("Could not find quote for member $memberId when signed!")
+    }
+
+    private fun quoteWasSigned(quote: Quote, signedProductId: UUID): Instant {
         val signedAt = Instant.now()
-        val signedQuote = quoteWithMember.copy(state = QuoteState.SIGNED, signedProductId = signedProductId)
+        val signedQuote = quote.copy(state = QuoteState.SIGNED, signedProductId = signedProductId)
 
         quoteRepository.update(signedQuote, signedAt)
 
-        return Right(SignedQuoteResponseDto(signedProductId, signedAt))
+        return signedAt
     }
 
     override fun activateQuote(

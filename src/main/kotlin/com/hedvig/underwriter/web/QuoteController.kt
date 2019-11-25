@@ -8,6 +8,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.ProductSignedDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import java.util.UUID
 import javax.validation.Valid
@@ -111,5 +112,14 @@ class QuoteController @Autowired constructor(
     @GetMapping("/members/{memberId}")
     fun getAllQuotesFromMemberId(@PathVariable memberId: String): ResponseEntity<List<QuoteDto>> {
         return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
+    }
+
+    //this is just temporary should be removed when member service doesn't signing
+    @PostMapping("/productSigned")
+    fun productSigned(
+        @RequestBody productSignedDto: ProductSignedDto
+    ): ResponseEntity<String> {
+        quoteService.productSignedQuote(productSignedDto.memberId, productSignedDto.productId)
+        return ResponseEntity.ok("")
     }
 }
