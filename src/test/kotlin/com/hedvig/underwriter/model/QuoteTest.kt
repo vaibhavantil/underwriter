@@ -1,11 +1,6 @@
 package com.hedvig.underwriter.model
 
 import arrow.core.Either
-import arrow.core.extensions.either.applicativeError.handleError
-import arrow.core.extensions.either.applicativeError.raiseError
-import arrow.core.getOrElse
-import arrow.core.left
-import arrow.core.orNull
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
@@ -14,11 +9,11 @@ import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import io.mockk.every
 import io.mockk.mockk
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Test
 
 class QuoteTest {
     @Test
@@ -178,7 +173,7 @@ class QuoteTest {
             breachedUnderwritingGuidelines = null
         )
 
-        every { debtChecker.passesDebtCheck(any())} returns listOf("fails debt check")
+        every { debtChecker.passesDebtCheck(any()) } returns listOf("fails debt check")
 
         val result = quote.complete(debtChecker, productPricingService)
         require(result is Either.Left)
@@ -216,8 +211,8 @@ class QuoteTest {
 
         val breachedUnderwritingGuidelines = listOf("fails debt check")
         val bypasser = "blargh@hedvig.com"
-        every { debtChecker.passesDebtCheck(any())} returns breachedUnderwritingGuidelines
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any())} returns
+        every { debtChecker.passesDebtCheck(any()) } returns breachedUnderwritingGuidelines
+        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns
             QuotePriceResponseDto(BigDecimal.valueOf(100))
 
         val result = quote.complete(debtChecker, productPricingService, bypasser)

@@ -448,7 +448,6 @@ class QuoteRepositoryImplTest {
         assertQuotesDeepEqualExceptInternalId(breachedUnderwritingGuidelinesQuote, quoteDao.find(quote.id))
     }
 
-
     private fun assertQuotesDeepEqualExceptInternalId(
         expected: Quote,
         result: Quote?
