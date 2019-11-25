@@ -3,13 +3,8 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.getOrElse
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
-import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
@@ -19,13 +14,12 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
+import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import java.math.BigDecimal
-import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
@@ -62,28 +56,7 @@ class QuoteServiceImplTest {
         val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO)
 
         val quoteId = UUID.randomUUID()
-        val quote = Quote(
-            id = quoteId,
-            createdAt = Instant.now(),
-            price = BigDecimal.ZERO,
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
-            attributedTo = Partner.COMPRICER,
-            data = ApartmentData(
-                UUID.randomUUID(),
-                ssn = "191212121212",
-                lastName = "",
-                livingSpace = 2,
-                city = "",
-                zipCode = "",
-                householdSize = 3,
-                subType = ApartmentProductSubType.BRF,
-                firstName = "",
-                street = ""
-            ),
-            breachedUnderwritingGuidelines = null
-        )
+        val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
@@ -106,28 +79,7 @@ class QuoteServiceImplTest {
         val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO)
 
         val quoteId = UUID.randomUUID()
-        val quote = Quote(
-            id = quoteId,
-            createdAt = Instant.now(),
-            price = BigDecimal.ZERO,
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
-            attributedTo = Partner.HEDVIG,
-            breachedUnderwritingGuidelines = null,
-            data = ApartmentData(
-                UUID.randomUUID(),
-                ssn = "191212121212",
-                lastName = "",
-                livingSpace = 2,
-                city = "",
-                zipCode = "",
-                householdSize = 3,
-                subType = ApartmentProductSubType.BRF,
-                firstName = "",
-                street = ""
-            )
-        )
+        val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
@@ -154,30 +106,7 @@ class QuoteServiceImplTest {
             customerIOClient = customerIO
         )
 
-        val quote = Quote(
-            id = UUID.randomUUID(),
-            memberId = "12345",
-            createdAt = Instant.now(),
-            price = BigDecimal.ZERO,
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
-            attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
-                UUID.randomUUID(),
-                ssn = "191212121212",
-                lastName = "Last",
-                livingSpace = 2,
-                city = "Storstan",
-                zipCode = "12345",
-                householdSize = 3,
-                subType = ApartmentProductSubType.BRF,
-                firstName = "First",
-                street = "Storgatan 1"
-            ),
-            originatingProductId = UUID.randomUUID(),
-            breachedUnderwritingGuidelines = null
-        )
+        val quote = a.QuoteBuilder(originatingProductId = UUID.randomUUID(), memberId = "12345").build()
 
         val createdProductResponse = ModifiedProductCreatedDto(id = UUID.randomUUID())
 
