@@ -266,10 +266,12 @@ class QuoteServiceImpl(
         return Right(SignedQuoteResponseDto(signedProductId, signedAt))
     }
 
-    override fun productSignedQuote(memberId: String, productId: UUID) {
+    override fun productWasSignedQuote(memberId: String, productId: UUID) {
         quoteRepository.findOneByMemberId(memberId)?.let { quote ->
-            quoteWasSigned(quote, productId)
-        } ?: throw IllegalStateException("Could not find quote for member $memberId when signed!")
+            if (quote.state != QuoteState.SIGNED) {
+                quoteWasSigned(quote, productId)
+            }
+        } ?: logger.info("Could not find quote for member $memberId when signed!")
     }
 
     private fun quoteWasSigned(quote: Quote, signedProductId: UUID): Instant {

@@ -115,11 +115,11 @@ class QuoteController @Autowired constructor(
     }
 
     //this is just temporary should be removed when member service doesn't signing
-    @PostMapping("/productSigned")
-    fun productSigned(
+    @PostMapping("/productWasSigned")
+    fun productWasSigned(
         @RequestBody productSignedDto: ProductSignedDto
     ): ResponseEntity<String> {
-        quoteService.productSignedQuote(productSignedDto.memberId, productSignedDto.productId)
+        quoteService.productWasSignedQuote(productSignedDto.memberId, productSignedDto.productId)
         return ResponseEntity.ok("")
     }
 }

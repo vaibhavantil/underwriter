@@ -27,7 +27,7 @@ interface QuoteService {
 
     fun getQuote(completeQuoteId: UUID): Quote?
     fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
-    fun productSignedQuote(memberId: String, productId: UUID)
+    fun productWasSignedQuote(memberId: String, productId: UUID)
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(
         incompleteQuoteDto: IncompleteQuoteDto,
