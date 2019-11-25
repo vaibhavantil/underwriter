@@ -19,6 +19,7 @@ import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
+import graphql.servlet.context.GraphQLServletContext
 import java.lang.IllegalStateException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -32,15 +33,22 @@ class Mutation @Autowired constructor(
 ) : GraphQLMutationResolver {
 
     fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
-        // TODO: let's discuss initiatedFrom!
-        val quote = quoteService.createQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id, initiatedFrom = QuoteInitiatedFrom.WEBONBOARDING)
+        val quote = quoteService.createQuote(
+            input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
+            input.id,
+            initiatedFrom = when {
+                env.isAndroid() -> QuoteInitiatedFrom.ANDROID
+                env.isIOS() -> QuoteInitiatedFrom.IOS
+                else -> QuoteInitiatedFrom.WEBONBOARDING
+            }
+        )
 
-        return when (val quoteOrError = quoteService.completeQuote(quote.id)) {
+        return when (val errorOrQuote = quoteService.completeQuote(quote.id)) {
             is Either.Left -> {
-                when (quoteOrError.a.errorCode) {
+                when (errorOrQuote.a.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
                         QuoteResult.UnderwritingLimitsHit(
-                            quoteOrError.a.breachedUnderwritingGuidelines?.map { breachedUnderwritingGuidelines ->
+                            errorOrQuote.a.breachedUnderwritingGuidelines?.map { breachedUnderwritingGuidelines ->
                                 UnderwritingLimit(breachedUnderwritingGuidelines)
                             } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
                         )
@@ -58,7 +66,7 @@ class Mutation @Autowired constructor(
                 }
             }
             is Either.Right -> {
-                val completeQuoteResponseDto = quoteOrError.b
+                val completeQuoteResponseDto = errorOrQuote.b
 
                 QuoteResult.Quote(
                     id = completeQuoteResponseDto.id,
@@ -86,4 +94,12 @@ class Mutation @Autowired constructor(
     fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): QuoteResult {
         TODO()
     }
+
+    fun DataFetchingEnvironment.isAndroid() =
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("Android", false)
+            ?: false
+
+    fun DataFetchingEnvironment.isIOS() =
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("iOS", false)
+            ?: false
 }

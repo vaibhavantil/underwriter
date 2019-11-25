@@ -4,5 +4,7 @@ enum class QuoteInitiatedFrom {
     RAPIO,
     WEBONBOARDING,
     APP,
+    IOS,
+    ANDROID,
     HOPE
 }
