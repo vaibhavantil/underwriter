@@ -70,6 +70,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             startDate = databaseQuote.startDate,
             validity = databaseQuote.validity,
             memberId = databaseQuote.memberId,
+            breachedUnderwritingGuidelines = databaseQuote.breachedUnderwritingGuidelines,
+            underwritingGuidelinesBypassedBy = databaseQuote.underwritingGuidelinesBypassedBy,
             originatingProductId = databaseQuote.originatingProductId,
             signedProductId = databaseQuote.signedProductId
         )
@@ -77,7 +79,6 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
 
     override fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?) =
         jdbi.inTransaction<Quote?, RuntimeException> { h ->
-            val dao = h.attach<QuoteDao>()
             val modifiedQuote = modifier(find(quoteId, h))
             if (modifiedQuote != null) {
                 update(modifiedQuote, Instant.now(), h)

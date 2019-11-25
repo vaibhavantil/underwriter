@@ -1,5 +1,4 @@
 databaseChangeLog:
-#  - logicalFilePath: changelog.xml
   - include:
       file: ./migrations/20191016-1600-create-quotes.sql
       relativeToChangelogFile: true
@@ -20,4 +19,7 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: ./migrations/20191029-1639-add-required-house-data.sql
+      relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20191125-1100-add-breached-underwriting-guidelines.sql
       relativeToChangelogFile: true

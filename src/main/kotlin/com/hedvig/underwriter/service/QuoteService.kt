@@ -13,7 +13,10 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface QuoteService {
-    fun completeQuote(incompleteQuoteId: UUID): Either<ErrorResponseDto, CompleteQuoteResponseDto>
+    fun completeQuote(
+        incompleteQuoteId: UUID,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
     fun activateQuote(
         completeQuoteId: UUID,
@@ -25,5 +28,9 @@ interface QuoteService {
     fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
-    fun updateQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID): Either<ErrorResponseDto, Quote>
+    fun updateQuote(
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, Quote>
 }

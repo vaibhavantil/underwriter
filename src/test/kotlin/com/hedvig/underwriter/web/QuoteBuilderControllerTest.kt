@@ -88,6 +88,7 @@ internal class QuoteBuilderControllerTest {
                 lastName = "null",
                 ssn = "189003042342"
             ),
+            breachedUnderwritingGuidelines = null,
             currentInsurer = null
         )
 
@@ -127,6 +128,7 @@ internal class QuoteBuilderControllerTest {
                 lastName = "null",
                 id = UUID.randomUUID()
             ),
+            breachedUnderwritingGuidelines = null,
             currentInsurer = null
         )
 
