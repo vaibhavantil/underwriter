@@ -12,7 +12,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuoteP
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
-import rx.Completable.complete
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -227,13 +226,11 @@ data class Quote(
                         area = extraBuilding.area,
                         hasWaterConnected = extraBuilding.hasWaterConnected
                     )
-
                 },
                 isSubleted = data.isSubleted
             )
             else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
         }
-
 
     fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
         var newQuote = copy(
