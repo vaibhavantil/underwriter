@@ -150,7 +150,7 @@ data class Quote(
         }
     }
 
-    fun getCalculateQuoteRequestDto() =
+    fun createCalculateQuoteRequestDto() =
         when (this.data) {
             is ApartmentData -> CalculateQuoteRequestDto(
                 memberId = memberId!!,

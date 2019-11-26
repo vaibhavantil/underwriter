@@ -264,7 +264,7 @@ class QuoteServiceImpl(
                 productPricingService.createProduct(quote.getRapioQuoteRequestDto(it), quote.memberId).id
             } ?: throw RuntimeException("No email when creating product")
         } else {
-            productPricingService.createProduct(quote.getCalculateQuoteRequestDto(), quote.memberId).id
+            productPricingService.createProduct(quote.createCalculateQuoteRequestDto(), quote.memberId).id
         }
 
         quote.attributedTo.campaignCode?.let { campaignCode ->
