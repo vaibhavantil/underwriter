@@ -161,7 +161,7 @@ data class Quote(
                 student = data.isStudent,
                 address = Address(
                     data.street!!,
-                    data.city!!,
+                    data.city,
                     data.zipCode!!,
                     0
                 ),
@@ -194,7 +194,7 @@ data class Quote(
                 student = false,
                 address = Address(
                     data.street!!,
-                    data.city!!,
+                    data.city,
                     data.zipCode!!,
                     0
                 ),
@@ -207,22 +207,7 @@ data class Quote(
                 numberOfBathrooms = data.numberOfBathrooms,
                 extraBuildings = data.extraBuildings?.map { extraBuilding ->
                     ExtraBuildingDTO(
-                        type = when (extraBuilding.type) {
-                            ExtraBuildingType.GARAGE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GARAGE
-                            ExtraBuildingType.CARPORT -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.CARPORT
-                            ExtraBuildingType.SHED -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.SHED
-                            ExtraBuildingType.STOREHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.STOREHOUSE
-                            ExtraBuildingType.FRIGGEBOD -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.FRIGGEBOD
-                            ExtraBuildingType.ATTEFALL -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.ATTEFALL
-                            ExtraBuildingType.OUTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.OUTHOUSE
-                            ExtraBuildingType.GUESTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GUESTHOUSE
-                            ExtraBuildingType.GAZEBO -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GAZEBO
-                            ExtraBuildingType.GREENHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GREENHOUSE
-                            ExtraBuildingType.SAUNA -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.SAUNA
-                            ExtraBuildingType.BARN -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.BARN
-                            ExtraBuildingType.BOATHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.BOATHOUSE
-                            ExtraBuildingType.OTHER -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.OTHER
-                        },
+                        type = com.hedvig.underwriter.graphql.type.ExtraBuildingType.valueOf(extraBuilding.type.name),
                         area = extraBuilding.area,
                         hasWaterConnected = extraBuilding.hasWaterConnected
                     )

@@ -245,7 +245,7 @@ class QuoteServiceImpl(
     override fun memberSigned(memberId: String) {
         quoteRepository.findOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, null)
-        } ?: throw IllegalStateException("Preformed member sign with no quote!")
+        } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
     private fun signQuoteWithMemberId(
@@ -253,7 +253,7 @@ class QuoteServiceImpl(
         signedInMemberService: Boolean,
         email: String?
     ): SignedQuoteResponseDto {
-        checkNotNull(quote.memberId) { "Quote must have a member id!" }
+        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
         if (!signedInMemberService && quote.data is PersonPolicyHolder<*>) {
             memberService.updateMemberSsn(quote.memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))

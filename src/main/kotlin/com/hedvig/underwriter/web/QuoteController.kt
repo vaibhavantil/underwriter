@@ -114,8 +114,8 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/member/{memberId}/signed")
-    fun memberSigned(@PathVariable memberId: String): ResponseEntity<String> {
+    fun memberSigned(@PathVariable memberId: String): ResponseEntity.HeadersBuilder<*> {
         quoteService.memberSigned(memberId)
-        return ResponseEntity.ok("")
+        return ResponseEntity.noContent()
     }
 }
