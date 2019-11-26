@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -15,7 +16,7 @@ import java.util.UUID
 interface QuoteService {
     fun completeQuote(
         incompleteQuoteId: UUID,
-        underwritingGuidelinesBypassedBy: String?
+        underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
     fun activateQuote(
@@ -27,7 +28,11 @@ interface QuoteService {
     fun getQuote(completeQuoteId: UUID): Quote?
     fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
-    fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto
+    fun createQuote(
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID? = null,
+        initiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.RAPIO
+    ): IncompleteQuoteResponseDto
     fun updateQuote(
         incompleteQuoteDto: IncompleteQuoteDto,
         id: UUID,

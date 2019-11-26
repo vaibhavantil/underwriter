@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 class ProductPricingServiceImpl @Autowired constructor(
     val productPricingClient: ProductPricingClient
 ) : ProductPricingService {
+
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
         val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)

@@ -98,13 +98,13 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID?, initiatedFrom: QuoteInitiatedFrom): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
-            id = UUID.randomUUID(),
+            id = id ?: UUID.randomUUID(),
             createdAt = now,
             productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            initiatedFrom = initiatedFrom,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
                 incompleteQuoteDto.incompleteApartmentQuoteData != null -> ApartmentData(UUID.randomUUID())
@@ -161,12 +161,18 @@ class QuoteServiceImpl(
                     )
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached"
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
                     )
                 },
                 { completeQuote ->
                     quoteRepository.update(completeQuote)
-                    CompleteQuoteResponseDto(id = completeQuote.id, price = completeQuote.price!!)
+
+                    CompleteQuoteResponseDto(
+                        id = completeQuote.id,
+                        price = completeQuote.price!!,
+                        validTo = completeQuote.createdAt.plusMillis(completeQuote.validity)
+                    )
                 }
             )
     }

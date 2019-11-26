@@ -1,0 +1,50 @@
+mutation {
+    createQuote(input: {
+        id: "00000000-0000-0000-0000-000000000000"
+        firstName: "first"
+        lastName: "family"
+        ssn: "191212121212"
+        apartment: {
+            street: "Kungsgatan 1"
+            livingSpace: 30
+            zipCode: "12345"
+            householdSize: 2
+            type: BRF
+        }
+    }) {
+        ... on UnderwritingLimitsHit {
+            limits {
+                description
+            }
+        }
+        ... on Quote {
+            id
+            price {
+                amount
+                currency
+            }
+            details {
+                ... on ApartmentQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    type
+                }
+                ... on HouseQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    ancillarySpace
+                    extraBuildings {
+                        type
+                        area
+                        hasWaterConnected
+                        displayName
+                    }
+                }
+            }
+        }
+    }
+}

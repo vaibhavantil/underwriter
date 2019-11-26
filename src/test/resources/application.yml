@@ -1,1 +1,8 @@
 spring.liquibase.change-log: classpath:/db/changelog/changelog-master.yml
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+graphcms.project: Underwriter
+graphcms.url: empty
