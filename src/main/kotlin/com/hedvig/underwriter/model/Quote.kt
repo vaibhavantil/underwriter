@@ -5,10 +5,14 @@ import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDTO
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import rx.Completable.complete
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -147,6 +151,90 @@ data class Quote(
         }
     }
 
+    fun getCalculateQuoteRequestDto() =
+        when (this.data) {
+            is ApartmentData -> CalculateQuoteRequestDto(
+                memberId = memberId!!,
+                ssn = data.ssn!!,
+                firstName = data.firstName!!,
+                lastName = data.lastName!!,
+                birthDate = data.ssn!!.birthDateFromSsn(),
+                student = data.isStudent,
+                address = Address(
+                    data.street!!,
+                    data.city!!,
+                    data.zipCode!!,
+                    0
+                ),
+                livingSpace = data.livingSpace!!.toFloat(),
+                houseType = when (data.subType!!) {
+                    ApartmentProductSubType.BRF -> ProductPricingProductTypes.BRF
+                    ApartmentProductSubType.RENT -> ProductPricingProductTypes.RENT
+                    ApartmentProductSubType.RENT_BRF -> TODO() // what is even rent brf?
+                    ApartmentProductSubType.SUBLET_RENTAL -> ProductPricingProductTypes.STUDENT_RENT
+                    ApartmentProductSubType.SUBLET_BRF -> ProductPricingProductTypes.STUDENT_BRF
+                    ApartmentProductSubType.STUDENT_BRF -> ProductPricingProductTypes.STUDENT_BRF
+                    ApartmentProductSubType.STUDENT_RENT -> ProductPricingProductTypes.STUDENT_RENT
+                    ApartmentProductSubType.LODGER -> TODO()
+                    ApartmentProductSubType.UNKNOWN -> TODO()
+                },
+                currentInsurer = currentInsurer,
+                personsInHouseHold = data.householdSize!!,
+                ancillaryArea = null,
+                yearOfConstruction = null,
+                numberOfBathrooms = null,
+                extraBuildings = null,
+                isSubleted = null
+            )
+            is HouseData -> CalculateQuoteRequestDto(
+                memberId = memberId!!,
+                ssn = data.ssn!!,
+                firstName = data.firstName!!,
+                lastName = data.lastName!!,
+                birthDate = data.ssn!!.birthDateFromSsn(),
+                student = false,
+                address = Address(
+                    data.street!!,
+                    data.city!!,
+                    data.zipCode!!,
+                    0
+                ),
+                livingSpace = data.livingSpace!!.toFloat(),
+                houseType = ProductPricingProductTypes.HOUSE,
+                currentInsurer = currentInsurer,
+                personsInHouseHold = data.householdSize!!,
+                ancillaryArea = data.ancillaryArea,
+                yearOfConstruction = data.yearOfConstruction,
+                numberOfBathrooms = data.numberOfBathrooms,
+                extraBuildings = data.extraBuildings?.map { extraBuilding ->
+                    ExtraBuildingDTO(
+                        type = when (extraBuilding.type) {
+                            ExtraBuildingType.GARAGE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GARAGE
+                            ExtraBuildingType.CARPORT -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.CARPORT
+                            ExtraBuildingType.SHED -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.SHED
+                            ExtraBuildingType.STOREHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.STOREHOUSE
+                            ExtraBuildingType.FRIGGEBOD -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.FRIGGEBOD
+                            ExtraBuildingType.ATTEFALL -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.ATTEFALL
+                            ExtraBuildingType.OUTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.OUTHOUSE
+                            ExtraBuildingType.GUESTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GUESTHOUSE
+                            ExtraBuildingType.GAZEBO -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GAZEBO
+                            ExtraBuildingType.GREENHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.GREENHOUSE
+                            ExtraBuildingType.SAUNA -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.SAUNA
+                            ExtraBuildingType.BARN -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.BARN
+                            ExtraBuildingType.BOATHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.BOATHOUSE
+                            ExtraBuildingType.OTHER -> com.hedvig.underwriter.graphql.type.ExtraBuildingType.OTHER
+                        },
+                        area = extraBuilding.area,
+                        hasWaterConnected = extraBuilding.hasWaterConnected
+                    )
+
+                },
+                isSubleted = data.isSubleted
+            )
+            else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
+        }
+
+
     fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
         var newQuote = copy(
             productType = incompleteQuoteDto.productType ?: productType,
@@ -268,18 +356,22 @@ data class Quote(
         val newQuote = copy(data = quoteData, breachedUnderwritingGuidelines = breachedUnderwritingGuidelines)
 
         if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
-            return Either.right(newQuote.copy(
+            return Either.right(
+                newQuote.copy(
                     price = getPriceRetrievedFromProductPricing(productPricingService),
                     underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
                     state = QuoteState.QUOTED
-            ))
+                )
+            )
         }
 
         if (breachedUnderwritingGuidelines.isEmpty()) {
-            return Either.right(newQuote.copy(
-                price = getPriceRetrievedFromProductPricing(productPricingService),
-                state = QuoteState.QUOTED
-            ))
+            return Either.right(
+                newQuote.copy(
+                    price = getPriceRetrievedFromProductPricing(productPricingService),
+                    state = QuoteState.QUOTED
+                )
+            )
         }
 
         return Either.left(breachedUnderwritingGuidelines)

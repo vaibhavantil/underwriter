@@ -1,9 +1,11 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
@@ -11,6 +13,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampa
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
+import java.lang.RuntimeException
 
 @Service
 @EnableFeignClients
@@ -36,6 +39,13 @@ class ProductPricingServiceImpl @Autowired constructor(
         val signedQuote = rapioProductCreatedResponseDto.body
         return signedQuote!!
     }
+
+    override fun createProduct(
+        calculateQuoteRequest: CalculateQuoteRequestDto,
+        memberId: String
+    ): ProductCreatedResponseDto =
+        productPricingClient.createProduct(calculateQuoteRequest, memberId).body
+            ?: throw RuntimeException("Create product returned with empty body")
 
     override fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto =
         productPricingClient.createModifiedProductFromQuote(quoteRequestDto, quoteRequestDto.memberId)

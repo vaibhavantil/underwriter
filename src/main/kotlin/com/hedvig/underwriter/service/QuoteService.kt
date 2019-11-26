@@ -19,6 +19,7 @@ interface QuoteService {
         underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
+    fun memberSigned(memberId: String)
     fun activateQuote(
         completeQuoteId: UUID,
         activationDate: LocalDate? = null,
