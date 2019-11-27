@@ -217,36 +217,23 @@ class QuoteServiceImpl(
                 return Either.left(quoteNotSignableErrorDto)
             }
 
-            when (quote.data) {
-                is ApartmentData -> {
-                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-                    if (memberAlreadySigned.ssnAlreadySignedMember) {
-                        return Either.Left(
-                            ErrorResponseDto(
-                                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                                "quote is already signed"
-                            )
-                        )
-                    }
-                }
-                is HouseData -> {
-                    val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-                    if (memberAlreadySigned.ssnAlreadySignedMember) {
-                        return Either.Left(
-                            ErrorResponseDto(
-                                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                                "quote is already signed"
-                            )
-                        )
-                    }
-                }
+            val memberAlreadySigned = when (quote.data) {
+                is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                else -> throw RuntimeException("Unsupported quote data class")
+            }
+
+            if (memberAlreadySigned.ssnAlreadySignedMember) {
+                return Either.Left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                        "quote is already signed"
+                    )
+                )
             }
 
             val memberId = memberService.createMember()
 
-            if (quote.data is PersonPolicyHolder<*>) {
-                memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
-            }
+            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
 
             quoteRepository.update(updatedStartTime.copy(memberId = memberId))
         } else {
