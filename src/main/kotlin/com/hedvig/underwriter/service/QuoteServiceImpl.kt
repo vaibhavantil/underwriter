@@ -248,7 +248,6 @@ class QuoteServiceImpl(
             }
 
             quoteRepository.update(updatedStartTime.copy(memberId = memberId))
-
         } else {
             quote
         }
