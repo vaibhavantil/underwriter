@@ -15,6 +15,6 @@ sealed class QuoteDetails {
         val householdSize: Int,
         val livingSpace: Int,
         val ancillarySpace: Int,
-        val extraBuildings: List<ExtraBuilding>
+        val extraBuildings: List<ExtraBuilding.ExtraBuildingCore>
     ) : QuoteDetails()
 }
