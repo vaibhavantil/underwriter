@@ -38,10 +38,7 @@ mutation {
                     householdSize
                     ancillarySpace
                     extraBuildings {
-                        type
-                        area
-                        hasWaterConnected
-                        displayName
+                        __typename
                     }
                 }
             }
