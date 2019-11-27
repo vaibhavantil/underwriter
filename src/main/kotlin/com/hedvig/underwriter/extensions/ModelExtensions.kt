@@ -119,12 +119,78 @@ fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService,
             livingSpace = house.livingSpace,
             ancillarySpace = house.ancillarySpace,
             extraBuildings = house.extraBuildings.map { extraBuildingInput ->
-                ExtraBuilding(
-                    type = extraBuildingInput.type,
-                    area = extraBuildingInput.area,
-                    hasWaterConnected = extraBuildingInput.hasWaterConnected,
-                    displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
-                )
+                when (extraBuildingInput.type) {
+                    ExtraBuildingType.GARAGE -> ExtraBuilding.ExtraBuildingGarage(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.CARPORT -> ExtraBuilding.ExtraBuildingCarport(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.SHED -> ExtraBuilding.ExtraBuildingShed(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.STOREHOUSE -> ExtraBuilding.ExtraBuildingStorehouse(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.FRIGGEBOD -> ExtraBuilding.ExtraBuildingFriggebod(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.ATTEFALL -> ExtraBuilding.ExtraBuildingAttefall(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.OUTHOUSE -> ExtraBuilding.ExtraBuildingOuthouse(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.GUESTHOUSE -> ExtraBuilding.ExtraBuildingGuesthouse(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.GAZEBO -> ExtraBuilding.ExtraBuildingGazebo(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.GREENHOUSE -> ExtraBuilding.ExtraBuildingGreenhouse(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.SAUNA -> ExtraBuilding.ExtraBuildingSauna(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.BARN -> ExtraBuilding.ExtraBuildingBarn(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.BOATHOUSE -> ExtraBuilding.ExtraBuildingBoathouse(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                    ExtraBuildingType.OTHER -> ExtraBuilding.ExtraBuildingOther(
+                        area = extraBuildingInput.area,
+                        hasWaterConnected = extraBuildingInput.hasWaterConnected,
+                        displayName = extraBuildingInput.type.getDisplayName(localizationService, locale)
+                    )
+                }
             }
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
