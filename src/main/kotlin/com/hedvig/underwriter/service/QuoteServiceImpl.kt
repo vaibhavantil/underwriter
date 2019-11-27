@@ -29,6 +29,8 @@ import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -98,7 +100,11 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto, id: UUID?, initiatedFrom: QuoteInitiatedFrom): IncompleteQuoteResponseDto {
+    override fun createQuote(
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID?,
+        initiatedFrom: QuoteInitiatedFrom
+    ): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
             id = id ?: UUID.randomUUID(),
@@ -233,17 +239,38 @@ class QuoteServiceImpl(
 
         val quoteWithMember = quoteRepository.update(updatedStartTime.copy(memberId = memberId))
 
-        if (quoteWithMember.data is PersonPolicyHolder<*>) {
-            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
+        return Right(signQuoteWithMemberId(quoteWithMember, false, body.email))
+    }
+
+    override fun memberSigned(memberId: String) {
+        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+            signQuoteWithMemberId(quote, true, null)
+        } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
+    }
+
+    private fun signQuoteWithMemberId(
+        quote: Quote,
+        signedInMemberService: Boolean,
+        email: String?
+    ): SignedQuoteResponseDto {
+        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+
+        if (!signedInMemberService && quote.data is PersonPolicyHolder<*>) {
+            memberService.updateMemberSsn(quote.memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
         }
 
-        val signedProductId =
-            productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
+        val signedProductId = if (!signedInMemberService) {
+            email?.let {
+                productPricingService.createProduct(quote.getRapioQuoteRequestDto(it), quote.memberId).id
+            } ?: throw RuntimeException("No email when creating product")
+        } else {
+            productPricingService.createProduct(quote.createCalculateQuoteRequestDto(), quote.memberId).id
+        }
 
         quote.attributedTo.campaignCode?.let { campaignCode ->
             val response = productPricingService.redeemCampaign(
                 RedeemCampaignDto(
-                    memberId,
+                    quote.memberId,
                     campaignCode,
                     LocalDate.now()
                 )
@@ -253,20 +280,20 @@ class QuoteServiceImpl(
             }
         }
 
-        if (quoteWithMember.data is PersonPolicyHolder<*>) {
-            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
+        if (!signedInMemberService && quote.data is PersonPolicyHolder<*>) {
+            memberService.signQuote(quote.memberId.toLong(), UnderwriterQuoteSignRequest(quote.data.ssn!!))
         }
 
-        if (quoteWithMember.attributedTo != Partner.HEDVIG) {
-            customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
+        if (quote.attributedTo != Partner.HEDVIG) {
+            customerIOClient?.setPartnerCode(quote.memberId, quote.attributedTo)
         }
 
         val signedAt = Instant.now()
-        val signedQuote = quoteWithMember.copy(state = QuoteState.SIGNED, signedProductId = signedProductId)
+        val signedQuote = quote.copy(state = QuoteState.SIGNED, signedProductId = signedProductId)
 
         quoteRepository.update(signedQuote, signedAt)
 
-        return Right(SignedQuoteResponseDto(signedProductId, signedAt))
+        return SignedQuoteResponseDto(signedProductId, signedAt)
     }
 
     override fun activateQuote(
