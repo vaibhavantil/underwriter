@@ -34,6 +34,7 @@ import java.lang.IllegalStateException
 import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
@@ -192,7 +193,7 @@ class QuoteServiceImpl(
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
         if (quote.originatingProductId != null) {
-            throw Exception("")
+            throw RuntimeException("There is a product Id already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
@@ -241,7 +242,7 @@ class QuoteServiceImpl(
                 }
             }
 
-            val memberId = quote.memberId ?: memberService.createMember()
+            val memberId = memberService.createMember()
 
             if (quote.data is PersonPolicyHolder<*>) {
                 memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
@@ -286,7 +287,7 @@ class QuoteServiceImpl(
                     RedeemCampaignDto(
                         quoteWithProductId.memberId,
                         campaignCode,
-                        LocalDate.now()
+                        LocalDate.now(ZoneId.of("Europe/Stockholm"))
                     )
                 )
             } catch (e: FeignException) {
