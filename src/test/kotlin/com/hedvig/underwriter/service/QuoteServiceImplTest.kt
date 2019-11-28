@@ -14,6 +14,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
@@ -63,7 +64,7 @@ class QuoteServiceImplTest {
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(
-                any(),
+                any<RapioQuoteRequestDto>(),
                 any()
             )
         } returns RapioProductCreatedResponseDto(UUID.randomUUID())
@@ -86,7 +87,7 @@ class QuoteServiceImplTest {
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createProduct(
-                any(),
+                any<RapioQuoteRequestDto>(),
                 any()
             )
         } returns RapioProductCreatedResponseDto(UUID.randomUUID())

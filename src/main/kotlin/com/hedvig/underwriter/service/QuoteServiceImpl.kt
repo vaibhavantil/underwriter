@@ -29,8 +29,12 @@ import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import feign.FeignException
+import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
@@ -98,13 +102,17 @@ class QuoteServiceImpl(
         }
     }
 
-    override fun createQuote(incompleteQuoteDto: IncompleteQuoteDto): IncompleteQuoteResponseDto {
+    override fun createQuote(
+        incompleteQuoteDto: IncompleteQuoteDto,
+        id: UUID?,
+        initiatedFrom: QuoteInitiatedFrom
+    ): IncompleteQuoteResponseDto {
         val now = Instant.now()
         val quote = Quote(
-            id = UUID.randomUUID(),
+            id = id ?: UUID.randomUUID(),
             createdAt = now,
             productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.RAPIO,
+            initiatedFrom = initiatedFrom,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
                 incompleteQuoteDto.incompleteApartmentQuoteData != null -> ApartmentData(UUID.randomUUID())
@@ -161,12 +169,18 @@ class QuoteServiceImpl(
                     )
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached"
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
                     )
                 },
                 { completeQuote ->
                     quoteRepository.update(completeQuote)
-                    CompleteQuoteResponseDto(id = completeQuote.id, price = completeQuote.price!!)
+
+                    CompleteQuoteResponseDto(
+                        id = completeQuote.id,
+                        price = completeQuote.price!!,
+                        validTo = completeQuote.createdAt.plusMillis(completeQuote.validity)
+                    )
                 }
             )
     }
@@ -178,34 +192,8 @@ class QuoteServiceImpl(
         val quote = getQuote(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
-        if (quoteNotSignableErrorDto != null) {
-            return Either.left(quoteNotSignableErrorDto)
-        }
-
-        when (quote.data) {
-            is ApartmentData -> {
-                val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-                if (memberAlreadySigned.ssnAlreadySignedMember) {
-                    return Either.Left(
-                        ErrorResponseDto(
-                            ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                            "quote is already signed"
-                        )
-                    )
-                }
-            }
-            is HouseData -> {
-                val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-                if (memberAlreadySigned.ssnAlreadySignedMember) {
-                    return Either.Left(
-                        ErrorResponseDto(
-                            ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                            "quote is already signed"
-                        )
-                    )
-                }
-            }
+        if (quote.originatingProductId != null) {
+            throw RuntimeException("There is a product Id already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
@@ -223,44 +211,94 @@ class QuoteServiceImpl(
             else -> updatedName.copy(startDate = null)
         }
 
-        val memberId = quote.memberId ?: memberService.createMember()
+        val quoteWithMember = if (quote.memberId == null) {
+            val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
+            if (quoteNotSignableErrorDto != null) {
+                return Either.left(quoteNotSignableErrorDto)
+            }
 
-        val quoteWithMember = quoteRepository.update(updatedStartTime.copy(memberId = memberId))
+            val memberAlreadySigned = when (quote.data) {
+                is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+                else -> throw RuntimeException("Unsupported quote data class")
+            }
 
-        if (quoteWithMember.data is PersonPolicyHolder<*>) {
-            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quoteWithMember.data.ssn!!))
+            if (memberAlreadySigned.ssnAlreadySignedMember) {
+                return Either.Left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+                        "quote is already signed"
+                    )
+                )
+            }
+
+            val memberId = memberService.createMember()
+
+            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
+
+            quoteRepository.update(updatedStartTime.copy(memberId = memberId))
+        } else {
+            quote
         }
 
-        val signedProductId =
-            productPricingService.createProduct(quoteWithMember.getRapioQuoteRequestDto(body.email), memberId).id
+        return Right(signQuoteWithMemberId(quoteWithMember, false, body.email))
+    }
 
-        quote.attributedTo.campaignCode?.let { campaignCode ->
-            val response = productPricingService.redeemCampaign(
-                RedeemCampaignDto(
-                    memberId,
-                    campaignCode,
-                    LocalDate.now()
+    override fun memberSigned(memberId: String) {
+        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+            signQuoteWithMemberId(quote, true, null)
+        } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
+    }
+
+    private fun signQuoteWithMemberId(
+        quote: Quote,
+        signedInMemberService: Boolean,
+        email: String?
+    ): SignedQuoteResponseDto {
+        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+
+        val signedProductId = quote.signedProductId
+            ?: if (!signedInMemberService) {
+                email?.let {
+                    productPricingService.createProduct(quote.getRapioQuoteRequestDto(it), quote.memberId).id
+                } ?: throw RuntimeException("No email when creating product")
+            } else {
+                productPricingService.createProduct(quote.createCalculateQuoteRequestDto(), quote.memberId).id
+            }
+
+        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
+        checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+
+        quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
+            try {
+                productPricingService.redeemCampaign(
+                    RedeemCampaignDto(
+                        quoteWithProductId.memberId,
+                        campaignCode,
+                        LocalDate.now(ZoneId.of("Europe/Stockholm"))
+                    )
                 )
-            )
-            if (response.statusCode.isError) {
-                logger.error("Failed to redeem $campaignCode for partner ${quote.attributedTo} with response $response")
+            } catch (e: FeignException) {
+                logger.error("Failed to redeem $campaignCode for partner ${quoteWithProductId.attributedTo} with response ${e.message}")
             }
         }
 
-        if (quoteWithMember.data is PersonPolicyHolder<*>) {
-            memberService.signQuote(memberId.toLong(), UnderwriterQuoteSignRequest(quoteWithMember.data.ssn!!))
-        }
-
-        if (quoteWithMember.attributedTo != Partner.HEDVIG) {
-            customerIOClient?.setPartnerCode(memberId, updatedStartTime.attributedTo)
+        if (!signedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
+            memberService.signQuote(
+                quoteWithProductId.memberId.toLong(),
+                UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
+            )
         }
 
         val signedAt = Instant.now()
-        val signedQuote = quoteWithMember.copy(state = QuoteState.SIGNED, signedProductId = signedProductId)
+        val signedQuote = quoteWithProductId.copy(state = QuoteState.SIGNED)
 
         quoteRepository.update(signedQuote, signedAt)
 
-        return Right(SignedQuoteResponseDto(signedProductId, signedAt))
+        if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
+            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
+        }
+
+        return SignedQuoteResponseDto(signedProductId, signedAt)
     }
 
     override fun activateQuote(
