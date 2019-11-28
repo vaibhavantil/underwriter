@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.extensions
 
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
@@ -10,11 +9,9 @@ import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType
-import com.hedvig.underwriter.graphql.type.Quote
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.model.Quote as WebQuote
 import com.hedvig.underwriter.model.birthDateFromSsn
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
@@ -217,18 +214,3 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
-
-fun WebQuote.toCompleteQuote() = Quote.CompleteQuote(
-    id = this.id,
-    currentInsurer = this.currentInsurer,
-    price = MonetaryAmountV2(
-        this.price!!.toPlainString(),
-        "SEK"
-    ),
-    expiresAt = this.createdAt.plusMillis(this.validity)
-)
-
-fun WebQuote.toIncompleteQuote() = Quote.IncompleteQuote(
-    id = this.id,
-    currentInsurer = this.currentInsurer
-)

@@ -107,7 +107,7 @@ type CompleteQuote {
     id: ID!
     currentInsurer: String
     price: MonetaryAmountV2!
-#    details: QuoteDetails! TODO lets add this later
+    details: CompleteQuoteDetails!
 }
 
 union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
@@ -254,7 +254,7 @@ union Quote = CompleteQuote | IncompleteQuote
 type IncompleteQuote {
     id: ID!
     currentInsurer: String
-#    details: QuoteDetails TODO lets add this later
+    details: IncompleteQuoteDetails
 }
 
 union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails

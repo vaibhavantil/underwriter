@@ -1,6 +1,6 @@
 mutation {
     createQuote(input: {
-        id: "00000000-0000-0000-0000-000000000000"
+        id: "123e4567-e89b-12d3-a456-426655440000"
         firstName: "first"
         lastName: "family"
         ssn: "191212121212"
