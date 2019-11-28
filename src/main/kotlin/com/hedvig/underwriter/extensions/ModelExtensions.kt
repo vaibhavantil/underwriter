@@ -1,17 +1,20 @@
 package com.hedvig.underwriter.extensions
 
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
+import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.CreateApartmentInput
 import com.hedvig.underwriter.graphql.type.CreateHouseInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType
-import com.hedvig.underwriter.graphql.type.QuoteDetails
+import com.hedvig.underwriter.graphql.type.Quote
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote as WebQuote
 import com.hedvig.underwriter.model.birthDateFromSsn
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
@@ -102,9 +105,9 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.BRF -> ApartmentProductSubType.BRF
 }
 
-fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService, locale: Locale): QuoteDetails =
+fun CreateQuoteInput.createCompleteQuoteResult(localizationService: LocalizationService, locale: Locale): CompleteQuoteDetails =
     this.apartment?.let { apartment ->
-        QuoteDetails.ApartmentQuoteDetails(
+        CompleteQuoteDetails.CompleteApartmentQuoteDetails(
             street = apartment.street,
             zipCode = apartment.zipCode,
             householdSize = apartment.householdSize,
@@ -112,7 +115,7 @@ fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService,
             type = apartment.type
         )
     } ?: this.house?.let { house ->
-        QuoteDetails.HouseQuoteDetails(
+        CompleteQuoteDetails.CompleteHouseQuoteDetails(
             street = house.street,
             zipCode = house.zipCode,
             householdSize = house.householdSize,
@@ -214,3 +217,18 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
+
+fun WebQuote.toCompleteQuote() = Quote.CompleteQuote(
+    id = this.id,
+    currentInsurer = this.currentInsurer,
+    price = MonetaryAmountV2(
+        this.price!!.toPlainString(),
+        "SEK"
+    ),
+    expiresAt = this.createdAt.plusMillis(this.validity)
+)
+
+fun WebQuote.toIncompleteQuote() = Quote.IncompleteQuote(
+    id = this.id,
+    currentInsurer = this.currentInsurer
+)

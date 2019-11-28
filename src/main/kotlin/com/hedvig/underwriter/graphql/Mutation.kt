@@ -7,16 +7,15 @@ import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createQuoteResult
+import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
+import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
-import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
@@ -27,12 +26,11 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
     private val localizationService: LocalizationService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver
 ) : GraphQLMutationResolver {
 
-    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
         val quote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
@@ -47,7 +45,7 @@ class Mutation @Autowired constructor(
             is Either.Left -> {
                 when (errorOrQuote.a.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
-                        QuoteResult.UnderwritingLimitsHit(
+                        CreateQuoteResult.UnderwritingLimitsHit(
                             errorOrQuote.a.breachedUnderwritingGuidelines?.map { breachedUnderwritingGuidelines ->
                                 UnderwritingLimit(breachedUnderwritingGuidelines)
                             } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
@@ -68,7 +66,7 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
 
-                QuoteResult.Quote(
+                CreateQuoteResult.CompleteQuote(
                     id = completeQuoteResponseDto.id,
                     firstName = input.firstName,
                     lastName = input.lastName,
@@ -77,7 +75,7 @@ class Mutation @Autowired constructor(
                         completeQuoteResponseDto.price.toPlainString(),
                         "SEK"
                     ),
-                    details = input.createQuoteResult(
+                    details = input.createCompleteQuoteResult(
                         localizationService,
                         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                     ),
@@ -87,11 +85,11 @@ class Mutation @Autowired constructor(
         }
     }
 
-    fun editQuote(input: EditQuoteInput): QuoteResult {
+    fun editQuote(input: EditQuoteInput): CreateQuoteResult {
         TODO()
     }
 
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): QuoteResult {
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): CreateQuoteResult {
         TODO()
     }
 

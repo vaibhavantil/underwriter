@@ -1,16 +1,16 @@
 schema {
     mutation: Mutation
-    # for some reason Query is needed, otherwise it will throw:
-    # SchemaClassScannerError: Type definition for root query type 'Query' not found!
     query: Query
 }
 
-type Query {}
+type Query {
+    quote(id: ID): Quote!
+}
 
 type Mutation {
-    createQuote(input: CreateQuoteInput!): QuoteResult!
-    editQuote(input: EditQuoteInput!): QuoteResult!
-    removeCurrentInsurer(input : RemoveCurrentInsurerInput!): QuoteResult!
+    createQuote(input: CreateQuoteInput!): CreateQuoteResult!
+#    editQuote(input: EditQuoteInput!): CreateQuoteResult!
+#    removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
 }
 
 input CreateQuoteInput {
@@ -101,17 +101,18 @@ input RemoveCurrentInsurerInput {
     id: ID!
 }
 
-union QuoteResult = Quote | UnderwritingLimitsHit
+union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 
-type Quote {
+type CompleteQuote {
     id: ID!
+    currentInsurer: String
     price: MonetaryAmountV2!
-    details: QuoteDetails!
+#    details: QuoteDetails! TODO lets add this later
 }
 
-union QuoteDetails = ApartmentQuoteDetails | HouseQuoteDetails
+union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
 
-type ApartmentQuoteDetails {
+type CompleteApartmentQuoteDetails {
     street: String!
     zipCode: String!
     householdSize: Int!
@@ -119,7 +120,7 @@ type ApartmentQuoteDetails {
     type: ApartmentType!
 }
 
-type HouseQuoteDetails {
+type CompleteHouseQuoteDetails {
     street: String!
     zipCode: String!
     householdSize: Int!
@@ -246,4 +247,50 @@ type UnderwritingLimit {
 type MonetaryAmountV2 {
     amount: String!,
     currency: String!
+}
+
+union Quote = CompleteQuote | IncompleteQuote
+
+type IncompleteQuote {
+    id: ID!
+    currentInsurer: String
+#    details: QuoteDetails TODO lets add this later
+}
+
+union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
+
+type IncompleteApartmentQuoteDetails {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    type: ApartmentType
+}
+
+type IncompleteHouseQuoteDetails {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    ancillarySpace: Int
+    extraBuildings: [ExtraBuilding!]
+}
+
+union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
+
+type IncompleteApartmentQuoteDetails {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    type: ApartmentType
+}
+
+type IncompleteHouseQuoteDetails {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    ancillarySpace: Int
+    extraBuildings: [ExtraBuilding!]
 }

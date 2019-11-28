@@ -4,19 +4,19 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import java.time.Instant
 import java.util.UUID
 
-sealed class QuoteResult {
+sealed class CreateQuoteResult {
 
-    data class Quote(
+    data class CompleteQuote(
         val id: UUID,
         val firstName: String,
         val lastName: String,
         val currentInsurer: String?,
         val price: MonetaryAmountV2,
-        val details: QuoteDetails,
+        val details: CompleteQuoteDetails,
         val expiresAt: Instant
-    ) : QuoteResult()
+    ) : CreateQuoteResult()
 
     data class UnderwritingLimitsHit(
         val limits: List<UnderwritingLimit>
-    ) : QuoteResult()
+    ) : CreateQuoteResult()
 }
