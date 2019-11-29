@@ -1,10 +1,11 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.model.Quote
 import java.time.Instant
 import java.util.UUID
 
-sealed class Quote {
+sealed class QuoteResult {
 
     data class CompleteQuote(
         val id: UUID,
@@ -14,7 +15,7 @@ sealed class Quote {
         val price: MonetaryAmountV2,
         val details: CompleteQuoteDetails,
         val expiresAt: Instant
-    ) : Quote()
+    ) : QuoteResult()
 
 
     data class IncompleteQuote(
@@ -23,5 +24,9 @@ sealed class Quote {
         val lastName: String?,
         val currentInsurer: String?,
         val details: IncompleteQuoteDetails?
-    ) : Quote()
+    ) : QuoteResult()
+
+    data class UnderwritingLimitsHit(
+        val limits: List<UnderwritingLimit>
+    ) : QuoteResult()
 }

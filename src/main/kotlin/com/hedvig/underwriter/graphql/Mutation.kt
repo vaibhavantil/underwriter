@@ -10,8 +10,8 @@ import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
-import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
+import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -30,7 +30,9 @@ class Mutation @Autowired constructor(
     private val textKeysLocaleResolver: TextKeysLocaleResolver
 ) : GraphQLMutationResolver {
 
-    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
+    // Do to discrepancy between the graphql schema and how the graphql library is implemented
+    // we can but should never return QuoteResult.IncompleteQuote
+    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
         val quote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
@@ -45,7 +47,7 @@ class Mutation @Autowired constructor(
             is Either.Left -> {
                 when (errorOrQuote.a.errorCode) {
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
-                        CreateQuoteResult.UnderwritingLimitsHit(
+                        QuoteResult.UnderwritingLimitsHit(
                             errorOrQuote.a.breachedUnderwritingGuidelines?.map { breachedUnderwritingGuidelines ->
                                 UnderwritingLimit(breachedUnderwritingGuidelines)
                             } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
@@ -66,7 +68,7 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
 
-                CreateQuoteResult.CompleteQuote(
+                QuoteResult.CompleteQuote(
                     id = completeQuoteResponseDto.id,
                     firstName = input.firstName,
                     lastName = input.lastName,
@@ -85,11 +87,11 @@ class Mutation @Autowired constructor(
         }
     }
 
-    fun editQuote(input: EditQuoteInput): CreateQuoteResult {
+    fun editQuote(input: EditQuoteInput): QuoteResult {
         TODO()
     }
 
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): CreateQuoteResult {
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): QuoteResult {
         TODO()
     }
 
