@@ -1,8 +1,9 @@
 package com.hedvig.underwriter.config
 
 import com.coxautodev.graphql.tools.SchemaParserDictionary
+import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
-import com.hedvig.underwriter.graphql.type.QuoteDetails
+import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
@@ -25,10 +26,13 @@ class GraphQLConfiguration {
         return SchemaParserDictionary()
             .add(
                 dictionary = listOf(
-                    QuoteResult.Quote::class.java,
+                    CompleteQuoteDetails.CompleteApartmentQuoteDetails::class.java,
+                    CompleteQuoteDetails.CompleteHouseQuoteDetails::class.java,
+                    QuoteResult.CompleteQuote::class.java,
+                    QuoteResult.IncompleteQuote::class.java,
                     QuoteResult.UnderwritingLimitsHit::class.java,
-                    QuoteDetails.ApartmentQuoteDetails::class.java,
-                    QuoteDetails.HouseQuoteDetails::class.java,
+                    IncompleteQuoteDetails.IncompleteApartmentQuoteDetails::class.java,
+                    IncompleteQuoteDetails.IncompleteHouseQuoteDetails::class.java,
                     ExtraBuilding.ExtraBuildingGarage::class.java,
                     ExtraBuilding.ExtraBuildingCarport::class.java,
                     ExtraBuilding.ExtraBuildingShed::class.java,

@@ -17,21 +17,21 @@ mutation {
                 description
             }
         }
-        ... on Quote {
+        ... on CompleteQuote {
             id
             price {
                 amount
                 currency
             }
             details {
-                ... on ApartmentQuoteDetails {
+                ... on CompleteApartmentQuoteDetails {
                     street
                     zipCode
                     livingSpace
                     householdSize
                     type
                 }
-                ... on HouseQuoteDetails {
+                ... on CompleteHouseQuoteDetails {
                     street
                     zipCode
                     livingSpace

@@ -7,7 +7,7 @@ import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createQuoteResult
+import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -16,7 +16,6 @@ import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
@@ -27,11 +26,12 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
     private val localizationService: LocalizationService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver
 ) : GraphQLMutationResolver {
 
+    // Do to discrepancy between the graphql schema and how the graphql library is implemented
+    // we can but should never return QuoteResult.IncompleteQuote
     fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
         val quote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
@@ -68,7 +68,7 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
 
-                QuoteResult.Quote(
+                QuoteResult.CompleteQuote(
                     id = completeQuoteResponseDto.id,
                     firstName = input.firstName,
                     lastName = input.lastName,
@@ -77,7 +77,7 @@ class Mutation @Autowired constructor(
                         completeQuoteResponseDto.price.toPlainString(),
                         "SEK"
                     ),
-                    details = input.createQuoteResult(
+                    details = input.createCompleteQuoteResult(
                         localizationService,
                         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                     ),

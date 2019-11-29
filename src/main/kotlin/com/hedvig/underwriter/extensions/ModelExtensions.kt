@@ -2,13 +2,13 @@ package com.hedvig.underwriter.extensions
 
 import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
+import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.CreateApartmentInput
 import com.hedvig.underwriter.graphql.type.CreateHouseInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType
-import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
@@ -102,9 +102,9 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.BRF -> ApartmentProductSubType.BRF
 }
 
-fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService, locale: Locale): QuoteDetails =
+fun CreateQuoteInput.createCompleteQuoteResult(localizationService: LocalizationService, locale: Locale): CompleteQuoteDetails =
     this.apartment?.let { apartment ->
-        QuoteDetails.ApartmentQuoteDetails(
+        CompleteQuoteDetails.CompleteApartmentQuoteDetails(
             street = apartment.street,
             zipCode = apartment.zipCode,
             householdSize = apartment.householdSize,
@@ -112,7 +112,7 @@ fun CreateQuoteInput.createQuoteResult(localizationService: LocalizationService,
             type = apartment.type
         )
     } ?: this.house?.let { house ->
-        QuoteDetails.HouseQuoteDetails(
+        CompleteQuoteDetails.CompleteHouseQuoteDetails(
             street = house.street,
             zipCode = house.zipCode,
             householdSize = house.householdSize,
