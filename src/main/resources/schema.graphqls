@@ -110,26 +110,6 @@ type CompleteQuote {
     details: CompleteQuoteDetails!
 }
 
-union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
-
-type CompleteApartmentQuoteDetails {
-    street: String!
-    zipCode: String!
-    householdSize: Int!
-    livingSpace: Int!
-    type: ApartmentType!
-}
-
-type CompleteHouseQuoteDetails {
-    street: String!
-    zipCode: String!
-    householdSize: Int!
-    livingSpace: Int!
-    ancillarySpace: Int!
-    extraBuildings: [ExtraBuilding!]!
-}
-
-
 union ExtraBuilding =
       ExtraBuildingGarage
     | ExtraBuildingCarport
@@ -251,29 +231,29 @@ type MonetaryAmountV2 {
 
 union Quote = CompleteQuote | IncompleteQuote
 
+union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
+
+type CompleteApartmentQuoteDetails {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    type: ApartmentType!
+}
+
+type CompleteHouseQuoteDetails {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    ancillarySpace: Int!
+    extraBuildings: [ExtraBuilding!]!
+}
+
 type IncompleteQuote {
     id: ID!
     currentInsurer: String
     details: IncompleteQuoteDetails
-}
-
-union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
-
-type IncompleteApartmentQuoteDetails {
-    street: String
-    zipCode: String
-    householdSize: Int
-    livingSpace: Int
-    type: ApartmentType
-}
-
-type IncompleteHouseQuoteDetails {
-    street: String
-    zipCode: String
-    householdSize: Int
-    livingSpace: Int
-    ancillarySpace: Int
-    extraBuildings: [ExtraBuilding!]
 }
 
 union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
