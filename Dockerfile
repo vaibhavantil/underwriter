@@ -1,5 +1,6 @@
 FROM amazoncorretto:11
 
-ADD target/underwriter-0.0.1-SNAPSHOT.jar /
+RUN curl -o dd-java-agent.jar -L 'https://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.datadoghq&a=dd-java-agent&v=LATEST'
 
-ENTRYPOINT java -jar underwriter-0.0.1-SNAPSHOT.jar
+ADD target/underwriter-0.0.1-SNAPSHOT.jar /
+ENTRYPOINT java -javaagent:/dd-java-agent.jar -jar underwriter-0.0.1-SNAPSHOT.jar
