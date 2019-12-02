@@ -22,6 +22,7 @@ import graphql.servlet.context.GraphQLServletContext
 import java.lang.IllegalStateException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class Mutation @Autowired constructor(
@@ -32,7 +33,14 @@ class Mutation @Autowired constructor(
 
     // Do to discrepancy between the graphql schema and how the graphql library is implemented
     // we can but should never return QuoteResult.IncompleteQuote
-    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+    fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+        val ssn = if (createQuoteInput.ssn.length == 10) {
+            addCenturyToSSN(createQuoteInput.ssn)
+        } else {
+            createQuoteInput.ssn
+        }
+        val input = createQuoteInput.copy(ssn = ssn)
+
         val quote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
@@ -102,4 +110,15 @@ class Mutation @Autowired constructor(
     fun DataFetchingEnvironment.isIOS() =
         this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("iOS", false)
             ?: false
+
+    private fun addCenturyToSSN(ssn: String): String {
+        val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
+        val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+
+        return if (personalIdentityNumberYear > breakPoint) {
+            "19$ssn"
+        } else {
+            "20$ssn"
+        }
+    }
 }
