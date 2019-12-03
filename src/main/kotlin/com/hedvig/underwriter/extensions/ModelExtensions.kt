@@ -226,7 +226,7 @@ fun CreateQuoteInput.toEditMemberRequest() =
         toEditMemberRequest(house.street, house.zipCode)
     } ?: throw IllegalStateException("Trying to create EditMemberRequest without apartment and house!")
 
-private fun  CreateQuoteInput.toEditMemberRequest(street: String, zipCode: String) = EditMemberRequest(
+private fun CreateQuoteInput.toEditMemberRequest(street: String, zipCode: String) = EditMemberRequest(
     ssn = this.ssn,
     firstName = this.firstName,
     lastName = this.lastName,
