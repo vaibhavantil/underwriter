@@ -7,7 +7,6 @@ import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
-import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
@@ -24,6 +23,8 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampa
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
+import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
@@ -108,15 +109,16 @@ class QuoteServiceImpl(
         initiatedFrom: QuoteInitiatedFrom
     ): IncompleteQuoteResponseDto {
         val now = Instant.now()
+
         val quote = Quote(
             id = id ?: UUID.randomUUID(),
             createdAt = now,
-            productType = ProductType.APARTMENT,
+            productType = incompleteQuoteDto.productType!!,
             initiatedFrom = initiatedFrom,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
-                incompleteQuoteDto.incompleteApartmentQuoteData != null -> ApartmentData(UUID.randomUUID())
-                incompleteQuoteDto.incompleteHouseQuoteData != null -> HouseData(UUID.randomUUID())
+                incompleteQuoteDto.incompleteQuoteData is IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
+                incompleteQuoteDto.incompleteQuoteData is IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
                 else -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,

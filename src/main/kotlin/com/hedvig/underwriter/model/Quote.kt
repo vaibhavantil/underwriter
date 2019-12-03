@@ -11,6 +11,8 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildi
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
+import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.math.BigDecimal
 import java.time.Instant
@@ -120,6 +122,7 @@ data class Quote(
         }
     }
 
+//    Need to add for house here also
     fun getRapioQuoteRequestDto(email: String): RapioQuoteRequestDto {
         return when (val data = this.data) {
             is ApartmentData -> {
@@ -225,20 +228,22 @@ data class Quote(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
                     lastName = incompleteQuoteDto.lastName ?: data.lastName,
-                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
-                )
+                    subType = when (incompleteQuoteDto.incompleteQuoteData) {
+                        is IncompleteApartmentQuoteDataDto -> data.subType
+                        else -> null
+                        }
+                    )
                 is HouseData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
                     lastName = incompleteQuoteDto.lastName ?: data.lastName
                 )
-            }
+            } as QuoteData
         )
         if (
-            incompleteQuoteDto.productType == ProductType.APARTMENT ||
-            incompleteQuoteDto.incompleteApartmentQuoteData != null
+            incompleteQuoteDto.incompleteQuoteData is IncompleteApartmentQuoteDataDto
         ) {
-            val apartmentRequest = incompleteQuoteDto.incompleteApartmentQuoteData!!
+            val apartmentRequest = incompleteQuoteDto.incompleteQuoteData
             val newQuoteData: ApartmentData = when {
                 newQuote.data is ApartmentData -> newQuote.data as ApartmentData
                 newQuote.data is HouseData -> {
@@ -270,10 +275,9 @@ data class Quote(
         }
 
         if (
-            incompleteQuoteDto.productType == ProductType.HOUSE ||
-            incompleteQuoteDto.incompleteHouseQuoteData != null
+            incompleteQuoteDto.incompleteQuoteData is IncompleteHouseQuoteDataDto
         ) {
-            val houseRequest = incompleteQuoteDto.incompleteHouseQuoteData!!
+            val houseRequest = incompleteQuoteDto.incompleteQuoteData
             val newQuoteData: HouseData = when {
                 newQuote.data is HouseData -> newQuote.data as HouseData
                 newQuote.data is ApartmentData -> {
@@ -292,8 +296,8 @@ data class Quote(
                 }
                 else -> HouseData(id = UUID.randomUUID())
             }
-            newQuote = newQuote.copy(
-                data = newQuoteData.copy(
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
                     street = houseRequest.street ?: newQuoteData.street,
                     zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
                     city = houseRequest.city ?: newQuoteData.city,
@@ -306,8 +310,8 @@ data class Quote(
                     ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
                     yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction,
                     floor = houseRequest.floor
+                    )
                 )
-            )
         }
 
         return newQuote
