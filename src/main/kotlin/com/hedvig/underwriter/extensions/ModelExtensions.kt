@@ -13,6 +13,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
@@ -102,7 +103,10 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.BRF -> ApartmentProductSubType.BRF
 }
 
-fun CreateQuoteInput.createCompleteQuoteResult(localizationService: LocalizationService, locale: Locale): CompleteQuoteDetails =
+fun CreateQuoteInput.createCompleteQuoteResult(
+    localizationService: LocalizationService,
+    locale: Locale
+): CompleteQuoteDetails =
     this.apartment?.let { apartment ->
         CompleteQuoteDetails.CompleteApartmentQuoteDetails(
             street = apartment.street,
@@ -214,3 +218,19 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
+
+fun CreateQuoteInput.toEditMemberRequest() =
+    this.apartment?.let { apartment ->
+        toEditMemberRequest(apartment.street, apartment.zipCode)
+    } ?: this.house?.let { house ->
+        toEditMemberRequest(house.street, house.zipCode)
+    } ?: throw IllegalStateException("Trying to create EditMemberRequest without apartment and house!")
+
+private fun  CreateQuoteInput.toEditMemberRequest(street: String, zipCode: String) = EditMemberRequest(
+    ssn = this.ssn,
+    firstName = this.firstName,
+    lastName = this.lastName,
+    street = street,
+    zipCode = zipCode,
+    birthDate = this.ssn.birthDateFromSsn()
+)
