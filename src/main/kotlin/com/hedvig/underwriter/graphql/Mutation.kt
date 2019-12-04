@@ -8,7 +8,6 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.createCompleteQuoteResult
-import com.hedvig.underwriter.extensions.toEditMemberRequest
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -18,6 +17,8 @@ import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest.Companion.fromCreateQuoteinput
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.toEditMemberRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
@@ -80,7 +81,7 @@ class Mutation @Autowired constructor(
                 val completeQuoteResponseDto = errorOrQuote.b
 
                 env.getTokenOrNull()?.let { memberId ->
-                    memberService.editMember(memberId.toLong(), input.toEditMemberRequest())
+                    memberService.editMember(memberId.toLong(), fromCreateQuoteinput(input))
                 }
 
                 QuoteResult.CompleteQuote(

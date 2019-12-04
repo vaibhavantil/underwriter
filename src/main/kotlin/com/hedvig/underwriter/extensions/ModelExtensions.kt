@@ -218,19 +218,3 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
-
-fun CreateQuoteInput.toEditMemberRequest() =
-    this.apartment?.let { apartment ->
-        toEditMemberRequest(apartment.street, apartment.zipCode)
-    } ?: this.house?.let { house ->
-        toEditMemberRequest(house.street, house.zipCode)
-    } ?: throw IllegalStateException("Trying to create EditMemberRequest without apartment and house!")
-
-private fun CreateQuoteInput.toEditMemberRequest(street: String, zipCode: String) = EditMemberRequest(
-    ssn = this.ssn,
-    firstName = this.firstName,
-    lastName = this.lastName,
-    street = street,
-    zipCode = zipCode,
-    birthDate = this.ssn.birthDateFromSsn()
-)
