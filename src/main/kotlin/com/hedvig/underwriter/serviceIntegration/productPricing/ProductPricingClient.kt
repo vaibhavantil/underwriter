@@ -1,22 +1,23 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import feign.Headers
-import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import javax.validation.Valid
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -42,12 +43,11 @@ interface ProductPricingClient {
 
     ): ResponseEntity<RapioProductCreatedResponseDto>
 
-    @PostMapping("/_/createProduct")
-    fun createProduct(
-        @Valid @RequestBody req: CalculateQuoteRequestDto,
-        @RequestHeader(value = "hedvig.token") memberId: String
-
-    ): ResponseEntity<ProductCreatedResponseDto>
+    @PostMapping("/_/underwriter/{memberId}/signed/quote")
+    fun signedQuote(
+        @Valid @RequestBody req: SignedQuoteRequest,
+        @PathVariable memberId: String
+    ): ResponseEntity<SignedProductResponseDto>
 
     @PostMapping("/_/insurance/quotes/createModifiedProduct")
     fun createModifiedProductFromQuote(
