@@ -308,8 +308,7 @@ data class Quote(
                     extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from)
                         ?: newQuoteData.extraBuildings,
                     ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
-                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction,
-                    floor = houseRequest.floor
+                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction
                     )
                 )
         }
