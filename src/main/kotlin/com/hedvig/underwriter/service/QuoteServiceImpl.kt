@@ -285,7 +285,7 @@ class QuoteServiceImpl(
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO)
-            memberService.finalizeOnBoarding(quote, signedRequest.email)
+            memberService.finalizeOnboarding(quote, signedRequest.email)
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
             try {
