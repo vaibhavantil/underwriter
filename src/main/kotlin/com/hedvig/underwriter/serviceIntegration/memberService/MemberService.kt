@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -31,4 +32,6 @@ interface MemberService {
     fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse
 
     fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String? = null)
+
+    fun editMember(memberId: Long, request: EditMemberRequest)
 }
