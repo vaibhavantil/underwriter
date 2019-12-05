@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.hedvig.underwriter.model.Quote
-import java.time.Instant
 import javax.money.MonetaryAmount
 
 data class SignedQuoteRequest(

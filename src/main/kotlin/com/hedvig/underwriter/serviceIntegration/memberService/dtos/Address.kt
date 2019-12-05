@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
-class Address (
+class Address(
     val street: String,
     val city: String,
     val zipCode: String,

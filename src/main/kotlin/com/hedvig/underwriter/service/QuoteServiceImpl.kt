@@ -3,7 +3,6 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.orNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
@@ -33,17 +32,15 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.javamoney.moneta.Money
 import java.lang.IllegalStateException
 import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import javax.money.MonetaryAmount
-import javax.money.MonetaryAmountFactory
 
 @Service
 class QuoteServiceImpl(
