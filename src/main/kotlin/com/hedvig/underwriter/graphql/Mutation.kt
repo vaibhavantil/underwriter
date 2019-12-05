@@ -16,6 +16,8 @@ import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest.Companion.fromCreateQuoteinput
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
@@ -28,7 +30,8 @@ import org.springframework.stereotype.Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
     private val localizationService: LocalizationService,
-    private val textKeysLocaleResolver: TextKeysLocaleResolver
+    private val textKeysLocaleResolver: TextKeysLocaleResolver,
+    private val memberService: MemberService
 ) : GraphQLMutationResolver {
 
     // Do to discrepancy between the graphql schema and how the graphql library is implemented
@@ -75,6 +78,10 @@ class Mutation @Autowired constructor(
             }
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
+
+                env.getTokenOrNull()?.let { memberId ->
+                    memberService.editMember(memberId.toLong(), fromCreateQuoteinput(input))
+                }
 
                 QuoteResult.CompleteQuote(
                     id = completeQuoteResponseDto.id,

@@ -102,7 +102,10 @@ fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.BRF -> ApartmentProductSubType.BRF
 }
 
-fun CreateQuoteInput.createCompleteQuoteResult(localizationService: LocalizationService, locale: Locale): CompleteQuoteDetails =
+fun CreateQuoteInput.createCompleteQuoteResult(
+    localizationService: LocalizationService,
+    locale: Locale
+): CompleteQuoteDetails =
     this.apartment?.let { apartment ->
         CompleteQuoteDetails.CompleteApartmentQuoteDetails(
             street = apartment.street,

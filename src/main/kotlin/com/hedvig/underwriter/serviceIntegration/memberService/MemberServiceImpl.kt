@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -64,5 +65,9 @@ class MemberServiceImpl @Autowired constructor(
     override fun createMember(): String {
         val memberId = this.client.createMember().body
         return memberId!!.memberId
+    }
+
+    override fun editMember(memberId: Long, request: EditMemberRequest) {
+        client.editMember(memberId, request)
     }
 }
