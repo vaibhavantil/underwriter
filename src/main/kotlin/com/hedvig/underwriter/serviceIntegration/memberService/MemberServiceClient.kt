@@ -5,6 +5,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlready
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.Headers
 import org.springframework.cloud.openfeign.FeignClient
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -42,4 +44,10 @@ interface MemberServiceClient {
 
     @GetMapping("/v2/member/sign/signedSSN")
     fun checkIsSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): IsSsnAlreadySignedMemberResponse
+
+    @RequestMapping("/_/member/{memberId}/finalizeOnboarding")
+    fun finalizeOnBoarding(
+        @PathVariable("memberId") memberId: String,
+        @RequestBody req: FinalizeOnBoardingRequest
+    ): ResponseEntity<*>
 }

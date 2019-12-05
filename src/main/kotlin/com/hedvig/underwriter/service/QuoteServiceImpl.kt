@@ -284,6 +284,9 @@ class QuoteServiceImpl(
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
+        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO)
+            memberService.finalizeOnBoarding(quote, signedRequest.email)
+
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
             try {
                 productPricingService.redeemCampaign(
