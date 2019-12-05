@@ -9,6 +9,7 @@ import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignRequest
 import java.util.UUID
 import javax.validation.Valid
 import javax.validation.constraints.Email
@@ -114,8 +115,8 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/member/{memberId}/signed")
-    fun memberSigned(@PathVariable memberId: String): ResponseEntity.HeadersBuilder<*> {
-        quoteService.memberSigned(memberId)
+    fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity.HeadersBuilder<*> {
+        quoteService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent()
     }
 }

@@ -17,7 +17,6 @@ import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest.Companion.fromCreateQuoteinput
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
@@ -80,7 +79,10 @@ class Mutation @Autowired constructor(
                 val completeQuoteResponseDto = errorOrQuote.b
 
                 env.getTokenOrNull()?.let { memberId ->
-                    memberService.editMember(memberId.toLong(), fromCreateQuoteinput(input))
+                    // This should be removed when underwriter handles sign
+                    val actualQuote = quoteService.getQuote(completeQuoteResponseDto.id)
+                        ?: throw RuntimeException("Quote must not be null!")
+                    memberService.finalizeOnboarding(actualQuote.copy(memberId = memberId), "")
                 }
 
                 QuoteResult.CompleteQuote(

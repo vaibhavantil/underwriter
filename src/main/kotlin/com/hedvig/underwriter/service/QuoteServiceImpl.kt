@@ -21,12 +21,14 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
@@ -36,6 +38,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 
@@ -240,33 +243,46 @@ class QuoteServiceImpl(
             quote
         }
 
-        return Right(signQuoteWithMemberId(quoteWithMember, false, body.email))
+        return Right(
+            signQuoteWithMemberId(
+                quoteWithMember,
+                false,
+                SignRequest(body.email, "", "", "")
+            )
+        )
     }
 
-    override fun memberSigned(memberId: String) {
+    override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, true, null)
+            signQuoteWithMemberId(quote, true, signedRequest)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
     private fun signQuoteWithMemberId(
         quote: Quote,
         signedInMemberService: Boolean,
-        email: String?
+        signedRequest: SignRequest
     ): SignedQuoteResponseDto {
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+        checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
 
-        val signedProductId = quote.signedProductId
-            ?: if (!signedInMemberService) {
-                email?.let {
-                    productPricingService.createProduct(quote.getRapioQuoteRequestDto(it), quote.memberId).id
-                } ?: throw RuntimeException("No email when creating product")
-            } else {
-                productPricingService.createProduct(quote.createCalculateQuoteRequestDto(), quote.memberId).id
-            }
+        val signedProductId = productPricingService.signedQuote(
+            SignedQuoteRequest(
+                price = Money.of(quote.price, "SEK"),
+                email = signedRequest.email,
+                quote = quote,
+                referenceToken = signedRequest.referenceToken,
+                signature = signedRequest.signature,
+                oscpResponse = signedRequest.oscpResponse
+            ),
+            quote.memberId
+        ).id
 
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+
+        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO)
+            memberService.finalizeOnboarding(quote, signedRequest.email)
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
             try {

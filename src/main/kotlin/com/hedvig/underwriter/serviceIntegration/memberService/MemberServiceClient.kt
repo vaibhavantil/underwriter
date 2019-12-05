@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -44,6 +45,9 @@ interface MemberServiceClient {
     @GetMapping("/v2/member/sign/signedSSN")
     fun checkIsSsnAlreadySignedMemberEntity(@RequestHeader ssn: String): IsSsnAlreadySignedMemberResponse
 
-    @PostMapping("/_/member/{memberId}/edit")
-    fun editMember(@PathVariable memberId: Long, @RequestBody request: EditMemberRequest): ResponseEntity<Void>
+    @RequestMapping("/_/member/{memberId}/finalizeOnboarding")
+    fun finalizeOnBoarding(
+        @PathVariable("memberId") memberId: String,
+        @RequestBody req: FinalizeOnBoardingRequest
+    ): ResponseEntity<*>
 }

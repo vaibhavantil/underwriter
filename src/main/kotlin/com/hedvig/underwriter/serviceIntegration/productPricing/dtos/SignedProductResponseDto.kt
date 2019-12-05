@@ -2,6 +2,6 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import java.util.UUID
 
-data class ProductCreatedResponseDto(
+data class SignedProductResponseDto(
     val id: UUID
 )

@@ -9,6 +9,7 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import java.time.LocalDate
 import java.util.UUID
@@ -19,7 +20,7 @@ interface QuoteService {
         underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
-    fun memberSigned(memberId: String)
+    fun memberSigned(memberId: String, signRequest: SignRequest)
     fun activateQuote(
         completeQuoteId: UUID,
         activationDate: LocalDate? = null,
