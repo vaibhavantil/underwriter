@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.EditMemberRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
@@ -51,7 +50,4 @@ interface MemberServiceClient {
         @PathVariable("memberId") memberId: String,
         @RequestBody req: FinalizeOnBoardingRequest
     ): ResponseEntity<*>
-
-    @PostMapping("/_/member/{memberId}/edit")
-    fun editMember(@PathVariable memberId: Long, @RequestBody request: EditMemberRequest): ResponseEntity<Void>
 }
