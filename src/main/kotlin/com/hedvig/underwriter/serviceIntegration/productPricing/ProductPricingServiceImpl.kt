@@ -5,8 +5,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuoteP
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import java.lang.RuntimeException
@@ -28,15 +26,6 @@ class ProductPricingServiceImpl @Autowired constructor(
     override fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto {
         val price = this.productPricingClient.priceFromProductPricingForHomeQuote(apartmentQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
-    }
-
-    override fun createProduct(
-        rapioQuoteRequest: RapioQuoteRequestDto,
-        memberId: String
-    ): RapioProductCreatedResponseDto {
-        val rapioProductCreatedResponseDto = this.productPricingClient.createProduct(rapioQuoteRequest, memberId)
-        val signedQuote = rapioProductCreatedResponseDto.body
-        return signedQuote!!
     }
 
     override fun signedQuote(
