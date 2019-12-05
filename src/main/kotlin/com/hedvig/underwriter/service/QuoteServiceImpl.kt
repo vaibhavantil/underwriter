@@ -264,7 +264,7 @@ class QuoteServiceImpl(
         signedRequest: SignRequest
     ): SignedQuoteResponseDto {
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
-        checkNotNull(quote.price) { "Quote must price to sign! Quote id: ${quote.id}" }
+        checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
 
         val signedProductId = productPricingService.signedQuote(
             SignedQuoteRequest(
