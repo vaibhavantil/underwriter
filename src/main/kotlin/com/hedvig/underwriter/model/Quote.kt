@@ -18,7 +18,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Year
-import java.util.*
+import java.util.UUID
 
 fun String.birthDateFromSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
@@ -248,7 +248,7 @@ data class Quote(
                     data.street!!,
                     data.city,
                     data.zipCode!!,
-                  0
+                    0
                 ),
                 livingSpace = data.livingSpace!!.toFloat(),
                 houseType = ProductPricingProductTypes.HOUSE,

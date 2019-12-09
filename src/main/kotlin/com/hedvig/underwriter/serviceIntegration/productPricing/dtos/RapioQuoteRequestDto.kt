@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import java.math.BigDecimal
 import java.time.LocalDate

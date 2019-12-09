@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
