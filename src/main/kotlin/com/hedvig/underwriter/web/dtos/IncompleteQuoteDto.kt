@@ -19,9 +19,9 @@ data class IncompleteQuoteDto(
     val ssn: String?,
     val quotingPartner: Partner?,
     @get: Valid val productType: ProductType?,
+    val incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
-    val incompleteQuoteData: IncompleteQuoteRequestData?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null
 )

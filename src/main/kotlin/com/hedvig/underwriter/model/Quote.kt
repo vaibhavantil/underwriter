@@ -207,7 +207,6 @@ data class Quote(
                     )
                 )
         }
-
         return newQuote
     }
 
