@@ -15,7 +15,7 @@ data class ApartmentQuotePriceDto(
     var isStudent: Boolean
 ) {
     companion object {
-        fun from(quote: Quote) : ApartmentQuotePriceDto {
+        fun from(quote: Quote): ApartmentQuotePriceDto {
             val quoteData = quote.data
             if (quoteData is ApartmentData) {
                 return ApartmentQuotePriceDto(

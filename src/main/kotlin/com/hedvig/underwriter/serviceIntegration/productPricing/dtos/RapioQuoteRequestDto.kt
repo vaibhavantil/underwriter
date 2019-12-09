@@ -35,9 +35,8 @@ data class RapioQuoteRequestDto(
     @get:JsonProperty("isSubleted")
     val isSubleted: Boolean?
 ) {
-    companion object
-    {
-        fun from(quote: Quote, email: String):RapioQuoteRequestDto{
+    companion object {
+        fun from(quote: Quote, email: String): RapioQuoteRequestDto {
             return when (val data = quote.data) {
                 is HouseData -> {
                     RapioQuoteRequestDto(
