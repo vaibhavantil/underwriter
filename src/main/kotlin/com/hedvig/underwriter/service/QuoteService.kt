@@ -38,6 +38,6 @@ interface QuoteService {
     fun updateQuote(
         incompleteQuoteDto: IncompleteQuoteDto,
         id: UUID,
-        underwritingGuidelinesBypassedBy: String?
+        underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, Quote>
 }

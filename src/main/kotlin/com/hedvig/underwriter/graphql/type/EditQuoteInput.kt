@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.graphql.type
 
+import java.util.UUID
+
 data class EditQuoteInput(
-    val id: String,
+    val id: UUID,
     val firstName: String?,
     val lastName: String?,
     val currentInsurer: String?,
