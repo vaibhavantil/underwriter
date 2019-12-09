@@ -6,11 +6,11 @@ import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
 import java.lang.IllegalStateException
 import java.util.Locale
 
@@ -59,8 +59,6 @@ fun Quote.createCompleteQuoteResult(
             }
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
-
-
 
 fun Quote.createIncompleteQuoteResult(
     localizationService: LocalizationService,
@@ -160,7 +158,6 @@ private fun ExtaBuildingModel.toGraphQLResponseObject(localizationService: Local
             displayName = type.getDisplayName(localizationService, locale)
         )
     }
-
 
 private fun ExtraBuildingType.getDisplayName(localizationService: LocalizationService, locale: Locale): String =
     localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${this.name}") ?: getDefaultDisplayName(this)

@@ -2,7 +2,6 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
@@ -13,7 +12,6 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -78,7 +76,22 @@ class QuoteServiceImpl(
             quoteToUpdate!!.update(incompleteQuoteDto)
         }
 
-        updatedQuote?.let { updated ->
+        return responseFromUpdateQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+    }
+
+    override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
+        val updatedQuote = quoteRepository.modify(id) { quoteToUpdate ->
+            quoteToUpdate!!.copy(currentInsurer = null)
+        }
+
+        return responseFromUpdateQuote(updatedQuote)
+    }
+
+    private fun responseFromUpdateQuote(
+        quote: Quote?,
+        underwritingGuidelinesBypassedBy: String? = null
+    ): Either<ErrorResponseDto, Quote> {
+        quote?.let { updated ->
             return if (updated.state == QuoteState.QUOTED) {
                 updated.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                     .bimap(

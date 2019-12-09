@@ -22,7 +22,6 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
@@ -78,8 +77,19 @@ class Mutation @Autowired constructor(
     }
 
     fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): QuoteResult =
-        when (val errorOrQuote =
-            quoteService.updateQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id)) {
+        responseForEditedQuote(
+            quoteService.updateQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id),
+            env
+        )
+
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment) =
+        responseForEditedQuote(
+            quoteService.removeCurrentInsurerFromQuote(input.id),
+            env
+        )
+
+    fun responseForEditedQuote(errorOrQuote: Either<ErrorResponseDto, Quote>, env: DataFetchingEnvironment) =
+        when (errorOrQuote) {
             is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
             is Either.Right -> {
                 val quote = errorOrQuote.b
@@ -135,10 +145,6 @@ class Mutation @Autowired constructor(
             throw IllegalStateException("Invalid state")
         ErrorCodes.UNKNOWN_ERROR_CODE ->
             throw IllegalStateException("Unknown error code")
-    }
-
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): QuoteResult {
-        TODO()
     }
 
     fun DataFetchingEnvironment.isAndroid() =

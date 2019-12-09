@@ -40,4 +40,7 @@ interface QuoteService {
         id: UUID,
         underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, Quote>
+    fun removeCurrentInsurerFromQuote(
+        id: UUID
+    ): Either<ErrorResponseDto, Quote>
 }
