@@ -18,7 +18,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Year
-import java.util.UUID
+import java.util.*
 
 fun String.birthDateFromSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
@@ -122,9 +122,43 @@ data class Quote(
         }
     }
 
-//    Need to add for house here also
     fun getRapioQuoteRequestDto(email: String): RapioQuoteRequestDto {
         return when (val data = this.data) {
+            is HouseData -> {
+                RapioQuoteRequestDto(
+                    this.price!!,
+                    data.firstName!!,
+                    data.lastName!!,
+                    data.ssn!!.birthDateFromSsn(),
+                    false,
+                    Address(
+                        data.street!!,
+                        data.city!!,
+                        data.zipCode!!,
+                        0
+                    ),
+                    data.livingSpace!!.toFloat(),
+                    ProductPricingProductTypes.HOUSE,
+                    currentInsurer,
+                    data.householdSize!!,
+                    startDate?.atStartOfDay(),
+                    data.ssn,
+                    email,
+                    "",
+                    initiatedFrom,
+                    data.ancillaryArea,
+                    data.yearOfConstruction,
+                    data.numberOfBathrooms,
+                    data.extraBuildings?.map { extraBuilding ->
+                        ExtraBuildingDTO(
+                            com.hedvig.underwriter.graphql.type.ExtraBuildingType.valueOf(extraBuilding.type.name),
+                            extraBuilding.area,
+                            extraBuilding.hasWaterConnected
+                        )
+                    },
+                    data.isSubleted
+                    )
+            }
             is ApartmentData -> {
                 RapioQuoteRequestDto(
                     this.price!!,
@@ -139,14 +173,29 @@ data class Quote(
                         0
                     ),
                     data.livingSpace!!.toFloat(),
-                    data.subType!!,
+                    when (data.subType!!) {
+                        ApartmentProductSubType.BRF -> ProductPricingProductTypes.BRF
+                        ApartmentProductSubType.RENT -> ProductPricingProductTypes.RENT
+                        ApartmentProductSubType.RENT_BRF -> TODO()
+                        ApartmentProductSubType.SUBLET_RENTAL -> ProductPricingProductTypes.STUDENT_RENT
+                        ApartmentProductSubType.SUBLET_BRF -> ProductPricingProductTypes.STUDENT_BRF
+                        ApartmentProductSubType.STUDENT_BRF -> ProductPricingProductTypes.STUDENT_BRF
+                        ApartmentProductSubType.STUDENT_RENT -> ProductPricingProductTypes.STUDENT_RENT
+                        ApartmentProductSubType.LODGER -> TODO()
+                        ApartmentProductSubType.UNKNOWN -> TODO()
+                    },
                     currentInsurer,
                     data.householdSize!!,
                     startDate?.atStartOfDay(),
                     data.ssn,
                     email,
                     "",
-                    initiatedFrom
+                    initiatedFrom,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
                 )
             }
             else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
@@ -199,7 +248,7 @@ data class Quote(
                     data.street!!,
                     data.city,
                     data.zipCode!!,
-                    0
+                  0
                 ),
                 livingSpace = data.livingSpace!!.toFloat(),
                 houseType = ProductPricingProductTypes.HOUSE,

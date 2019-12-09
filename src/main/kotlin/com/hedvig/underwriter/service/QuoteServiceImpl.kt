@@ -117,6 +117,8 @@ class QuoteServiceImpl(
             initiatedFrom = initiatedFrom,
             attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
+                incompleteQuoteDto.incompleteApartmentQuoteData is IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
+                incompleteQuoteDto.incompleteHouseQuoteData is IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
                 incompleteQuoteDto.incompleteQuoteData is IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
                 incompleteQuoteDto.incompleteQuoteData is IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
                 else -> throw IllegalArgumentException("Must provide either house or apartment data")

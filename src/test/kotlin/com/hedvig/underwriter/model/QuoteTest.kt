@@ -14,7 +14,12 @@ import java.time.Instant
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit4.SpringRunner
 
+@RunWith(SpringRunner::class)
+@SpringBootTest
 class QuoteTest {
     @Test
     fun updatesQuote() {
@@ -37,6 +42,8 @@ class QuoteTest {
                 ssn = "201212121212",
                 currentInsurer = null,
                 incompleteQuoteData = null,
+                incompleteApartmentQuoteData = null,
+                incompleteHouseQuoteData = null,
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,
@@ -71,6 +78,8 @@ class QuoteTest {
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
+                incompleteApartmentQuoteData = null,
+                incompleteHouseQuoteData = null,
                 incompleteQuoteData = IncompleteHouseQuoteDataDto(
                     street = "Storgatan 2",
                     zipCode = null,
@@ -128,6 +137,8 @@ class QuoteTest {
                     subType = ApartmentProductSubType.BRF,
                     floor = null
                 ),
+                incompleteApartmentQuoteData = null,
+                incompleteHouseQuoteData = null,
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,

@@ -33,6 +33,8 @@ fun CreateQuoteInput.toIncompleteQuoteDto(
     ssn = this.ssn,
     productType = this.getProductType(),
     incompleteQuoteData = if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto(),
+    incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
+    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId
