@@ -3,7 +3,6 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.orNull
-import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
@@ -74,32 +73,36 @@ class QuoteServiceImpl(
             )
         }
 
-        val updatedQuote = quoteRepository.modify(quote.id) { quoteToUpdate ->
-            quoteToUpdate!!.update(incompleteQuoteDto)
-        }
+        try {
+            val result = quoteRepository.modify(quote.id) { quoteToUpdate ->
+                var updated = quoteToUpdate!!.update(incompleteQuoteDto)
 
-        updatedQuote?.let { updated ->
-            return if (updated.state == QuoteState.QUOTED) {
-                updated.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-                    .bimap(
-                        { breachedUnderwritingGuidelines ->
-                            ErrorResponseDto(
-                                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                                "quote cannot be calculated, underwriting guidelines are breached",
-                                breachedUnderwritingGuidelines
-                            )
-                        },
-                        { quote -> quote }
+                if (updated.state == QuoteState.QUOTED) {
+                    updated = updated.complete(
+                        debtChecker = debtChecker,
+                        productPricingService = productPricingService,
+                        underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
                     )
-            } else {
-                Either.Right(updated)
-            }
-        } ?: return Either.Left(
-            ErrorResponseDto(
-                ErrorCodes.UNKNOWN_ERROR_CODE,
-                "unable to update quote"
+                        .bimap(
+                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { quote -> quote }
+                        )
+                        .orNull()!!
+                }
+
+                updated
+            }!!
+
+            return Either.Right(result)
+        } catch (e: QuoteCompletionFailedException) {
+            logger.error(e.message, e)
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.UNKNOWN_ERROR_CODE,
+                    "unable to update quote"
+                )
             )
-        )
+        }
     }
 
     override fun createQuote(
@@ -179,7 +182,7 @@ class QuoteServiceImpl(
                     CompleteQuoteResponseDto(
                         id = completeQuote.id,
                         price = completeQuote.price!!,
-                        validTo = completeQuote.validTo
+                        validTo = completeQuote.createdAt.plusMillis(completeQuote.validity)
                     )
                 }
             )

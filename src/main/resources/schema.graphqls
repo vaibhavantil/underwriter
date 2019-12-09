@@ -9,8 +9,8 @@ type Query {
 
 type Mutation {
     createQuote(input: CreateQuoteInput!): CreateQuoteResult!
-    editQuote(input: EditQuoteInput!): CreateQuoteResult!
-    removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
+#    editQuote(input: EditQuoteInput!): CreateQuoteResult!
+#    removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
 }
 
 input CreateQuoteInput {
