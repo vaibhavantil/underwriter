@@ -3,21 +3,14 @@ package com.hedvig.underwriter.model
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Address
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingDTO
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductPricingProductTypes
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import java.time.Year
 import java.util.UUID
 
 fun String.birthDateFromSsn(): LocalDate {
@@ -117,157 +110,10 @@ data class Quote(
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
         return when (this.data) {
-            is ApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(homeQuotePriceDto(this)).price
-            is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(houseQuotePriceDto(this)).price
+            is ApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
+            is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
         }
     }
-
-    fun getRapioQuoteRequestDto(email: String): RapioQuoteRequestDto {
-        return when (val data = this.data) {
-            is HouseData -> {
-                RapioQuoteRequestDto(
-                    this.price!!,
-                    data.firstName!!,
-                    data.lastName!!,
-                    data.ssn!!.birthDateFromSsn(),
-                    false,
-                    Address(
-                        data.street!!,
-                        data.city!!,
-                        data.zipCode!!,
-                        0
-                    ),
-                    data.livingSpace!!.toFloat(),
-                    ProductPricingProductTypes.HOUSE,
-                    currentInsurer,
-                    data.householdSize!!,
-                    startDate?.atStartOfDay(),
-                    data.ssn,
-                    email,
-                    "",
-                    initiatedFrom,
-                    data.ancillaryArea,
-                    data.yearOfConstruction,
-                    data.numberOfBathrooms,
-                    data.extraBuildings?.map { extraBuilding ->
-                        ExtraBuildingDTO(
-                            com.hedvig.underwriter.graphql.type.ExtraBuildingType.valueOf(extraBuilding.type.name),
-                            extraBuilding.area,
-                            extraBuilding.hasWaterConnected
-                        )
-                    },
-                    data.isSubleted
-                    )
-            }
-            is ApartmentData -> {
-                RapioQuoteRequestDto(
-                    this.price!!,
-                    data.firstName!!,
-                    data.lastName!!,
-                    data.ssn!!.birthDateFromSsn(),
-                    false,
-                    Address(
-                        data.street!!,
-                        data.city!!,
-                        data.zipCode!!,
-                        0
-                    ),
-                    data.livingSpace!!.toFloat(),
-                    when (data.subType!!) {
-                        ApartmentProductSubType.BRF -> ProductPricingProductTypes.BRF
-                        ApartmentProductSubType.RENT -> ProductPricingProductTypes.RENT
-                        ApartmentProductSubType.RENT_BRF -> TODO()
-                        ApartmentProductSubType.SUBLET_RENTAL -> ProductPricingProductTypes.STUDENT_RENT
-                        ApartmentProductSubType.SUBLET_BRF -> ProductPricingProductTypes.STUDENT_BRF
-                        ApartmentProductSubType.STUDENT_BRF -> ProductPricingProductTypes.STUDENT_BRF
-                        ApartmentProductSubType.STUDENT_RENT -> ProductPricingProductTypes.STUDENT_RENT
-                        ApartmentProductSubType.LODGER -> TODO()
-                        ApartmentProductSubType.UNKNOWN -> TODO()
-                    },
-                    currentInsurer,
-                    data.householdSize!!,
-                    startDate?.atStartOfDay(),
-                    data.ssn,
-                    email,
-                    "",
-                    initiatedFrom,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )
-            }
-            else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
-        }
-    }
-
-    fun createCalculateQuoteRequestDto() =
-        when (this.data) {
-            is ApartmentData -> CalculateQuoteRequestDto(
-                memberId = memberId!!,
-                ssn = data.ssn!!,
-                firstName = data.firstName!!,
-                lastName = data.lastName!!,
-                birthDate = data.ssn!!.birthDateFromSsn(),
-                student = data.isStudent,
-                address = Address(
-                    data.street!!,
-                    data.city,
-                    data.zipCode!!,
-                    0
-                ),
-                livingSpace = data.livingSpace!!.toFloat(),
-                houseType = when (data.subType!!) {
-                    ApartmentProductSubType.BRF -> ProductPricingProductTypes.BRF
-                    ApartmentProductSubType.RENT -> ProductPricingProductTypes.RENT
-                    ApartmentProductSubType.RENT_BRF -> TODO() // what is even rent brf?
-                    ApartmentProductSubType.SUBLET_RENTAL -> ProductPricingProductTypes.STUDENT_RENT
-                    ApartmentProductSubType.SUBLET_BRF -> ProductPricingProductTypes.STUDENT_BRF
-                    ApartmentProductSubType.STUDENT_BRF -> ProductPricingProductTypes.STUDENT_BRF
-                    ApartmentProductSubType.STUDENT_RENT -> ProductPricingProductTypes.STUDENT_RENT
-                    ApartmentProductSubType.LODGER -> TODO()
-                    ApartmentProductSubType.UNKNOWN -> TODO()
-                },
-                currentInsurer = currentInsurer,
-                personsInHouseHold = data.householdSize!!,
-                ancillaryArea = null,
-                yearOfConstruction = null,
-                numberOfBathrooms = null,
-                extraBuildings = null,
-                isSubleted = null
-            )
-            is HouseData -> CalculateQuoteRequestDto(
-                memberId = memberId!!,
-                ssn = data.ssn!!,
-                firstName = data.firstName!!,
-                lastName = data.lastName!!,
-                birthDate = data.ssn!!.birthDateFromSsn(),
-                student = false,
-                address = Address(
-                    data.street!!,
-                    data.city,
-                    data.zipCode!!,
-                    0
-                ),
-                livingSpace = data.livingSpace!!.toFloat(),
-                houseType = ProductPricingProductTypes.HOUSE,
-                currentInsurer = currentInsurer,
-                personsInHouseHold = data.householdSize!!,
-                ancillaryArea = data.ancillaryArea,
-                yearOfConstruction = data.yearOfConstruction,
-                numberOfBathrooms = data.numberOfBathrooms,
-                extraBuildings = data.extraBuildings?.map { extraBuilding ->
-                    ExtraBuildingDTO(
-                        type = com.hedvig.underwriter.graphql.type.ExtraBuildingType.valueOf(extraBuilding.type.name),
-                        area = extraBuilding.area,
-                        hasWaterConnected = extraBuilding.hasWaterConnected
-                    )
-                },
-                isSubleted = data.isSubleted
-            )
-            else -> throw RuntimeException("Incomplete quote is of unknown type: ${this.data::class}")
-        }
 
     fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
         var newQuote = copy(
@@ -409,47 +255,5 @@ data class Quote(
         }
 
         return Either.left(breachedUnderwritingGuidelines)
-    }
-
-    companion object {
-        private fun homeQuotePriceDto(quote: Quote): ApartmentQuotePriceDto {
-            val quoteData = quote.data
-            if (quoteData is ApartmentData) {
-                return ApartmentQuotePriceDto(
-                    birthDate = quoteData.ssn!!.birthDateFromSsn(),
-                    livingSpace = quoteData.livingSpace!!,
-                    houseHoldSize = quoteData.householdSize!!,
-                    zipCode = quoteData.zipCode!!,
-                    houseType = quoteData.subType!!,
-                    isStudent = quoteData.isStudent
-                )
-            }
-            throw RuntimeException("missing data cannot create home quote price dto")
-        }
-
-        private fun houseQuotePriceDto(completeQuote: Quote): HouseQuotePriceDto {
-            val completeQuoteData = completeQuote.data
-            if (completeQuoteData is HouseData) {
-                return HouseQuotePriceDto(
-                    birthDate = completeQuoteData.ssn!!.birthDateFromSsn(),
-                    livingSpace = completeQuoteData.livingSpace!!,
-                    houseHoldSize = completeQuoteData.householdSize!!,
-                    zipCode = completeQuoteData.zipCode!!,
-                    ancillaryArea = completeQuoteData.ancillaryArea!!,
-                    numberOfBathrooms = completeQuoteData.numberOfBathrooms!!,
-                    yearOfConstruction = Year.of(completeQuoteData.yearOfConstruction!!),
-                    extraBuildings = completeQuoteData.extraBuildings!!.map { extraBuilding ->
-                        ExtraBuildingRequestDto(
-                            id = null,
-                            hasWaterConnected = extraBuilding.hasWaterConnected,
-                            area = extraBuilding.area,
-                            type = extraBuilding.type
-                        )
-                    },
-                    isSubleted = completeQuoteData.isSubleted!!
-                )
-            }
-            throw RuntimeException("missing data cannot create house quote price dto")
-        }
     }
 }

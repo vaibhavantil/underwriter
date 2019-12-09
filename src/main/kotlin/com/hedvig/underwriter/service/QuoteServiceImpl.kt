@@ -17,8 +17,10 @@ import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -263,10 +265,10 @@ class QuoteServiceImpl(
         val signedProductId = quote.signedProductId
             ?: if (!signedInMemberService) {
                 email?.let {
-                    productPricingService.createProduct(quote.getRapioQuoteRequestDto(it), quote.memberId).id
+                    productPricingService.createProduct(RapioQuoteRequestDto.from(quote, it), quote.memberId).id
                 } ?: throw RuntimeException("No email when creating product")
             } else {
-                productPricingService.createProduct(quote.createCalculateQuoteRequestDto(), quote.memberId).id
+                productPricingService.createProduct(CalculateQuoteRequestDto.from(quote), quote.memberId).id
             }
 
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
