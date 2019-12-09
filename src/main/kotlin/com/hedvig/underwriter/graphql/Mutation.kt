@@ -2,17 +2,10 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
-import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createCompleteQuoteResult
-import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
-import com.hedvig.underwriter.extensions.firstName
-import com.hedvig.underwriter.extensions.lastName
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
-import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
@@ -71,7 +64,7 @@ class Mutation @Autowired constructor(
                     memberService.finalizeOnboarding(quote.copy(memberId = memberId), "")
                 }
 
-                getCompleteQuoteResult(quote, env)
+                quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
             }
         }
     }
@@ -95,37 +88,12 @@ class Mutation @Autowired constructor(
                 val quote = errorOrQuote.b
 
                 if (quote.isComplete) {
-                    getCompleteQuoteResult(quote, env)
+                    quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
                 } else {
-                    QuoteResult.IncompleteQuote(
-                        id = quote.id,
-                        firstName = quote.firstName,
-                        lastName = quote.lastName,
-                        currentInsurer = quote.currentInsurer,
-                        details = quote.createIncompleteQuoteResult(
-                            localizationService,
-                            textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
-                        )
-                    )
+                    quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
                 }
             }
         }
-
-    fun getCompleteQuoteResult(quote: Quote, env: DataFetchingEnvironment) = QuoteResult.CompleteQuote(
-        id = quote.id,
-        firstName = quote.firstName,
-        lastName = quote.lastName,
-        currentInsurer = quote.currentInsurer,
-        price = MonetaryAmountV2(
-            quote.price!!.toPlainString(),
-            "SEK"
-        ),
-        details = quote.createCompleteQuoteResult(
-            localizationService,
-            textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
-        ),
-        expiresAt = quote.validTo
-    )
 
     fun getQuoteResultFromError(errorResponse: ErrorResponseDto) = when (errorResponse.errorCode) {
         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
