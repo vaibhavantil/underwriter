@@ -13,8 +13,8 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlready
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioProductCreatedResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RapioQuoteRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
@@ -63,11 +63,11 @@ class QuoteServiceImplTest {
         every { quoteRepository.update(any(), any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.createProduct(
-                any<RapioQuoteRequestDto>(),
+            productPricingService.signedQuote(
+                any<SignedQuoteRequest>(),
                 any()
             )
-        } returns RapioProductCreatedResponseDto(UUID.randomUUID())
+        } returns SignedProductResponseDto(UUID.randomUUID())
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
@@ -86,11 +86,11 @@ class QuoteServiceImplTest {
         every { quoteRepository.update(any(), any()) } returnsArgument 0
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.createProduct(
-                any<RapioQuoteRequestDto>(),
+            productPricingService.signedQuote(
+                any<SignedQuoteRequest>(),
                 any()
             )
-        } returns RapioProductCreatedResponseDto(UUID.randomUUID())
+        } returns SignedProductResponseDto(UUID.randomUUID())
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))

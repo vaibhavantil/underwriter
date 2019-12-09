@@ -16,10 +16,12 @@ import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
 import java.lang.IllegalStateException
+import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -27,12 +29,20 @@ import org.springframework.stereotype.Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
     private val localizationService: LocalizationService,
-    private val textKeysLocaleResolver: TextKeysLocaleResolver
+    private val textKeysLocaleResolver: TextKeysLocaleResolver,
+    private val memberService: MemberService
 ) : GraphQLMutationResolver {
 
     // Do to discrepancy between the graphql schema and how the graphql library is implemented
     // we can but should never return QuoteResult.IncompleteQuote
-    fun createQuote(input: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+    fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+        val ssn = if (createQuoteInput.ssn.length == 10) {
+            addCenturyToSSN(createQuoteInput.ssn)
+        } else {
+            createQuoteInput.ssn
+        }
+        val input = createQuoteInput.copy(ssn = ssn)
+
         val quote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
@@ -68,6 +78,13 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
 
+                env.getTokenOrNull()?.let { memberId ->
+                    // This should be removed when underwriter handles sign
+                    val actualQuote = quoteService.getQuote(completeQuoteResponseDto.id)
+                        ?: throw RuntimeException("Quote must not be null!")
+                    memberService.finalizeOnboarding(actualQuote.copy(memberId = memberId), "")
+                }
+
                 QuoteResult.CompleteQuote(
                     id = completeQuoteResponseDto.id,
                     firstName = input.firstName,
@@ -102,4 +119,15 @@ class Mutation @Autowired constructor(
     fun DataFetchingEnvironment.isIOS() =
         this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("iOS", false)
             ?: false
+
+    private fun addCenturyToSSN(ssn: String): String {
+        val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
+        val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+
+        return if (personalIdentityNumberYear > breakPoint) {
+            "19$ssn"
+        } else {
+            "20$ssn"
+        }
+    }
 }

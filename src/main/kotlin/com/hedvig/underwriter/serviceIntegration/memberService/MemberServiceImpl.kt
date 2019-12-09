@@ -3,6 +3,8 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -64,5 +66,10 @@ class MemberServiceImpl @Autowired constructor(
     override fun createMember(): String {
         val memberId = this.client.createMember().body
         return memberId!!.memberId
+    }
+
+    override fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String?) {
+        logger.debug("Finalizing web on boarding by populating member-service")
+        client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
     }
 }
