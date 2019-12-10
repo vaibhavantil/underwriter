@@ -44,7 +44,6 @@ internal class QuoteBuilderControllerTest {
             "dateStartedRecievingQuoteInfo": "2019-09-17T13:32:00.783981Z",
             "apartmentProductSubType": "RENT",
             "IncompleteQuoteData": {
-                "type": "apartment",
                 "incompleteApartmentQuoteData": {
                     "zipcode": "11216"
                 }
