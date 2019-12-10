@@ -33,7 +33,7 @@ val Quote.house
     get() = (data as? HouseData)
 
 val Quote.validTo
-    get() = this.createdAt.plusMillis(this.validity)!!
+    get() = this.createdAt.plusSeconds(this.validity)!!
 
 fun Quote.createCompleteQuoteResult(
     localizationService: LocalizationService,

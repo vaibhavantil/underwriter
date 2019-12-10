@@ -124,8 +124,7 @@ class Mutation @Autowired constructor(
 
     fun DataFetchingEnvironment.isIOS() =
         this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains(
-            "iOS",
-            false
+            iOSUserAgentRegex
         )
             ?: false
 
@@ -138,5 +137,9 @@ class Mutation @Autowired constructor(
         } else {
             "20$ssn"
         }
+    }
+
+    companion object {
+        private val iOSUserAgentRegex = Regex("iOS|iPhone|iPad|iPod")
     }
 }
