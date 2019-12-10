@@ -57,8 +57,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     fun findLatestOneByMemberId(memberId: String, h: Handle): Quote? {
         val dao = h.attach<QuoteDao>()
         val databaseQuotes = dao.findByMemberId(memberId)
-        val latestQuote = databaseQuotes.maxBy { it.timestamp }!!
-        return findQuote(latestQuote, dao)
+        val latestQuote = databaseQuotes.maxBy { it.timestamp }
+        return latestQuote?.let { quote -> findQuote(quote, dao) }
     }
 
     fun findQuote(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
