@@ -144,6 +144,11 @@ class QuoteServiceImpl(
         return quote?.let((QuoteDto)::fromQuote)
     }
 
+    override fun getLatestQuoteForMemberId(memberId: String): QuoteDto? {
+        val quote = quoteRepository.findLatestOneByMemberId(memberId)
+        return quote?.let((QuoteDto)::fromQuote)
+    }
+
     override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
         quoteRepository.findByMemberId(memberId)
             .map((QuoteDto)::fromQuote)
@@ -255,7 +260,7 @@ class QuoteServiceImpl(
     }
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
-        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+        quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, signedRequest)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
