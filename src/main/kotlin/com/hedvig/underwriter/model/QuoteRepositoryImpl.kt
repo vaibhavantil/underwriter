@@ -51,6 +51,16 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return findQuote(databaseQuote, dao)
     }
 
+    override fun findLatestOneByMemberId(memberId: String): Quote? =
+        jdbi.inTransaction<Quote?, RuntimeException> { h -> findLatestOneByMemberId(memberId, h) }
+
+    fun findLatestOneByMemberId(memberId: String, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuotes = dao.findByMemberId(memberId)
+        val latestQuote = databaseQuotes.maxBy { it.timestamp }!!
+        return findQuote(latestQuote, dao)
+    }
+
     fun findQuote(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
         val quoteData: QuoteData = when {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
