@@ -260,7 +260,7 @@ class QuoteServiceImpl(
     }
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
-        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+        quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, signedRequest)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
