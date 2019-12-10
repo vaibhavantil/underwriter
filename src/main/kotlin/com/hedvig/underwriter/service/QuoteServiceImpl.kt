@@ -135,7 +135,8 @@ class QuoteServiceImpl(
             state = QuoteState.INCOMPLETE,
             memberId = incompleteQuoteDto.memberId,
             breachedUnderwritingGuidelines = null,
-            originatingProductId = incompleteQuoteDto.originatingProductId
+            originatingProductId = incompleteQuoteDto.originatingProductId,
+            currentInsurer = incompleteQuoteDto.currentInsurer
         )
 
         quoteRepository.insert(quote.update(incompleteQuoteDto), now)
