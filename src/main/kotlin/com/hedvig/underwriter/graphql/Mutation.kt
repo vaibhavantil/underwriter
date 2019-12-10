@@ -2,22 +2,21 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
-import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
+import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
 import java.lang.IllegalStateException
@@ -43,7 +42,7 @@ class Mutation @Autowired constructor(
         }
         val input = createQuoteInput.copy(ssn = ssn)
 
-        val quote = quoteService.createQuote(
+        val incompleteQuote = quoteService.createQuote(
             input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
             initiatedFrom = when {
@@ -53,71 +52,79 @@ class Mutation @Autowired constructor(
             }
         )
 
-        return when (val errorOrQuote = quoteService.completeQuote(quote.id)) {
-            is Either.Left -> {
-                when (errorOrQuote.a.errorCode) {
-                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
-                        QuoteResult.UnderwritingLimitsHit(
-                            errorOrQuote.a.breachedUnderwritingGuidelines?.map { breachedUnderwritingGuidelines ->
-                                UnderwritingLimit(breachedUnderwritingGuidelines)
-                            } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
-                        )
-                    }
-                    ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE ->
-                        throw IllegalStateException("Member has existing insurance")
-                    ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED ->
-                        throw IllegalStateException("Quote has expired")
-                    ErrorCodes.NO_SUCH_QUOTE ->
-                        throw IllegalStateException("No such quote")
-                    ErrorCodes.INVALID_STATE ->
-                        throw IllegalStateException("Invalid state")
-                    ErrorCodes.UNKNOWN_ERROR_CODE ->
-                        throw IllegalStateException("Unknown error code")
-                }
-            }
+        return when (val errorOrQuote = quoteService.completeQuote(incompleteQuote.id)) {
+            is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
             is Either.Right -> {
                 val completeQuoteResponseDto = errorOrQuote.b
 
+                val quote = quoteService.getQuote(completeQuoteResponseDto.id)
+                    ?: throw RuntimeException("Quote must not be null!")
                 env.getTokenOrNull()?.let { memberId ->
                     // This should be removed when underwriter handles sign
-                    val actualQuote = quoteService.getQuote(completeQuoteResponseDto.id)
-                        ?: throw RuntimeException("Quote must not be null!")
-                    memberService.finalizeOnboarding(actualQuote.copy(memberId = memberId), "")
+                    memberService.finalizeOnboarding(quote.copy(memberId = memberId), "")
                 }
 
-                QuoteResult.CompleteQuote(
-                    id = completeQuoteResponseDto.id,
-                    firstName = input.firstName,
-                    lastName = input.lastName,
-                    currentInsurer = input.currentInsurer,
-                    price = MonetaryAmountV2(
-                        completeQuoteResponseDto.price.toPlainString(),
-                        "SEK"
-                    ),
-                    details = input.createCompleteQuoteResult(
-                        localizationService,
-                        textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
-                    ),
-                    expiresAt = completeQuoteResponseDto.validTo
-                )
+                quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
             }
         }
     }
 
-    fun editQuote(input: EditQuoteInput): QuoteResult {
-        TODO()
-    }
+    fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): QuoteResult =
+        responseForEditedQuote(
+            quoteService.updateQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id),
+            env
+        )
 
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput): QuoteResult {
-        TODO()
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment) =
+        responseForEditedQuote(
+            quoteService.removeCurrentInsurerFromQuote(input.id),
+            env
+        )
+
+    fun responseForEditedQuote(errorOrQuote: Either<ErrorResponseDto, Quote>, env: DataFetchingEnvironment) =
+        when (errorOrQuote) {
+            is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
+            is Either.Right -> {
+                val quote = errorOrQuote.b
+
+                if (quote.isComplete) {
+                    quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
+                } else {
+                    quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
+                }
+            }
+        }
+
+    fun getQuoteResultFromError(errorResponse: ErrorResponseDto) = when (errorResponse.errorCode) {
+        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
+            QuoteResult.UnderwritingLimitsHit(
+                errorResponse.breachedUnderwritingGuidelines?.map { description ->
+                    UnderwritingLimit(description)
+                } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
+            )
+        }
+        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE ->
+            throw IllegalStateException("Member has existing insurance")
+        ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED ->
+            throw IllegalStateException("Quote has expired")
+        ErrorCodes.NO_SUCH_QUOTE ->
+            throw IllegalStateException("No such quote")
+        ErrorCodes.INVALID_STATE ->
+            throw IllegalStateException("Invalid state")
+        ErrorCodes.UNKNOWN_ERROR_CODE ->
+            throw IllegalStateException("Unknown error code")
     }
 
     fun DataFetchingEnvironment.isAndroid() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("Android", false)
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains(
+            androidAppUserAgentRegex
+        )
             ?: false
 
     fun DataFetchingEnvironment.isIOS() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains("iOS", false)
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains(
+            iOSAppUserAgentRegex
+        )
             ?: false
 
     private fun addCenturyToSSN(ssn: String): String {
@@ -129,5 +136,10 @@ class Mutation @Autowired constructor(
         } else {
             "20$ssn"
         }
+    }
+
+    companion object {
+        private val iOSAppUserAgentRegex = Regex("^com\\.hedvig.+iOS")
+        private val androidAppUserAgentRegex = Regex("^com\\.hedvig.+Android")
     }
 }
