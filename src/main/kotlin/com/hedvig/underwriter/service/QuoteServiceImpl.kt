@@ -2,7 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.orNull
+import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
@@ -11,7 +11,6 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -74,36 +73,47 @@ class QuoteServiceImpl(
             )
         }
 
-        try {
-            val result = quoteRepository.modify(quote.id) { quoteToUpdate ->
-                var updated = quoteToUpdate!!.update(incompleteQuoteDto)
-
-                if (updated.state == QuoteState.QUOTED) {
-                    updated = updated.complete(
-                        debtChecker = debtChecker,
-                        productPricingService = productPricingService,
-                        underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
-                    )
-                        .bimap(
-                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
-                            { quote -> quote }
-                        )
-                        .orNull()!!
-                }
-
-                updated
-            }!!
-
-            return Either.Right(result)
-        } catch (e: QuoteCompletionFailedException) {
-            logger.error(e.message, e)
-            return Either.Left(
-                ErrorResponseDto(
-                    ErrorCodes.UNKNOWN_ERROR_CODE,
-                    "unable to update quote"
-                )
-            )
+        val updatedQuote = quoteRepository.modify(quote.id) { quoteToUpdate ->
+            quoteToUpdate!!.update(incompleteQuoteDto)
         }
+
+        return responseFromUpdateQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+    }
+
+    override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
+        val updatedQuote = quoteRepository.modify(id) { quoteToUpdate ->
+            quoteToUpdate!!.copy(currentInsurer = null)
+        }
+
+        return responseFromUpdateQuote(updatedQuote)
+    }
+
+    private fun responseFromUpdateQuote(
+        quote: Quote?,
+        underwritingGuidelinesBypassedBy: String? = null
+    ): Either<ErrorResponseDto, Quote> {
+        quote?.let { updated ->
+            return if (updated.state == QuoteState.QUOTED) {
+                updated.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+                    .bimap(
+                        { breachedUnderwritingGuidelines ->
+                            ErrorResponseDto(
+                                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                                "quote cannot be calculated, underwriting guidelines are breached",
+                                breachedUnderwritingGuidelines
+                            )
+                        },
+                        { quote -> quote }
+                    )
+            } else {
+                Either.Right(updated)
+            }
+        } ?: return Either.Left(
+            ErrorResponseDto(
+                ErrorCodes.UNKNOWN_ERROR_CODE,
+                "unable to update quote"
+            )
+        )
     }
 
     override fun createQuote(
@@ -129,7 +139,8 @@ class QuoteServiceImpl(
             state = QuoteState.INCOMPLETE,
             memberId = incompleteQuoteDto.memberId,
             breachedUnderwritingGuidelines = null,
-            originatingProductId = incompleteQuoteDto.originatingProductId
+            originatingProductId = incompleteQuoteDto.originatingProductId,
+            currentInsurer = incompleteQuoteDto.currentInsurer
         )
 
         quoteRepository.insert(quote.update(incompleteQuoteDto), now)
@@ -186,7 +197,7 @@ class QuoteServiceImpl(
                     CompleteQuoteResponseDto(
                         id = completeQuote.id,
                         price = completeQuote.price!!,
-                        validTo = completeQuote.createdAt.plusMillis(completeQuote.validity)
+                        validTo = completeQuote.validTo
                     )
                 }
             )
