@@ -2,7 +2,6 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.getOrElse
 import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
