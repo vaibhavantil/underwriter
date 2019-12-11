@@ -357,6 +357,65 @@ class QuoteRepositoryImplTest {
     }
 
     @Test
+    fun insertsAndFindLatestQuotesByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val timestamp2 = Instant.now().minusSeconds(10)
+        val quote1 = Quote(
+            id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
+            productType = ProductType.APARTMENT,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            createdAt = timestamp,
+            breachedUnderwritingGuidelines = null,
+            state = QuoteState.INCOMPLETE
+        )
+        val quote2 = Quote(
+            id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
+            productType = ProductType.APARTMENT,
+            data = ApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            createdAt = timestamp2,
+            state = QuoteState.INCOMPLETE
+        )
+        quoteDao.insert(quote1, timestamp)
+        quoteDao.insert(quote2, timestamp2)
+
+        val result = quoteDao.findLatestOneByMemberId(quote1.memberId!!)
+        assertQuotesDeepEqualExceptInternalId(quote1, result)
+    }
+
+    @Test
     fun updatesHouseQuotes() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
