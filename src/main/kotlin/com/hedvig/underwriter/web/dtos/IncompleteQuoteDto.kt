@@ -20,18 +20,17 @@ data class IncompleteQuoteDto(
     val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType?,
-    val incompleteQuoteData: IncompleteQuoteRequestData?,
+    @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @field:JsonSubTypes(
+        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
+        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
+    ) val incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null
 )
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
-    JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
-)
 sealed class IncompleteQuoteRequestData
 
 data class IncompleteHouseQuoteDataDto(
