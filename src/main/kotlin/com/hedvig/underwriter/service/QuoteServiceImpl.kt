@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.HouseData
@@ -11,6 +12,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -73,11 +75,28 @@ class QuoteServiceImpl(
             )
         }
 
-        val updatedQuote = quoteRepository.modify(quote.id) { quoteToUpdate ->
-            quoteToUpdate!!.update(incompleteQuoteDto)
+        return try {
+            quoteRepository.modify(quote.id) { quoteToUpdate ->
+                val updatedQuote = quoteToUpdate!!.update(incompleteQuoteDto)
+                if (updatedQuote.state == QuoteState.QUOTED) {
+                    updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+                        .bimap(
+                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { quote -> quote }
+                        )
+                        .orNull()
+                } else {
+                    updatedQuote
+                }
+            }!!.let { updatedQuote -> Either.right(updatedQuote) }
+        } catch (e: QuoteCompletionFailedException) {
+            Either.left(
+                ErrorResponseDto(
+                    ErrorCodes.UNKNOWN_ERROR_CODE,
+                    "Unable to complete quote"
+                )
+            )
         }
-
-        return responseFromUpdateQuote(updatedQuote, underwritingGuidelinesBypassedBy)
     }
 
     override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
@@ -85,35 +104,7 @@ class QuoteServiceImpl(
             quoteToUpdate!!.copy(currentInsurer = null)
         }
 
-        return responseFromUpdateQuote(updatedQuote)
-    }
-
-    private fun responseFromUpdateQuote(
-        quote: Quote?,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<ErrorResponseDto, Quote> {
-        quote?.let { updated ->
-            return if (updated.state == QuoteState.QUOTED) {
-                updated.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-                    .bimap(
-                        { breachedUnderwritingGuidelines ->
-                            ErrorResponseDto(
-                                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                                "quote cannot be calculated, underwriting guidelines are breached",
-                                breachedUnderwritingGuidelines
-                            )
-                        },
-                        { quote -> quote }
-                    )
-            } else {
-                Either.Right(updated)
-            }
-        } ?: return Either.Left(
-            ErrorResponseDto(
-                ErrorCodes.UNKNOWN_ERROR_CODE,
-                "unable to update quote"
-            )
-        )
+        return Either.right(updatedQuote!!)
     }
 
     override fun createQuote(
@@ -154,6 +145,11 @@ class QuoteServiceImpl(
 
     override fun getSingleQuoteForMemberId(memberId: String): QuoteDto? {
         val quote = quoteRepository.findOneByMemberId(memberId)
+        return quote?.let((QuoteDto)::fromQuote)
+    }
+
+    override fun getLatestQuoteForMemberId(memberId: String): QuoteDto? {
+        val quote = quoteRepository.findLatestOneByMemberId(memberId)
         return quote?.let((QuoteDto)::fromQuote)
     }
 
@@ -268,7 +264,7 @@ class QuoteServiceImpl(
     }
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
-        quoteRepository.findOneByMemberId(memberId)?.let { quote ->
+        quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, signedRequest)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
