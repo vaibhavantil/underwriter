@@ -5,7 +5,6 @@ import javax.money.MonetaryAmount
 
 data class SignedQuoteRequest(
     val price: MonetaryAmount,
-    val email: String,
     val quote: Quote,
     val referenceToken: String,
     val signature: String,
