@@ -254,21 +254,23 @@ class QuoteServiceImpl(
             signQuoteWithMemberId(
                 quoteWithMember,
                 false,
-                SignRequest(body.email, "", "", "")
+                SignRequest("", "", ""),
+                body.email
             )
         )
     }
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, true, signedRequest)
+            signQuoteWithMemberId(quote, true, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
     private fun signQuoteWithMemberId(
         quote: Quote,
         signedInMemberService: Boolean,
-        signedRequest: SignRequest
+        signedRequest: SignRequest,
+        email: String?
     ): SignedQuoteResponseDto {
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
         checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
@@ -276,7 +278,6 @@ class QuoteServiceImpl(
         val signedProductId = productPricingService.signedQuote(
             SignedQuoteRequest(
                 price = Money.of(quote.price, "SEK"),
-                email = signedRequest.email,
                 quote = quote,
                 referenceToken = signedRequest.referenceToken,
                 signature = signedRequest.signature,
@@ -288,8 +289,11 @@ class QuoteServiceImpl(
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
-        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO)
-            memberService.finalizeOnboarding(quote, signedRequest.email)
+        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO){
+            email?.let {
+                memberService.finalizeOnboarding(quote, it) }
+                ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
+        }
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
             try {
