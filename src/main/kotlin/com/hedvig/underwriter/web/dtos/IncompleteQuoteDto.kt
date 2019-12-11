@@ -11,7 +11,6 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import java.time.LocalDate
 import java.util.UUID
-import javax.validation.Valid
 
 data class IncompleteQuoteDto(
     val firstName: String?,
@@ -20,7 +19,7 @@ data class IncompleteQuoteDto(
     val birthDate: LocalDate?,
     val ssn: String?,
     val quotingPartner: Partner?,
-    @get: Valid val productType: ProductType?,
+    val productType: ProductType?,
     val incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
