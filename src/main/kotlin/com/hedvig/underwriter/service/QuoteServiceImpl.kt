@@ -289,7 +289,7 @@ class QuoteServiceImpl(
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
-        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO){
+        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
                 memberService.finalizeOnboarding(quote, it) }
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
