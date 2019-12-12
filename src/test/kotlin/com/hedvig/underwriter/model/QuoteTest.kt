@@ -36,6 +36,7 @@ class QuoteTest {
                 productType = null,
                 ssn = "201212121212",
                 currentInsurer = null,
+                incompleteQuoteData = null,
                 incompleteApartmentQuoteData = null,
                 incompleteHouseQuoteData = null,
                 originatingProductId = null,
@@ -73,7 +74,8 @@ class QuoteTest {
                 ssn = "201212121213",
                 currentInsurer = null,
                 incompleteApartmentQuoteData = null,
-                incompleteHouseQuoteData = IncompleteHouseQuoteDataDto(
+                incompleteHouseQuoteData = null,
+                incompleteQuoteData = IncompleteHouseQuoteDataDto(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,
@@ -121,8 +123,7 @@ class QuoteTest {
                 productType = ProductType.APARTMENT,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteHouseQuoteData = null,
-                incompleteApartmentQuoteData = IncompleteApartmentQuoteDataDto(
+                incompleteQuoteData = IncompleteApartmentQuoteDataDto(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,
@@ -131,6 +132,8 @@ class QuoteTest {
                     subType = ApartmentProductSubType.BRF,
                     floor = null
                 ),
+                incompleteApartmentQuoteData = null,
+                incompleteHouseQuoteData = null,
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,

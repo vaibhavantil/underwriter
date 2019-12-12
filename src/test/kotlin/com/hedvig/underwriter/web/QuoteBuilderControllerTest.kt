@@ -41,9 +41,8 @@ internal class QuoteBuilderControllerTest {
 
     val createQuoteRequestJson = """
         {
-            "dateStartedRecievingQuoteInfo": "2019-09-17T13:32:00.783981Z",
-            "apartmentProductSubType": "RENT",
             "incompleteQuoteData": {
+            "type": "apartment",
                 "incompleteApartmentQuoteData": {
                     "zipcode": "11216"
                 }

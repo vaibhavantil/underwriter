@@ -7,5 +7,5 @@ enum class ProductPricingProductTypes {
     SUBLET_BRF,
     STUDENT_BRF,
     STUDENT_RENT,
-    HOUSE
+    HOUSE,
 }

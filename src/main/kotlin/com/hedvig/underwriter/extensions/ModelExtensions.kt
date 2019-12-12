@@ -30,8 +30,9 @@ fun CreateQuoteInput.toIncompleteQuoteDto(
     birthDate = this.ssn.birthDateFromSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
-    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
+    incompleteQuoteData = if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto(),
     incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
+    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId
@@ -71,6 +72,7 @@ fun EditQuoteInput.toIncompleteQuoteDto(
     birthDate = this.ssn?.birthDateFromSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
+    incompleteQuoteData = if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto(),
     incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
     incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
     quotingPartner = quotingPartner,

@@ -92,7 +92,7 @@ data class HouseData(
     val extraBuildings: List<ExtraBuilding>? = null,
     @get:JvmName("getIsSubleted")
     val isSubleted: Boolean? = null,
-    val floor: Int = 0,
+    val floor: Int? = 0,
     @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), HomeInsurance, PersonPolicyHolder<HouseData> {

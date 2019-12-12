@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.HouseData
@@ -18,11 +20,18 @@ data class IncompleteQuoteDto(
     val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType?,
+    @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @field:JsonSubTypes(
+        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
+        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
+    ) val incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null
 )
+
+sealed class IncompleteQuoteRequestData
 
 data class IncompleteHouseQuoteDataDto(
     val street: String?,
@@ -36,8 +45,8 @@ data class IncompleteHouseQuoteDataDto(
     val extraBuildings: List<ExtraBuildingRequestDto>?,
     @field:JsonProperty("subleted")
     val isSubleted: Boolean?,
-    val floor: Int = 0
-) {
+    val floor: Int? = 0
+) : IncompleteQuoteRequestData() {
     companion object {
         fun fromHouseData(house: HouseData) = IncompleteHouseQuoteDataDto(
             street = house.street,
@@ -62,7 +71,7 @@ data class IncompleteApartmentQuoteDataDto(
     val householdSize: Int?,
     val floor: Int?,
     val subType: ApartmentProductSubType?
-) {
+) : IncompleteQuoteRequestData() {
     companion object {
         fun fromApartmentData(apartment: ApartmentData) = IncompleteApartmentQuoteDataDto(
             street = apartment.street,

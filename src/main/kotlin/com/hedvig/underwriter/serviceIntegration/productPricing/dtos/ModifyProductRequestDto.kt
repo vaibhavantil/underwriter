@@ -75,8 +75,7 @@ data class ModifyProductRequestDto(
                     yearOfConstruction = quote.data.yearOfConstruction,
                     numberOfBathrooms = quote.data.numberOfBathrooms,
                     extraBuildings = quote.data.extraBuildings?.map { extraBuilding -> extraBuilding.toDto() },
-                    isSubleted = quote.data.isSubleted!!,
-                    floor = quote.data.floor
+                    isSubleted = quote.data.isSubleted!!
                 )
             }
     }
