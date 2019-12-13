@@ -2,12 +2,12 @@ package com.hedvig.underwriter.serviceIntegration.customerio
 
 import com.hedvig.underwriter.model.Partner
 import io.sentry.Sentry
+import java.util.Arrays
 import mu.KotlinLogging
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cloud.openfeign.EnableFeignClients
-import org.springframework.stereotype.Component
 import org.springframework.core.env.Environment
-import java.util.*
+import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 
@@ -21,8 +21,8 @@ class CustomerIO(val customerIOClient: CustomerIOClient, val env: Environment) {
             val map = mutableMapOf("partner_code" to partner.name)
             this.customerIOClient.put(memberId, map)
         } catch (ex: Exception) {
-            if (Arrays.stream(env.activeProfiles).anyMatch { env -> env.contentEquals("staging")
-                    || env.contentEquals("production") }
+            if (Arrays.stream(env.activeProfiles).anyMatch { env -> env.contentEquals("staging") ||
+                    env.contentEquals("production") }
             ) {
                 Sentry.capture(ex)
             }
