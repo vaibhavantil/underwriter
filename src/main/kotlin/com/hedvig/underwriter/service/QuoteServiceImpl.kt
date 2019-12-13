@@ -40,12 +40,12 @@ import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Arrays
+import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.util.UUID
-import java.util.Arrays
 
 @Service
 class QuoteServiceImpl(

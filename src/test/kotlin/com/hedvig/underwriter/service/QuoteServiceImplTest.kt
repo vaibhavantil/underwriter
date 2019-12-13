@@ -28,6 +28,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 
 @RunWith(MockitoJUnitRunner::class)
@@ -48,13 +49,16 @@ class QuoteServiceImplTest {
     @MockK
     lateinit var customerIO: CustomerIO
 
+    @MockK
+    lateinit var env: Environment
+
     @Before
     fun setUp() = MockKAnnotations.init(this, relaxUnitFun = true)
 
     @Test
     fun givenPartnerSendsPartnerIdToCustomerIO() {
 
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO)
+        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
 
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
@@ -77,7 +81,7 @@ class QuoteServiceImplTest {
 
     @Test
     fun givenPartnerIsHedvigDoNotSendPartnerIdToCustomerIO() {
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO)
+        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
 
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
@@ -104,7 +108,8 @@ class QuoteServiceImplTest {
             memberService = memberService,
             productPricingService = productPricingService,
             quoteRepository = quoteRepository,
-            customerIOClient = customerIO
+            customerIOClient = customerIO,
+            env = env
         )
 
         val quote = a.QuoteBuilder(originatingProductId = UUID.randomUUID(), memberId = "12345").build()
