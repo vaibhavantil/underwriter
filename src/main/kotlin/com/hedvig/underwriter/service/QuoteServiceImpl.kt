@@ -40,7 +40,6 @@ import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Arrays
 import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
@@ -333,7 +332,7 @@ class QuoteServiceImpl(
             try {
             customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
             } catch (exception: Exception) {
-                if (Arrays.stream(env.activeProfiles).anyMatch { env -> env.contentEquals("staging") ||
+                if (env.activeProfiles.any { env -> env.contentEquals("staging") ||
                         env.contentEquals("production") }
                 ) {
                     Sentry.capture(exception)
