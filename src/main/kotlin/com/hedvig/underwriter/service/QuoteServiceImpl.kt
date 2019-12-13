@@ -81,7 +81,12 @@ class QuoteServiceImpl(
                 if (updatedQuote.state == QuoteState.QUOTED) {
                     updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                         .bimap(
-                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { errors ->
+                                throw QuoteCompletionFailedException(
+                                    "Unable to complete quote: $errors",
+                                    errors
+                                )
+                            },
                             { quote -> quote }
                         )
                         .orNull()
@@ -90,7 +95,15 @@ class QuoteServiceImpl(
                 }
             }!!.let { updatedQuote -> Either.right(updatedQuote) }
         } catch (e: QuoteCompletionFailedException) {
-            Either.left(
+            e.breachedUnderwritingGuidelines?.let { breachedUnderwritingGuidelines ->
+                Either.left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
+                    )
+                )
+            } ?: Either.left(
                 ErrorResponseDto(
                     ErrorCodes.UNKNOWN_ERROR_CODE,
                     "Unable to complete quote"
@@ -295,7 +308,8 @@ class QuoteServiceImpl(
 
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
-                memberService.finalizeOnboarding(quote, it) }
+                memberService.finalizeOnboarding(quote, it)
+            }
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
