@@ -292,3 +292,5 @@ type InsuranceCost {
     monthlyNet: MonetaryAmountV2!,
     freeUntil: LocalDate
 }
+
+scalar LocalDate
