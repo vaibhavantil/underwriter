@@ -2,6 +2,7 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
+import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
@@ -15,10 +16,12 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
+import org.javamoney.moneta.Money
 import java.lang.IllegalStateException
 import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
+    private val productPricingService: ProductPricingService,
     private val localizationService: LocalizationService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val memberService: MemberService
@@ -64,7 +68,14 @@ class Mutation @Autowired constructor(
                     memberService.finalizeOnboarding(quote.copy(memberId = memberId), "")
                 }
 
-                quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
+                quote.getCompleteQuoteResult(
+                    env,
+                    localizationService,
+                    textKeysLocaleResolver,
+                    productPricingService.calculateInsuranceCost(
+                        Money.of(quote.price, "SEK"), env.getToken()
+                    )
+                )
             }
         }
     }
@@ -88,7 +99,14 @@ class Mutation @Autowired constructor(
                 val quote = errorOrQuote.b
 
                 if (quote.isComplete) {
-                    quote.getCompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
+                    quote.getCompleteQuoteResult(
+                        env,
+                        localizationService,
+                        textKeysLocaleResolver,
+                        productPricingService.calculateInsuranceCost(
+                            Money.of(quote.price, "SEK"), env.getToken()
+                        )
+                    )
                 } else {
                     quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
                 }
