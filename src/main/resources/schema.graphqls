@@ -259,6 +259,9 @@ type CompleteHouseQuoteDetails {
     livingSpace: Int!
     ancillarySpace: Int!
     extraBuildings: [ExtraBuilding!]!
+    numberOfBathrooms: Int!
+    yearOfConstruction: Int!
+    isSubleted: Boolean!
 }
 
 type IncompleteQuote {
@@ -284,6 +287,10 @@ type IncompleteHouseQuoteDetails {
     livingSpace: Int
     ancillarySpace: Int
     extraBuildings: [ExtraBuilding!]
+    numberOfBathrooms: Int
+    yearOfConstruction: Int
+    numberOfBathrooms: Int
+    isSubleted: Boolean
 }
 
 type InsuranceCost {
