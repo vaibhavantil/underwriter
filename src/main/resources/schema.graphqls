@@ -5,6 +5,7 @@ schema {
 
 type Query {
     quote(id: ID): Quote!
+    lastQuoteOfMember: Quote!
 }
 
 type Mutation {
@@ -113,6 +114,10 @@ type CompleteQuote {
     id: ID!
     currentInsurer: String
     price: MonetaryAmountV2!
+    insuranceCost: InsuranceCost!
+    firstName: String
+    lastName: String
+    ssn: String
     details: CompleteQuoteDetails!
 }
 
@@ -279,4 +284,11 @@ type IncompleteHouseQuoteDetails {
     livingSpace: Int
     ancillarySpace: Int
     extraBuildings: [ExtraBuilding!]
+}
+
+type InsuranceCost {
+    monthlyGross: MonetaryAmountV2!,
+    monthlyDiscount: MonetaryAmountV2!,
+    monthlyNet: MonetaryAmountV2!,
+    freeUntil: LocalDate
 }

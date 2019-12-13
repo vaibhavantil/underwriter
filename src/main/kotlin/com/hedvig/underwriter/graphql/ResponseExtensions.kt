@@ -8,7 +8,9 @@ import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
 import com.hedvig.underwriter.extensions.firstName
 import com.hedvig.underwriter.extensions.lastName
+import com.hedvig.underwriter.extensions.ssn
 import com.hedvig.underwriter.extensions.validTo
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.Quote
 import graphql.schema.DataFetchingEnvironment
@@ -16,16 +18,19 @@ import graphql.schema.DataFetchingEnvironment
 fun Quote.getCompleteQuoteResult(
     env: DataFetchingEnvironment,
     localizationService: LocalizationService,
-    textKeysLocaleResolver: TextKeysLocaleResolver
+    textKeysLocaleResolver: TextKeysLocaleResolver,
+    insuranceCost: InsuranceCost
 ) = QuoteResult.CompleteQuote(
     id = id,
     firstName = firstName,
     lastName = lastName,
+    ssn = ssn,
     currentInsurer = currentInsurer,
     price = MonetaryAmountV2(
         price!!.toPlainString(),
         "SEK"
     ),
+    insuranceCost = insuranceCost,
     details = createCompleteQuoteResult(
         localizationService,
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())

@@ -8,10 +8,12 @@ sealed class QuoteResult {
 
     data class CompleteQuote(
         val id: UUID,
-        val firstName: String,
-        val lastName: String,
+        val firstName: String?,
+        val lastName: String?,
+        val ssn: String?,
         val currentInsurer: String?,
         val price: MonetaryAmountV2,
+        val insuranceCost: InsuranceCost,
         val details: CompleteQuoteDetails,
         val expiresAt: Instant
     ) : QuoteResult()
