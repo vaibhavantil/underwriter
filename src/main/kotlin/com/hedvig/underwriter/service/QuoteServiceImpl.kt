@@ -81,7 +81,12 @@ class QuoteServiceImpl(
                 if (updatedQuote.state == QuoteState.QUOTED) {
                     updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                         .bimap(
-                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { errors ->
+                                throw QuoteCompletionFailedException(
+                                    "Unable to complete quote: $errors",
+                                    errors
+                                )
+                            },
                             { quote -> quote }
                         )
                         .orNull()
@@ -90,7 +95,15 @@ class QuoteServiceImpl(
                 }
             }!!.let { updatedQuote -> Either.right(updatedQuote) }
         } catch (e: QuoteCompletionFailedException) {
-            Either.left(
+            e.breachedUnderwritingGuidelines?.let { breachedUnderwritingGuidelines ->
+                Either.left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
+                    )
+                )
+            } ?: Either.left(
                 ErrorResponseDto(
                     ErrorCodes.UNKNOWN_ERROR_CODE,
                     "Unable to complete quote"
@@ -148,10 +161,8 @@ class QuoteServiceImpl(
         return quote?.let((QuoteDto)::fromQuote)
     }
 
-    override fun getLatestQuoteForMemberId(memberId: String): QuoteDto? {
-        val quote = quoteRepository.findLatestOneByMemberId(memberId)
-        return quote?.let((QuoteDto)::fromQuote)
-    }
+    override fun getLatestQuoteForMemberId(memberId: String): Quote? =
+        quoteRepository.findLatestOneByMemberId(memberId)
 
     override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
         quoteRepository.findByMemberId(memberId)

@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.graphql
 
 import com.graphql.spring.boot.test.GraphQLTestTemplate
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -9,6 +11,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import java.math.BigDecimal
 import java.time.LocalDate
+import org.javamoney.moneta.Money
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -35,27 +38,44 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulQuote() {
-        Mockito.`when`(productPricingService.priceFromProductPricingForApartmentQuote(
-            ApartmentQuotePriceDto(
-            birthDate = LocalDate.of(1912, 12, 12),
-                livingSpace = 30,
-                zipCode = "12345",
-                houseHoldSize = 2,
-                houseType = ApartmentProductSubType.BRF,
-                isStudent = false
-        ))).thenReturn(
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForApartmentQuote(
+                ApartmentQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    houseHoldSize = 2,
+                    houseType = ApartmentProductSubType.BRF,
+                    isStudent = false
+                )
+            )
+        ).thenReturn(
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
         )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "SEK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
 
         val response = graphQLTestTemplate.perform("/mutations/createQuote.graphql", null)
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
         assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000000")
-        assert(createQuote["price"]["amount"].textValue() == "1")
-        assert(createQuote["price"]["currency"].textValue() == "SEK")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
         assert(createQuote["details"]["street"].textValue() == "Kungsgatan 1")
         assert(createQuote["details"]["zipCode"].textValue() == "12345")
         assert(createQuote["details"]["livingSpace"].intValue() == 30)

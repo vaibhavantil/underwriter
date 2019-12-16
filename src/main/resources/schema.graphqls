@@ -5,6 +5,7 @@ schema {
 
 type Query {
     quote(id: ID): Quote!
+    lastQuoteOfMember: Quote!
 }
 
 type Mutation {
@@ -112,7 +113,10 @@ union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 type CompleteQuote {
     id: ID!
     currentInsurer: String
-    price: MonetaryAmountV2!
+    insuranceCost: InsuranceCost!
+    firstName: String!
+    lastName: String!
+    ssn: String!
     details: CompleteQuoteDetails!
 }
 
@@ -254,6 +258,9 @@ type CompleteHouseQuoteDetails {
     livingSpace: Int!
     ancillarySpace: Int!
     extraBuildings: [ExtraBuilding!]!
+    numberOfBathrooms: Int!
+    yearOfConstruction: Int!
+    isSubleted: Boolean!
 }
 
 type IncompleteQuote {
@@ -279,4 +286,17 @@ type IncompleteHouseQuoteDetails {
     livingSpace: Int
     ancillarySpace: Int
     extraBuildings: [ExtraBuilding!]
+    numberOfBathrooms: Int
+    yearOfConstruction: Int
+    numberOfBathrooms: Int
+    isSubleted: Boolean
 }
+
+type InsuranceCost {
+    monthlyGross: MonetaryAmountV2!,
+    monthlyDiscount: MonetaryAmountV2!,
+    monthlyNet: MonetaryAmountV2!,
+    freeUntil: LocalDate
+}
+
+scalar LocalDate
