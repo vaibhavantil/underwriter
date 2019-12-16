@@ -74,8 +74,8 @@ internal class GraphQlMutationsTest {
 
         assert(response.isOk)
         assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000000")
-        assert(createQuote["price"]["amount"].textValue() == "1")
-        assert(createQuote["price"]["currency"].textValue() == "SEK")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
         assert(createQuote["details"]["street"].textValue() == "Kungsgatan 1")
         assert(createQuote["details"]["zipCode"].textValue() == "12345")
         assert(createQuote["details"]["livingSpace"].intValue() == 30)
