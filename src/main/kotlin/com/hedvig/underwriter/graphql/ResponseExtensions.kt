@@ -26,10 +26,6 @@ fun Quote.getCompleteQuoteResult(
     lastName = lastName,
     ssn = ssn,
     currentInsurer = currentInsurer,
-    price = MonetaryAmountV2(
-        price!!.toPlainString(),
-        "SEK"
-    ),
     insuranceCost = insuranceCost,
     details = createCompleteQuoteResult(
         localizationService,
