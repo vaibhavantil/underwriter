@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
+import java.time.LocalDate
 import java.util.UUID
 
 data class CreateQuoteInput(
@@ -8,6 +9,7 @@ data class CreateQuoteInput(
     val lastName: String,
     val currentInsurer: String?,
     val ssn: String,
+    val startDate: LocalDate?,
     val apartment: CreateApartmentInput?,
     val house: CreateHouseInput?
 )

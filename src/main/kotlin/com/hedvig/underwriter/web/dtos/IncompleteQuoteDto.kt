@@ -9,6 +9,7 @@ import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -28,7 +29,8 @@ data class IncompleteQuoteDto(
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,
-    val originatingProductId: UUID? = null
+    val originatingProductId: UUID? = null,
+    val startDate: Instant? = null
 )
 
 sealed class IncompleteQuoteRequestData
