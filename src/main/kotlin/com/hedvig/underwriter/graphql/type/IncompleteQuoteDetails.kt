@@ -15,6 +15,9 @@ sealed class IncompleteQuoteDetails {
         val householdSize: Int?,
         val livingSpace: Int?,
         val ancillarySpace: Int?,
-        val extraBuildings: List<ExtraBuilding.ExtraBuildingCore>?
+        val extraBuildings: List<ExtraBuilding.ExtraBuildingCore>?,
+        val numberOfBathrooms: Int?,
+        val yearOfConstruction: Int?,
+        val isSubleted: Boolean?
     ) : IncompleteQuoteDetails()
 }

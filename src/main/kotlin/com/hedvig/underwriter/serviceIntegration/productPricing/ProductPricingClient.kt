@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
@@ -39,6 +41,12 @@ interface ProductPricingClient {
         @Valid @RequestBody req: SignedQuoteRequest,
         @PathVariable memberId: String
     ): ResponseEntity<SignedProductResponseDto>
+
+    @PostMapping("/_/underwriter/{memberId}/calculate/insurance/cost")
+    fun calculateInsuranceCost(
+        @Valid @RequestBody req: CalculateInsuranceCostRequest,
+        @PathVariable memberId: String
+    ): ResponseEntity<InsuranceCost>
 
     @PostMapping("/_/insurance/quotes/createModifiedProduct")
     fun createModifiedProductFromQuote(
