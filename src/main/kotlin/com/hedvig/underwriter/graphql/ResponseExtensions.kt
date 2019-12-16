@@ -26,7 +26,7 @@ fun Quote.getCompleteQuoteResult(
     id = id,
     firstName = firstName,
     lastName = lastName,
-    currentInsurer = currentInsurer?.let { CurrentInsurer.create(it)},
+    currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     ssn = ssn,
     insuranceCost = insuranceCost,
     details = createCompleteQuoteResult(
@@ -45,7 +45,7 @@ fun Quote.getIncompleteQuoteResult(
     id = id,
     firstName = firstName,
     lastName = lastName,
-    currentInsurer = currentInsurer?.let { CurrentInsurer.create(it)},
+    currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     details = createIncompleteQuoteResult(
         localizationService,
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())

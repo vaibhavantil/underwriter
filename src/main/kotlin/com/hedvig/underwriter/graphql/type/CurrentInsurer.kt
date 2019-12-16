@@ -63,6 +63,5 @@ data class CurrentInsurer(
                 else -> throw IllegalArgumentException("Unknown id($id) when creating CurrentInsurer")
             }
         }
-
     }
 }
