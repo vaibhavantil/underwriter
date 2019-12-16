@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.graphql
 
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.createCompleteQuoteResult

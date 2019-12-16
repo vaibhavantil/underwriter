@@ -19,9 +19,20 @@ mutation {
         }
         ... on CompleteQuote {
             id
-            price {
-                amount
-                currency
+            insuranceCost {
+                monthlyGross {
+                    amount
+                    currency
+                }
+                monthlyDiscount {
+                    amount
+                    currency
+                }
+                monthlyNet {
+                    amount
+                    currency
+                }
+                freeUntil
             }
             details {
                 ... on CompleteApartmentQuoteDetails {
