@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 sealed class QuoteResult {
@@ -9,19 +9,21 @@ sealed class QuoteResult {
         val id: UUID,
         val firstName: String,
         val lastName: String,
+        val currentInsurer: CurrentInsurer?,
         val ssn: String,
-        val currentInsurer: String?,
         val insuranceCost: InsuranceCost,
         val details: CompleteQuoteDetails,
-        val expiresAt: Instant
+        val startDate: LocalDate?,
+        val expiresAt: LocalDate
     ) : QuoteResult()
 
     data class IncompleteQuote(
         val id: UUID,
         val firstName: String?,
         val lastName: String?,
-        val currentInsurer: String?,
-        val details: IncompleteQuoteDetails?
+        val currentInsurer: CurrentInsurer?,
+        val details: IncompleteQuoteDetails?,
+        val startDate: LocalDate?
     ) : QuoteResult()
 
     data class UnderwritingLimitsHit(

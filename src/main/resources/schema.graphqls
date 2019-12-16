@@ -20,6 +20,7 @@ input CreateQuoteInput {
     lastName: String!
     currentInsurer: String
     ssn: String!
+    startDate: LocalDate
     apartment: CreateApartmentInput
     house: CreateHouseInput
 }
@@ -50,6 +51,7 @@ input EditQuoteInput {
     lastName: String
     currentInsurer: String
     ssn: String
+    startDate: LocalDate
     apartment: EditApartmentInput
     house: EditHouseInput
 }
@@ -112,12 +114,20 @@ union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 
 type CompleteQuote {
     id: ID!
-    currentInsurer: String
+    currentInsurer: CurrentInsurer
     insuranceCost: InsuranceCost!
     firstName: String!
     lastName: String!
     ssn: String!
     details: CompleteQuoteDetails!
+    startDate: LocalDate!
+    expiresAt: LocalDate!
+}
+
+type CurrentInsurer {
+    id: String
+    displayName: String
+    switchable: Boolean
 }
 
 union ExtraBuilding =
@@ -265,7 +275,8 @@ type CompleteHouseQuoteDetails {
 
 type IncompleteQuote {
     id: ID!
-    currentInsurer: String
+    currentInsurer: CurrentInsurer
+    startDate: LocalDate
     details: IncompleteQuoteDetails
 }
 

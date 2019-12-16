@@ -14,6 +14,7 @@ import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.util.toStockholmInstant
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
@@ -35,7 +36,8 @@ fun CreateQuoteInput.toIncompleteQuoteDto(
     incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
     quotingPartner = quotingPartner,
     memberId = memberId,
-    originatingProductId = originatingProductId
+    originatingProductId = originatingProductId,
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
 )
 
 fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
