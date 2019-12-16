@@ -34,7 +34,6 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import io.sentry.Sentry
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -330,13 +329,11 @@ class QuoteServiceImpl(
         if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
 
             val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
-            if (activeProfiles.isNotEmpty() && customerIOClient == null)
-            {
+            if (activeProfiles.isNotEmpty() && customerIOClient == null) {
                 logger.error("customerIOClient is null even thou $activeProfiles is set")
             }
 
             customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
-
         }
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
