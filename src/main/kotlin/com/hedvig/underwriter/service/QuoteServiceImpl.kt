@@ -34,14 +34,13 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
@@ -50,7 +49,8 @@ class QuoteServiceImpl(
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository,
-    val customerIOClient: CustomerIO?
+    val customerIOClient: CustomerIO?,
+    val env: Environment
 ) : QuoteService {
 
     val logger = getLogger(QuoteServiceImpl::class.java)!!
@@ -338,6 +338,12 @@ class QuoteServiceImpl(
         quoteRepository.update(signedQuote, signedAt)
 
         if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
+
+            val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
+            if (activeProfiles.isNotEmpty() && customerIOClient == null) {
+                logger.error("customerIOClient is null even thou $activeProfiles is set")
+            }
+
             customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
         }
 
