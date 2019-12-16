@@ -161,10 +161,8 @@ class QuoteServiceImpl(
         return quote?.let((QuoteDto)::fromQuote)
     }
 
-    override fun getLatestQuoteForMemberId(memberId: String): QuoteDto? {
-        val quote = quoteRepository.findLatestOneByMemberId(memberId)
-        return quote?.let((QuoteDto)::fromQuote)
-    }
+    override fun getLatestQuoteForMemberId(memberId: String): Quote? =
+        quoteRepository.findLatestOneByMemberId(memberId)
 
     override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
         quoteRepository.findByMemberId(memberId)

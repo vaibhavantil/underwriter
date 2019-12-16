@@ -113,11 +113,10 @@ union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 type CompleteQuote {
     id: ID!
     currentInsurer: String
-    price: MonetaryAmountV2!
     insuranceCost: InsuranceCost!
-    firstName: String
-    lastName: String
-    ssn: String
+    firstName: String!
+    lastName: String!
+    ssn: String!
     details: CompleteQuoteDetails!
 }
 

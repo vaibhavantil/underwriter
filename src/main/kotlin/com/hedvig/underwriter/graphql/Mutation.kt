@@ -73,7 +73,8 @@ class Mutation @Autowired constructor(
                     localizationService,
                     textKeysLocaleResolver,
                     productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, "SEK"), env.getToken()
+                        Money.of(quote.price, "SEK"),
+                        env.getToken()
                     )
                 )
             }

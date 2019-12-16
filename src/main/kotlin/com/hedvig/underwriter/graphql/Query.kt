@@ -30,7 +30,7 @@ class Query @Autowired constructor(
     } ?: throw IllegalStateException("No quote found!")
 
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
-        quoteRepository.findLatestOneByMemberId(env.getToken())?.let { quote ->
+        quoteService.getLatestQuoteForMemberId(env.getToken())?.let { quote ->
             quote.toResult(env)
         } ?: throw IllegalStateException("No quote found!")
 
