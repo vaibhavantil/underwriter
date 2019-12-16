@@ -27,12 +27,12 @@ class Query @Autowired constructor(
     // we can but should never return QuoteResult.UnderwritingLimitsHit
     fun quote(id: UUID, env: DataFetchingEnvironment) = quoteService.getQuote(id)?.let { quote ->
         quote.toResult(env)
-    } ?: throw IllegalStateException("No quote found!")
+    } ?: throw IllegalStateException("No quote with id '$id' was found!")
 
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
         quoteService.getLatestQuoteForMemberId(env.getToken())?.let { quote ->
             quote.toResult(env)
-        } ?: throw IllegalStateException("No quote found!")
+        } ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = when {
         isComplete -> {
