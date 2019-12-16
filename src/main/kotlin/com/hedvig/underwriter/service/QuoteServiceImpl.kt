@@ -22,7 +22,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProdu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
-import com.hedvig.underwriter.util.toLocalDate
+import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -146,7 +146,7 @@ class QuoteServiceImpl(
             breachedUnderwritingGuidelines = null,
             originatingProductId = incompleteQuoteDto.originatingProductId,
             currentInsurer = incompleteQuoteDto.currentInsurer,
-            startDate = incompleteQuoteDto.startDate?.toLocalDate()
+            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate()
         )
 
         quoteRepository.insert(quote.update(incompleteQuoteDto), now)

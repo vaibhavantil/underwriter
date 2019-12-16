@@ -5,7 +5,7 @@ import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.util.toLocalDate
+import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
@@ -119,7 +119,7 @@ data class Quote(
     fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
         var newQuote = copy(
             productType = incompleteQuoteDto.productType ?: productType,
-            startDate = incompleteQuoteDto.startDate?.toLocalDate() ?: startDate,
+            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
                 is ApartmentData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
