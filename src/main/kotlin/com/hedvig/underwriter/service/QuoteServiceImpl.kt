@@ -35,8 +35,6 @@ import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
 import io.sentry.Sentry
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -298,7 +296,8 @@ class QuoteServiceImpl(
 
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
-                memberService.finalizeOnboarding(quote, it) }
+                memberService.finalizeOnboarding(quote, it)
+            }
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
@@ -329,15 +328,15 @@ class QuoteServiceImpl(
         quoteRepository.update(signedQuote, signedAt)
 
         if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
-            try {
-            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
-            } catch (exception: Exception) {
-                if (env.activeProfiles.any { env -> env.contentEquals("staging") ||
-                        env.contentEquals("production") }
-                ) {
-                    Sentry.capture(exception)
-                }
+
+            val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
+            if (activeProfiles.isNotEmpty() && customerIOClient == null)
+            {
+                logger.error("customerIOClient is null even thou $activeProfiles is set")
             }
+
+            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
+
         }
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
