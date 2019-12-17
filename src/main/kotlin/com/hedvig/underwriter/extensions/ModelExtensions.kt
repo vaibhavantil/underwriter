@@ -83,7 +83,8 @@ fun EditQuoteInput.toIncompleteQuoteDto(
     incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
     quotingPartner = quotingPartner,
     memberId = memberId,
-    originatingProductId = originatingProductId
+    originatingProductId = originatingProductId,
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
 )
 
 fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
