@@ -121,7 +121,7 @@ type CompleteQuote {
     lastName: String!
     ssn: String!
     details: CompleteQuoteDetails!
-    startDate: LocalDate!
+    startDate: LocalDate
     expiresAt: LocalDate!
 }
 
