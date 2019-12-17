@@ -44,4 +44,7 @@ interface QuoteService {
     fun removeCurrentInsurerFromQuote(
         id: UUID
     ): Either<ErrorResponseDto, Quote>
+    fun removeStartDateFromQuote(
+        id: UUID
+    ): Either<ErrorResponseDto, Quote>
 }

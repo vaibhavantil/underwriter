@@ -12,6 +12,7 @@ type Mutation {
     createQuote(input: CreateQuoteInput!): CreateQuoteResult!
     editQuote(input: EditQuoteInput!): CreateQuoteResult!
     removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
+    removeStartDate(input : RemoveStartDateInput!): CreateQuoteResult!
 }
 
 input CreateQuoteInput {
@@ -107,6 +108,10 @@ enum ApartmentType {
 }
 
 input RemoveCurrentInsurerInput {
+    id: ID!
+}
+
+input RemoveStartDateInput {
     id: ID!
 }
 
