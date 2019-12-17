@@ -7,6 +7,7 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -24,7 +25,8 @@ data class HouseOrApartmentIncompleteQuoteDto(
         JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
     ) var incompleteQuoteData: com.hedvig.underwriter.web.dtos.IncompleteQuoteRequestData?,
     val memberId: String?,
-    val originatingProductId: UUID?
+    val originatingProductId: UUID?,
+    val startDate: Instant?
 ) {
     companion object {
         fun from(incompleteQuoteDto: IncompleteQuoteDto): HouseOrApartmentIncompleteQuoteDto {
@@ -46,7 +48,8 @@ data class HouseOrApartmentIncompleteQuoteDto(
                 },
                 productType = incompleteQuoteDto.productType,
                 memberId = incompleteQuoteDto.memberId,
-                originatingProductId = incompleteQuoteDto.originatingProductId
+                originatingProductId = incompleteQuoteDto.originatingProductId,
+                startDate = incompleteQuoteDto.startDate
             )
         }
     }

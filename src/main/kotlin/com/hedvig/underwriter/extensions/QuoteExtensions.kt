@@ -56,7 +56,10 @@ fun Quote.createCompleteQuoteResult(
             ancillarySpace = house.ancillaryArea!!,
             extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
                 extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
-            }
+            },
+            numberOfBathrooms = house.numberOfBathrooms!!,
+            yearOfConstruction = house.yearOfConstruction!!,
+            isSubleted = house.isSubleted!!
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
 
@@ -81,7 +84,10 @@ fun Quote.createIncompleteQuoteResult(
             ancillarySpace = house.ancillaryArea,
             extraBuildings = house.extraBuildings?.map { extraBuildingInput ->
                 extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
-            }
+            },
+            numberOfBathrooms = house.numberOfBathrooms,
+            yearOfConstruction = house.yearOfConstruction,
+            isSubleted = house.isSubleted
         )
     }
 

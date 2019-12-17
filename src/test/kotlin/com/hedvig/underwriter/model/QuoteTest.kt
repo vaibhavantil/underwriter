@@ -40,7 +40,8 @@ class QuoteTest {
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,
-                memberId = null
+                memberId = null,
+                startDate = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
@@ -86,7 +87,8 @@ class QuoteTest {
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,
-                memberId = null
+                memberId = null,
+                startDate = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
@@ -131,7 +133,8 @@ class QuoteTest {
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,
-                memberId = null
+                memberId = null,
+                startDate = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)

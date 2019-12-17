@@ -6,6 +6,7 @@ import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import java.math.BigDecimal
@@ -117,7 +118,9 @@ data class Quote(
 
     fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
         var newQuote = copy(
+//<<<<<<< HEAD
             productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
+            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
                 is ApartmentData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
@@ -126,7 +129,17 @@ data class Quote(
                     subType = when (houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
                         is IncompleteApartmentQuoteDataDto -> data.subType
                         else -> null
-                        }
+                    }
+//=======
+//            productType = incompleteQuoteDto.productType ?: productType,
+//            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
+//            data = when (data) {
+//                is ApartmentData -> data.copy(
+//                    ssn = incompleteQuoteDto.ssn ?: data.ssn,
+//                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
+//                    lastName = incompleteQuoteDto.lastName ?: data.lastName,
+//                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
+//>>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
                     )
                 is HouseData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,

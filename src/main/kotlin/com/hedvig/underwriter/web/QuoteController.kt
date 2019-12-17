@@ -111,8 +111,8 @@ class QuoteController @Autowired constructor(
 
     @GetMapping("/members/{memberId}/latestQuote")
     fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
-        val quoteDto = quoteService.getLatestQuoteForMemberId(memberId) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(quoteDto)
+        val quote = quoteService.getLatestQuoteForMemberId(memberId) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(QuoteDto.fromQuote(quote))
     }
 
     @GetMapping("/members/{memberId}")

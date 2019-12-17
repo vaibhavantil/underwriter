@@ -15,6 +15,7 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
 import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.util.toStockholmInstant
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import java.util.UUID
@@ -33,7 +34,8 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
     quotingPartner = quotingPartner,
     memberId = memberId,
-    originatingProductId = originatingProductId
+    originatingProductId = originatingProductId,
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
 )
 
 fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
@@ -70,10 +72,21 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     birthDate = this.ssn?.birthDateFromSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
+//<<<<<<< HEAD
     incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
+//=======
+//    incompleteQuoteData = when {
+//        this.apartment != null -> this.apartment.toIncompleteApartmentQuoteDataDto()
+//        this.house != null -> this.house.toIncompleteHouseQuoteDataDto()
+//        else -> null
+//    },
+//    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
+//    incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
+//>>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
     quotingPartner = quotingPartner,
     memberId = memberId,
-    originatingProductId = originatingProductId
+    originatingProductId = originatingProductId,
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
 )
 
 fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
@@ -132,12 +145,12 @@ fun CreateQuoteInput.getProductType(): ProductType =
         ProductType.HOUSE
     } ?: ProductType.UNKNOWN
 
-fun EditQuoteInput.getProductType(): ProductType =
+fun EditQuoteInput.getProductType(): ProductType? =
     this.apartment?.let {
         ProductType.APARTMENT
     } ?: this.house?.let {
         ProductType.HOUSE
-    } ?: ProductType.UNKNOWN
+    } ?: null
 
 fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.STUDENT_RENT -> ApartmentProductSubType.STUDENT_RENT

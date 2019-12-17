@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
@@ -8,6 +10,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import java.lang.RuntimeException
+import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -39,4 +42,7 @@ class ProductPricingServiceImpl @Autowired constructor(
 
     override fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto) =
         this.productPricingClient.redeemCampaign(redeemCampaignDto)
+
+    override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
+        productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
 }

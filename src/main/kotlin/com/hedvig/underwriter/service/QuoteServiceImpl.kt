@@ -23,6 +23,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProdu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -32,9 +33,6 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import io.sentry.Sentry
-import java.lang.IllegalStateException
-import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -82,7 +80,12 @@ class QuoteServiceImpl(
                 if (updatedQuote.state == QuoteState.QUOTED) {
                     updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                         .bimap(
-                            { errors -> throw QuoteCompletionFailedException("Unable to complete quote: $errors") },
+                            { errors ->
+                                throw QuoteCompletionFailedException(
+                                    "Unable to complete quote: $errors",
+                                    errors
+                                )
+                            },
                             { quote -> quote }
                         )
                         .orNull()
@@ -91,7 +94,15 @@ class QuoteServiceImpl(
                 }
             }!!.let { updatedQuote -> Either.right(updatedQuote) }
         } catch (e: QuoteCompletionFailedException) {
-            Either.left(
+            e.breachedUnderwritingGuidelines?.let { breachedUnderwritingGuidelines ->
+                Either.left(
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
+                    )
+                )
+            } ?: Either.left(
                 ErrorResponseDto(
                     ErrorCodes.UNKNOWN_ERROR_CODE,
                     "Unable to complete quote"
@@ -129,8 +140,15 @@ class QuoteServiceImpl(
             state = QuoteState.INCOMPLETE,
             memberId = houseOrApartmentIncompleteQuoteDto.memberId,
             breachedUnderwritingGuidelines = null,
+//<<<<<<< HEAD
             originatingProductId = houseOrApartmentIncompleteQuoteDto.originatingProductId,
-            currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer
+            currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer,
+            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate()
+////=======
+//            originatingProductId = incompleteQuoteDto.originatingProductId,
+//            currentInsurer = incompleteQuoteDto.currentInsurer,
+//            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate()
+//>>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
         )
 
         quoteRepository.insert(quote.update(houseOrApartmentIncompleteQuoteDto), now)
@@ -147,10 +165,8 @@ class QuoteServiceImpl(
         return quote?.let((QuoteDto)::fromQuote)
     }
 
-    override fun getLatestQuoteForMemberId(memberId: String): QuoteDto? {
-        val quote = quoteRepository.findLatestOneByMemberId(memberId)
-        return quote?.let((QuoteDto)::fromQuote)
-    }
+    override fun getLatestQuoteForMemberId(memberId: String): Quote? =
+        quoteRepository.findLatestOneByMemberId(memberId)
 
     override fun getQuotesForMemberId(memberId: String): List<QuoteDto> =
         quoteRepository.findByMemberId(memberId)
@@ -294,7 +310,8 @@ class QuoteServiceImpl(
 
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
-                memberService.finalizeOnboarding(quote, it) }
+                memberService.finalizeOnboarding(quote, it)
+            }
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
@@ -325,15 +342,13 @@ class QuoteServiceImpl(
         quoteRepository.update(signedQuote, signedAt)
 
         if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
-            try {
-            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
-            } catch (exception: Exception) {
-                if (env.activeProfiles.any { env -> env.contentEquals("staging") ||
-                        env.contentEquals("production") }
-                ) {
-                    Sentry.capture(exception)
-                }
+
+            val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
+            if (activeProfiles.isNotEmpty() && customerIOClient == null) {
+                logger.error("customerIOClient is null even thou $activeProfiles is set")
             }
+
+            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
         }
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
