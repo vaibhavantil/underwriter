@@ -142,12 +142,12 @@ fun CreateQuoteInput.getProductType(): ProductType =
         ProductType.HOUSE
     } ?: ProductType.UNKNOWN
 
-fun EditQuoteInput.getProductType(): ProductType =
+fun EditQuoteInput.getProductType(): ProductType? =
     this.apartment?.let {
         ProductType.APARTMENT
     } ?: this.house?.let {
         ProductType.HOUSE
-    } ?: ProductType.UNKNOWN
+    } ?: null
 
 fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.STUDENT_RENT -> ApartmentProductSubType.STUDENT_RENT

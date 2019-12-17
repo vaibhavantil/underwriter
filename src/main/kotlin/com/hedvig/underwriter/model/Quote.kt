@@ -125,10 +125,7 @@ data class Quote(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
                     firstName = incompleteQuoteDto.firstName ?: data.firstName,
                     lastName = incompleteQuoteDto.lastName ?: data.lastName,
-                    subType = when (incompleteQuoteDto.incompleteQuoteData) {
-                        is IncompleteApartmentQuoteDataDto -> data.subType
-                        else -> null
-                        }
+                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
                     )
                 is HouseData -> data.copy(
                     ssn = incompleteQuoteDto.ssn ?: data.ssn,
