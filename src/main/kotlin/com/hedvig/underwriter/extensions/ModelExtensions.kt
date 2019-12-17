@@ -72,7 +72,11 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     birthDate = this.ssn?.birthDateFromSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
-    incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
+    incompleteQuoteData = when {
+        this.apartment != null -> this.apartment.toIncompleteApartmentQuoteDataDto()
+        this.house != null -> this.house.toIncompleteHouseQuoteDataDto()
+        else -> null
+    },
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
