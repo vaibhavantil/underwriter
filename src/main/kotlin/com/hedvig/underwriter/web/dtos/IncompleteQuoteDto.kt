@@ -24,7 +24,7 @@ data class IncompleteQuoteDto(
     @field:JsonSubTypes(
         JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
         JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
-    ) var incompleteQuoteData: IncompleteQuoteRequestData?,
+    ) val incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,
@@ -46,22 +46,7 @@ data class IncompleteHouseQuoteDataDto(
     @field:JsonProperty("subleted")
     val isSubleted: Boolean?,
     val floor: Int? = 0
-) : IncompleteQuoteRequestData() {
-    companion object {
-        fun fromHouseData(house: HouseData) = IncompleteHouseQuoteDataDto(
-            street = house.street,
-            zipCode = house.zipCode,
-            city = house.city,
-            livingSpace = house.livingSpace,
-            householdSize = house.householdSize,
-            ancillaryArea = house.ancillaryArea,
-            yearOfConstruction = house.yearOfConstruction,
-            numberOfBathrooms = house.numberOfBathrooms,
-            extraBuildings = house.extraBuildings?.map { ExtraBuildingRequestDto(null, it.type, it.area, it.hasWaterConnected) },
-            isSubleted = house.isSubleted
-        )
-    }
-}
+) : IncompleteQuoteRequestData()
 
 data class IncompleteApartmentQuoteDataDto(
     val street: String?,
@@ -71,16 +56,4 @@ data class IncompleteApartmentQuoteDataDto(
     val householdSize: Int?,
     val floor: Int?,
     val subType: ApartmentProductSubType?
-) : IncompleteQuoteRequestData() {
-    companion object {
-        fun fromApartmentData(apartment: ApartmentData) = IncompleteApartmentQuoteDataDto(
-            street = apartment.street,
-            zipCode = apartment.zipCode,
-            city = apartment.city,
-            livingSpace = apartment.livingSpace,
-            householdSize = apartment.householdSize,
-            floor = null,
-            subType = apartment.subType
-        )
-    }
-}
+) : IncompleteQuoteRequestData()
