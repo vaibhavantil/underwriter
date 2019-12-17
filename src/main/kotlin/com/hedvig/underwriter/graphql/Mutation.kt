@@ -11,6 +11,7 @@ import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
+import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -90,6 +91,12 @@ class Mutation @Autowired constructor(
     fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment) =
         responseForEditedQuote(
             quoteService.removeCurrentInsurerFromQuote(input.id),
+            env
+        )
+
+    fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment) =
+        responseForEditedQuote(
+            quoteService.removeStartDateFromQuote(input.id),
             env
         )
 

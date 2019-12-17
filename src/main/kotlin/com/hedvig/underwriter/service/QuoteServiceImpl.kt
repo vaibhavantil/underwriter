@@ -119,6 +119,14 @@ class QuoteServiceImpl(
         return Either.right(updatedQuote!!)
     }
 
+    override fun removeStartDateFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
+        val updatedQuote = quoteRepository.modify(id) { quoteToUpdate ->
+            quoteToUpdate!!.copy(startDate = null)
+        }
+
+        return Either.right(updatedQuote!!)
+    }
+
     override fun createQuote(
         houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
         id: UUID?,
