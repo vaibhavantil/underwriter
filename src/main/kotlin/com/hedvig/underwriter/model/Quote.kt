@@ -2,13 +2,13 @@ package com.hedvig.underwriter.model
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -116,31 +116,35 @@ data class Quote(
         }
     }
 
-    fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
+    fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
         var newQuote = copy(
-            productType = incompleteQuoteDto.productType ?: productType,
-            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
+            productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
+            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
                 is ApartmentData -> data.copy(
-                    ssn = incompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = incompleteQuoteDto.lastName ?: data.lastName,
-                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
-                    )
+                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
+                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
+                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
+                    subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
+                        is IncompleteApartmentQuoteDataDto -> quoteData.subType ?: data.subType
+                        else -> null
+                    }
+                )
                 is HouseData -> data.copy(
-                    ssn = incompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = incompleteQuoteDto.lastName ?: data.lastName
+                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
+                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
+                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName
                 )
             } as QuoteData
         )
+
+        val requestData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData
         if (
-            incompleteQuoteDto.incompleteQuoteData is IncompleteApartmentQuoteDataDto
+            requestData is IncompleteApartmentQuoteDataDto
         ) {
-            val apartmentRequest = incompleteQuoteDto.incompleteQuoteData
-            val newQuoteData: ApartmentData = when {
-                newQuote.data is ApartmentData -> newQuote.data as ApartmentData
-                newQuote.data is HouseData -> {
+            val newQuoteData: ApartmentData = when (newQuote.data) {
+                is ApartmentData -> newQuote.data as ApartmentData
+                is HouseData -> {
                     val houseData = newQuote.data as HouseData
                     ApartmentData(
                         id = houseData.id,
@@ -154,27 +158,24 @@ data class Quote(
                         livingSpace = houseData.livingSpace
                     )
                 }
-                else -> ApartmentData(id = UUID.randomUUID())
             }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
-                    street = apartmentRequest.street ?: newQuoteData.street,
-                    zipCode = apartmentRequest.zipCode ?: newQuoteData.zipCode,
-                    city = apartmentRequest.city ?: newQuoteData.city,
-                    householdSize = apartmentRequest.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = apartmentRequest.livingSpace ?: newQuoteData.livingSpace,
-                    subType = apartmentRequest.subType ?: newQuoteData.subType
+                    street = requestData.street ?: newQuoteData.street,
+                    zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                    city = requestData.city ?: newQuoteData.city,
+                    householdSize = requestData.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                    subType = requestData.subType ?: newQuoteData.subType
                 )
             )
         }
-
         if (
-            incompleteQuoteDto.incompleteQuoteData is IncompleteHouseQuoteDataDto
+            requestData is IncompleteHouseQuoteDataDto
         ) {
-            val houseRequest = incompleteQuoteDto.incompleteQuoteData
-            val newQuoteData: HouseData = when {
-                newQuote.data is HouseData -> newQuote.data as HouseData
-                newQuote.data is ApartmentData -> {
+            val newQuoteData: HouseData = when (newQuote.data) {
+                is HouseData -> newQuote.data as HouseData
+                is ApartmentData -> {
                     val apartmentData = newQuote.data as ApartmentData
                     HouseData(
                         id = apartmentData.id,
@@ -188,23 +189,22 @@ data class Quote(
                         livingSpace = apartmentData.livingSpace
                     )
                 }
-                else -> HouseData(id = UUID.randomUUID())
             }
-                newQuote = newQuote.copy(
-                    data = newQuoteData.copy(
-                    street = houseRequest.street ?: newQuoteData.street,
-                    zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
-                    city = houseRequest.city ?: newQuoteData.city,
-                    householdSize = houseRequest.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = houseRequest.livingSpace ?: newQuoteData.livingSpace,
-                    numberOfBathrooms = houseRequest.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
-                    isSubleted = houseRequest.isSubleted ?: newQuoteData.isSubleted,
-                    extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from)
+            newQuote = newQuote.copy(
+                data = newQuoteData.copy(
+                    street = requestData.street ?: newQuoteData.street,
+                    zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                    city = requestData.city ?: newQuoteData.city,
+                    householdSize = requestData.householdSize ?: newQuoteData.householdSize,
+                    livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                    numberOfBathrooms = requestData.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
+                    isSubleted = requestData.isSubleted ?: newQuoteData.isSubleted,
+                    extraBuildings = requestData.extraBuildings?.map((ExtraBuilding)::from)
                         ?: newQuoteData.extraBuildings,
-                    ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
-                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction
-                    )
+                    ancillaryArea = requestData.ancillaryArea ?: newQuoteData.ancillaryArea,
+                    yearOfConstruction = requestData.yearOfConstruction ?: newQuoteData.yearOfConstruction
                 )
+            )
         }
         return newQuote
     }

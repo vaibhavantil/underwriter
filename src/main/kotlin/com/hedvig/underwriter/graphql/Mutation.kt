@@ -6,7 +6,7 @@ import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.toIncompleteQuoteDto
+import com.hedvig.underwriter.extensions.toHouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
@@ -47,7 +47,7 @@ class Mutation @Autowired constructor(
         val input = createQuoteInput.copy(ssn = ssn)
 
         val incompleteQuote = quoteService.createQuote(
-            input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()),
+            input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
             initiatedFrom = when {
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID
@@ -83,7 +83,7 @@ class Mutation @Autowired constructor(
 
     fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): QuoteResult =
         responseForEditedQuote(
-            quoteService.updateQuote(input.toIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id),
+            quoteService.updateQuote(input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id),
             env
         )
 

@@ -13,27 +13,25 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.util.toStockholmInstant
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.util.UUID
 
-fun CreateQuoteInput.toIncompleteQuoteDto(
+fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner: Partner? = null,
     memberId: String? = null,
     originatingProductId: UUID? = null
-) = IncompleteQuoteDto(
+) = HouseOrApartmentIncompleteQuoteDto(
     firstName = this.firstName,
     lastName = this.lastName,
     currentInsurer = this.currentInsurer,
     birthDate = this.ssn.birthDateFromSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
-    incompleteQuoteData = if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto(),
-    incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
-    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
+    incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
@@ -63,11 +61,11 @@ fun CreateHouseInput.toIncompleteHouseQuoteDataDto() = IncompleteHouseQuoteDataD
     city = null
 )
 
-fun EditQuoteInput.toIncompleteQuoteDto(
+fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner: Partner? = null,
     memberId: String? = null,
     originatingProductId: UUID? = null
-) = IncompleteQuoteDto(
+) = HouseOrApartmentIncompleteQuoteDto(
     firstName = this.firstName,
     lastName = this.lastName,
     currentInsurer = this.currentInsurer,
@@ -79,8 +77,6 @@ fun EditQuoteInput.toIncompleteQuoteDto(
         this.house != null -> this.house.toIncompleteHouseQuoteDataDto()
         else -> null
     },
-    incompleteApartmentQuoteData = this.apartment?.toIncompleteApartmentQuoteDataDto(),
-    incompleteHouseQuoteData = this.house?.toIncompleteHouseQuoteDataDto(),
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
