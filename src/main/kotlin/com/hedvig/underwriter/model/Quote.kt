@@ -126,6 +126,7 @@ data class Quote(
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
                     subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
+                        null -> data.subType
                         is IncompleteApartmentQuoteDataDto -> quoteData.subType ?: data.subType
                         else -> null
                     }

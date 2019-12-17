@@ -144,7 +144,7 @@ fun EditQuoteInput.getProductType(): ProductType? =
         ProductType.APARTMENT
     } ?: this.house?.let {
         ProductType.HOUSE
-    } ?: null
+    }
 
 fun ApartmentType.toSubType(): ApartmentProductSubType = when (this) {
     ApartmentType.STUDENT_RENT -> ApartmentProductSubType.STUDENT_RENT
