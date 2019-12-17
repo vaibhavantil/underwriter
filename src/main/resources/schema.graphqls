@@ -237,7 +237,7 @@ type MonetaryAmountV2 {
 
 union Quote = CompleteQuote | IncompleteQuote
 
-union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
+union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
 
 type CompleteApartmentQuoteDetails {
     street: String!
@@ -262,7 +262,7 @@ type IncompleteQuote {
     details: IncompleteQuoteDetails
 }
 
-union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
+union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails
 
 type IncompleteApartmentQuoteDetails {
     street: String

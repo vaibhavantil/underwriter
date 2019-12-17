@@ -2,12 +2,12 @@ package com.hedvig.underwriter.model
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -115,7 +115,7 @@ data class Quote(
         }
     }
 
-    fun update(incompleteQuoteDto: IncompleteQuoteDto): Quote {
+    fun update(incompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
         var newQuote = copy(
             productType = incompleteQuoteDto.productType ?: productType,
             data = when (data) {
@@ -157,16 +157,18 @@ data class Quote(
                 }
                 else -> ApartmentData(id = UUID.randomUUID())
             }
-            newQuote = newQuote.copy(
-                data = newQuoteData.copy(
-                    street = apartmentRequest.street ?: newQuoteData.street,
-                    zipCode = apartmentRequest.zipCode ?: newQuoteData.zipCode,
-                    city = apartmentRequest.city ?: newQuoteData.city,
-                    householdSize = apartmentRequest.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = apartmentRequest.livingSpace ?: newQuoteData.livingSpace,
-                    subType = apartmentRequest.subType ?: newQuoteData.subType
+            if (apartmentRequest is IncompleteApartmentQuoteDataDto) {
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = apartmentRequest.street ?: newQuoteData.street,
+                        zipCode = apartmentRequest.zipCode ?: newQuoteData.zipCode,
+                        city = apartmentRequest.city ?: newQuoteData.city,
+                        householdSize = apartmentRequest.householdSize ?: newQuoteData.householdSize,
+                        livingSpace = apartmentRequest.livingSpace ?: newQuoteData.livingSpace,
+                        subType = apartmentRequest.subType ?: newQuoteData.subType
+                    )
                 )
-            )
+            }
         }
 
         if (
@@ -191,21 +193,23 @@ data class Quote(
                 }
                 else -> HouseData(id = UUID.randomUUID())
             }
+            if (houseRequest is IncompleteHouseQuoteDataDto) {
                 newQuote = newQuote.copy(
                     data = newQuoteData.copy(
-                    street = houseRequest.street ?: newQuoteData.street,
-                    zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
-                    city = houseRequest.city ?: newQuoteData.city,
-                    householdSize = houseRequest.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = houseRequest.livingSpace ?: newQuoteData.livingSpace,
-                    numberOfBathrooms = houseRequest.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
-                    isSubleted = houseRequest.isSubleted ?: newQuoteData.isSubleted,
-                    extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from)
-                        ?: newQuoteData.extraBuildings,
-                    ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
-                    yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction
+                        street = houseRequest.street ?: newQuoteData.street,
+                        zipCode = houseRequest.zipCode ?: newQuoteData.zipCode,
+                        city = houseRequest.city ?: newQuoteData.city,
+                        householdSize = houseRequest.householdSize ?: newQuoteData.householdSize,
+                        livingSpace = houseRequest.livingSpace ?: newQuoteData.livingSpace,
+                        numberOfBathrooms = houseRequest.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
+                        isSubleted = houseRequest.isSubleted ?: newQuoteData.isSubleted,
+                        extraBuildings = houseRequest.extraBuildings?.map((ExtraBuilding)::from)
+                            ?: newQuoteData.extraBuildings,
+                        ancillaryArea = houseRequest.ancillaryArea ?: newQuoteData.ancillaryArea,
+                        yearOfConstruction = houseRequest.yearOfConstruction ?: newQuoteData.yearOfConstruction
                     )
                 )
+            }
         }
         return newQuote
     }

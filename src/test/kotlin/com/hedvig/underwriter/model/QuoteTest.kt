@@ -2,11 +2,11 @@ package com.hedvig.underwriter.model
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import io.mockk.every
 import io.mockk.mockk
 import java.math.BigDecimal
@@ -30,15 +30,13 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            IncompleteQuoteDto(
+            HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
                 productType = null,
                 ssn = "201212121212",
                 currentInsurer = null,
                 incompleteQuoteData = null,
-                incompleteApartmentQuoteData = null,
-                incompleteHouseQuoteData = null,
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,
@@ -67,14 +65,12 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            IncompleteQuoteDto(
+            HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteApartmentQuoteData = null,
-                incompleteHouseQuoteData = null,
                 incompleteQuoteData = IncompleteHouseQuoteDataDto(
                     street = "Storgatan 2",
                     zipCode = null,
@@ -117,7 +113,7 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            IncompleteQuoteDto(
+            HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
                 productType = ProductType.APARTMENT,
@@ -132,8 +128,6 @@ class QuoteTest {
                     subType = ApartmentProductSubType.BRF,
                     floor = null
                 ),
-                incompleteApartmentQuoteData = null,
-                incompleteHouseQuoteData = null,
                 originatingProductId = null,
                 quotingPartner = null,
                 birthDate = null,

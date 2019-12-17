@@ -24,7 +24,7 @@ data class IncompleteQuoteDto(
     @field:JsonSubTypes(
         JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
         JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
-    ) val incompleteQuoteData: IncompleteQuoteRequestData?,
+    ) var incompleteQuoteData: IncompleteQuoteRequestData?,
     val incompleteHouseQuoteData: IncompleteHouseQuoteDataDto?,
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,

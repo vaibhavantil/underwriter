@@ -3,6 +3,7 @@ package com.hedvig.underwriter.web
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
@@ -35,7 +36,9 @@ class QuoteController @Autowired constructor(
 ) {
     @PostMapping
     fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteResponseDto> {
-        val quote = quoteService.createQuote(incompleteQuoteDto)
+        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
+
+        val quote = quoteService.createQuote(houseOrApartmentIncompleteQuoteDto)
         return ResponseEntity.ok(quote)
     }
 
@@ -52,6 +55,7 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
+
         return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
@@ -74,7 +78,9 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-        return when (val quoteOrError = quoteService.updateQuote(incompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
+        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
+
+        return when (val quoteOrError = quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(QuoteDto.fromQuote(quoteOrError.b))
         }

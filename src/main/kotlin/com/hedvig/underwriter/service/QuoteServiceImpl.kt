@@ -12,6 +12,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
@@ -25,9 +26,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuote
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
@@ -59,7 +57,7 @@ class QuoteServiceImpl(
     val logger = getLogger(QuoteServiceImpl::class.java)!!
 
     override fun updateQuote(
-        incompleteQuoteDto: IncompleteQuoteDto,
+        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
         id: UUID,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, Quote> {
@@ -80,7 +78,7 @@ class QuoteServiceImpl(
 
         return try {
             quoteRepository.modify(quote.id) { quoteToUpdate ->
-                val updatedQuote = quoteToUpdate!!.update(incompleteQuoteDto)
+                val updatedQuote = quoteToUpdate!!.update(houseOrApartmentIncompleteQuoteDto)
                 if (updatedQuote.state == QuoteState.QUOTED) {
                     updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                         .bimap(
@@ -111,7 +109,7 @@ class QuoteServiceImpl(
     }
 
     override fun createQuote(
-        incompleteQuoteDto: IncompleteQuoteDto,
+        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
         id: UUID?,
         initiatedFrom: QuoteInitiatedFrom
     ): IncompleteQuoteResponseDto {
@@ -120,24 +118,22 @@ class QuoteServiceImpl(
         val quote = Quote(
             id = id ?: UUID.randomUUID(),
             createdAt = now,
-            productType = incompleteQuoteDto.productType!!,
+            productType = houseOrApartmentIncompleteQuoteDto.productType!!,
             initiatedFrom = initiatedFrom,
-            attributedTo = incompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
+            attributedTo = houseOrApartmentIncompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
             data = when {
-                incompleteQuoteDto.incompleteApartmentQuoteData is IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
-                incompleteQuoteDto.incompleteHouseQuoteData is IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
-                incompleteQuoteDto.incompleteQuoteData is IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
-                incompleteQuoteDto.incompleteQuoteData is IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
+                houseOrApartmentIncompleteQuoteDto.incompleteQuoteData is com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
+                houseOrApartmentIncompleteQuoteDto.incompleteQuoteData is com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
                 else -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
-            memberId = incompleteQuoteDto.memberId,
+            memberId = houseOrApartmentIncompleteQuoteDto.memberId,
             breachedUnderwritingGuidelines = null,
-            originatingProductId = incompleteQuoteDto.originatingProductId,
-            currentInsurer = incompleteQuoteDto.currentInsurer
+            originatingProductId = houseOrApartmentIncompleteQuoteDto.originatingProductId,
+            currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer
         )
 
-        quoteRepository.insert(quote.update(incompleteQuoteDto), now)
+        quoteRepository.insert(quote.update(houseOrApartmentIncompleteQuoteDto), now)
 
         return IncompleteQuoteResponseDto(quote.id, quote.productType, quote.initiatedFrom)
     }
