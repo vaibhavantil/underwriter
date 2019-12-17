@@ -115,6 +115,7 @@ union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 type CompleteQuote {
     id: ID!
     currentInsurer: CurrentInsurer
+    price: MonetaryAmountV2! @depricated(reason: "Use insuranceCost")
     insuranceCost: InsuranceCost!
     firstName: String!
     lastName: String!
