@@ -23,17 +23,13 @@ data class HouseOrApartmentIncompleteQuoteDto(
         JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
         JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
     ) var incompleteQuoteData: com.hedvig.underwriter.web.dtos.IncompleteQuoteRequestData?,
-    val memberId: String? = null,
-    val originatingProductId: UUID? = null
+    val memberId: String?,
+    val originatingProductId: UUID?
 ) {
     companion object {
         fun from(incompleteQuoteDto: IncompleteQuoteDto): HouseOrApartmentIncompleteQuoteDto {
             if (incompleteQuoteDto.incompleteQuoteData == null && incompleteQuoteDto.incompleteHouseQuoteData == null && incompleteQuoteDto.incompleteApartmentQuoteData == null) {
                 throw RuntimeException("Cannot create House or Apartment quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData are all null")
-            }
-
-            if (incompleteQuoteDto.incompleteApartmentQuoteData != null && incompleteQuoteDto.incompleteHouseQuoteData != null) {
-                throw java.lang.RuntimeException("Cannot create House or Apartment quote data as both Apartment and House quote data are present")
             }
 
             return HouseOrApartmentIncompleteQuoteDto(
