@@ -140,15 +140,15 @@ class QuoteServiceImpl(
             state = QuoteState.INCOMPLETE,
             memberId = houseOrApartmentIncompleteQuoteDto.memberId,
             breachedUnderwritingGuidelines = null,
-//<<<<<<< HEAD
+// <<<<<<< HEAD
             originatingProductId = houseOrApartmentIncompleteQuoteDto.originatingProductId,
             currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer,
             startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate()
-////=======
+// //=======
 //            originatingProductId = incompleteQuoteDto.originatingProductId,
 //            currentInsurer = incompleteQuoteDto.currentInsurer,
 //            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate()
-//>>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
+// >>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
         )
 
         quoteRepository.insert(quote.update(houseOrApartmentIncompleteQuoteDto), now)

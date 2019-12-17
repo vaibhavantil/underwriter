@@ -118,7 +118,7 @@ data class Quote(
 
     fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
         var newQuote = copy(
-//<<<<<<< HEAD
+// <<<<<<< HEAD
             productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
             startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
@@ -130,7 +130,7 @@ data class Quote(
                         is IncompleteApartmentQuoteDataDto -> data.subType
                         else -> null
                     }
-//=======
+// =======
 //            productType = incompleteQuoteDto.productType ?: productType,
 //            startDate = incompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
 //            data = when (data) {
@@ -139,7 +139,7 @@ data class Quote(
 //                    firstName = incompleteQuoteDto.firstName ?: data.firstName,
 //                    lastName = incompleteQuoteDto.lastName ?: data.lastName,
 //                    subType = incompleteQuoteDto.incompleteApartmentQuoteData?.subType ?: data.subType
-//>>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
+// >>>>>>> 846e94c76bdfc090ade481e34990ef696a15617d
                     )
                 is HouseData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
@@ -153,7 +153,7 @@ data class Quote(
         if (
             requestData is IncompleteApartmentQuoteDataDto
         ) {
-            val newQuoteData: ApartmentData = when(newQuote.data) {
+            val newQuoteData: ApartmentData = when (newQuote.data) {
                 is ApartmentData -> newQuote.data as ApartmentData
                 is HouseData -> {
                     val houseData = newQuote.data as HouseData
@@ -184,7 +184,7 @@ data class Quote(
         if (
             requestData is IncompleteHouseQuoteDataDto
         ) {
-            val newQuoteData: HouseData = when(newQuote.data) {
+            val newQuoteData: HouseData = when (newQuote.data) {
                 is HouseData -> newQuote.data as HouseData
                 is ApartmentData -> {
                     val apartmentData = newQuote.data as ApartmentData
