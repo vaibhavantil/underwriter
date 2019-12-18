@@ -15,6 +15,7 @@ data class CurrentInsurer(
             "Gjensidige" to Pair("Gjensidige", false),
             "Vardia" to Pair("Vardia", false),
             "Tre Kronor" to Pair("Tre Kronor", true),
+            "ICA" to Pair("Ica", true),
             "Dina Försäkringar" to Pair("Dina Försäkringar", false)
         )
 
