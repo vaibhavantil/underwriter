@@ -150,7 +150,8 @@ class QuoteServiceImpl(
             breachedUnderwritingGuidelines = null,
             originatingProductId = houseOrApartmentIncompleteQuoteDto.originatingProductId,
             currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer,
-            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate()
+            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate(),
+            dataCollectionId = houseOrApartmentIncompleteQuoteDto.dataCollectionId
         )
 
         quoteRepository.insert(quote.update(houseOrApartmentIncompleteQuoteDto), now)

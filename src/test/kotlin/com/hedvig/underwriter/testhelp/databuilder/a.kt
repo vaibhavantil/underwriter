@@ -71,6 +71,7 @@ class a {
         val ssn: String? = "191212121212",
         val firstName: String? = "",
         val lastName: String? = "",
+        val email: String? = "em@i.l",
 
         val street: String? = "",
         val city: String? = "",
@@ -81,6 +82,6 @@ class a {
         val internalId: Int? = null
     ) : QuoteDataBuilder {
 
-        override fun build() = ApartmentData(id, ssn, firstName, lastName, street, city, zipCode, householdSize, livingSpace, subType, internalId)
+        override fun build() = ApartmentData(id, ssn, firstName, lastName, email, street, city, zipCode, householdSize, livingSpace, subType, internalId)
     }
 }

@@ -16,7 +16,9 @@ sealed class QuoteResult {
         val insuranceCost: InsuranceCost,
         val details: CompleteQuoteDetails,
         val startDate: LocalDate?,
-        val expiresAt: LocalDate
+        val expiresAt: LocalDate,
+        val email: String?,
+        val dataCollectionId: UUID?
     ) : QuoteResult()
 
     data class IncompleteQuote(
@@ -25,7 +27,9 @@ sealed class QuoteResult {
         val lastName: String?,
         val currentInsurer: CurrentInsurer?,
         val details: IncompleteQuoteDetails?,
-        val startDate: LocalDate?
+        val startDate: LocalDate?,
+        val email: String?,
+        val dataCollectionId: UUID?
     ) : QuoteResult()
 
     data class UnderwritingLimitsHit(

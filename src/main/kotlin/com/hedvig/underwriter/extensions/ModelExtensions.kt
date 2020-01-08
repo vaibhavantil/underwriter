@@ -27,6 +27,7 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
 ) = HouseOrApartmentIncompleteQuoteDto(
     firstName = this.firstName,
     lastName = this.lastName,
+    email = this.email,
     currentInsurer = this.currentInsurer,
     birthDate = this.ssn.birthDateFromSsn(),
     ssn = this.ssn,
@@ -35,7 +36,8 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
-    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
+    dataCollectionId = this.dataCollectionId
 )
 
 fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
@@ -68,6 +70,7 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
 ) = HouseOrApartmentIncompleteQuoteDto(
     firstName = this.firstName,
     lastName = this.lastName,
+    email = this.email,
     currentInsurer = this.currentInsurer,
     birthDate = this.ssn?.birthDateFromSsn(),
     ssn = this.ssn,
@@ -80,7 +83,8 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
-    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant()
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
+    dataCollectionId = this.dataCollectionId
 )
 
 fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(

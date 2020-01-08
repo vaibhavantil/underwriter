@@ -33,6 +33,7 @@ interface PersonPolicyHolder<T : QuoteData> {
     val ssn: String?
     val firstName: String?
     val lastName: String?
+    val email: String?
 
     fun updateName(firstName: String, lastName: String): T
 
@@ -78,6 +79,7 @@ data class HouseData(
     override val ssn: String? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
+    override val email: String? = null,
 
     override val street: String? = null,
     override val zipCode: String? = null,
@@ -152,6 +154,7 @@ data class ApartmentData(
     override val ssn: String? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
+    override val email: String? = null,
 
     override val street: String? = null,
     override val city: String? = null,

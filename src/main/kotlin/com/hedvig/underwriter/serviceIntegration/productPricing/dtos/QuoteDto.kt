@@ -30,7 +30,8 @@ data class QuoteDto(
     @get:JsonProperty("isComplete")
     val isComplete: Boolean,
     val originatingProductId: UUID?,
-    val signedProductId: UUID?
+    val signedProductId: UUID?,
+    val dataCollectionId: UUID? = null
 ) {
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
@@ -52,7 +53,8 @@ data class QuoteDto(
                         breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
                         isComplete = quote.isComplete,
                         originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId
+                        signedProductId = quote.signedProductId,
+                        dataCollectionId = quote.dataCollectionId
                     )
                 }
 
@@ -73,7 +75,8 @@ data class QuoteDto(
                         breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
                         isComplete = quote.isComplete,
                         originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId
+                        signedProductId = quote.signedProductId,
+                        dataCollectionId = quote.dataCollectionId
                     )
                 }
             }

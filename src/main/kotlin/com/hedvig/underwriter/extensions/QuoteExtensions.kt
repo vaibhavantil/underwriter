@@ -26,6 +26,9 @@ val Quote.ssn
     get() = (data as? PersonPolicyHolder<*>)?.ssn
         ?: throw RuntimeException("No ssn on Quote! $this")
 
+val Quote.email
+    get() = (data as? PersonPolicyHolder<*>)?.email
+
 val Quote.apartment
     get() = (data as? ApartmentData)
 

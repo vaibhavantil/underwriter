@@ -24,6 +24,8 @@ input CreateQuoteInput {
     startDate: LocalDate
     apartment: CreateApartmentInput
     house: CreateHouseInput
+    email: String
+    dataCollectionId: ID
 }
 
 input CreateApartmentInput {
@@ -55,6 +57,7 @@ input EditQuoteInput {
     startDate: LocalDate
     apartment: EditApartmentInput
     house: EditHouseInput
+    email: String
 }
 
 input EditApartmentInput {
@@ -128,6 +131,8 @@ type CompleteQuote {
     details: CompleteQuoteDetails!
     startDate: LocalDate
     expiresAt: LocalDate!
+    email: String
+    dataCollectionId: ID
 }
 
 type CurrentInsurer {
@@ -284,6 +289,8 @@ type IncompleteQuote {
     currentInsurer: CurrentInsurer
     startDate: LocalDate
     details: IncompleteQuoteDetails
+    email: String
+    dataCollectionId: ID
 }
 
 union IncompleteQuoteDetails = IncompleteApartmentQuoteDetails | IncompleteHouseQuoteDetails

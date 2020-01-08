@@ -27,7 +27,8 @@ interface QuoteDao {
                 breached_underwriting_guidelines,
                 underwriting_guidelines_bypassed_by,
                 originating_product_id,
-                signed_product_id
+                signed_product_id,
+                data_collection_id
             )
             VALUES (
                 :masterQuoteId,
@@ -45,7 +46,8 @@ interface QuoteDao {
                 :breachedUnderwritingGuidelines,
                 :underwritingGuidelinesBypassedBy,
                 :originatingProductId,
-                :signedProductId
+                :signedProductId,
+                :dataCollectionId
             )
             RETURNING *
     """
@@ -74,9 +76,9 @@ interface QuoteDao {
     @SqlUpdate(
         """
             INSERT INTO quote_revision_apartment_data
-            (id, ssn, first_name, last_name, street, city, zip_code, household_size, living_space, sub_type)
+            (id, ssn, first_name, last_name, email, street, city, zip_code, household_size, living_space, sub_type)
             VALUES
-            (:id, :ssn, :firstName, :lastName, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
+            (:id, :ssn, :firstName, :lastName, :email, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
             RETURNING *
         """
     )
@@ -133,6 +135,7 @@ interface QuoteDao {
                 ssn,
                 first_name,
                 last_name,
+                email,
                 street,
                 city,
                 zip_code,
@@ -151,6 +154,7 @@ interface QuoteDao {
                 :ssn,
                 :firstName,
                 :lastName,
+                :email,
                 :street,
                 :city,
                 :zipCode,

@@ -6,6 +6,7 @@ import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
+import com.hedvig.underwriter.extensions.email
 import com.hedvig.underwriter.extensions.firstName
 import com.hedvig.underwriter.extensions.lastName
 import com.hedvig.underwriter.extensions.ssn
@@ -27,6 +28,7 @@ fun Quote.getCompleteQuoteResult(
     id = id,
     firstName = firstName,
     lastName = lastName,
+    email = email,
     currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     ssn = ssn,
     price = MonetaryAmountV2(
@@ -39,7 +41,8 @@ fun Quote.getCompleteQuoteResult(
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
     ),
     expiresAt = validTo.toStockholmLocalDate(),
-    startDate = startDate?.coerceAtLeast(LocalDate.now())
+    startDate = startDate?.coerceAtLeast(LocalDate.now()),
+    dataCollectionId = dataCollectionId
 )
 
 fun Quote.getIncompleteQuoteResult(
@@ -50,10 +53,12 @@ fun Quote.getIncompleteQuoteResult(
     id = id,
     firstName = firstName,
     lastName = lastName,
+    email = email,
     currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     details = createIncompleteQuoteResult(
         localizationService,
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
     ),
-    startDate = startDate?.coerceAtLeast(LocalDate.now())
+    startDate = startDate?.coerceAtLeast(LocalDate.now()),
+    dataCollectionId = dataCollectionId
 )
