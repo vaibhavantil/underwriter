@@ -3,11 +3,11 @@
 --changeset fredrikareschoug:20200108-1000-add-email-and-data-collection-id-to-quote.sql
 
 ALTER TABLE quote_revision_house_data
-    ADD COLUMN email varchar(100) NULL
+    ADD COLUMN email varchar(255) NULL
 ;
 
 ALTER TABLE quote_revision_apartment_data
-    ADD COLUMN email varchar(100) NULL
+    ADD COLUMN email varchar(255) NULL
 ;
 
 ALTER TABLE quote_revisions

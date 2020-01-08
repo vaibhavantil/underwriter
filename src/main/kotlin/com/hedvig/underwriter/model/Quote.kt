@@ -102,7 +102,6 @@ data class Quote(
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val signedProductId: UUID? = null,
-
     val dataCollectionId: UUID? = null
 ) {
     val isComplete: Boolean
