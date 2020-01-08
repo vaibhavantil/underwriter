@@ -33,6 +33,7 @@ class QuoteTest {
             HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
+                email = null,
                 productType = null,
                 ssn = "201212121212",
                 currentInsurer = null,
@@ -41,7 +42,8 @@ class QuoteTest {
                 quotingPartner = null,
                 birthDate = null,
                 memberId = null,
-                startDate = null
+                startDate = null,
+                dataCollectionId = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
@@ -69,6 +71,7 @@ class QuoteTest {
             HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
+                email = null,
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
@@ -88,7 +91,8 @@ class QuoteTest {
                 quotingPartner = null,
                 birthDate = null,
                 memberId = null,
-                startDate = null
+                startDate = null,
+                dataCollectionId = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
@@ -118,6 +122,7 @@ class QuoteTest {
             HouseOrApartmentIncompleteQuoteDto(
                 firstName = null,
                 lastName = null,
+                email = null,
                 productType = ProductType.APARTMENT,
                 ssn = "201212121213",
                 currentInsurer = null,
@@ -134,7 +139,8 @@ class QuoteTest {
                 quotingPartner = null,
                 birthDate = null,
                 memberId = null,
-                startDate = null
+                startDate = null,
+                dataCollectionId = null
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)

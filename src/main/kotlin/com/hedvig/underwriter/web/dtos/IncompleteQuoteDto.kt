@@ -14,6 +14,7 @@ import java.util.UUID
 data class IncompleteQuoteDto(
     val firstName: String?,
     val lastName: String?,
+    val email: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
     val ssn: String?,
@@ -28,7 +29,8 @@ data class IncompleteQuoteDto(
     val incompleteApartmentQuoteData: IncompleteApartmentQuoteDataDto?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
-    val startDate: Instant? = null
+    val startDate: Instant? = null,
+    val dataCollectionId: UUID? = null
 )
 
 sealed class IncompleteQuoteRequestData

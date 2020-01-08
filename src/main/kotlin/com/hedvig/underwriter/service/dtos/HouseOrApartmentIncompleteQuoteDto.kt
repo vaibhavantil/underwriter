@@ -14,6 +14,7 @@ import java.util.UUID
 data class HouseOrApartmentIncompleteQuoteDto(
     val firstName: String?,
     val lastName: String?,
+    val email: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
     val ssn: String?,
@@ -26,7 +27,8 @@ data class HouseOrApartmentIncompleteQuoteDto(
     ) var incompleteQuoteData: com.hedvig.underwriter.web.dtos.IncompleteQuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
-    val startDate: Instant?
+    val startDate: Instant?,
+    val dataCollectionId: UUID?
 ) {
     companion object {
         fun from(incompleteQuoteDto: IncompleteQuoteDto): HouseOrApartmentIncompleteQuoteDto {
@@ -37,6 +39,7 @@ data class HouseOrApartmentIncompleteQuoteDto(
             return HouseOrApartmentIncompleteQuoteDto(
                 firstName = incompleteQuoteDto.firstName,
                 lastName = incompleteQuoteDto.lastName,
+                email = incompleteQuoteDto.email,
                 currentInsurer = incompleteQuoteDto.currentInsurer,
                 birthDate = incompleteQuoteDto.birthDate,
                 ssn = incompleteQuoteDto.ssn,
@@ -49,7 +52,8 @@ data class HouseOrApartmentIncompleteQuoteDto(
                 productType = incompleteQuoteDto.productType,
                 memberId = incompleteQuoteDto.memberId,
                 originatingProductId = incompleteQuoteDto.originatingProductId,
-                startDate = incompleteQuoteDto.startDate
+                startDate = incompleteQuoteDto.startDate,
+                dataCollectionId = incompleteQuoteDto.dataCollectionId
             )
         }
     }

@@ -43,7 +43,8 @@ data class DatabaseQuoteRevision(
     val initiatedFrom: QuoteInitiatedFrom?,
     val createdAt: Instant?,
     val originatingProductId: UUID?,
-    val signedProductId: UUID?
+    val signedProductId: UUID?,
+    val dataCollectionId: UUID?
 ) {
 
     companion object {
@@ -73,7 +74,8 @@ data class DatabaseQuoteRevision(
                 createdAt = quote.createdAt,
                 initiatedFrom = quote.initiatedFrom,
                 originatingProductId = quote.originatingProductId,
-                signedProductId = quote.signedProductId
+                signedProductId = quote.signedProductId,
+                dataCollectionId = quote.dataCollectionId
             )
     }
 }
@@ -99,7 +101,8 @@ data class Quote(
     val underwritingGuidelinesBypassedBy: String? = null,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
-    val signedProductId: UUID? = null
+    val signedProductId: UUID? = null,
+    val dataCollectionId: UUID? = null
 ) {
     val isComplete: Boolean
         get() = when {
@@ -125,6 +128,7 @@ data class Quote(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
+                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email,
                     subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
                         is IncompleteApartmentQuoteDataDto? -> quoteData?.subType ?: data.subType
                         else -> null
@@ -133,7 +137,8 @@ data class Quote(
                 is HouseData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName
+                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
+                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
                 )
             } as QuoteData
         )
@@ -150,6 +155,7 @@ data class Quote(
                         id = houseData.id,
                         firstName = houseData.firstName,
                         lastName = houseData.lastName,
+                        email = houseData.email,
                         ssn = houseData.ssn,
                         street = houseData.street,
                         zipCode = houseData.zipCode,
@@ -181,6 +187,7 @@ data class Quote(
                         id = apartmentData.id,
                         firstName = apartmentData.firstName,
                         lastName = apartmentData.lastName,
+                        email = apartmentData.email,
                         ssn = apartmentData.ssn,
                         street = apartmentData.street,
                         zipCode = apartmentData.zipCode,
