@@ -193,7 +193,6 @@ class QuoteServiceImpl(
                 .map { it: Quote -> this.quoteRepository.insert(it); it }
 
                 transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
-
         } else {
             quoteRepository.insert(quote, now)
             Right(CompleteQuoteResponseDto(quote.id, quote.price!!, quote.validTo))
@@ -233,7 +232,7 @@ class QuoteServiceImpl(
             )
         }
 
-         val potentiallySavedQuote = quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+        val potentiallySavedQuote = quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
             .map { it: Quote -> quoteRepository.update(it) }
 
         return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
