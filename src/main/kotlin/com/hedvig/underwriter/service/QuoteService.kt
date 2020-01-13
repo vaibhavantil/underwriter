@@ -7,7 +7,6 @@ import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
@@ -32,10 +31,12 @@ interface QuoteService {
     fun getLatestQuoteForMemberId(memberId: String): Quote?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(
-        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
+        incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
         id: UUID? = null,
-        initiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.RAPIO
-    ): IncompleteQuoteResponseDto
+        initiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.RAPIO,
+        shouldComplete: Boolean = false,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun updateQuote(
         houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
         id: UUID,

@@ -38,14 +38,14 @@ class QuoteController @Autowired constructor(
     fun createQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<out Any> {
         val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
 
-        val quote = quoteService.createQuote(houseOrApartmentIncompleteQuoteDto)
-        return if (incompleteQuoteDto.complete)
-            quoteService.completeQuote(quote.id).bimap(
+        return quoteService.createQuote(
+            houseOrApartmentIncompleteQuoteDto,
+            shouldComplete = incompleteQuoteDto.complete,
+            underwritingGuidelinesBypassedBy = null)
+            .bimap(
                 { ResponseEntity.status(422).body(it) },
                 { ResponseEntity.status(200).body(it) }
             ).getOrHandle { it }
-        else
-            ResponseEntity.ok(quote)
     }
 
     @PostMapping(

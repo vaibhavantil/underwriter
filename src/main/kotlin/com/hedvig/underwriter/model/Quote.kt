@@ -133,14 +133,14 @@ data class Quote(
                         is IncompleteApartmentQuoteDataDto? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
-                )
+                ) as QuoteData // This cast removes an IntellJ warning
                 is HouseData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
                     email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
-                )
-            } as QuoteData
+                ) as QuoteData // This cast removes an IntellJ warning
+            }
         )
 
         val requestData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData

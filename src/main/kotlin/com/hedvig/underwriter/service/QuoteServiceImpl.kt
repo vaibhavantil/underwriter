@@ -5,6 +5,7 @@ import arrow.core.Right
 import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.HouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
@@ -27,7 +28,7 @@ import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
@@ -128,35 +129,100 @@ class QuoteServiceImpl(
     }
 
     override fun createQuote(
-        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
+        incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
         id: UUID?,
-        initiatedFrom: QuoteInitiatedFrom
-    ): IncompleteQuoteResponseDto {
+        initiatedFrom: QuoteInitiatedFrom,
+        shouldComplete: Boolean,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val now = Instant.now()
 
         val quote = Quote(
             id = id ?: UUID.randomUUID(),
             createdAt = now,
-            productType = houseOrApartmentIncompleteQuoteDto.productType!!,
+            productType = incompleteQuoteData.productType!!,
             initiatedFrom = initiatedFrom,
-            attributedTo = houseOrApartmentIncompleteQuoteDto.quotingPartner ?: Partner.HEDVIG,
-            data = when {
-                houseOrApartmentIncompleteQuoteDto.incompleteQuoteData is com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto -> ApartmentData(UUID.randomUUID())
-                houseOrApartmentIncompleteQuoteDto.incompleteQuoteData is com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto -> HouseData(UUID.randomUUID())
-                else -> throw IllegalArgumentException("Must provide either house or apartment data")
+            attributedTo = incompleteQuoteData.quotingPartner ?: Partner.HEDVIG,
+            data = when (val quoteData = incompleteQuoteData.incompleteQuoteData) {
+                is IncompleteApartmentQuoteDataDto ->
+                    ApartmentData(
+                        id = UUID.randomUUID(),
+                        ssn = incompleteQuoteData.ssn,
+                        firstName = incompleteQuoteData.firstName,
+                        lastName = incompleteQuoteData.lastName,
+                        email = incompleteQuoteData.email,
+                        subType = quoteData.subType,
+                        street = quoteData.street,
+                        zipCode = quoteData.zipCode,
+                        city = quoteData.city,
+                        householdSize = quoteData.householdSize,
+                        livingSpace = quoteData.livingSpace
+                    )
+                is com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto ->
+                    HouseData(
+                        id = UUID.randomUUID(),
+                        ssn = incompleteQuoteData.ssn,
+                        firstName = incompleteQuoteData.firstName,
+                        lastName = incompleteQuoteData.lastName,
+                        email = incompleteQuoteData.email,
+                        street = quoteData.street,
+                        zipCode = quoteData.zipCode,
+                        city = quoteData.city,
+                        householdSize = quoteData.householdSize,
+                        livingSpace = quoteData.livingSpace,
+                        numberOfBathrooms = quoteData.numberOfBathrooms,
+                        isSubleted = quoteData.isSubleted,
+                        extraBuildings = quoteData.extraBuildings?.map((ExtraBuilding)::from),
+                        ancillaryArea = quoteData.ancillaryArea,
+                        yearOfConstruction = quoteData.yearOfConstruction
+                    )
+                null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
-            memberId = houseOrApartmentIncompleteQuoteDto.memberId,
+            memberId = incompleteQuoteData.memberId,
             breachedUnderwritingGuidelines = null,
-            originatingProductId = houseOrApartmentIncompleteQuoteDto.originatingProductId,
-            currentInsurer = houseOrApartmentIncompleteQuoteDto.currentInsurer,
-            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate(),
-            dataCollectionId = houseOrApartmentIncompleteQuoteDto.dataCollectionId
+            originatingProductId = incompleteQuoteData.originatingProductId,
+            currentInsurer = incompleteQuoteData.currentInsurer,
+            startDate = incompleteQuoteData.startDate?.toStockholmLocalDate(),
+            dataCollectionId = incompleteQuoteData.dataCollectionId
         )
 
-        quoteRepository.insert(quote.update(houseOrApartmentIncompleteQuoteDto), now)
+        return if (shouldComplete) {
+            completeAndHandleReturn(quote, underwritingGuidelinesBypassedBy) { this@QuoteServiceImpl.quoteRepository.insert(it); it }
+        } else {
+            quoteRepository.insert(quote, now)
+            Right(CompleteQuoteResponseDto(quote.id, quote.price!!, quote.validTo))
+        }
+    }
 
-        return IncompleteQuoteResponseDto(quote.id, quote.productType, quote.initiatedFrom)
+    private fun completeAndHandleReturn(
+        quote: Quote,
+        underwritingGuidelinesBypassedBy: String?,
+        afterComplete: (Quote) -> Quote
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        return quote
+            .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+            .map(afterComplete)
+            .bimap(
+                { breachedUnderwritingGuidelines ->
+                    logger.error(
+                        "Underwriting guidelines breached for incomplete quote ${quote.id}: {}",
+                        breachedUnderwritingGuidelines
+                    )
+                    ErrorResponseDto(
+                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                        "quote cannot be calculated, underwriting guidelines are breached",
+                        breachedUnderwritingGuidelines
+                    )
+                },
+                { completeQuote ->
+                    CompleteQuoteResponseDto(
+                        id = completeQuote.id,
+                        price = completeQuote.price!!,
+                        validTo = completeQuote.validTo
+                    )
+                }
+            )
     }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
@@ -192,29 +258,7 @@ class QuoteServiceImpl(
             )
         }
 
-        return quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-            .bimap(
-                { breachedUnderwritingGuidelines ->
-                    logger.error(
-                        "Underwriting guidelines breached for incomplete quote $incompleteQuoteId: {}",
-                        breachedUnderwritingGuidelines
-                    )
-                    ErrorResponseDto(
-                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached",
-                        breachedUnderwritingGuidelines
-                    )
-                },
-                { completeQuote ->
-                    quoteRepository.update(completeQuote)
-
-                    CompleteQuoteResponseDto(
-                        id = completeQuote.id,
-                        price = completeQuote.price!!,
-                        validTo = completeQuote.validTo
-                    )
-                }
-            )
+        return completeAndHandleReturn(quote, underwritingGuidelinesBypassedBy) { this@QuoteServiceImpl.quoteRepository.update(it) }
     }
 
     override fun signQuote(

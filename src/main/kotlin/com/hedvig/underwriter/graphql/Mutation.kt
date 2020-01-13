@@ -54,13 +54,15 @@ class Mutation @Autowired constructor(
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID
                 env.isIOS() -> QuoteInitiatedFrom.IOS
                 else -> QuoteInitiatedFrom.WEBONBOARDING
-            }
+            },
+            shouldComplete = true,
+            underwritingGuidelinesBypassedBy = null
         )
 
-        return when (val errorOrQuote = quoteService.completeQuote(incompleteQuote.id)) {
-            is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
+        return when (incompleteQuote) {
+            is Either.Left -> getQuoteResultFromError(incompleteQuote.a)
             is Either.Right -> {
-                val completeQuoteResponseDto = errorOrQuote.b
+                val completeQuoteResponseDto = incompleteQuote.b
 
                 val quote = quoteService.getQuote(completeQuoteResponseDto.id)
                     ?: throw RuntimeException("Quote must not be null!")
