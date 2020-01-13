@@ -188,41 +188,16 @@ class QuoteServiceImpl(
         )
 
         return if (shouldComplete) {
-            completeAndHandleReturn(quote, underwritingGuidelinesBypassedBy) { this@QuoteServiceImpl.quoteRepository.insert(it); it }
+            val potentiallySavedQuote = quote
+                .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+                .map { it: Quote -> this.quoteRepository.insert(it); it }
+
+                transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
+
         } else {
             quoteRepository.insert(quote, now)
             Right(CompleteQuoteResponseDto(quote.id, quote.price!!, quote.validTo))
         }
-    }
-
-    private fun completeAndHandleReturn(
-        quote: Quote,
-        underwritingGuidelinesBypassedBy: String?,
-        afterComplete: (Quote) -> Quote
-    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-        return quote
-            .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-            .map(afterComplete)
-            .bimap(
-                { breachedUnderwritingGuidelines ->
-                    logger.error(
-                        "Underwriting guidelines breached for incomplete quote ${quote.id}: {}",
-                        breachedUnderwritingGuidelines
-                    )
-                    ErrorResponseDto(
-                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached",
-                        breachedUnderwritingGuidelines
-                    )
-                },
-                { completeQuote ->
-                    CompleteQuoteResponseDto(
-                        id = completeQuote.id,
-                        price = completeQuote.price!!,
-                        validTo = completeQuote.validTo
-                    )
-                }
-            )
     }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
@@ -258,7 +233,36 @@ class QuoteServiceImpl(
             )
         }
 
-        return completeAndHandleReturn(quote, underwritingGuidelinesBypassedBy) { this@QuoteServiceImpl.quoteRepository.update(it) }
+         val potentiallySavedQuote = quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+            .map { it: Quote -> quoteRepository.update(it) }
+
+        return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
+    }
+
+    private fun transformCompleteQuoteReturn(
+        potentiallySavedQuote: Either<List<String>, Quote>,
+        quoteId: UUID
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        return potentiallySavedQuote.bimap(
+            { breachedUnderwritingGuidelines ->
+                logger.error(
+                    "Underwriting guidelines breached for incomplete quote $quoteId: {}",
+                    breachedUnderwritingGuidelines
+                )
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                    "quote cannot be calculated, underwriting guidelines are breached",
+                    breachedUnderwritingGuidelines
+                )
+            },
+            { completeQuote ->
+                CompleteQuoteResponseDto(
+                    id = completeQuote.id,
+                    price = completeQuote.price!!,
+                    validTo = completeQuote.validTo
+                )
+            }
+        )
     }
 
     override fun signQuote(

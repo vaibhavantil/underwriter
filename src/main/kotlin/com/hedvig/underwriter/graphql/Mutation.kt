@@ -47,7 +47,7 @@ class Mutation @Autowired constructor(
         }
         val input = createQuoteInput.copy(ssn = ssn)
 
-        val incompleteQuote = quoteService.createQuote(
+        val completeQuote = quoteService.createQuote(
             input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
             initiatedFrom = when {
@@ -59,10 +59,10 @@ class Mutation @Autowired constructor(
             underwritingGuidelinesBypassedBy = null
         )
 
-        return when (incompleteQuote) {
-            is Either.Left -> getQuoteResultFromError(incompleteQuote.a)
+        return when (completeQuote) {
+            is Either.Left -> getQuoteResultFromError(completeQuote.a)
             is Either.Right -> {
-                val completeQuoteResponseDto = incompleteQuote.b
+                val completeQuoteResponseDto = completeQuote.b
 
                 val quote = quoteService.getQuote(completeQuoteResponseDto.id)
                     ?: throw RuntimeException("Quote must not be null!")

@@ -31,7 +31,8 @@ data class IncompleteQuoteDto(
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,
     val dataCollectionId: UUID? = null,
-    val complete: Boolean = false
+    val complete: Boolean = false,
+    val underwritingGuidelinesBypassedBy: String? = null
 )
 
 sealed class IncompleteQuoteRequestData
