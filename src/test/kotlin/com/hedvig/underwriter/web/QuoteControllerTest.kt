@@ -28,7 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)
-internal class QuoteBuilderControllerTest {
+internal class QuoteControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -104,7 +104,7 @@ internal class QuoteBuilderControllerTest {
 
     @Ignore
     @Test
-    fun createCompleteQuote() {
+    fun completeQuote() {
 
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 

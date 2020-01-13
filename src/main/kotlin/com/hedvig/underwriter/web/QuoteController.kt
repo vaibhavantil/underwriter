@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
@@ -8,12 +9,8 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -35,11 +35,17 @@ class QuoteController @Autowired constructor(
     val memberService: MemberService
 ) {
     @PostMapping
-    fun createIncompleteQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<IncompleteQuoteResponseDto> {
+    fun createQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<out Any> {
         val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
 
         val quote = quoteService.createQuote(houseOrApartmentIncompleteQuoteDto)
-        return ResponseEntity.ok(quote)
+        return if (incompleteQuoteDto.complete)
+            quoteService.completeQuote(quote.id).bimap(
+                { ResponseEntity.status(422).body(it) },
+                { ResponseEntity.status(200).body(it) }
+            ).getOrHandle { it }
+        else
+            ResponseEntity.ok(quote)
     }
 
     @PostMapping(
@@ -48,7 +54,7 @@ class QuoteController @Autowired constructor(
             "/{incompleteQuoteId}/complete"
         ]
     )
-    fun createCompleteQuote(
+    fun completeQuote(
         @Valid @PathVariable incompleteQuoteId: UUID,
         @Valid
         @Email
@@ -56,7 +62,8 @@ class QuoteController @Autowired constructor(
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
 
-        return when (val quoteOrError = quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
+        return when (val quoteOrError =
+            quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
         }
@@ -80,7 +87,8 @@ class QuoteController @Autowired constructor(
     ): ResponseEntity<Any> {
         val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
 
-        return when (val quoteOrError = quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
+        return when (val quoteOrError =
+            quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(QuoteDto.fromQuote(quoteOrError.b))
         }

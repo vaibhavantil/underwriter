@@ -30,7 +30,8 @@ data class IncompleteQuoteDto(
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,
-    val dataCollectionId: UUID? = null
+    val dataCollectionId: UUID? = null,
+    val complete: Boolean = false
 )
 
 sealed class IncompleteQuoteRequestData
