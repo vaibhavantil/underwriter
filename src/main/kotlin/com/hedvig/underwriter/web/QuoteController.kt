@@ -8,7 +8,7 @@ import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import java.util.UUID
@@ -35,13 +35,13 @@ class QuoteController @Autowired constructor(
     val memberService: MemberService
 ) {
     @PostMapping
-    fun createQuote(@Valid @RequestBody incompleteQuoteDto: IncompleteQuoteDto): ResponseEntity<out Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
+    fun createQuote(@Valid @RequestBody requestDto: QuoteRequestDto): ResponseEntity<out Any> {
+        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(requestDto)
 
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
-            shouldComplete = incompleteQuoteDto.complete,
-            underwritingGuidelinesBypassedBy = incompleteQuoteDto.underwritingGuidelinesBypassedBy)
+            shouldComplete = requestDto.shouldComplete,
+            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy)
             .bimap(
                 { ResponseEntity.status(422).body(it) },
                 { ResponseEntity.status(200).body(it) }
@@ -79,13 +79,13 @@ class QuoteController @Autowired constructor(
     @PatchMapping("/{id}")
     fun updateQuoteInfo(
         @PathVariable id: UUID,
-        @RequestBody @Valid incompleteQuoteDto: IncompleteQuoteDto,
+        @RequestBody @Valid quoteRequestDto: QuoteRequestDto,
         @Valid
         @Email
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(incompleteQuoteDto)
+        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(quoteRequestDto)
 
         return when (val quoteOrError =
             quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {

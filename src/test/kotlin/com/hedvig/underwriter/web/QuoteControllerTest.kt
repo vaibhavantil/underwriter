@@ -97,7 +97,7 @@ internal class QuoteControllerTest {
             currentInsurer = null
         )
 
-        every {  quoteService.getQuote(uuid) } returns incompleteQuote
+        every { quoteService.getQuote(uuid) } returns incompleteQuote
 
         mockMvc
             .perform(

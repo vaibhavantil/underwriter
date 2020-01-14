@@ -34,6 +34,7 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -195,7 +196,7 @@ class QuoteServiceImpl(
                 transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
         } else {
             quoteRepository.insert(quote, now)
-            Right(CompleteQuoteResponseDto(quote.id, quote.price!!, quote.validTo))
+            Right(CompleteQuoteResponseDto(quote.id, BigDecimal.ZERO, quote.validTo))
         }
     }
 
