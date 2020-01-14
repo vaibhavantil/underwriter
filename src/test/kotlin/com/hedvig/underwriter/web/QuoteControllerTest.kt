@@ -97,8 +97,7 @@ internal class QuoteControllerTest {
             currentInsurer = null
         )
 
-        Mockito.`when`(quoteService.getQuote(uuid))
-            .thenReturn(incompleteQuote)
+        every {  quoteService.getQuote(uuid) } returns incompleteQuote
 
         mockMvc
             .perform(
