@@ -42,7 +42,6 @@ class QuoteController @Autowired constructor(
     @PostMapping
     fun createQuote(
         @Valid @RequestBody requestDto: QuoteRequestDto,
-        @RequestHeader("UserAgent") userAgent: String,
         httpServletRequest: HttpServletRequest
     ): ResponseEntity<out Any> {
         val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(requestDto)

@@ -61,7 +61,7 @@ internal class QuoteControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
 
-        every { quoteService.createQuote(any(), shouldComplete = any(), underwritingGuidelinesBypassedBy = any()) } returns Either.Right(CompleteQuoteResponseDto(UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"), BigDecimal.TEN, Instant.now()))
+        every { quoteService.createQuote(any(), shouldComplete = any(), underwritingGuidelinesBypassedBy = any(), initiatedFrom = QuoteInitiatedFrom.RAPIO) } returns Either.Right(CompleteQuoteResponseDto(UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"), BigDecimal.TEN, Instant.now()))
 
         val result = mockMvc.perform(request)
 
