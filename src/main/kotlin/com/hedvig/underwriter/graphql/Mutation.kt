@@ -6,6 +6,8 @@ import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
+import com.hedvig.underwriter.extensions.isAndroid
+import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.extensions.toHouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -47,20 +49,22 @@ class Mutation @Autowired constructor(
         }
         val input = createQuoteInput.copy(ssn = ssn)
 
-        val incompleteQuote = quoteService.createQuote(
+        val completeQuote = quoteService.createQuote(
             input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,
             initiatedFrom = when {
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID
                 env.isIOS() -> QuoteInitiatedFrom.IOS
                 else -> QuoteInitiatedFrom.WEBONBOARDING
-            }
+            },
+            shouldComplete = true,
+            underwritingGuidelinesBypassedBy = null
         )
 
-        return when (val errorOrQuote = quoteService.completeQuote(incompleteQuote.id)) {
-            is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
+        return when (completeQuote) {
+            is Either.Left -> getQuoteResultFromError(completeQuote.a)
             is Either.Right -> {
-                val completeQuoteResponseDto = errorOrQuote.b
+                val completeQuoteResponseDto = completeQuote.b
 
                 val quote = quoteService.getQuote(completeQuoteResponseDto.id)
                     ?: throw RuntimeException("Quote must not be null!")
@@ -142,16 +146,11 @@ class Mutation @Autowired constructor(
     }
 
     fun DataFetchingEnvironment.isAndroid() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains(
-            androidAppUserAgentRegex
-        )
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isAndroid() ?: false
             ?: false
 
     fun DataFetchingEnvironment.isIOS() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("User-Agent")?.contains(
-            iOSAppUserAgentRegex
-        )
-            ?: false
+        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isIOS() ?: false
 
     private fun addCenturyToSSN(ssn: String): String {
         val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
@@ -162,10 +161,5 @@ class Mutation @Autowired constructor(
         } else {
             "20$ssn"
         }
-    }
-
-    companion object {
-        private val iOSAppUserAgentRegex = Regex("^com\\.hedvig.+iOS")
-        private val androidAppUserAgentRegex = Regex("^com\\.hedvig.+Android")
     }
 }

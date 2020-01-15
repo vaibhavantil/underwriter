@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.web
 
+import arrow.core.Either
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
@@ -9,6 +10,10 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
 import org.junit.Ignore
@@ -17,7 +22,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
@@ -28,15 +32,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)
-internal class QuoteBuilderControllerTest {
+internal class QuoteControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @MockkBean
     lateinit var quoteService: QuoteService
 
-    @MockBean
+    @MockkBean
     lateinit var memberService: MemberService
 
     val createQuoteRequestJson = """
@@ -56,6 +60,8 @@ internal class QuoteBuilderControllerTest {
             .content(createQuoteRequestJson)
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
+
+        every { quoteService.createQuote(any(), shouldComplete = any(), underwritingGuidelinesBypassedBy = any(), initiatedFrom = QuoteInitiatedFrom.RAPIO) } returns Either.Right(CompleteQuoteResponseDto(UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"), BigDecimal.TEN, Instant.now()))
 
         val result = mockMvc.perform(request)
 
@@ -91,8 +97,7 @@ internal class QuoteBuilderControllerTest {
             currentInsurer = null
         )
 
-        Mockito.`when`(quoteService.getQuote(uuid))
-            .thenReturn(incompleteQuote)
+        every { quoteService.getQuote(uuid) } returns incompleteQuote
 
         mockMvc
             .perform(
@@ -104,7 +109,7 @@ internal class QuoteBuilderControllerTest {
 
     @Ignore
     @Test
-    fun createCompleteQuote() {
+    fun completeQuote() {
 
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 

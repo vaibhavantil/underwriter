@@ -6,7 +6,7 @@ import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteQuoteDto
+import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -31,29 +31,29 @@ data class HouseOrApartmentIncompleteQuoteDto(
     val dataCollectionId: UUID?
 ) {
     companion object {
-        fun from(incompleteQuoteDto: IncompleteQuoteDto): HouseOrApartmentIncompleteQuoteDto {
-            if (incompleteQuoteDto.incompleteQuoteData == null && incompleteQuoteDto.incompleteHouseQuoteData == null && incompleteQuoteDto.incompleteApartmentQuoteData == null) {
+        fun from(quoteRequestDto: QuoteRequestDto): HouseOrApartmentIncompleteQuoteDto {
+            if (quoteRequestDto.incompleteQuoteData == null && quoteRequestDto.incompleteHouseQuoteData == null && quoteRequestDto.incompleteApartmentQuoteData == null) {
                 throw RuntimeException("Cannot create House or Apartment quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData are all null")
             }
 
             return HouseOrApartmentIncompleteQuoteDto(
-                firstName = incompleteQuoteDto.firstName,
-                lastName = incompleteQuoteDto.lastName,
-                email = incompleteQuoteDto.email,
-                currentInsurer = incompleteQuoteDto.currentInsurer,
-                birthDate = incompleteQuoteDto.birthDate,
-                ssn = incompleteQuoteDto.ssn,
-                quotingPartner = incompleteQuoteDto.quotingPartner,
+                firstName = quoteRequestDto.firstName,
+                lastName = quoteRequestDto.lastName,
+                email = quoteRequestDto.email,
+                currentInsurer = quoteRequestDto.currentInsurer,
+                birthDate = quoteRequestDto.birthDate,
+                ssn = quoteRequestDto.ssn,
+                quotingPartner = quoteRequestDto.quotingPartner,
                 incompleteQuoteData = when {
-                    incompleteQuoteDto.incompleteApartmentQuoteData != null -> incompleteQuoteDto.incompleteApartmentQuoteData
-                    incompleteQuoteDto.incompleteHouseQuoteData != null -> incompleteQuoteDto.incompleteHouseQuoteData
-                    else -> incompleteQuoteDto.incompleteQuoteData
+                    quoteRequestDto.incompleteApartmentQuoteData != null -> quoteRequestDto.incompleteApartmentQuoteData
+                    quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.incompleteHouseQuoteData
+                    else -> quoteRequestDto.incompleteQuoteData
                 },
-                productType = incompleteQuoteDto.productType,
-                memberId = incompleteQuoteDto.memberId,
-                originatingProductId = incompleteQuoteDto.originatingProductId,
-                startDate = incompleteQuoteDto.startDate,
-                dataCollectionId = incompleteQuoteDto.dataCollectionId
+                productType = quoteRequestDto.productType,
+                memberId = quoteRequestDto.memberId,
+                originatingProductId = quoteRequestDto.originatingProductId,
+                startDate = quoteRequestDto.startDate,
+                dataCollectionId = quoteRequestDto.dataCollectionId
             )
         }
     }

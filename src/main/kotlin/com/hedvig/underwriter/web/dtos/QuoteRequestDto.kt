@@ -11,7 +11,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-data class IncompleteQuoteDto(
+data class QuoteRequestDto(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
@@ -30,7 +30,9 @@ data class IncompleteQuoteDto(
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,
-    val dataCollectionId: UUID? = null
+    val dataCollectionId: UUID? = null,
+    val shouldComplete: Boolean = false,
+    val underwritingGuidelinesBypassedBy: String? = null
 )
 
 sealed class IncompleteQuoteRequestData
