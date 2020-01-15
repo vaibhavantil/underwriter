@@ -48,6 +48,7 @@ class QuoteController @Autowired constructor(
         val quoteInitiatedFrom = when {
             httpServletRequest.isAndroid() -> QuoteInitiatedFrom.ANDROID
             httpServletRequest.isIOS() -> QuoteInitiatedFrom.IOS
+            requestDto.originatingProductId != null -> QuoteInitiatedFrom.HOPE
             else -> QuoteInitiatedFrom.RAPIO
         }
 
