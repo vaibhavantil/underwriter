@@ -33,7 +33,7 @@ interface QuoteService {
     fun createQuote(
         incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
         id: UUID? = null,
-        initiatedFrom: QuoteInitiatedFrom = QuoteInitiatedFrom.RAPIO,
+        initiatedFrom: QuoteInitiatedFrom,
         shouldComplete: Boolean = false,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
