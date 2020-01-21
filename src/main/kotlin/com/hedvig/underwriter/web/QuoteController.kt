@@ -1,5 +1,4 @@
 package com.hedvig.underwriter.web
-
 import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.underwriter.extensions.isAndroid
@@ -56,7 +55,8 @@ class QuoteController @Autowired constructor(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
             shouldComplete = requestDto.shouldComplete,
-            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy)
+            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
+        )
             .bimap(
                 { ResponseEntity.status(422).body(it) },
                 { ResponseEntity.status(200).body(it) }
@@ -144,8 +144,8 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/member/{memberId}/signed")
-    fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity.HeadersBuilder<*> {
+    fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         quoteService.memberSigned(memberId, signRequest)
-        return ResponseEntity.noContent()
+        return ResponseEntity.noContent().build()
     }
 }
