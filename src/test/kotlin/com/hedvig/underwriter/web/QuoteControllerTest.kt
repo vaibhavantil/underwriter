@@ -94,7 +94,8 @@ internal class QuoteControllerTest {
                 ssn = "189003042342"
             ),
             breachedUnderwritingGuidelines = null,
-            currentInsurer = null
+            currentInsurer = null,
+            contractId = null
         )
 
         every { quoteService.getQuote(uuid) } returns incompleteQuote
@@ -133,7 +134,8 @@ internal class QuoteControllerTest {
                 id = UUID.randomUUID()
             ),
             breachedUnderwritingGuidelines = null,
-            currentInsurer = null
+            currentInsurer = null,
+            contractId = null
         )
 
         Mockito.`when`(quoteService.getQuote(uuid))

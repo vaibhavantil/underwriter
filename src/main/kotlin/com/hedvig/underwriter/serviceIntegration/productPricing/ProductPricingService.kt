@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ContractCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
@@ -11,6 +12,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProdu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
+import java.util.*
 
 interface ProductPricingService {
     fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto
@@ -24,4 +26,6 @@ interface ProductPricingService {
     fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto): ResponseEntity<Void>
 
     fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost
+
+    fun createContract(contractId: UUID, signedQuoteRequest: SignedQuoteRequest): ResponseEntity<ContractCreatedResponseDto>
 }

@@ -43,6 +43,8 @@ import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @Service
 class QuoteServiceImpl(
@@ -185,7 +187,8 @@ class QuoteServiceImpl(
             originatingProductId = incompleteQuoteData.originatingProductId,
             currentInsurer = incompleteQuoteData.currentInsurer,
             startDate = incompleteQuoteData.startDate?.toStockholmLocalDate(),
-            dataCollectionId = incompleteQuoteData.dataCollectionId
+            dataCollectionId = incompleteQuoteData.dataCollectionId,
+            contractId = null
         )
 
         return if (shouldComplete) {
@@ -272,8 +275,8 @@ class QuoteServiceImpl(
         val quote = getQuote(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.originatingProductId != null) {
-            throw RuntimeException("There is a product Id already")
+        if (quote.contractId != null) {
+            throw RuntimeException("There is a contract id already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
@@ -288,7 +291,10 @@ class QuoteServiceImpl(
                     startDate = body.startDate
                 )
             }
-            else -> updatedName.copy(startDate = null)
+            else -> updatedName.copy(startDate = when {
+                quote.currentInsurer == null -> LocalDate.ofInstant(Instant.now(), ZoneOffset.UTC)
+                else -> null
+            })
         }
 
         val quoteWithMember = if (quote.memberId == null) {
@@ -345,19 +351,19 @@ class QuoteServiceImpl(
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
         checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
 
-        val signedProductId = productPricingService.signedQuote(
+        val contractCreatedId = productPricingService.createContract(
+            quote.contractId ?: UUID.randomUUID(),
             SignedQuoteRequest(
                 price = Money.of(quote.price, "SEK"),
                 quote = quote,
                 referenceToken = signedRequest.referenceToken,
                 signature = signedRequest.signature,
                 oscpResponse = signedRequest.oscpResponse
-            ),
-            quote.memberId
-        ).id
+            ))
 
-        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
-        checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+        val quoteWithContractId = quoteRepository.update(quote.copy(contractId = contractCreatedId.body!!.contractId))
+
+        checkNotNull(quoteWithContractId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
@@ -366,43 +372,43 @@ class QuoteServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
+        quoteWithContractId.attributedTo.campaignCode?.let { campaignCode ->
             try {
                 productPricingService.redeemCampaign(
                     RedeemCampaignDto(
-                        quoteWithProductId.memberId,
+                        quoteWithContractId.memberId,
                         campaignCode,
                         LocalDate.now(ZoneId.of("Europe/Stockholm"))
                     )
                 )
             } catch (e: FeignException) {
-                logger.error("Failed to redeem $campaignCode for partner ${quoteWithProductId.attributedTo} with response ${e.message}")
+                logger.error("Failed to redeem $campaignCode for partner ${quoteWithContractId.attributedTo} with response ${e.message}")
             }
         }
 
-        if (!signedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
+        if (!signedInMemberService && quoteWithContractId.data is PersonPolicyHolder<*>) {
             memberService.signQuote(
-                quoteWithProductId.memberId.toLong(),
-                UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
+                quoteWithContractId.memberId.toLong(),
+                UnderwriterQuoteSignRequest(quoteWithContractId.data.ssn!!)
             )
         }
 
         val signedAt = Instant.now()
-        val signedQuote = quoteWithProductId.copy(state = QuoteState.SIGNED)
+        val signedQuote = quoteWithContractId.copy(state = QuoteState.SIGNED)
 
         quoteRepository.update(signedQuote, signedAt)
 
-        if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
+        if (quoteWithContractId.attributedTo != Partner.HEDVIG) {
 
             val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
             if (activeProfiles.isNotEmpty() && customerIOClient == null) {
                 logger.error("customerIOClient is null even thou $activeProfiles is set")
             }
 
-            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
+            customerIOClient?.setPartnerCode(quoteWithContractId.memberId, quoteWithContractId.attributedTo)
         }
 
-        return SignedQuoteResponseDto(signedProductId, signedAt)
+        return SignedQuoteResponseDto(quoteWithContractId.id, signedAt)
     }
 
     override fun activateQuote(

@@ -84,7 +84,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             underwritingGuidelinesBypassedBy = databaseQuote.underwritingGuidelinesBypassedBy,
             originatingProductId = databaseQuote.originatingProductId,
             signedProductId = databaseQuote.signedProductId,
-            dataCollectionId = databaseQuote.dataCollectionId
+            dataCollectionId = databaseQuote.dataCollectionId,
+            contractId = databaseQuote.contractId
         )
     }
 

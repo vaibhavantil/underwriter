@@ -27,7 +27,8 @@ class QuoteTest {
             attributedTo = Partner.HEDVIG,
             state = QuoteState.QUOTED,
             breachedUnderwritingGuidelines = null,
-            price = BigDecimal.valueOf(100)
+            price = BigDecimal.valueOf(100),
+            contractId = UUID.fromString("3FF207D0-06D7-4C7F-ADF4-BC633A2FA72F")
         )
         val updatedQuote = quote.update(
             HouseOrApartmentIncompleteQuoteDto(
@@ -48,6 +49,7 @@ class QuoteTest {
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as ApartmentData).ssn).isEqualTo("201212121212")
+        assertThat(updatedQuote.contractId).isEqualTo(quote.contractId)
     }
 
     @Test
@@ -65,7 +67,8 @@ class QuoteTest {
             attributedTo = Partner.HEDVIG,
             state = QuoteState.QUOTED,
             breachedUnderwritingGuidelines = null,
-            price = BigDecimal.valueOf(100)
+            price = BigDecimal.valueOf(100),
+            contractId = null
         )
         val updatedQuote = quote.update(
             HouseOrApartmentIncompleteQuoteDto(
@@ -116,7 +119,8 @@ class QuoteTest {
             attributedTo = Partner.HEDVIG,
             breachedUnderwritingGuidelines = null,
             state = QuoteState.QUOTED,
-            price = BigDecimal.valueOf(100)
+            price = BigDecimal.valueOf(100),
+            contractId = null
         )
         val updatedQuote = quote.update(
             HouseOrApartmentIncompleteQuoteDto(
@@ -176,7 +180,8 @@ class QuoteTest {
             ),
             currentInsurer = null,
             memberId = "123456",
-            breachedUnderwritingGuidelines = null
+            breachedUnderwritingGuidelines = null,
+            contractId = null
         )
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf("fails debt check")
@@ -212,7 +217,8 @@ class QuoteTest {
             ),
             currentInsurer = null,
             memberId = "123456",
-            breachedUnderwritingGuidelines = null
+            breachedUnderwritingGuidelines = null,
+            contractId = null
         )
 
         val breachedUnderwritingGuidelines = listOf("fails debt check")

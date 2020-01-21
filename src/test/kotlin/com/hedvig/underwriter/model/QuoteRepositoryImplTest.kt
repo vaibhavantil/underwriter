@@ -51,7 +51,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            signedProductId = UUID.randomUUID(),
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -82,7 +83,8 @@ class QuoteRepositoryImplTest {
                 subType = ApartmentProductSubType.BRF
             ),
             breachedUnderwritingGuidelines = null,
-            currentInsurer = null
+            currentInsurer = null,
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
@@ -137,7 +139,8 @@ class QuoteRepositoryImplTest {
             ),
             currentInsurer = null,
             memberId = "123456",
-            breachedUnderwritingGuidelines = null
+            breachedUnderwritingGuidelines = null,
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -180,7 +183,8 @@ class QuoteRepositoryImplTest {
             currentInsurer = null,
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
-            state = QuoteState.SIGNED
+            state = QuoteState.SIGNED,
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
@@ -212,7 +216,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             createdAt = timestamp,
-            state = QuoteState.INCOMPLETE
+            state = QuoteState.INCOMPLETE,
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
@@ -255,7 +260,8 @@ class QuoteRepositoryImplTest {
             currentInsurer = null,
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
-            state = QuoteState.SIGNED
+            state = QuoteState.SIGNED,
+            contractId = null
         )
         val quote2 = Quote(
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
@@ -289,7 +295,8 @@ class QuoteRepositoryImplTest {
             currentInsurer = null,
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
-            state = QuoteState.SIGNED
+            state = QuoteState.SIGNED,
+            contractId = null
         )
         quoteDao.insert(quote1, timestamp)
         quoteDao.insert(quote2, timestamp)
@@ -324,7 +331,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             createdAt = timestamp,
             breachedUnderwritingGuidelines = null,
-            state = QuoteState.INCOMPLETE
+            state = QuoteState.INCOMPLETE,
+            contractId = null
         )
         val quote2 = Quote(
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
@@ -347,7 +355,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             createdAt = timestamp,
-            state = QuoteState.INCOMPLETE
+            state = QuoteState.INCOMPLETE,
+            contractId = null
         )
         quoteDao.insert(quote1, timestamp)
         quoteDao.insert(quote2, timestamp)
@@ -383,7 +392,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             createdAt = timestamp,
             breachedUnderwritingGuidelines = null,
-            state = QuoteState.INCOMPLETE
+            state = QuoteState.INCOMPLETE,
+            contractId = null
         )
         val quote2 = Quote(
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
@@ -406,7 +416,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             createdAt = timestamp2,
-            state = QuoteState.INCOMPLETE
+            state = QuoteState.INCOMPLETE,
+            contractId = null
         )
         quoteDao.insert(quote1, timestamp)
         quoteDao.insert(quote2, timestamp2)
@@ -451,7 +462,8 @@ class QuoteRepositoryImplTest {
                 isSubleted = false
             ),
             breachedUnderwritingGuidelines = null,
-            currentInsurer = null
+            currentInsurer = null,
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
 
@@ -496,7 +508,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            signedProductId = UUID.randomUUID(),
+            contractId = null
         )
         quoteDao.insert(quote, timestamp)
         val breachedUnderwritingGuidelinesQuote = quote.copy(

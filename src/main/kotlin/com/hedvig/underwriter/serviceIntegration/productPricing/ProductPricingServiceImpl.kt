@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ContractCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
@@ -13,7 +14,9 @@ import java.lang.RuntimeException
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 @EnableFeignClients
@@ -45,4 +48,10 @@ class ProductPricingServiceImpl @Autowired constructor(
 
     override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
+
+    override fun createContract(contractId: UUID, signedQuoteRequest: SignedQuoteRequest
+    ): ResponseEntity<ContractCreatedResponseDto> {
+        val contractId = productPricingClient.createContract(contractId, signedQuoteRequest).body
+        return ResponseEntity.ok(ContractCreatedResponseDto(contractId!!.contractId))
+    }
 }

@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ContractCreatedResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import java.util.*
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -58,4 +60,7 @@ interface ProductPricingClient {
     fun redeemCampaign(
         @Valid @RequestBody req: RedeemCampaignDto
     ): ResponseEntity<Void>
+
+    @PostMapping("/_/underwriter/createContract/{contractId}")
+    fun createContract(@PathVariable contractId: UUID, @Valid @RequestBody signedQuoteRequest: SignedQuoteRequest): ResponseEntity<ContractCreatedResponseDto>
 }

@@ -26,3 +26,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20200108-1000-add-email-and-data-collection-id-to-quote.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20200120-1342-add-contract-id-to-quote.sql
+      relativeToChangelogFile: true
