@@ -14,10 +14,6 @@ import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -28,6 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -56,7 +56,8 @@ class QuoteController @Autowired constructor(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
             shouldComplete = requestDto.shouldComplete,
-            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy)
+            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
+        )
             .bimap(
                 { ResponseEntity.status(422).body(it) },
                 { ResponseEntity.status(200).body(it) }
@@ -144,8 +145,8 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/member/{memberId}/signed")
-    fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity.HeadersBuilder<*> {
+    fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         quoteService.memberSigned(memberId, signRequest)
-        return ResponseEntity.noContent()
+        return ResponseEntity.noContent().build()
     }
 }
