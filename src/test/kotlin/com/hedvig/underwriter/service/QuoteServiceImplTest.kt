@@ -5,6 +5,7 @@ import arrow.core.Right
 import arrow.core.getOrElse
 import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
+import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
@@ -78,7 +79,7 @@ class QuoteServiceImplTest {
         every { env.activeProfiles } returns arrayOf<String>()
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
-        verify { customerIO.setPartnerCode("1234", Partner.COMPRICER) }
+        verify { customerIO.postSignUpdate(ofType(Quote::class)) }
     }
 
     @Test
@@ -100,7 +101,7 @@ class QuoteServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
-        verify(exactly = 0) { customerIO.setPartnerCode(any(), any()) }
+        verify(exactly = 0) { customerIO.postSignUpdate(any()) }
     }
 
     @Test
