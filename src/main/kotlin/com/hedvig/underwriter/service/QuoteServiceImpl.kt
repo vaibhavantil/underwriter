@@ -272,8 +272,8 @@ class QuoteServiceImpl(
         val quote = getQuote(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.originatingProductId != null) {
-            throw RuntimeException("There is a product Id already")
+        if (quote.signedProductId != null) {
+            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
