@@ -345,6 +345,13 @@ class QuoteServiceImpl(
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
         checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
 
+        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
+            email?.let {
+                memberService.finalizeOnboarding(quote, it)
+            }
+                ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
+        }
+
         val signedProductId = productPricingService.signedQuote(
             SignedQuoteRequest(
                 price = Money.of(quote.price, "SEK"),
@@ -358,13 +365,6 @@ class QuoteServiceImpl(
 
         val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
-
-        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
-            email?.let {
-                memberService.finalizeOnboarding(quote, it)
-            }
-                ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
-        }
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
             try {
