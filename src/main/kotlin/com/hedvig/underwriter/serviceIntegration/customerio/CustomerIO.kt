@@ -21,7 +21,7 @@ class CustomerIO(val customerIOClient: CustomerIOClient) {
                 val map = mutableMapOf(
                     "partner_code" to memberId.attributedTo.name,
                     "sign_source" to memberId.initiatedFrom.name,
-                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm"))
+                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond()
                 )
                 this.customerIOClient.put(memberId.memberId, map)
             } catch (ex: Exception) {
