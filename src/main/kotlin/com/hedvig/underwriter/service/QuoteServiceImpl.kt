@@ -399,7 +399,7 @@ class QuoteServiceImpl(
                 logger.error("customerIOClient is null even thou $activeProfiles is set")
             }
 
-            customerIOClient?.setPartnerCode(quoteWithProductId.memberId, quoteWithProductId.attributedTo)
+            customerIOClient?.postSignUpdate(quoteWithProductId)
         }
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
