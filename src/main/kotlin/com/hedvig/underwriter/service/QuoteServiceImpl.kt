@@ -392,15 +392,11 @@ class QuoteServiceImpl(
 
         quoteRepository.update(signedQuote, signedAt)
 
-        if (quoteWithProductId.attributedTo != Partner.HEDVIG) {
-
-            val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
-            if (activeProfiles.isNotEmpty() && customerIOClient == null) {
-                logger.error("customerIOClient is null even thou $activeProfiles is set")
-            }
-
-            customerIOClient?.postSignUpdate(quoteWithProductId)
+        val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
+        if (activeProfiles.isNotEmpty() && customerIOClient == null) {
+            logger.error("customerIOClient is null even thou $activeProfiles is set")
         }
+        customerIOClient?.postSignUpdate(quoteWithProductId)
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
     }
