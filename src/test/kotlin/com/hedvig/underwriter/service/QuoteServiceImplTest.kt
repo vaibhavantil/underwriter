@@ -83,7 +83,7 @@ class QuoteServiceImplTest {
     }
 
     @Test
-    fun givenPartnerIsHedvigDoNotSendPartnerIdToCustomerIO() {
+    fun givenPartnerIsHedvigSendPartnerIdToCustomerIO() {
         val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
 
         val quoteId = UUID.randomUUID()
@@ -100,8 +100,10 @@ class QuoteServiceImplTest {
         } returns SignedProductResponseDto(UUID.randomUUID())
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
+        every { env.activeProfiles } returns arrayOf<String>()
+
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
-        verify(exactly = 0) { customerIO.postSignUpdate(any()) }
+        verify { customerIO.postSignUpdate(any()) }
     }
 
     @Test
