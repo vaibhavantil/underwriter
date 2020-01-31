@@ -101,7 +101,7 @@ class QuoteServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         every { env.activeProfiles } returns arrayOf<String>()
-        
+
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
     }
