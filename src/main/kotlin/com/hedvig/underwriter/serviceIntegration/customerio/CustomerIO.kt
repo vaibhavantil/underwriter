@@ -15,17 +15,20 @@ private val logger = KotlinLogging.logger {}
 @EnableFeignClients
 class CustomerIO(val customerIOClient: CustomerIOClient) {
 
-    fun postSignUpdate(memberId: Quote) {
-        if (memberId.memberId != null) {
+    fun postSignUpdate(quote: Quote) {
+        if (quote.memberId != null) {
+            val isSwitcher = quote.currentInsurer != null
             try {
                 val map = mutableMapOf(
-                    "partner_code" to memberId.attributedTo.name,
-                    "sign_source" to memberId.initiatedFrom.name,
-                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond()
+                    "partner_code" to quote.attributedTo.name,
+                    "sign_source" to quote.initiatedFrom.name,
+                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond(),
+                    "switcher_company" to quote.currentInsurer,
+                    "is_switcher" to isSwitcher
                 )
-                this.customerIOClient.put(memberId.memberId, map)
+                this.customerIOClient.put(quote.memberId, map)
             } catch (ex: Exception) {
-                logger.error("Could not update \"member\" with id \"${memberId.memberId}\"", ex)
+                logger.error("Could not update \"member\" with id \"${quote.memberId}\"", ex)
             }
         }
     }
