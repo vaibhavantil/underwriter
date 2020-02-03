@@ -13,5 +13,9 @@ data class CreateQuoteInput(
     val startDate: LocalDate?,
     val apartment: CreateApartmentInput?,
     val house: CreateHouseInput?,
+    val swedishApartment: CreateSwedishApartmentInput?,
+    val swedishHouse: CreateSwedishHouseInput?,
+    val norweiganHomeContents: CreateNorwegianHomeContentsInput?,
+    val norweiganTravel: CreateNorwegianTravelInput?,
     val dataCollectionId: UUID?
 )

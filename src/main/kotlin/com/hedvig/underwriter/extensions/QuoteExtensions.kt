@@ -5,6 +5,7 @@ import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
+import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
 import com.hedvig.underwriter.model.ExtraBuildingType
@@ -65,6 +66,35 @@ fun Quote.createCompleteQuoteResult(
             isSubleted = house.isSubleted!!
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
+
+fun Quote.createQuoteResult(
+    localizationService: LocalizationService,
+    locale: Locale
+): QuoteDetails =
+    this.apartment?.let { apartment ->
+        QuoteDetails.SwedishApartmentQuoteDetails(
+            street = apartment.street!!,
+            zipCode = apartment.zipCode!!,
+            householdSize = apartment.householdSize!!,
+            livingSpace = apartment.livingSpace!!,
+            type = ApartmentType.valueOf(apartment.subType!!.name)
+        )
+    } ?: this.house?.let { house ->
+        QuoteDetails.SwedishHouseQuoteDetails(
+            street = house.street!!,
+            zipCode = house.zipCode!!,
+            householdSize = house.householdSize!!,
+            livingSpace = house.livingSpace!!,
+            ancillarySpace = house.ancillaryArea!!,
+            extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
+                extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
+            },
+            numberOfBathrooms = house.numberOfBathrooms!!,
+            yearOfConstruction = house.yearOfConstruction!!,
+            isSubleted = house.isSubleted!!
+        )
+    }  ?: this.
+    ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
 
 fun Quote.createIncompleteQuoteResult(
     localizationService: LocalizationService,

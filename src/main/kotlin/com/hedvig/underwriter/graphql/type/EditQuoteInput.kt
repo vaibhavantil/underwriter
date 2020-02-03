@@ -13,5 +13,9 @@ data class EditQuoteInput(
     val startDate: LocalDate?,
     val apartment: EditApartmentInput?,
     val house: EditHouseInput?,
+    val swedishApartment: EditSwedishApartmentInput?,
+    val swedishHouse: EditSwedishHouseInput?,
+    val norweiganHomeContents: EditNorwegianHomeContentsInput?,
+    val norweiganTravel: EditNorwegianTravelInput?,
     val dataCollectionId: UUID?
 )

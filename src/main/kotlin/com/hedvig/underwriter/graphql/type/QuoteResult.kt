@@ -14,7 +14,9 @@ sealed class QuoteResult {
         val ssn: String,
         val price: MonetaryAmountV2,
         val insuranceCost: InsuranceCost,
+        @Deprecated("use quoteDetails")
         val details: CompleteQuoteDetails,
+        val quoteDetails: QuoteDetails,
         val startDate: LocalDate?,
         val expiresAt: LocalDate,
         val email: String?,
