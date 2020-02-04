@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.birthDateFromSsn
@@ -17,7 +17,7 @@ data class ApartmentQuotePriceDto(
     companion object {
         fun from(quote: Quote): ApartmentQuotePriceDto {
             val quoteData = quote.data
-            if (quoteData is ApartmentData) {
+            if (quoteData is SwedishApartmentData) {
                 return ApartmentQuotePriceDto(
                     birthDate = quoteData.ssn!!.birthDateFromSsn(),
                     livingSpace = quoteData.livingSpace!!,

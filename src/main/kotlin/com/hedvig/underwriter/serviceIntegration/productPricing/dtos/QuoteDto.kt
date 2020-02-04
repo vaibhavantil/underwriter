@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
@@ -36,7 +36,7 @@ data class QuoteDto(
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
             when (quote.data) {
-                is ApartmentData -> {
+                is SwedishApartmentData -> {
                     return QuoteDto(
                         id = quote.id,
                         createdAt = quote.createdAt,
@@ -58,7 +58,7 @@ data class QuoteDto(
                     )
                 }
 
-                is HouseData -> {
+                is SwedishHouseData -> {
                     return QuoteDto(
                         id = quote.id,
                         createdAt = quote.createdAt,

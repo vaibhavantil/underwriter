@@ -21,7 +21,7 @@ class QuoteTest {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            data = ApartmentData(id = UUID.randomUUID()),
+            data = SwedishApartmentData(id = UUID.randomUUID()),
             productType = ProductType.APARTMENT,
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
@@ -47,7 +47,7 @@ class QuoteTest {
             )
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
-        assertThat((updatedQuote.data as ApartmentData).ssn).isEqualTo("201212121212")
+        assertThat((updatedQuote.data as SwedishApartmentData).ssn).isEqualTo("201212121212")
     }
 
     @Test
@@ -55,7 +55,7 @@ class QuoteTest {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 id = UUID.randomUUID(),
                 ssn = "201212121212",
                 street = "Storgatan 1"
@@ -97,8 +97,8 @@ class QuoteTest {
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat(updatedQuote.productType).isEqualTo(ProductType.HOUSE)
-        assertThat((updatedQuote.data as HouseData).ssn).isEqualTo("201212121213")
-        assertThat((updatedQuote.data as HouseData).street).isEqualTo("Storgatan 2")
+        assertThat((updatedQuote.data as SwedishHouseData).ssn).isEqualTo("201212121213")
+        assertThat((updatedQuote.data as SwedishHouseData).street).isEqualTo("Storgatan 2")
     }
 
     @Test
@@ -106,7 +106,7 @@ class QuoteTest {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            data = HouseData(
+            data = SwedishHouseData(
                 id = UUID.randomUUID(),
                 ssn = "201212121212",
                 street = "Storgatan 1"
@@ -145,9 +145,9 @@ class QuoteTest {
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat(updatedQuote.productType).isEqualTo(ProductType.APARTMENT)
-        assertThat((updatedQuote.data as ApartmentData).ssn).isEqualTo("201212121213")
-        assertThat((updatedQuote.data as ApartmentData).street).isEqualTo("Storgatan 2")
-        assertThat((updatedQuote.data as ApartmentData).subType).isEqualTo(ApartmentProductSubType.BRF)
+        assertThat((updatedQuote.data as SwedishApartmentData).ssn).isEqualTo("201212121213")
+        assertThat((updatedQuote.data as SwedishApartmentData).street).isEqualTo("Storgatan 2")
+        assertThat((updatedQuote.data as SwedishApartmentData).subType).isEqualTo(ApartmentProductSubType.BRF)
     }
 
     @Test
@@ -162,7 +162,7 @@ class QuoteTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -198,7 +198,7 @@ class QuoteTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",

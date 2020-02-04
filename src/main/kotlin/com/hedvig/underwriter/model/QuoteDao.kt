@@ -83,10 +83,10 @@ interface QuoteDao {
         """
     )
     @GetGeneratedKeys("internal_id")
-    fun insert(@BindBean quoteData: ApartmentData): ApartmentData
+    fun insert(@BindBean quoteData: SwedishApartmentData): SwedishApartmentData
 
     @SqlQuery("""SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
-    fun findApartmentQuoteData(@Bind id: Int): ApartmentData?
+    fun findApartmentQuoteData(@Bind id: Int): SwedishApartmentData?
 
     @SqlQuery(
         """
@@ -171,14 +171,14 @@ interface QuoteDao {
     """
     )
     @GetGeneratedKeys("internal_id")
-    fun insert(@BindBean data: HouseData): HouseData
+    fun insert(@BindBean data: SwedishHouseData): SwedishHouseData
 
     @SqlQuery(
         """
         SELECT * FROM quote_revision_house_data WHERE internal_id = :id
     """
     )
-    fun findHouseQuoteData(@Bind id: Int): HouseData?
+    fun findHouseQuoteData(@Bind id: Int): SwedishHouseData?
 
     @SqlUpdate(
         """

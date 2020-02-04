@@ -5,11 +5,14 @@ import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
+import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType
 import com.hedvig.underwriter.graphql.type.QuoteDetails
-import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
 import com.hedvig.underwriter.model.ExtraBuildingType
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
 import java.lang.IllegalStateException
@@ -30,11 +33,17 @@ val Quote.ssn
 val Quote.email
     get() = (data as? PersonPolicyHolder<*>)?.email
 
-val Quote.apartment
-    get() = (data as? ApartmentData)
+val Quote.swedishApartment
+    get() = (data as? SwedishApartmentData)
 
-val Quote.house
-    get() = (data as? HouseData)
+val Quote.swedishHouse
+    get() = (data as? SwedishHouseData)
+
+val Quote.norwegianHomeContents
+    get() = (data as? NorwegianHomeContentsData)
+
+val Quote.norwegianTravel
+    get() = (data as? NorwegianTravelData)
 
 val Quote.validTo
     get() = this.createdAt.plusSeconds(this.validity)!!
@@ -43,7 +52,7 @@ fun Quote.createCompleteQuoteResult(
     localizationService: LocalizationService,
     locale: Locale
 ): CompleteQuoteDetails =
-    this.apartment?.let { apartment ->
+    this.swedishApartment?.let { apartment ->
         CompleteQuoteDetails.CompleteApartmentQuoteDetails(
             street = apartment.street!!,
             zipCode = apartment.zipCode!!,
@@ -51,7 +60,7 @@ fun Quote.createCompleteQuoteResult(
             livingSpace = apartment.livingSpace!!,
             type = ApartmentType.valueOf(apartment.subType!!.name)
         )
-    } ?: this.house?.let { house ->
+    } ?: this.swedishHouse?.let { house ->
         CompleteQuoteDetails.CompleteHouseQuoteDetails(
             street = house.street!!,
             zipCode = house.zipCode!!,
@@ -65,13 +74,13 @@ fun Quote.createCompleteQuoteResult(
             yearOfConstruction = house.yearOfConstruction!!,
             isSubleted = house.isSubleted!!
         )
-    } ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
+    } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
 
 fun Quote.createQuoteResult(
     localizationService: LocalizationService,
     locale: Locale
 ): QuoteDetails =
-    this.apartment?.let { apartment ->
+    this.swedishApartment?.let { apartment ->
         QuoteDetails.SwedishApartmentQuoteDetails(
             street = apartment.street!!,
             zipCode = apartment.zipCode!!,
@@ -79,7 +88,7 @@ fun Quote.createQuoteResult(
             livingSpace = apartment.livingSpace!!,
             type = ApartmentType.valueOf(apartment.subType!!.name)
         )
-    } ?: this.house?.let { house ->
+    } ?: this.swedishHouse?.let { house ->
         QuoteDetails.SwedishHouseQuoteDetails(
             street = house.street!!,
             zipCode = house.zipCode!!,
@@ -93,14 +102,26 @@ fun Quote.createQuoteResult(
             yearOfConstruction = house.yearOfConstruction!!,
             isSubleted = house.isSubleted!!
         )
-    }  ?: this.
-    ?: throw IllegalStateException("Trying to create QuoteDetails without `apartment` or `house` data")
+    } ?: this.norwegianHomeContents?.let {
+        QuoteDetails.NorwegianHomeContentsDetails(
+            street = it.street,
+            zipCode = it.zipCode,
+            coinsured = it.householdSize,
+            livingSpace = it.livingSpace,
+            isStudent = it.isSudent,
+            type = NorwegianHomeContentsType.valueOf(it.type.name)
+        )
+    } ?: this.norwegianTravel?.let {
+        QuoteDetails.NorwegianTravelDetails(
+            coinsured = it.coinsured
+        )
+    } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
 fun Quote.createIncompleteQuoteResult(
     localizationService: LocalizationService,
     locale: Locale
 ): IncompleteQuoteDetails? =
-    this.apartment?.let { apartment ->
+    this.swedishApartment?.let { apartment ->
         IncompleteQuoteDetails.IncompleteApartmentQuoteDetails(
             street = apartment.street,
             zipCode = apartment.zipCode,
@@ -108,7 +129,7 @@ fun Quote.createIncompleteQuoteResult(
             livingSpace = apartment.livingSpace,
             type = apartment.subType?.let { ApartmentType.valueOf(it.name) }
         )
-    } ?: this.house?.let { house ->
+    } ?: this.swedishHouse?.let { house ->
         IncompleteQuoteDetails.IncompleteHouseQuoteDetails(
             street = house.street,
             zipCode = house.zipCode,

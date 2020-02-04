@@ -12,8 +12,8 @@ import org.jdbi.v3.json.Json
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ApartmentData::class, name = "apartment"),
-    JsonSubTypes.Type(value = HouseData::class, name = "house")
+    JsonSubTypes.Type(value = SwedishApartmentData::class, name = "apartment"),
+    JsonSubTypes.Type(value = SwedishHouseData::class, name = "house")
 )
 sealed class QuoteData {
     abstract val isComplete: Boolean
@@ -21,8 +21,10 @@ sealed class QuoteData {
 
     fun productType(): ProductType {
         return when (this) {
-            is HouseData -> ProductType.HOUSE
-            is ApartmentData -> ProductType.APARTMENT
+            is SwedishHouseData -> ProductType.HOUSE
+            is SwedishApartmentData -> ProductType.APARTMENT
+            is NorwegianHomeContentsData -> ProductType.UNKNOWN
+            is NorwegianTravelData -> ProductType.UNKNOWN
         }
     }
 
@@ -74,7 +76,8 @@ interface HomeInsurance {
     val householdSize: Int?
 }
 
-data class HouseData(
+//TODO: Let's split this file up. But right now we are refactoring some other parts of this so let's do it after
+data class SwedishHouseData(
     override val id: UUID,
     override val ssn: String? = null,
     override val firstName: String? = null,
@@ -97,7 +100,7 @@ data class HouseData(
     val floor: Int? = 0,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), HomeInsurance, PersonPolicyHolder<HouseData> {
+) : QuoteData(), HomeInsurance, PersonPolicyHolder<SwedishHouseData> {
     @get:JsonIgnore
     override val isComplete: Boolean
         get() = when (null) {
@@ -149,7 +152,7 @@ data class HouseData(
     }
 }
 
-data class ApartmentData(
+data class SwedishApartmentData(
     override val id: UUID,
     override val ssn: String? = null,
     override val firstName: String? = null,
@@ -165,7 +168,7 @@ data class ApartmentData(
     val subType: ApartmentProductSubType? = null,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), HomeInsurance, PersonPolicyHolder<ApartmentData> {
+) : QuoteData(), HomeInsurance, PersonPolicyHolder<SwedishApartmentData> {
     @get:JsonIgnore
     override val isComplete: Boolean
         get() = when (null) {
@@ -177,7 +180,7 @@ data class ApartmentData(
     val isStudent: Boolean
         get() = subType == ApartmentProductSubType.STUDENT_BRF || subType == ApartmentProductSubType.STUDENT_RENT
 
-    override fun updateName(firstName: String, lastName: String): ApartmentData {
+    override fun updateName(firstName: String, lastName: String): SwedishApartmentData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
@@ -252,3 +255,62 @@ enum class ExtraBuildingType {
     BOATHOUSE,
     OTHER
 }
+
+data class NorwegianHomeContentsData(
+    override val id: UUID,
+    override val ssn: String,
+    override val firstName: String,
+    override val lastName: String,
+    override val email: String,
+
+    override val street: String,
+    override val city: String,
+    override val zipCode: String,
+    override val householdSize: Int,
+    override val livingSpace: Int,
+    val isSudent: Boolean,
+    val type: NorwegianHomeContentsType
+):  QuoteData(), HomeInsurance, PersonPolicyHolder<NorwegianHomeContentsData> {
+
+    override fun updateName(firstName: String, lastName: String): NorwegianHomeContentsData {
+        return this.copy(firstName = firstName, lastName = lastName)
+    }
+
+    //TODO: Let's remove the consept of complete
+    override val isComplete: Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    //TODO: should not even be here
+    override fun passUwGuidelines(): List<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+
+enum class NorwegianHomeContentsType{
+    RENT,
+    OWN
+}
+
+data class NorwegianTravelData(
+    override val id: UUID,
+    override val ssn: String? = null,
+    override val firstName: String? = null,
+    override val lastName: String? = null,
+    override val email: String? = null,
+    val coinsured: Int
+): QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
+
+    override fun updateName(firstName: String, lastName: String): NorwegianTravelData {
+        return this.copy(firstName = firstName, lastName = lastName)
+    }
+
+    //TODO: Let's remove the consept of complete
+    override val isComplete: kotlin.Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    //TODO: should not even be here
+    override fun passUwGuidelines(): List<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
+

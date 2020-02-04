@@ -35,7 +35,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -69,7 +69,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.QUOTED,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -86,7 +86,7 @@ class QuoteRepositoryImplTest {
         )
         quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
-            data = (quote.data as ApartmentData).copy(
+            data = (quote.data as SwedishApartmentData).copy(
                 firstName = "John",
                 lastName = "Watson"
             ),
@@ -112,7 +112,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = HouseData(
+            data = SwedishHouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -151,7 +151,7 @@ class QuoteRepositoryImplTest {
         val quote = Quote(
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
-            data = HouseData(
+            data = SwedishHouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -193,7 +193,7 @@ class QuoteRepositoryImplTest {
         val timestamp = Instant.now()
         val quote = Quote(
             productType = ProductType.APARTMENT,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -227,7 +227,7 @@ class QuoteRepositoryImplTest {
             id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
-            data = HouseData(
+            data = SwedishHouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -261,7 +261,7 @@ class QuoteRepositoryImplTest {
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
             createdAt = timestamp,
             productType = ProductType.APARTMENT,
-            data = HouseData(
+            data = SwedishHouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -306,7 +306,7 @@ class QuoteRepositoryImplTest {
         val quote1 = Quote(
             id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
             productType = ProductType.APARTMENT,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -329,7 +329,7 @@ class QuoteRepositoryImplTest {
         val quote2 = Quote(
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
             productType = ProductType.APARTMENT,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -365,7 +365,7 @@ class QuoteRepositoryImplTest {
         val quote1 = Quote(
             id = UUID.fromString("4c1f22b6-0aab-4c9c-a00b-fd06af9fe84e"),
             productType = ProductType.APARTMENT,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -388,7 +388,7 @@ class QuoteRepositoryImplTest {
         val quote2 = Quote(
             id = UUID.fromString("bfc61528-bdca-45fe-9111-0e4549ed07d4"),
             productType = ProductType.APARTMENT,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -427,7 +427,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.QUOTED,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = HouseData(
+            data = SwedishHouseData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",
@@ -457,7 +457,7 @@ class QuoteRepositoryImplTest {
 
         val updatedQuote = quote.copy(
             state = QuoteState.SIGNED,
-            data = (quote.data as HouseData).copy(
+            data = (quote.data as SwedishHouseData).copy(
                 firstName = "John",
                 lastName = "Watson"
             ),
@@ -480,7 +480,7 @@ class QuoteRepositoryImplTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
                 ssn = "199003041234",

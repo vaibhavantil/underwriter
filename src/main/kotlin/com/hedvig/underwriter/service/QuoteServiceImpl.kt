@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
-import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ExtraBuilding
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
@@ -146,7 +146,7 @@ class QuoteServiceImpl(
             attributedTo = incompleteQuoteData.quotingPartner ?: Partner.HEDVIG,
             data = when (val quoteData = incompleteQuoteData.incompleteQuoteData) {
                 is IncompleteApartmentQuoteDataDto ->
-                    ApartmentData(
+                    SwedishApartmentData(
                         id = UUID.randomUUID(),
                         ssn = incompleteQuoteData.ssn,
                         firstName = incompleteQuoteData.firstName,
@@ -160,7 +160,7 @@ class QuoteServiceImpl(
                         livingSpace = quoteData.livingSpace
                     )
                 is com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto ->
-                    HouseData(
+                    SwedishHouseData(
                         id = UUID.randomUUID(),
                         ssn = incompleteQuoteData.ssn,
                         firstName = incompleteQuoteData.firstName,

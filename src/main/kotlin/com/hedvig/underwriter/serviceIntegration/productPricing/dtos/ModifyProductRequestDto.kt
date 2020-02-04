@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.Quote
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -36,7 +36,7 @@ data class ModifyProductRequestDto(
             previousInsuranceTerminationDate: LocalDate
         ): ModifyProductRequestDto =
             when (quote.data) {
-                is ApartmentData -> ModifyProductRequestDto(
+                is SwedishApartmentData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
                         ?: throw IllegalArgumentException("Originating product id must be present to modify a product"),
                     memberId = quote.memberId
@@ -53,13 +53,13 @@ data class ModifyProductRequestDto(
                     price = quote.price!!
                 )
 
-                is HouseData -> ModifyProductRequestDto(
+                is SwedishHouseData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
                         ?: throw IllegalArgumentException("Originating product id must be present to modify a product"),
                     memberId = quote.memberId
                         ?: throw IllegalArgumentException("memberId must be present in order to modify a product"),
                     isStudent = when (quote.data) {
-                        is ApartmentData -> quote.data.isStudent
+                        is SwedishApartmentData -> quote.data.isStudent
                         else -> false
                     },
                     street = quote.data.street!!,

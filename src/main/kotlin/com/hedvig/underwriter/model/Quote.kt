@@ -61,11 +61,11 @@ data class DatabaseQuoteRevision(
                 startDate = quote.startDate,
                 price = quote.price,
                 quoteApartmentDataId = when (quote.data) {
-                    is ApartmentData -> quote.data.internalId
+                    is SwedishApartmentData -> quote.data.internalId
                     else -> null
                 },
                 quoteHouseDataId = when (quote.data) {
-                    is HouseData -> quote.data.internalId
+                    is SwedishHouseData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,
@@ -114,8 +114,8 @@ data class Quote(
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
         return when (this.data) {
-            is ApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
-            is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
+            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
+            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
         }
     }
 
@@ -124,7 +124,7 @@ data class Quote(
             productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
             startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
-                is ApartmentData -> data.copy(
+                is SwedishApartmentData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
@@ -134,7 +134,7 @@ data class Quote(
                         else -> null
                     }
                 ) as QuoteData // This cast removes an IntellJ warning
-                is HouseData -> data.copy(
+                is SwedishHouseData -> data.copy(
                     ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
                     firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
@@ -147,11 +147,11 @@ data class Quote(
         if (
             requestData is IncompleteApartmentQuoteDataDto
         ) {
-            val newQuoteData: ApartmentData = when (newQuote.data) {
-                is ApartmentData -> newQuote.data as ApartmentData
-                is HouseData -> {
-                    val houseData = newQuote.data as HouseData
-                    ApartmentData(
+            val newQuoteData: SwedishApartmentData = when (newQuote.data) {
+                is SwedishApartmentData -> newQuote.data as SwedishApartmentData
+                is SwedishHouseData -> {
+                    val houseData = newQuote.data as SwedishHouseData
+                    SwedishApartmentData(
                         id = houseData.id,
                         firstName = houseData.firstName,
                         lastName = houseData.lastName,
@@ -179,11 +179,11 @@ data class Quote(
         if (
             requestData is IncompleteHouseQuoteDataDto
         ) {
-            val newQuoteData: HouseData = when (newQuote.data) {
-                is HouseData -> newQuote.data as HouseData
-                is ApartmentData -> {
-                    val apartmentData = newQuote.data as ApartmentData
-                    HouseData(
+            val newQuoteData: SwedishHouseData = when (newQuote.data) {
+                is SwedishHouseData -> newQuote.data as SwedishHouseData
+                is SwedishApartmentData -> {
+                    val apartmentData = newQuote.data as SwedishApartmentData
+                    SwedishHouseData(
                         id = apartmentData.id,
                         firstName = apartmentData.firstName,
                         lastName = apartmentData.lastName,

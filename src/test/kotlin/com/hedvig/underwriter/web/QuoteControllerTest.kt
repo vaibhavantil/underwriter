@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
@@ -80,7 +80,7 @@ internal class QuoteControllerTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 id = UUID.randomUUID(),
                 street = "123 Baker street",
                 city = "Stockholm",
@@ -121,7 +121,7 @@ internal class QuoteControllerTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
             data =
-            ApartmentData(
+            SwedishApartmentData(
                 street = "123 Baker street",
                 zipCode = "11216",
                 livingSpace = 33,

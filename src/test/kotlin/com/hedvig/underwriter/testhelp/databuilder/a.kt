@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
-import com.hedvig.underwriter.model.ApartmentData
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.ONE_DAY
 import com.hedvig.underwriter.model.Partner
@@ -82,6 +82,6 @@ class a {
         val internalId: Int? = null
     ) : QuoteDataBuilder {
 
-        override fun build() = ApartmentData(id, ssn, firstName, lastName, email, street, city, zipCode, householdSize, livingSpace, subType, internalId)
+        override fun build() = SwedishApartmentData(id, ssn, firstName, lastName, email, street, city, zipCode, householdSize, livingSpace, subType, internalId)
     }
 }

@@ -26,6 +26,7 @@ sealed class QuoteDetails {
         val zipCode: String,
         val coinsured: Int,
         val livingSpace: Int,
+        val isStudent: Boolean,
         val type: NorwegianHomeContentsType
     ) : QuoteDetails()
 
