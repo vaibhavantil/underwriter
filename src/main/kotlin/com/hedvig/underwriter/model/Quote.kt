@@ -1,7 +1,5 @@
 package com.hedvig.underwriter.model
 
-import arrow.core.Either
-import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.House
@@ -214,51 +212,5 @@ data class Quote(
             )
         }
         return newQuote
-    }
-
-    fun complete(
-        debtChecker: DebtChecker,
-        productPricingService: ProductPricingService,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<List<String>, Quote> {
-        val quoteData = this.data
-        val breachedUnderwritingGuidelines = mutableListOf<String>()
-        val bypassUnderwritingGuidelines = underwritingGuidelinesBypassedBy != null
-
-        breachedUnderwritingGuidelines.addAll(quoteData.passUwGuidelines())
-
-        if (quoteData is PersonPolicyHolder<*>) {
-            if (quoteData.age() < 18)
-                breachedUnderwritingGuidelines.add("member is younger than 18")
-            if (!quoteData.ssnIsValid())
-                breachedUnderwritingGuidelines.add("invalid ssn")
-
-            if (breachedUnderwritingGuidelines.isEmpty()) {
-                breachedUnderwritingGuidelines.addAll(debtChecker.passesDebtCheck(quoteData))
-            }
-        }
-
-        val newQuote = copy(data = quoteData, breachedUnderwritingGuidelines = breachedUnderwritingGuidelines)
-
-        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
-                    state = QuoteState.QUOTED
-                )
-            )
-        }
-
-        if (breachedUnderwritingGuidelines.isEmpty()) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    state = QuoteState.QUOTED
-                )
-            )
-        }
-
-        return Either.left(breachedUnderwritingGuidelines)
     }
 }

@@ -9,8 +9,8 @@ import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.HouseData
-import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.lang.IllegalStateException
 import java.util.Locale
 

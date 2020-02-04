@@ -2,22 +2,15 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import arrow.core.orNull
 import com.hedvig.underwriter.extensions.validTo
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.ExtraBuilding
-import com.hedvig.underwriter.model.HouseData
-import com.hedvig.underwriter.model.Partner
-import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -26,7 +19,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProdu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
-import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -127,76 +119,6 @@ class QuoteServiceImpl(
         }
 
         return Either.right(updatedQuote!!)
-    }
-
-    override fun createQuote(
-        quoteRequest: QuoteRequest,
-        id: UUID?,
-        initiatedFrom: QuoteInitiatedFrom,
-        underwritingGuidelinesBypassedBy: String?
-    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-        val now = Instant.now()
-
-        val quote = Quote(
-            id = id ?: UUID.randomUUID(),
-            createdAt = now,
-            productType = quoteRequest.productType!!,
-            initiatedFrom = initiatedFrom,
-            attributedTo = quoteRequest.quotingPartner ?: Partner.HEDVIG,
-            data = when (val quoteData = quoteRequest.incompleteQuoteData) {
-                is Apartment ->
-                    ApartmentData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        firstName = quoteRequest.firstName,
-                        lastName = quoteRequest.lastName,
-                        email = quoteRequest.email,
-                        subType = quoteData.subType,
-                        street = quoteData.street,
-                        zipCode = quoteData.zipCode,
-                        city = quoteData.city,
-                        householdSize = quoteData.householdSize,
-                        livingSpace = quoteData.livingSpace
-                    )
-                is House ->
-                    HouseData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        firstName = quoteRequest.firstName,
-                        lastName = quoteRequest.lastName,
-                        email = quoteRequest.email,
-                        street = quoteData.street,
-                        zipCode = quoteData.zipCode,
-                        city = quoteData.city,
-                        householdSize = quoteData.householdSize,
-                        livingSpace = quoteData.livingSpace,
-                        numberOfBathrooms = quoteData.numberOfBathrooms,
-                        isSubleted = quoteData.isSubleted,
-                        extraBuildings = quoteData.extraBuildings?.map((ExtraBuilding)::from),
-                        ancillaryArea = quoteData.ancillaryArea,
-                        yearOfConstruction = quoteData.yearOfConstruction
-                    )
-                null -> throw IllegalArgumentException("Must provide either house or apartment data")
-            },
-            state = QuoteState.INCOMPLETE,
-            memberId = quoteRequest.memberId,
-            breachedUnderwritingGuidelines = null,
-            originatingProductId = quoteRequest.originatingProductId,
-            currentInsurer = quoteRequest.currentInsurer,
-            startDate = quoteRequest.startDate?.toStockholmLocalDate(),
-            dataCollectionId = quoteRequest.dataCollectionId
-        )
-
-        // TODO: Underwriter fetches guidelines (including debt-check) and then "completes it"
-        // Result HIt or not, guidelines and price + discounts
-
-        // Store it with state UW_HIT
-
-        val potentiallySavedQuote = quote
-            .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-            .map { it: Quote -> this.quoteRepository.insert(it); it }
-
-        return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
     }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
