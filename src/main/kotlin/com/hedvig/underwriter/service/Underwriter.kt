@@ -11,6 +11,9 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.service.guideline.AgeRestrictionGuideline
+import com.hedvig.underwriter.service.guideline.Guideline
+import com.hedvig.underwriter.service.guideline.SwedishApartmentHouseHoldSize
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
@@ -96,7 +99,7 @@ class UnderwriterImpl(
 
         if (breachedUnderwritingGuidelines.isEmpty())
 
-        complete(quote, underwritingGuidelinesBypassedBy)
+            complete(quote, underwritingGuidelinesBypassedBy)
 
         return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
     }
@@ -128,13 +131,25 @@ class UnderwriterImpl(
         return Either.left(breachedUnderwritingGuidelines)
     }
 
+    private val swedishApartmentGuidelines = listOf(
+        AgeRestrictionGuideline(),
+        SwedishApartmentHouseHoldSize()
+    )
+
     private fun validateGuidelines(data: QuoteData): List<String> {
         val errors = mutableListOf<String>()
 
-        return when (data) {
+        when (data) {
             is HouseData -> validateGuidelines(data, errors)
-            is ApartmentData -> validateGuidelines(data, errors)
+            is ApartmentData -> swedishApartmentGuidelines.mapNotNull {
+                it.invokeValidate(data)
+            }.forEach {
+                errors.add(
+                    it
+                )
+            }
         }
+        return errors
     }
 
     private fun validateGuidelines(data: HouseData, errors: MutableList<String>): List<String> {
