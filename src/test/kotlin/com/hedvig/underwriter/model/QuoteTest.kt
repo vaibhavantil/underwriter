@@ -2,11 +2,11 @@ package com.hedvig.underwriter.model
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import io.mockk.every
 import io.mockk.mockk
 import java.math.BigDecimal
@@ -30,7 +30,7 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            HouseOrApartmentIncompleteQuoteDto(
+            QuoteRequest(
                 firstName = null,
                 lastName = null,
                 email = null,
@@ -68,14 +68,14 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            HouseOrApartmentIncompleteQuoteDto(
+            QuoteRequest(
                 firstName = null,
                 lastName = null,
                 email = null,
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteQuoteData = IncompleteHouseQuoteDataDto(
+                incompleteQuoteData = House(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,
@@ -119,14 +119,14 @@ class QuoteTest {
             price = BigDecimal.valueOf(100)
         )
         val updatedQuote = quote.update(
-            HouseOrApartmentIncompleteQuoteDto(
+            QuoteRequest(
                 firstName = null,
                 lastName = null,
                 email = null,
                 productType = ProductType.APARTMENT,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteQuoteData = IncompleteApartmentQuoteDataDto(
+                incompleteQuoteData = Apartment(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,

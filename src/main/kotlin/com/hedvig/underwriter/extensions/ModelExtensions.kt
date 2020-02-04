@@ -13,18 +13,18 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.util.toStockholmInstant
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import java.util.UUID
 
 fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner: Partner? = null,
     memberId: String? = null,
     originatingProductId: UUID? = null
-) = HouseOrApartmentIncompleteQuoteDto(
+) = QuoteRequest(
     firstName = this.firstName,
     lastName = this.lastName,
     email = this.email,
@@ -40,34 +40,36 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     dataCollectionId = this.dataCollectionId
 )
 
-fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
-    street = this.street,
-    zipCode = this.zipCode,
-    livingSpace = this.livingSpace,
-    householdSize = this.householdSize,
-    subType = this.type.toSubType(),
-    city = null,
-    floor = null
-)
+fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() =
+    Apartment(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        subType = this.type.toSubType(),
+        city = null,
+        floor = null
+    )
 
-fun CreateHouseInput.toIncompleteHouseQuoteDataDto() = IncompleteHouseQuoteDataDto(
-    street = this.street,
-    zipCode = this.zipCode,
-    livingSpace = this.livingSpace,
-    householdSize = this.householdSize,
-    ancillaryArea = this.ancillarySpace,
-    yearOfConstruction = this.yearOfConstruction,
-    isSubleted = this.isSubleted,
-    extraBuildings = this.extraBuildings.toExtraBuilding(),
-    numberOfBathrooms = this.numberOfBathrooms,
-    city = null
-)
+fun CreateHouseInput.toIncompleteHouseQuoteDataDto() =
+    House(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        ancillaryArea = this.ancillarySpace,
+        yearOfConstruction = this.yearOfConstruction,
+        isSubleted = this.isSubleted,
+        extraBuildings = this.extraBuildings.toExtraBuilding(),
+        numberOfBathrooms = this.numberOfBathrooms,
+        city = null
+    )
 
 fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     quotingPartner: Partner? = null,
     memberId: String? = null,
     originatingProductId: UUID? = null
-) = HouseOrApartmentIncompleteQuoteDto(
+) = QuoteRequest(
     firstName = this.firstName,
     lastName = this.lastName,
     email = this.email,
@@ -87,28 +89,30 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     dataCollectionId = this.dataCollectionId
 )
 
-fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() = IncompleteApartmentQuoteDataDto(
-    street = this.street,
-    zipCode = this.zipCode,
-    livingSpace = this.livingSpace,
-    householdSize = this.householdSize,
-    subType = this.type?.toSubType(),
-    city = null,
-    floor = null
-)
+fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() =
+    Apartment(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        subType = this.type?.toSubType(),
+        city = null,
+        floor = null
+    )
 
-fun EditHouseInput.toIncompleteHouseQuoteDataDto() = IncompleteHouseQuoteDataDto(
-    street = this.street,
-    zipCode = this.zipCode,
-    livingSpace = this.livingSpace,
-    householdSize = this.householdSize,
-    ancillaryArea = this.ancillarySpace,
-    yearOfConstruction = this.yearOfConstruction,
-    isSubleted = this.isSubleted,
-    extraBuildings = this.extraBuildings?.toExtraBuilding(),
-    numberOfBathrooms = this.numberOfBathrooms,
-    city = null
-)
+fun EditHouseInput.toIncompleteHouseQuoteDataDto() =
+    House(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        ancillaryArea = this.ancillarySpace,
+        yearOfConstruction = this.yearOfConstruction,
+        isSubleted = this.isSubleted,
+        extraBuildings = this.extraBuildings?.toExtraBuilding(),
+        numberOfBathrooms = this.numberOfBathrooms,
+        city = null
+    )
 
 fun List<ExtraBuildingInput>.toExtraBuilding(): List<ExtraBuildingRequestDto> = this.map { extraBuildingInput ->
     ExtraBuildingRequestDto(

@@ -2,13 +2,13 @@ package com.hedvig.underwriter.model
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -119,33 +119,33 @@ data class Quote(
         }
     }
 
-    fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
+    fun update(quoteRequest: QuoteRequest): Quote {
         var newQuote = copy(
-            productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
-            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
+            productType = quoteRequest.productType ?: productType,
+            startDate = quoteRequest.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
                 is ApartmentData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email,
-                    subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
-                        is IncompleteApartmentQuoteDataDto? -> quoteData?.subType ?: data.subType
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email,
+                    subType = when (val quoteData = quoteRequest.incompleteQuoteData) {
+                        is Apartment? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
                 ) as QuoteData // This cast removes an IntellJ warning
                 is HouseData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
                 ) as QuoteData // This cast removes an IntellJ warning
             }
         )
 
-        val requestData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData
+        val requestData = quoteRequest.incompleteQuoteData
         if (
-            requestData is IncompleteApartmentQuoteDataDto
+            requestData is Apartment
         ) {
             val newQuoteData: ApartmentData = when (newQuote.data) {
                 is ApartmentData -> newQuote.data as ApartmentData
@@ -177,7 +177,7 @@ data class Quote(
             )
         }
         if (
-            requestData is IncompleteHouseQuoteDataDto
+            requestData is House
         ) {
             val newQuoteData: HouseData = when (newQuote.data) {
                 is HouseData -> newQuote.data as HouseData

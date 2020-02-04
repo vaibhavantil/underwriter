@@ -1,17 +1,13 @@
-package com.hedvig.underwriter.service.dtos
+package com.hedvig.underwriter.service.model
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-data class HouseOrApartmentIncompleteQuoteDto(
+data class QuoteRequest(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
@@ -20,23 +16,19 @@ data class HouseOrApartmentIncompleteQuoteDto(
     val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType?,
-    @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-    @field:JsonSubTypes(
-        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
-        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
-    ) var incompleteQuoteData: com.hedvig.underwriter.web.dtos.IncompleteQuoteRequestData?,
+    val incompleteQuoteData: QuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
     val startDate: Instant?,
     val dataCollectionId: UUID?
 ) {
     companion object {
-        fun from(quoteRequestDto: QuoteRequestDto): HouseOrApartmentIncompleteQuoteDto {
+        fun from(quoteRequestDto: QuoteRequestDto): QuoteRequest {
             if (quoteRequestDto.incompleteQuoteData == null && quoteRequestDto.incompleteHouseQuoteData == null && quoteRequestDto.incompleteApartmentQuoteData == null) {
                 throw RuntimeException("Cannot create House or Apartment quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData are all null")
             }
 
-            return HouseOrApartmentIncompleteQuoteDto(
+            return QuoteRequest(
                 firstName = quoteRequestDto.firstName,
                 lastName = quoteRequestDto.lastName,
                 email = quoteRequestDto.email,

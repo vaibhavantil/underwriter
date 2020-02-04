@@ -13,9 +13,11 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -28,7 +30,6 @@ import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
@@ -56,7 +57,7 @@ class QuoteServiceImpl(
     val logger = getLogger(QuoteServiceImpl::class.java)!!
 
     override fun updateQuote(
-        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
+        quoteRequest: QuoteRequest,
         id: UUID,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, Quote> {
@@ -77,7 +78,7 @@ class QuoteServiceImpl(
 
         return try {
             quoteRepository.modify(quote.id) { quoteToUpdate ->
-                val updatedQuote = quoteToUpdate!!.update(houseOrApartmentIncompleteQuoteDto)
+                val updatedQuote = quoteToUpdate!!.update(quoteRequest)
                 if (updatedQuote.state == QuoteState.QUOTED) {
                     updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
                         .bimap(
@@ -129,7 +130,7 @@ class QuoteServiceImpl(
     }
 
     override fun createQuote(
-        incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
+        quoteRequest: QuoteRequest,
         id: UUID?,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
@@ -139,17 +140,17 @@ class QuoteServiceImpl(
         val quote = Quote(
             id = id ?: UUID.randomUUID(),
             createdAt = now,
-            productType = incompleteQuoteData.productType!!,
+            productType = quoteRequest.productType!!,
             initiatedFrom = initiatedFrom,
-            attributedTo = incompleteQuoteData.quotingPartner ?: Partner.HEDVIG,
-            data = when (val quoteData = incompleteQuoteData.incompleteQuoteData) {
-                is IncompleteApartmentQuoteDataDto ->
+            attributedTo = quoteRequest.quotingPartner ?: Partner.HEDVIG,
+            data = when (val quoteData = quoteRequest.incompleteQuoteData) {
+                is Apartment ->
                     ApartmentData(
                         id = UUID.randomUUID(),
-                        ssn = incompleteQuoteData.ssn,
-                        firstName = incompleteQuoteData.firstName,
-                        lastName = incompleteQuoteData.lastName,
-                        email = incompleteQuoteData.email,
+                        ssn = quoteRequest.ssn,
+                        firstName = quoteRequest.firstName,
+                        lastName = quoteRequest.lastName,
+                        email = quoteRequest.email,
                         subType = quoteData.subType,
                         street = quoteData.street,
                         zipCode = quoteData.zipCode,
@@ -157,13 +158,13 @@ class QuoteServiceImpl(
                         householdSize = quoteData.householdSize,
                         livingSpace = quoteData.livingSpace
                     )
-                is com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto ->
+                is House ->
                     HouseData(
                         id = UUID.randomUUID(),
-                        ssn = incompleteQuoteData.ssn,
-                        firstName = incompleteQuoteData.firstName,
-                        lastName = incompleteQuoteData.lastName,
-                        email = incompleteQuoteData.email,
+                        ssn = quoteRequest.ssn,
+                        firstName = quoteRequest.firstName,
+                        lastName = quoteRequest.lastName,
+                        email = quoteRequest.email,
                         street = quoteData.street,
                         zipCode = quoteData.zipCode,
                         city = quoteData.city,
@@ -178,13 +179,18 @@ class QuoteServiceImpl(
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
-            memberId = incompleteQuoteData.memberId,
+            memberId = quoteRequest.memberId,
             breachedUnderwritingGuidelines = null,
-            originatingProductId = incompleteQuoteData.originatingProductId,
-            currentInsurer = incompleteQuoteData.currentInsurer,
-            startDate = incompleteQuoteData.startDate?.toStockholmLocalDate(),
-            dataCollectionId = incompleteQuoteData.dataCollectionId
+            originatingProductId = quoteRequest.originatingProductId,
+            currentInsurer = quoteRequest.currentInsurer,
+            startDate = quoteRequest.startDate?.toStockholmLocalDate(),
+            dataCollectionId = quoteRequest.dataCollectionId
         )
+
+        // TODO: Underwriter fetches guidelines (including debt-check) and then "completes it"
+        // Result HIt or not, guidelines and price + discounts
+
+        // Store it with state UW_HIT
 
         val potentiallySavedQuote = quote
             .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)

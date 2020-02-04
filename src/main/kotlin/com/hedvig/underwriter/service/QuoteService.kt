@@ -3,7 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -31,13 +31,13 @@ interface QuoteService {
     fun getLatestQuoteForMemberId(memberId: String): Quote?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(
-        incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
+        incompleteQuoteData: QuoteRequest,
         id: UUID? = null,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun updateQuote(
-        houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto,
+        quoteRequest: QuoteRequest,
         id: UUID,
         underwritingGuidelinesBypassedBy: String? = null
     ): Either<ErrorResponseDto, Quote>
