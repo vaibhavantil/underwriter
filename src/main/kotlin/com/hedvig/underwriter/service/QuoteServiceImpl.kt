@@ -34,14 +34,14 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.javamoney.moneta.Money
-import org.slf4j.LoggerFactory.getLogger
-import org.springframework.core.env.Environment
-import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import org.javamoney.moneta.Money
+import org.slf4j.LoggerFactory.getLogger
+import org.springframework.core.env.Environment
+import org.springframework.stereotype.Service
 
 @Service
 class QuoteServiceImpl(
@@ -185,7 +185,6 @@ class QuoteServiceImpl(
             startDate = incompleteQuoteData.startDate?.toStockholmLocalDate(),
             dataCollectionId = incompleteQuoteData.dataCollectionId
         )
-
 
         val potentiallySavedQuote = quote
             .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
