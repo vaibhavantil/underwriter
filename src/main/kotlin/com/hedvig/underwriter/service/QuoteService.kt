@@ -34,7 +34,6 @@ interface QuoteService {
         incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
         id: UUID? = null,
         initiatedFrom: QuoteInitiatedFrom,
-        shouldComplete: Boolean = false,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun updateQuote(

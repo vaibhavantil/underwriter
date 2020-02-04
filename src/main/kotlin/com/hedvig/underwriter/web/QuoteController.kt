@@ -1,4 +1,5 @@
 package com.hedvig.underwriter.web
+
 import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.underwriter.extensions.isAndroid
@@ -13,10 +14,6 @@ import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,6 +24,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -54,7 +55,6 @@ class QuoteController @Autowired constructor(
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
-            shouldComplete = requestDto.shouldComplete,
             underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
         )
             .bimap(

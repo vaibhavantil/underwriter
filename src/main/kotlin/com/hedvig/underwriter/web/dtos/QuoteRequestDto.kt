@@ -31,7 +31,6 @@ data class QuoteRequestDto(
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,
     val dataCollectionId: UUID? = null,
-    val shouldComplete: Boolean = false,
     val underwritingGuidelinesBypassedBy: String? = null
 )
 

@@ -34,15 +34,14 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.math.BigDecimal
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.UUID
 
 @Service
 class QuoteServiceImpl(
@@ -133,7 +132,6 @@ class QuoteServiceImpl(
         incompleteQuoteData: HouseOrApartmentIncompleteQuoteDto,
         id: UUID?,
         initiatedFrom: QuoteInitiatedFrom,
-        shouldComplete: Boolean,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val now = Instant.now()
@@ -188,16 +186,12 @@ class QuoteServiceImpl(
             dataCollectionId = incompleteQuoteData.dataCollectionId
         )
 
-        return if (shouldComplete) {
-            val potentiallySavedQuote = quote
-                .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-                .map { it: Quote -> this.quoteRepository.insert(it); it }
 
-                transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
-        } else {
-            quoteRepository.insert(quote, now)
-            Right(CompleteQuoteResponseDto(quote.id, BigDecimal.ZERO, quote.validTo))
-        }
+        val potentiallySavedQuote = quote
+            .complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
+            .map { it: Quote -> this.quoteRepository.insert(it); it }
+
+        return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
     }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
