@@ -1,5 +1,8 @@
-package com.hedvig.underwriter.graphql.type
+package com.hedvig.underwriter.graphql.type.depricated
 
+import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
+
+@Deprecated("Use EditSwedishHouseInput")
 data class EditHouseInput(
     val street: String?,
     val zipCode: String?,

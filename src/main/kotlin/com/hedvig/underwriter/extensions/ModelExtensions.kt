@@ -1,11 +1,11 @@
 package com.hedvig.underwriter.extensions
 
 import com.hedvig.underwriter.graphql.type.ApartmentType
-import com.hedvig.underwriter.graphql.type.CreateApartmentInput
-import com.hedvig.underwriter.graphql.type.CreateHouseInput
+import com.hedvig.underwriter.graphql.type.depricated.CreateApartmentInput
+import com.hedvig.underwriter.graphql.type.depricated.CreateHouseInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
-import com.hedvig.underwriter.graphql.type.EditApartmentInput
-import com.hedvig.underwriter.graphql.type.EditHouseInput
+import com.hedvig.underwriter.graphql.type.depricated.EditApartmentInput
+import com.hedvig.underwriter.graphql.type.depricated.EditHouseInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType

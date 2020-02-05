@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import java.time.LocalDate
 import java.util.UUID
 
@@ -23,6 +24,7 @@ sealed class QuoteResult {
         val dataCollectionId: UUID?
     ) : QuoteResult()
 
+    @Deprecated("Incomplete is depricated")
     data class IncompleteQuote(
         val id: UUID,
         val firstName: String?,

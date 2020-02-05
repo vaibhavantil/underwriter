@@ -2,7 +2,7 @@ package com.hedvig.underwriter.extensions
 
 import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
-import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
+import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType

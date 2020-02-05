@@ -1,5 +1,9 @@
-package com.hedvig.underwriter.graphql.type
+package com.hedvig.underwriter.graphql.type.depricated
 
+import com.hedvig.underwriter.graphql.type.ApartmentType
+import com.hedvig.underwriter.graphql.type.ExtraBuilding
+
+@Deprecated("Use QuoteDetails")
 sealed class CompleteQuoteDetails {
     data class CompleteApartmentQuoteDetails(
         val street: String,
