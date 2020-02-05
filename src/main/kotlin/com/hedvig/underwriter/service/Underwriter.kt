@@ -10,20 +10,35 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.model.birthDateFromSsn
-import com.hedvig.underwriter.service.guideline.AgeRestrictionGuideline
-import com.hedvig.underwriter.service.guideline.Guideline
-import com.hedvig.underwriter.service.guideline.SwedishApartmentHouseHoldSize
-import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
+import com.hedvig.underwriter.service.guidelines.BaseGuideline
+import com.hedvig.underwriter.service.guidelines.PersonalDebt
+import com.hedvig.underwriter.service.guidelines.SocialSecurityDate
+import com.hedvig.underwriter.service.guidelines.SocialSecurityNumberFormat
+import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeAtLeast1
+import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeNotMoreThan6
+import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceAtLeast1Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceNotMoreThan250Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeAtLeast1Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeNotOverThan75Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeAtLeast1
+import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeNotMoreThan6
+import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceAtLeast1Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceNotMoreThan250Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfBathrooms
+import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm
+import com.hedvig.underwriter.service.guidelines.SwedishHouseYearOfConstruction
+import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentAgeNotMoreThan30Years
+import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentHouseholdSizeNotMoreThan2
+import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
+import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import java.time.Instant
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 import org.springframework.stereotype.Service
 
@@ -101,7 +116,8 @@ class UnderwriterImpl(
 
             complete(quote, underwritingGuidelinesBypassedBy)
 
-        return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
+        return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "", null))
+        // return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
     }
 
     private fun complete(
@@ -109,7 +125,7 @@ class UnderwriterImpl(
         underwritingGuidelinesBypassedBy: String? = null
     ): Either<List<String>, Quote> {
 
-        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
+/*        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
             return Either.right(
                 newQuote.copy(
                     price = getPriceRetrievedFromProductPricing(productPricingService),
@@ -129,131 +145,77 @@ class UnderwriterImpl(
         }
 
         return Either.left(breachedUnderwritingGuidelines)
+        */
+        return Either.left(emptyList())
     }
 
-    private val swedishApartmentGuidelines = listOf(
-        AgeRestrictionGuideline(),
-        SwedishApartmentHouseHoldSize()
+    // TODO: Change me
+    val swedishApartmentGuidelines = listOf(
+        SwedishApartmentHouseHoldSizeAtLeast1(),
+        SwedishApartmentLivingSpaceAtLeast1Sqm(),
+        SwedishApartmentHouseHoldSizeNotMoreThan6(),
+        SwedishApartmentLivingSpaceNotMoreThan250Sqm()
     )
 
-    private fun validateGuidelines(data: QuoteData): List<String> {
+    val swedishStudentApartmentGuidelines = listOf(
+        SwedishApartmentHouseHoldSizeAtLeast1(),
+        SwedishApartmentLivingSpaceAtLeast1Sqm(),
+        SwedishStudentApartmentHouseholdSizeNotMoreThan2(),
+        SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm(),
+        SwedishStudentApartmentAgeNotMoreThan30Years()
+    )
+
+    val swedishHouseGuideline = listOf(
+        SwedishHouseHouseholdSizeAtLeast1(),
+        SwedishHouseLivingSpaceAtLeast1Sqm(),
+        SwedishHouseHouseholdSizeNotMoreThan6(),
+        SwedishHouseLivingSpaceNotMoreThan250Sqm(),
+        SwedishHouseYearOfConstruction(),
+        SwedishHouseNumberOfBathrooms(),
+        SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm(),
+        SwedishHouseExtraBuildingsSizeNotOverThan75Sqm(),
+        SwedishHouseExtraBuildingsSizeAtLeast1Sqm()
+    )
+
+    val swedishPersonalGuidelines = listOf(
+        SocialSecurityNumberFormat,
+        SocialSecurityDate,
+        AgeRestrictionGuideline,
+        PersonalDebt(debtChecker)
+    )
+
+    fun validateGuidelines(data: QuoteData): List<String> {
         val errors = mutableListOf<String>()
 
+        errors.addAll(runRules(data, swedishPersonalGuidelines))
+
         when (data) {
-            is HouseData -> validateGuidelines(data, errors)
-            is ApartmentData -> swedishApartmentGuidelines.mapNotNull {
-                it.invokeValidate(data)
-            }.forEach {
-                errors.add(
-                    it
-                )
+            is HouseData -> errors.addAll(runRules(data, swedishHouseGuideline))
+            is ApartmentData -> when (data.subType) {
+                ApartmentProductSubType.STUDENT_BRF, ApartmentProductSubType.STUDENT_RENT ->
+                    errors.addAll(runRules(data, swedishStudentApartmentGuidelines))
+                else -> errors.addAll(runRules(data, swedishApartmentGuidelines))
             }
         }
         return errors
     }
 
-    private fun validateGuidelines(data: HouseData, errors: MutableList<String>): List<String> {
-        errors.addAll(swedishGuidelines(data, errors))
+    fun <T> runRules(
+        data: T,
+        listOfRules: List<BaseGuideline<T>>
+    ): MutableList<String> {
+        val guidelineErrors = mutableListOf<String>()
 
-        if (data.householdSize!! < 1) {
-            errors += "breaches underwriting guideline household size, must be at least 1"
-        }
-        if (data.livingSpace!! < 1) {
-            errors += "breaches underwriting guidline living space, must be at least 1 sqm"
-        }
-
-        if (data.householdSize!! > 6) {
-            errors += "breaches underwriting guideline household size, must not be more than 6"
-        }
-
-        if (data.livingSpace!! > 250) {
-            errors += "breaches underwriting guideline living space, must not be more than 250 sqm"
-        }
-
-        if (data.yearOfConstruction!! < 1925) {
-            errors += "breaches underwriting guideline year of construction, must not be older than 1925"
-        }
-
-        if (data.numberOfBathrooms!! > 2) {
-            errors += "breaches underwriting guideline number of bathrooms, must not be more than 2"
-        }
-
-        if (data.extraBuildings!!.filter { building -> building.area > 6 }.size > 4) {
-            errors += "breaches underwriting guideline extra building areas, number of extra buildings with an area over 6 sqm must not be more than 4"
-        }
-
-        if (data.extraBuildings.any { building -> building.area > 75 }) {
-            errors += "breaches underwriting guideline extra building areas, extra buildings may not be over 75 sqm"
-        }
-
-        if (data.extraBuildings.any { building -> building.area < 1 }) {
-            errors += "breaches underwriting guideline extra building areas, extra buildings must have an area of at least 1"
-        }
-
-        return errors
-    }
-
-    private fun validateGuidelines(data: ApartmentData, errors: MutableList<String>): List<String> {
-        errors.addAll(swedishGuidelines(data, errors))
-
-        if (data.householdSize!! < 1) {
-            errors.add("breaches underwriting guideline household size, must be at least 1")
-        }
-        if (data.livingSpace!! < 1) {
-            errors.add("breaches underwriting guidline living space, must be at least 1")
-        }
-
-        when (data.subType) {
-            ApartmentProductSubType.STUDENT_RENT, ApartmentProductSubType.STUDENT_BRF -> {
-                if (data.householdSize > 2) errors.add("breaches underwriting guideline household size must be less than 2")
-                if (data.livingSpace > 50) errors.add("breaches underwriting guideline living space must be less than or equal to 50sqm")
-                if (data.ssn!!.birthDateFromSsn().until(
-                        LocalDate.now(),
-                        ChronoUnit.YEARS
-                    ) > 30
-                ) errors.add("breaches underwriting guidelines member must be 30 years old or younger")
+        listOfRules.forEach {
+            val error = it.invokeValidate(data)
+            if (error != null) {
+                guidelineErrors.add(error)
             }
-            else -> {
-                if (data.householdSize > 6) errors.add("breaches underwriting guideline household size must be less than or equal to 6")
-                if (data.livingSpace > 250) errors.add("breaches underwriting guideline living space must be less than or equal to 250sqm")
+            if (it.skipAfter) {
+                return@forEach
             }
         }
-
-        return errors
-    }
-
-    private fun swedishGuidelines(
-        personalPolicyHolder: PersonPolicyHolder<*>,
-        errors: MutableList<String>
-    ): List<String> {
-        if (personalPolicyHolder.age() < 18) {
-            errors.add("member is younger than 18")
-            return errors
-        }
-
-        val trimmedInput = personalPolicyHolder.ssn!!.trim().replace("-", "").replace(" ", "")
-
-        if (trimmedInput.length != 12) {
-            errors.add("SSN Invalid length")
-            return errors
-        }
-
-        try {
-            LocalDate.parse(
-                trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
-                    4,
-                    6
-                ) + "-" + trimmedInput.substring(6, 8)
-            )
-        } catch (exception: Exception) {
-            errors.add("ssn not valid")
-            return errors
-        }
-
-        if (errors.isEmpty()) {
-            errors.addAll(debtChecker.passesDebtCheck(personalPolicyHolder))
-        }
-        return errors
+        return guidelineErrors
     }
 }
 
