@@ -6,6 +6,7 @@ import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.createCompleteQuoteResult
 import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
+import com.hedvig.underwriter.extensions.createQuoteDetails
 import com.hedvig.underwriter.extensions.email
 import com.hedvig.underwriter.extensions.firstName
 import com.hedvig.underwriter.extensions.lastName
@@ -13,7 +14,6 @@ import com.hedvig.underwriter.extensions.ssn
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.graphql.type.CurrentInsurer
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.util.toStockholmLocalDate
@@ -41,7 +41,10 @@ fun Quote.getCompleteQuoteResult(
         localizationService,
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
     ),
-    quoteDetails =
+    quoteDetails = createQuoteDetails(
+        localizationService,
+        textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+    ),
     expiresAt = validTo.toStockholmLocalDate(),
     startDate = startDate?.coerceAtLeast(LocalDate.now()),
     dataCollectionId = dataCollectionId

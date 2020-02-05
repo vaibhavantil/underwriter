@@ -116,6 +116,9 @@ data class Quote(
         return when (this.data) {
             is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
             is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
+            // TODO: This needs to be fixed should be done by the underwriter
+            is NorwegianHomeContentsData -> BigDecimal.ZERO
+            is NorwegianTravelData -> BigDecimal.ZERO
         }
     }
 
@@ -140,6 +143,8 @@ data class Quote(
                     lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
                     email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
                 ) as QuoteData // This cast removes an IntellJ warning
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
         )
 
@@ -164,6 +169,8 @@ data class Quote(
                         livingSpace = houseData.livingSpace
                     )
                 }
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -196,6 +203,8 @@ data class Quote(
                         livingSpace = apartmentData.livingSpace
                     )
                 }
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(

@@ -182,6 +182,90 @@ interface QuoteDao {
 
     @SqlUpdate(
         """
+            INSERT INTO quote_revision_house_data
+            (
+                id,
+                ssn,
+                first_name,
+                last_name,
+                email,
+                street,
+                city,
+                zip_code,
+                living_space,
+                coinsured,
+                is_student,
+                type
+            )
+            VALUES
+            (
+                :id,
+                :ssn,
+                :firstName,
+                :lastName,
+                :email,
+                :street,
+                :city,
+                :zipCode,
+                :livingSpace,
+                :coinsured,
+                :isStudent,
+                :type
+            )
+            RETURNING *
+    """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: NorwegianHomeContentsData): NorwegianHomeContentsData
+
+    @SqlQuery(
+        """
+        SELECT * FROM quote_norwegian_home_contents_data WHERE internal_id = :id
+    """
+    )
+    fun findNorwegianHomeContentsQuoteData(@Bind id: Int): NorwegianHomeContentsData?
+
+    @SqlUpdate(
+        """
+            INSERT INTO quote_revision_house_data
+            (
+                id,
+                ssn,
+                first_name,
+                last_name,
+                email,
+                street,
+                city,
+                zip_code,
+                living_space,
+                coinsured,
+                is_student,
+                type
+            )
+            VALUES
+            (
+                :id,
+                :ssn,
+                :firstName,
+                :lastName,
+                :email,
+                :coinsured
+            )
+            RETURNING *
+    """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: NorwegianTravelData): NorwegianTravelData
+
+    @SqlQuery(
+        """
+        SELECT * FROM quote_norwegian_travel_data WHERE internal_id = :id
+    """
+    )
+    fun findNorwegianTravelQuoteData(@Bind id: Int): NorwegianTravelData?
+
+    @SqlUpdate(
+        """
         INSERT INTO master_quotes (id, initiated_from, created_at) VALUES (:quoteId, :initiatedFrom, :createdAt)
     """
     )

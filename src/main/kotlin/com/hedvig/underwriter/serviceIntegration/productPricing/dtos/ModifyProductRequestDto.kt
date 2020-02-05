@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.Quote
@@ -77,6 +79,8 @@ data class ModifyProductRequestDto(
                     extraBuildings = quote.data.extraBuildings?.map { extraBuilding -> extraBuilding.toDto() },
                     isSubleted = quote.data.isSubleted!!
                 )
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
     }
 }

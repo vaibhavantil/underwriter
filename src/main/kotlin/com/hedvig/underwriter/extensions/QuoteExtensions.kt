@@ -76,7 +76,7 @@ fun Quote.createCompleteQuoteResult(
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
 
-fun Quote.createQuoteResult(
+fun Quote.createQuoteDetails(
     localizationService: LocalizationService,
     locale: Locale
 ): QuoteDetails =

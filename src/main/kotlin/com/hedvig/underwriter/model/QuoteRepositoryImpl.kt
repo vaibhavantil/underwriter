@@ -18,6 +18,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val quoteData: QuoteData = when (quote.data) {
             is SwedishApartmentData -> dao.insert(quote.data)
             is SwedishHouseData -> dao.insert(quote.data)
+            is NorwegianHomeContentsData -> dao.insert(quote.data)
+            is NorwegianTravelData -> dao.insert(quote.data)
         }
         dao.insertMasterQuote(quote.id, quote.initiatedFrom, timestamp)
         val databaseQuote = DatabaseQuoteRevision.from(quote.copy(data = quoteData))
@@ -108,6 +110,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val quoteData: QuoteData = when (updatedQuote.data) {
             is SwedishApartmentData -> dao.insert(updatedQuote.data)
             is SwedishHouseData -> dao.insert(updatedQuote.data)
+            is NorwegianHomeContentsData -> dao.insert(updatedQuote.data)
+            is NorwegianTravelData -> dao.insert(updatedQuote.data)
         }
         dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
     }

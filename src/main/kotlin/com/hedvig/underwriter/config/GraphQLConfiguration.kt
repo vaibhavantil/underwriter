@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.SchemaParserDictionary
 import com.hedvig.underwriter.graphql.type.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
+import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
@@ -31,6 +32,10 @@ class GraphQLConfiguration {
                     QuoteResult.CompleteQuote::class.java,
                     QuoteResult.IncompleteQuote::class.java,
                     QuoteResult.UnderwritingLimitsHit::class.java,
+                    QuoteDetails.SwedishApartmentQuoteDetails::class.java,
+                    QuoteDetails.SwedishHouseQuoteDetails::class.java,
+                    QuoteDetails.NorwegianHomeContentsDetails::class.java,
+                    QuoteDetails.NorwegianTravelDetails::class.java,
                     IncompleteQuoteDetails.IncompleteApartmentQuoteDetails::class.java,
                     IncompleteQuoteDetails.IncompleteHouseQuoteDetails::class.java,
                     ExtraBuilding.ExtraBuildingGarage::class.java,
