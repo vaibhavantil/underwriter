@@ -395,6 +395,7 @@ type NorwegianHomeContentsDetails {
     zipCode: String!
     coinsured: Int!
     livingSpace: Int!
+    isStudent: Boolean!
     type: NorwegianHomeContentsType!
 }
 
