@@ -110,22 +110,6 @@ data class Quote(
             else -> true
         }
 
-    private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
-        return when (this.data) {
-            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto.from(this)
-            ).price
-            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
-                HouseQuotePriceDto.from(
-                    this
-                )
-            ).price
-            // TODO: This needs to be fixed should be done by the underwriter
-            is NorwegianHomeContentsData -> BigDecimal.ZERO
-            is NorwegianTravelData -> BigDecimal.ZERO
-        }
-    }
-
     fun update(quoteRequest: QuoteRequest): Quote {
         var newQuote = copy(
             productType = quoteRequest.productType ?: productType,

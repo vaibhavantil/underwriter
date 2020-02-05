@@ -2,6 +2,8 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.orNull
+import arrow.core.right
 import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -38,7 +40,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class QuoteServiceImpl(
-    val debtChecker: DebtChecker,
+    val underwriter: Underwriter,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository,
@@ -59,11 +61,14 @@ class QuoteServiceImpl(
                 ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id")
             )
 
-        if (quote.state != QuoteState.INCOMPLETE && quote.state != QuoteState.QUOTED) {
+        if (quote.state != QuoteState.QUOTED) {
+            if (quote.state == QuoteState.INCOMPLETE) {
+                logger.error("updating quote that is in incomplete state. quote: $quote")
+            }
             return Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.INVALID_STATE,
-                    "quote must be incomplete or quoted to update but was really ${quote.state}"
+                    "quote must be quoted to update but was really ${quote.state}"
                 )
             )
         }
@@ -71,21 +76,16 @@ class QuoteServiceImpl(
         return try {
             quoteRepository.modify(quote.id) { quoteToUpdate ->
                 val updatedQuote = quoteToUpdate!!.update(quoteRequest)
-                if (updatedQuote.state == QuoteState.QUOTED) {
-                    updatedQuote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-                        .bimap(
-                            { errors ->
-                                throw QuoteCompletionFailedException(
-                                    "Unable to complete quote: $errors",
-                                    errors
-                                )
-                            },
-                            { quote -> quote }
-                        )
-                        .orNull()
-                } else {
-                    updatedQuote
-                }
+                underwriter.updateQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+                    .bimap(
+                        { errors ->
+                            throw QuoteCompletionFailedException(
+                                "Unable to complete quote: $errors",
+                                errors
+                            )
+                        },
+                        { quote -> quote }
+                    ).orNull()
             }!!.let { updatedQuote -> Either.right(updatedQuote) }
         } catch (e: QuoteCompletionFailedException) {
             e.breachedUnderwritingGuidelines?.let { breachedUnderwritingGuidelines ->
@@ -137,27 +137,19 @@ class QuoteServiceImpl(
         quoteRepository.findByMemberId(memberId)
             .map((QuoteDto)::fromQuote)
 
-    override fun completeQuote(
-        incompleteQuoteId: UUID,
+    override fun createQuote(
+        incompleteQuoteData: QuoteRequest,
+        id: UUID?,
+        initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-        val quote =
-            quoteRepository.find(incompleteQuoteId)
-                ?: return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "No such quote"))
-
-        if (quote.state != QuoteState.INCOMPLETE) {
-            return Either.Left(
-                ErrorResponseDto(
-                    ErrorCodes.INVALID_STATE,
-                    "quote must be completable but was really ${quote.state}"
-                )
-            )
+        val quoteId = id ?: UUID.randomUUID()
+        val breachedGuidelinesOrQuote =
+            underwriter.createQuote(incompleteQuoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
+        if (breachedGuidelinesOrQuote is Either.Right) {
+            quoteRepository.insert(breachedGuidelinesOrQuote.b)
         }
-
-        val potentiallySavedQuote = quote.complete(debtChecker, productPricingService, underwritingGuidelinesBypassedBy)
-            .map { it: Quote -> quoteRepository.update(it) }
-
-        return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
     private fun transformCompleteQuoteReturn(

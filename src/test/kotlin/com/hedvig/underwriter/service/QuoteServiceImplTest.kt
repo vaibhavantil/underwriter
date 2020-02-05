@@ -36,7 +36,7 @@ import org.springframework.http.ResponseEntity
 class QuoteServiceImplTest {
 
     @MockK
-    lateinit var debtChecker: DebtChecker
+    lateinit var underwriter: Underwriter
 
     @MockK
     lateinit var memberService: MemberService
@@ -59,7 +59,7 @@ class QuoteServiceImplTest {
     @Test
     fun givenPartnerSendsPartnerIdToCustomerIO() {
 
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
+        val cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository, customerIO, env)
 
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
@@ -84,7 +84,7 @@ class QuoteServiceImplTest {
 
     @Test
     fun givenPartnerIsHedvigSendPartnerIdToCustomerIO() {
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
+        val cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository, customerIO, env)
 
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
@@ -109,7 +109,7 @@ class QuoteServiceImplTest {
     @Test
     fun activatesQuoteByCreatingModifiedProduct() {
         val service = QuoteServiceImpl(
-            debtChecker = debtChecker,
+            underwriter = underwriter,
             memberService = memberService,
             productPricingService = productPricingService,
             quoteRepository = quoteRepository,

@@ -14,10 +14,6 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface QuoteService {
-    fun completeQuote(
-        incompleteQuoteId: UUID,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
     fun signQuote(completeQuoteId: UUID, body: SignQuoteRequest): Either<ErrorResponseDto, SignedQuoteResponseDto>
     fun memberSigned(memberId: String, signRequest: SignRequest)
     fun activateQuote(

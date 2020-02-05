@@ -36,6 +36,8 @@ import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSp
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -43,6 +45,7 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import java.time.Instant
 import java.util.UUID
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 
 @Service
 class UnderwriterImpl(
@@ -50,16 +53,16 @@ class UnderwriterImpl(
     val productPricingService: ProductPricingService
 ) : Underwriter {
 
-    fun createQuote(
+    override fun createQuote(
         quoteRequest: QuoteRequest,
-        id: UUID?,
+        id: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+    ): Either<List<String>, Quote> {
         val now = Instant.now()
 
         val quote = Quote(
-            id = id ?: UUID.randomUUID(),
+            id = id,
             createdAt = now,
             productType = quoteRequest.productType!!,
             initiatedFrom = initiatedFrom,
@@ -105,50 +108,51 @@ class UnderwriterImpl(
             originatingProductId = quoteRequest.originatingProductId,
             currentInsurer = quoteRequest.currentInsurer,
             startDate = quoteRequest.startDate?.toStockholmLocalDate(),
-            dataCollectionId = quoteRequest.dataCollectionId
+            dataCollectionId = quoteRequest.dataCollectionId,
+            underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
         )
 
-        val breachedUnderwritingGuidelines = mutableListOf<String>()
-
-        breachedUnderwritingGuidelines.addAll(
-            validateGuidelines(quote.data)
-        )
-
-        if (breachedUnderwritingGuidelines.isEmpty())
-
-            complete(quote, underwritingGuidelinesBypassedBy)
-
-        return Either.left(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "", null))
-        // return transformCompleteQuoteReturn(potentiallySavedQuote, quote.id)
+        return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
-    private fun complete(
-        quote: Quote,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<List<String>, Quote> {
+    override fun updateQuote(quote: Quote, underwritingGuidelinesBypassedBy: String?): Either<List<String>, Quote> {
+        return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
+    }
 
-/*        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
-                    state = QuoteState.QUOTED
-                )
+    private fun validateAndCompleteQuote(quote: Quote, underwritingGuidelinesBypassedBy: String?): Either<List<String>, Quote> {
+        val breachedUnderwritingGuidelines = mutableListOf<String>()
+        if (underwritingGuidelinesBypassedBy == null) {
+            breachedUnderwritingGuidelines.addAll(
+                validateGuidelines(quote.data)
             )
         }
 
-        if (breachedUnderwritingGuidelines.isEmpty()) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    state = QuoteState.QUOTED
-                )
-            )
-        }
+        return if (breachedUnderwritingGuidelines.isEmpty())
+            Either.right(complete(quote))
+        else
+            Either.left(breachedUnderwritingGuidelines)
+    }
 
-        return Either.left(breachedUnderwritingGuidelines)
-        */
-        return Either.left(emptyList())
+    private fun complete(quote: Quote): Quote {
+        val price = getPriceRetrievedFromProductPricing(quote)
+        return quote.copy(
+            price = price,
+            state = QuoteState.QUOTED
+        )
+    }
+
+    private fun getPriceRetrievedFromProductPricing(quote: Quote): BigDecimal {
+        return when (quote.data) {
+            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(
+                ApartmentQuotePriceDto.from(quote)
+            ).price
+            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
+                HouseQuotePriceDto.from(quote)
+            ).price
+            // TODO: This needs to be fixed should be done by the underwriter
+            is NorwegianHomeContentsData -> BigDecimal.ZERO
+            is NorwegianTravelData -> BigDecimal.ZERO
+        }
     }
 
     // TODO: Change me
@@ -223,4 +227,16 @@ class UnderwriterImpl(
     }
 }
 
-interface Underwriter
+interface Underwriter {
+    fun createQuote(
+        quoteRequest: QuoteRequest,
+        id: UUID,
+        initiatedFrom: QuoteInitiatedFrom,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<List<String>, Quote>
+
+    fun updateQuote(
+        quote: Quote,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<List<String>, Quote>
+}

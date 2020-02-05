@@ -11,14 +11,18 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
+import org.slf4j.LoggerFactory
 import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -76,12 +80,8 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-
-        return when (val quoteOrError =
-            quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
-            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
-            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
-        }
+        logger.error("completeQuote endpoint was used. incompleteQuoteId: $incompleteQuoteId underwritingGuidelinesBypassedBy: $underwritingGuidelinesBypassedBy")
+        return ResponseEntity.status(HttpStatus.GONE).body(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "endpoint is deprecated"))
     }
 
     @GetMapping("/{id}")
@@ -147,5 +147,9 @@ class QuoteController @Autowired constructor(
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         quoteService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(QuoteController::class.java)
     }
 }

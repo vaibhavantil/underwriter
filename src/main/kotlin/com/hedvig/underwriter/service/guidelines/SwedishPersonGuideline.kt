@@ -31,8 +31,8 @@ object SocialSecurityDate : SwedishPersonGuideline {
         get() = true
 
     private fun getPossibleDateFromSSN(data: QuoteData): String {
-        val trimmedInput = (data as PersonPolicyHolder<*>).ssn!!.trim()
-        trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
+        var trimmedInput = (data as PersonPolicyHolder<*>).ssn!!.trim()
+        trimmedInput = trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
             4,
             6
         ) + "-" + trimmedInput.substring(6, 8)
