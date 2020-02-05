@@ -1,15 +1,17 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.ExtraBuilding
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
@@ -64,7 +66,7 @@ class UnderwriterImpl(
             attributedTo = quoteRequest.quotingPartner ?: Partner.HEDVIG,
             data = when (val quoteData = quoteRequest.incompleteQuoteData) {
                 is QuoteRequestData.Apartment ->
-                    ApartmentData(
+                    SwedishApartmentData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,
                         firstName = quoteRequest.firstName,
@@ -78,7 +80,7 @@ class UnderwriterImpl(
                         livingSpace = quoteData.livingSpace
                     )
                 is QuoteRequestData.House ->
-                    HouseData(
+                    SwedishHouseData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,
                         firstName = quoteRequest.firstName,
@@ -190,12 +192,14 @@ class UnderwriterImpl(
         errors.addAll(runRules(data, swedishPersonalGuidelines))
 
         when (data) {
-            is HouseData -> errors.addAll(runRules(data, swedishHouseGuideline))
-            is ApartmentData -> when (data.subType) {
+            is SwedishHouseData -> errors.addAll(runRules(data, swedishHouseGuideline))
+            is SwedishApartmentData -> when (data.subType) {
                 ApartmentProductSubType.STUDENT_BRF, ApartmentProductSubType.STUDENT_RENT ->
                     errors.addAll(runRules(data, swedishStudentApartmentGuidelines))
                 else -> errors.addAll(runRules(data, swedishApartmentGuidelines))
             }
+            is NorwegianHomeContentsData -> TODO("todo")
+            is NorwegianTravelData -> TODO("todo")
         }
         return errors
     }
