@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.birthDateFromSsn
 import java.time.LocalDate
 

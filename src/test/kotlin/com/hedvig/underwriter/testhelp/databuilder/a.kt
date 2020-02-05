@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
-import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.ONE_DAY
 import com.hedvig.underwriter.model.Partner
@@ -9,6 +8,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate

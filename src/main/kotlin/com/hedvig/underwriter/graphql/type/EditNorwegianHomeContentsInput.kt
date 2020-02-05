@@ -8,4 +8,3 @@ data class EditNorwegianHomeContentsInput(
     val isStudent: Boolean?,
     val type: NorwegianHomeContentsType?
 )
-

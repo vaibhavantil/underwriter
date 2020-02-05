@@ -2,9 +2,9 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.model.Quote
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID

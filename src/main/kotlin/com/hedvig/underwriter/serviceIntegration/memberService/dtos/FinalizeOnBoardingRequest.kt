@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
 import com.hedvig.underwriter.model.HomeInsurance
-import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 class FinalizeOnBoardingRequest(
     val memberId: String,

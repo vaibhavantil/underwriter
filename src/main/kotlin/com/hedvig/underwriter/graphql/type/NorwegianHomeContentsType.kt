@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-enum class NorwegianHomeContentsType{
+enum class NorwegianHomeContentsType {
     RENT,
     OWN
 }

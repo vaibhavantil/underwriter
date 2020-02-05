@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDateFromSsn
 import java.time.LocalDate
 import java.time.Year

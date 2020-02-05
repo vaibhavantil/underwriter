@@ -1,14 +1,12 @@
 package com.hedvig.underwriter.model
 
-import arrow.core.Either
-import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.House
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -114,43 +112,49 @@ data class Quote(
 
     private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
         return when (this.data) {
-            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
-            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
+            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(
+                ApartmentQuotePriceDto.from(this)
+            ).price
+            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
+                HouseQuotePriceDto.from(
+                    this
+                )
+            ).price
             // TODO: This needs to be fixed should be done by the underwriter
             is NorwegianHomeContentsData -> BigDecimal.ZERO
             is NorwegianTravelData -> BigDecimal.ZERO
         }
     }
 
-    fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
+    fun update(quoteRequest: QuoteRequest): Quote {
         var newQuote = copy(
-            productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
-            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
+            productType = quoteRequest.productType ?: productType,
+            startDate = quoteRequest.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
                 is SwedishApartmentData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email,
-                    subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
-                        is IncompleteApartmentQuoteDataDto? -> quoteData?.subType ?: data.subType
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email,
+                    subType = when (val quoteData = quoteRequest.incompleteQuoteData) {
+                        is Apartment? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
                 ) as QuoteData // This cast removes an IntellJ warning
                 is SwedishHouseData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
                 ) as QuoteData // This cast removes an IntellJ warning
                 is NorwegianHomeContentsData -> TODO()
                 is NorwegianTravelData -> TODO()
             }
         )
 
-        val requestData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData
+        val requestData = quoteRequest.incompleteQuoteData
         if (
-            requestData is IncompleteApartmentQuoteDataDto
+            requestData is Apartment
         ) {
             val newQuoteData: SwedishApartmentData = when (newQuote.data) {
                 is SwedishApartmentData -> newQuote.data as SwedishApartmentData
@@ -184,7 +188,7 @@ data class Quote(
             )
         }
         if (
-            requestData is IncompleteHouseQuoteDataDto
+            requestData is House
         ) {
             val newQuoteData: SwedishHouseData = when (newQuote.data) {
                 is SwedishHouseData -> newQuote.data as SwedishHouseData
@@ -223,51 +227,5 @@ data class Quote(
             )
         }
         return newQuote
-    }
-
-    fun complete(
-        debtChecker: DebtChecker,
-        productPricingService: ProductPricingService,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<List<String>, Quote> {
-        val quoteData = this.data
-        val breachedUnderwritingGuidelines = mutableListOf<String>()
-        val bypassUnderwritingGuidelines = underwritingGuidelinesBypassedBy != null
-
-        breachedUnderwritingGuidelines.addAll(quoteData.passUwGuidelines())
-
-        if (quoteData is PersonPolicyHolder<*>) {
-            if (quoteData.age() < 18)
-                breachedUnderwritingGuidelines.add("member is younger than 18")
-            if (!quoteData.ssnIsValid())
-                breachedUnderwritingGuidelines.add("invalid ssn")
-
-            if (breachedUnderwritingGuidelines.isEmpty()) {
-                breachedUnderwritingGuidelines.addAll(debtChecker.passesDebtCheck(quoteData))
-            }
-        }
-
-        val newQuote = copy(data = quoteData, breachedUnderwritingGuidelines = breachedUnderwritingGuidelines)
-
-        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
-                    state = QuoteState.QUOTED
-                )
-            )
-        }
-
-        if (breachedUnderwritingGuidelines.isEmpty()) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    state = QuoteState.QUOTED
-                )
-            )
-        }
-
-        return Either.left(breachedUnderwritingGuidelines)
     }
 }

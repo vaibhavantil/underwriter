@@ -2,19 +2,19 @@ package com.hedvig.underwriter.extensions
 
 import com.hedvig.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.ApartmentType
-import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType
 import com.hedvig.underwriter.graphql.type.QuoteDetails
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.ExtraBuilding as ExtaBuildingModel
+import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
+import com.hedvig.underwriter.model.ExtraBuilding as ExtraBuildingModel
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
-import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.model.PersonPolicyHolder
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.lang.IllegalStateException
 import java.util.Locale
 
@@ -145,7 +145,7 @@ fun Quote.createIncompleteQuoteResult(
         )
     }
 
-private fun ExtaBuildingModel.toGraphQLResponseObject(localizationService: LocalizationService, locale: Locale) =
+private fun ExtraBuildingModel.toGraphQLResponseObject(localizationService: LocalizationService, locale: Locale) =
     when (type) {
         ExtraBuildingType.GARAGE -> ExtraBuilding.ExtraBuildingGarage(
             area = area,

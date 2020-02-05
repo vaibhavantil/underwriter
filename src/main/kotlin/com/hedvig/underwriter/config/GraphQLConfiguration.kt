@@ -1,11 +1,11 @@
 package com.hedvig.underwriter.config
 
 import com.coxautodev.graphql.tools.SchemaParserDictionary
-import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
+import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
 import org.springframework.context.annotation.Bean

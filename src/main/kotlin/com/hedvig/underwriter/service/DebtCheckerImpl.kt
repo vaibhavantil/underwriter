@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.service
 
-import com.hedvig.underwriter.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Flag
 import org.springframework.stereotype.Service

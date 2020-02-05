@@ -57,7 +57,6 @@ class Mutation @Autowired constructor(
                 env.isIOS() -> QuoteInitiatedFrom.IOS
                 else -> QuoteInitiatedFrom.WEBONBOARDING
             },
-            shouldComplete = true,
             underwritingGuidelinesBypassedBy = null
         )
 

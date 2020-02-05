@@ -1,4 +1,5 @@
 package com.hedvig.underwriter.web
+
 import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.underwriter.extensions.isAndroid
@@ -6,7 +7,7 @@ import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
@@ -42,7 +43,7 @@ class QuoteController @Autowired constructor(
         @Valid @RequestBody requestDto: QuoteRequestDto,
         httpServletRequest: HttpServletRequest
     ): ResponseEntity<out Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(requestDto)
+        val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(requestDto)
 
         val quoteInitiatedFrom = when {
             httpServletRequest.isAndroid() -> QuoteInitiatedFrom.ANDROID
@@ -54,7 +55,6 @@ class QuoteController @Autowired constructor(
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
-            shouldComplete = requestDto.shouldComplete,
             underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
         )
             .bimap(
@@ -100,7 +100,7 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(quoteRequestDto)
+        val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(quoteRequestDto)
 
         return when (val quoteOrError =
             quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {

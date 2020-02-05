@@ -25,4 +25,3 @@ sealed class CompleteQuoteDetails {
         val isSubleted: Boolean
     ) : CompleteQuoteDetails()
 }
-
