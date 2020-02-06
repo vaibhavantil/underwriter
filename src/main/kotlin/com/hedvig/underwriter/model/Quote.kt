@@ -1,11 +1,8 @@
 package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.House
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
@@ -121,7 +118,7 @@ data class Quote(
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email,
                     subType = when (val quoteData = quoteRequest.incompleteQuoteData) {
-                        is Apartment? -> quoteData?.subType ?: data.subType
+                        is SwedishApartment? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
                 ) as QuoteData // This cast removes an IntellJ warning
@@ -138,7 +135,7 @@ data class Quote(
 
         val requestData = quoteRequest.incompleteQuoteData
         if (
-            requestData is Apartment
+            requestData is SwedishApartment
         ) {
             val newQuoteData: SwedishApartmentData = when (newQuote.data) {
                 is SwedishApartmentData -> newQuote.data as SwedishApartmentData
@@ -172,7 +169,7 @@ data class Quote(
             )
         }
         if (
-            requestData is House
+            requestData is SwedishHouse
         ) {
             val newQuoteData: SwedishHouseData = when (newQuote.data) {
                 is SwedishHouseData -> newQuote.data as SwedishHouseData

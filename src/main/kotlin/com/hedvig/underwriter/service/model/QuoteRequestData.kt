@@ -5,7 +5,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 
 sealed class QuoteRequestData {
-    data class House(
+    data class SwedishHouse(
         val street: String?,
         val zipCode: String?,
         val city: String?,
@@ -20,7 +20,7 @@ sealed class QuoteRequestData {
         val floor: Int? = 0
     ) : QuoteRequestData()
 
-    data class Apartment(
+    data class SwedishApartment(
         val street: String?,
         val zipCode: String?,
         val city: String?,
