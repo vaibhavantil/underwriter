@@ -157,7 +157,7 @@ data class NorwegianHomeContentsData(
     override val email: String,
 
     override val street: String,
-    override val city: String,
+    override val city: String?,
     override val zipCode: String,
     override val livingSpace: Int,
     val coinsured: Int,

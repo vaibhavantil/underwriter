@@ -21,7 +21,7 @@ interface ProductPricingService {
 
     fun priceFromProductPricingForNorwegianHomeContentsQuote(norwegianHomeContentsQuotePriceDto: NorwegianHomeContentsQuotePriceDto): QuotePriceResponseDto
 
-    fun priceFromProductPricingForNorwegianQuote(norwegianTravelQuotePriceDto: NorwegianTravelQuotePriceDto): QuotePriceResponseDto
+    fun priceFromProductPricingForNorwegianTravelQuote(norwegianTravelQuotePriceDto: NorwegianTravelQuotePriceDto): QuotePriceResponseDto
 
     fun signedQuote(signedQuoteRequest: SignedQuoteRequest, memberId: String): SignedProductResponseDto
 

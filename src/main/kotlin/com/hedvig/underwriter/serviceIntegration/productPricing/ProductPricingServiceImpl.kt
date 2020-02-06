@@ -37,7 +37,7 @@ class ProductPricingServiceImpl @Autowired constructor(
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun priceFromProductPricingForNorwegianQuote(norwegianTravelQuotePriceDto: NorwegianTravelQuotePriceDto): QuotePriceResponseDto {
+    override fun priceFromProductPricingForNorwegianTravelQuote(norwegianTravelQuotePriceDto: NorwegianTravelQuotePriceDto): QuotePriceResponseDto {
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 

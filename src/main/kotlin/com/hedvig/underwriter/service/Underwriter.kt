@@ -13,6 +13,8 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
+import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentsGuidelines
+import com.hedvig.underwriter.service.guidelines.NorwegianTravelGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishHouseGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishPersonalGuidelines
@@ -81,8 +83,30 @@ class UnderwriterImpl(
                         ancillaryArea = quoteData.ancillaryArea,
                         yearOfConstruction = quoteData.yearOfConstruction
                     )
-                is QuoteRequestData.NorwegianHomeContents -> TODO()
-                is QuoteRequestData.NorwegianTravel -> TODO()
+                is QuoteRequestData.NorwegianHomeContents ->
+                    NorwegianHomeContentsData(
+                        id = UUID.randomUUID(),
+                        ssn = quoteRequest.ssn!!,
+                        firstName = quoteRequest.firstName!!,
+                        lastName = quoteRequest.lastName!!,
+                        email = quoteRequest.email!!,
+                        type = quoteData.type!!,
+                        street = quoteData.street!!,
+                        zipCode = quoteData.zipCode!!,
+                        city = quoteData.city,
+                        isStudent = quoteData.isStudent!!,
+                        coinsured = quoteData.coinsured!!,
+                        livingSpace = quoteData.livingSpace!!
+                    )
+                is QuoteRequestData.NorwegianTravel ->
+                    NorwegianTravelData(
+                        id = UUID.randomUUID(),
+                        ssn = quoteRequest.ssn!!,
+                        firstName = quoteRequest.firstName!!,
+                        lastName = quoteRequest.lastName!!,
+                        email = quoteRequest.email!!,
+                        coinsured = quoteData.coinsured!!
+                    )
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
@@ -155,8 +179,8 @@ class UnderwriterImpl(
                     errors.addAll(runRules(data, SwedishStudentApartmentGuidelines.setOfRules))
                 else -> errors.addAll(runRules(data, SwedishApartmentGuidelines.setOfRules))
             }
-            is NorwegianHomeContentsData -> TODO("todo")
-            is NorwegianTravelData -> TODO("todo")
+            is NorwegianHomeContentsData -> errors.addAll(runRules(data, NorwegianHomeContentsGuidelines.setOfRules))
+            is NorwegianTravelData -> errors.addAll(runRules(data, NorwegianTravelGuidelines.setOfRules))
         }
         return errors
     }

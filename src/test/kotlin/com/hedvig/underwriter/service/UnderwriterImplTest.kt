@@ -92,15 +92,30 @@ class UnderwriterImplTest {
     }
 
     @Test
-    fun successfullyCreatesNorwegianHomeQuote() {
+    fun successfullyCreatesNorwegianHomeContentsQuote() {
         val debtChecker = mockk<DebtChecker>()
         val productPricingService = mockk<ProductPricingService>()
 
         val cut = UnderwriterImpl(debtChecker, productPricingService)
-        val quoteRequest = a.SwedishHouseQuoteRequestBuilder().build()
+        val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder().build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
+        every { productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
+
+    @Test
+    fun successfullyCreatesNorwegianTravelQuote() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService)
+        val quoteRequest = a.NorwegianTravelQuoteRequestBuilder().build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { productPricingService.priceFromProductPricingForNorwegianTravelQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
