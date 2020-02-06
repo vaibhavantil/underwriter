@@ -39,10 +39,10 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import org.springframework.stereotype.Service
 
 @Service
 class UnderwriterImpl(
@@ -116,7 +116,10 @@ class UnderwriterImpl(
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
-    private fun validateAndCompleteQuote(quote: Quote, underwritingGuidelinesBypassedBy: String?): Either<List<String>, Quote> {
+    private fun validateAndCompleteQuote(
+        quote: Quote,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<List<String>, Quote> {
         val breachedUnderwritingGuidelines = mutableListOf<String>()
         if (underwritingGuidelinesBypassedBy == null) {
             breachedUnderwritingGuidelines.addAll(
@@ -154,30 +157,30 @@ class UnderwriterImpl(
 
     // TODO: Change me
     val swedishApartmentGuidelines = listOf(
-        SwedishApartmentHouseHoldSizeAtLeast1(),
-        SwedishApartmentLivingSpaceAtLeast1Sqm(),
-        SwedishApartmentHouseHoldSizeNotMoreThan6(),
-        SwedishApartmentLivingSpaceNotMoreThan250Sqm()
+        SwedishApartmentHouseHoldSizeAtLeast1,
+        SwedishApartmentLivingSpaceAtLeast1Sqm,
+        SwedishApartmentHouseHoldSizeNotMoreThan6,
+        SwedishApartmentLivingSpaceNotMoreThan250Sqm
     )
 
     val swedishStudentApartmentGuidelines = listOf(
-        SwedishApartmentHouseHoldSizeAtLeast1(),
-        SwedishApartmentLivingSpaceAtLeast1Sqm(),
-        SwedishStudentApartmentHouseholdSizeNotMoreThan2(),
-        SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm(),
-        SwedishStudentApartmentAgeNotMoreThan30Years()
+        SwedishApartmentHouseHoldSizeAtLeast1,
+        SwedishApartmentLivingSpaceAtLeast1Sqm,
+        SwedishStudentApartmentHouseholdSizeNotMoreThan2,
+        SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm,
+        SwedishStudentApartmentAgeNotMoreThan30Years
     )
 
     val swedishHouseGuideline = listOf(
-        SwedishHouseHouseholdSizeAtLeast1(),
-        SwedishHouseLivingSpaceAtLeast1Sqm(),
-        SwedishHouseHouseholdSizeNotMoreThan6(),
-        SwedishHouseLivingSpaceNotMoreThan250Sqm(),
-        SwedishHouseYearOfConstruction(),
-        SwedishHouseNumberOfBathrooms(),
-        SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm(),
-        SwedishHouseExtraBuildingsSizeNotOverThan75Sqm(),
-        SwedishHouseExtraBuildingsSizeAtLeast1Sqm()
+        SwedishHouseHouseholdSizeAtLeast1,
+        SwedishHouseLivingSpaceAtLeast1Sqm,
+        SwedishHouseHouseholdSizeNotMoreThan6,
+        SwedishHouseLivingSpaceNotMoreThan250Sqm,
+        SwedishHouseYearOfConstruction,
+        SwedishHouseNumberOfBathrooms,
+        SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm,
+        SwedishHouseExtraBuildingsSizeNotOverThan75Sqm,
+        SwedishHouseExtraBuildingsSizeAtLeast1Sqm
     )
 
     val swedishPersonalGuidelines = listOf(

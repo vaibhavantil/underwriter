@@ -1,14 +1,8 @@
 package com.hedvig.underwriter.model
 
-import arrow.core.Either
-import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.House
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
-import io.mockk.every
-import io.mockk.mockk
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
