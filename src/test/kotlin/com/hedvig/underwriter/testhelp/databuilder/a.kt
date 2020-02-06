@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.ONE_DAY
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
@@ -161,7 +162,7 @@ class a {
         val householdSize: Int? = 3,
         val livingSpace: Int? = 2,
         val ancillaryArea: Int? = 50,
-        val yearOfConstruction: Int? = 100,
+        val yearOfConstruction: Int? = 1925,
         val numberOfBathrooms: Int? = 1,
         val extraBuildings: List<ExtraBuildingRequestDto>? = emptyList(),
         val isSubleted: Boolean? = false
@@ -177,6 +178,20 @@ class a {
             numberOfBathrooms = numberOfBathrooms,
             extraBuildings = extraBuildings,
             isSubleted = isSubleted
+        )
+    }
+
+    data class SwedishHouseQuoteRequestDataExtraBuildingsBuilder(
+        val id: UUID? = UUID.randomUUID(),
+        val type: ExtraBuildingType? = ExtraBuildingType.GARAGE,
+        val area: Int? = 5,
+        val hasWaterConnected: Boolean? = true
+    ) : DataBuilder<ExtraBuildingRequestDto> {
+        override fun build() = ExtraBuildingRequestDto(
+            id = id,
+            type = type!!,
+            area = area!!,
+            hasWaterConnected = hasWaterConnected!!
         )
     }
 
