@@ -12,7 +12,7 @@ data class NorwegianTravelQuotePriceDto(
             val quoteData = quote.data
             if (quoteData is NorwegianTravelData) {
                 return NorwegianTravelQuotePriceDto(
-                    coinsured = quoteData.coInsured
+                    coinsured = quoteData.coinsured
                 )
             }
             throw RuntimeException("missing data cannot create home quote price dto")

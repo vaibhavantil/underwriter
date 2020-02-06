@@ -113,7 +113,7 @@ fun Quote.createQuoteDetails(
         )
     } ?: this.norwegianTravel?.let {
         QuoteDetails.NorwegianTravelDetails(
-            coinsured = it.coInsured
+            coinsured = it.coinsured
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 

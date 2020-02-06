@@ -185,7 +185,7 @@ data class NorwegianTravelData(
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
-    val coInsured: Int
+    val coinsured: Int
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
 
     override fun updateName(firstName: String, lastName: String): NorwegianTravelData {
