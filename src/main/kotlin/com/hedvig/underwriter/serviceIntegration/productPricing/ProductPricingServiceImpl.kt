@@ -25,7 +25,7 @@ class ProductPricingServiceImpl @Autowired constructor(
 ) : ProductPricingService {
 
     override fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto {
-        val price = BigDecimal.ZERO //this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
+        val price = this.productPricingClient.priceFromProductPricingForHouseQuote(houseQuotePriceDto).body!!.price
         return QuotePriceResponseDto(price)
     }
 
