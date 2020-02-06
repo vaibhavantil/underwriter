@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
-import java.util.UUID
 import org.jdbi.v3.json.Json
+import java.util.UUID
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -28,18 +27,6 @@ sealed class QuoteData {
     }
 }
 
-interface AddressInsurance {
-    val street: String?
-    val zipCode: String?
-    val city: String?
-    val livingSpace: Int?
-}
-
-interface HomeInsurance : AddressInsurance {
-    val householdSize: Int?
-}
-
-// TODO: Let's split this file up. But right now we are refactoring some other parts of this so let's do it after
 data class SwedishHouseData(
     override val id: UUID,
     override val ssn: String? = null,
@@ -107,48 +94,6 @@ data class SwedishApartmentData(
     }
 }
 
-data class ExtraBuilding(
-    val type: ExtraBuildingType,
-    val area: Int,
-    val hasWaterConnected: Boolean,
-    val displayName: String?
-) {
-    fun toDto(): ExtraBuildingRequestDto =
-        ExtraBuildingRequestDto(
-            id = null,
-            type = type,
-            area = area,
-            hasWaterConnected = hasWaterConnected
-        )
-
-    companion object {
-        fun from(extraBuildingDto: ExtraBuildingRequestDto): ExtraBuilding =
-            ExtraBuilding(
-                type = extraBuildingDto.type,
-                area = extraBuildingDto.area,
-                hasWaterConnected = extraBuildingDto.hasWaterConnected,
-                displayName = null
-            )
-    }
-}
-
-enum class ExtraBuildingType {
-    GARAGE,
-    CARPORT,
-    SHED,
-    STOREHOUSE,
-    FRIGGEBOD,
-    ATTEFALL,
-    OUTHOUSE,
-    GUESTHOUSE,
-    GAZEBO,
-    GREENHOUSE,
-    SAUNA,
-    BARN,
-    BOATHOUSE,
-    OTHER
-}
-
 data class NorwegianHomeContentsData(
     override val id: UUID,
     override val ssn: String,
@@ -172,11 +117,6 @@ data class NorwegianHomeContentsData(
     // TODO: Let's remove the consept of complete
     override val isComplete: Boolean
         get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
-}
-
-enum class NorwegianHomeContentsType {
-    RENT,
-    OWN
 }
 
 data class NorwegianTravelData(
