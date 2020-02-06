@@ -16,7 +16,8 @@ data class CurrentInsurer(
             "Vardia" to Pair("Vardia", false),
             "Tre Kronor" to Pair("Tre Kronor", true),
             "ICA" to Pair("Ica", true),
-            "Dina Försäkringar" to Pair("Dina Försäkringar", false)
+            "Dina Försäkringar" to Pair("Dina Försäkringar", false),
+            "other" to Pair("Other", false)
         )
 
         fun create(id: String) = insurerMap[id]?.let {
