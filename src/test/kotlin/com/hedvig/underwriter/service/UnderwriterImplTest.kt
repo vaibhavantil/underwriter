@@ -8,10 +8,13 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.every
 import io.mockk.mockk
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -19,85 +22,38 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
 
-
 @RunWith(MockitoJUnitRunner::class)
 class UnderwriterImplTest {
 
     @Test
-    fun successfullyChecksUnderwritingGuidelines() {
-        /*val debtChecker = mockk<DebtChecker>()
+    fun successfullyCreatesSwedishApartmentQuote() {
+        val debtChecker = mockk<DebtChecker>()
         val productPricingService = mockk<ProductPricingService>()
 
-        val quote = Quote(
-            id = UUID.randomUUID(),
-            createdAt = Instant.now(),
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            data = SwedishApartmentData(
-                firstName = "Sherlock",
-                lastName = "Holmes",
-                ssn = "199003041234",
-                street = "221 Baker street",
-                zipCode = "11216",
-                livingSpace = 33,
-                householdSize = 4,
-                city = "London",
-                id = UUID.randomUUID(),
-                subType = ApartmentProductSubType.BRF
-            ),
-            currentInsurer = null,
-            memberId = "123456",
-            breachedUnderwritingGuidelines = null
-        )
+        val cut = UnderwriterImpl(debtChecker, productPricingService)
+        val quoteRequest = a.SwedishApartmentQuoteRequestBuilder().build()
 
-        every { debtChecker.passesDebtCheck(any()) } returns listOf("fails debt check")
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
 
-        val result = quote.complete(debtChecker, productPricingService)
-        require(result is Either.Left)
-        assertThat(result.a).isEqualTo(listOf("fails debt check"))*/
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
     }
-
 
     @Test
-    fun successfullyBypassesUnderwritingGuidelines() {
-        /*val debtChecker = mockk<DebtChecker>()
+    fun underwritingGuidelineHitAgeOnCreatesSwedishApartmentQuote() {
+        val debtChecker = mockk<DebtChecker>()
         val productPricingService = mockk<ProductPricingService>()
 
-        val quote = Quote(
-            id = UUID.randomUUID(),
-            createdAt = Instant.now(),
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.HEDVIG,
-            data = SwedishApartmentData(
-                firstName = "Sherlock",
-                lastName = "Holmes",
-                ssn = "199003041234",
-                street = "221 Baker street",
-                zipCode = "11216",
-                livingSpace = 33,
-                householdSize = 4,
-                city = "London",
-                id = UUID.randomUUID(),
-                subType = ApartmentProductSubType.BRF
-            ),
-            currentInsurer = null,
-            memberId = "123456",
-            breachedUnderwritingGuidelines = null
-        )
+        val cut = UnderwriterImpl(debtChecker, productPricingService)
+        val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(ssn = "202001010000").build()
 
-        val breachedUnderwritingGuidelines = listOf("fails debt check")
-        val bypasser = "blargh@hedvig.com"
-        every { debtChecker.passesDebtCheck(any()) } returns breachedUnderwritingGuidelines
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns
-            QuotePriceResponseDto(BigDecimal.valueOf(100))
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
 
-        val result = quote.complete(debtChecker, productPricingService, bypasser)
-        require(result is Either.Right)
-        assertThat(result.b.breachedUnderwritingGuidelines).isEqualTo(breachedUnderwritingGuidelines)
-        assertThat(result.b.underwritingGuidelinesBypassedBy).isEqualTo(bypasser)*/
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a).isEqualTo(listOf(AgeRestrictionGuideline.errorMessage))
     }
+
 }

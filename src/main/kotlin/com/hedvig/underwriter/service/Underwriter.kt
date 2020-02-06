@@ -39,13 +39,10 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
-import com.hedvig.underwriter.web.dtos.ErrorCodes
-import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.time.Instant
-import java.util.UUID
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.Instant
+import java.util.UUID
 
 @Service
 class UnderwriterImpl(
