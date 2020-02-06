@@ -106,6 +106,7 @@ data class NorwegianHomeContentsData(
     override val zipCode: String,
     override val livingSpace: Int,
     val coinsured: Int,
+    @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     val type: NorwegianHomeContentsType,
     val internalId: Int? = null

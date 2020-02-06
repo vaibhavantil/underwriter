@@ -198,8 +198,8 @@ interface QuoteDao {
                 zip_code,
                 living_space,
                 coinsured,
-                is_student,
-                type
+                type,
+                is_student
             )
             VALUES
             (
@@ -213,8 +213,8 @@ interface QuoteDao {
                 :zipCode,
                 :livingSpace,
                 :coinsured,
-                :isStudent,
-                :type
+                :type,
+                :isStudent
             )
             RETURNING *
     """

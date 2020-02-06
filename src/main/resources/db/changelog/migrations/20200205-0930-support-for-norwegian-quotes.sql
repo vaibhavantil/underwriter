@@ -10,7 +10,7 @@ CREATE TABLE quote_revision_norwegian_home_contents_data (
     last_name varchar(100) NOT NULL,
     email varchar(255) NULL,
     street varchar (100) NOT NULL,
-    city varchar(100) NOT NULL,
+    city varchar(100) NULL,
     zip_code varchar(6) NOT NULL,
     coinsured smallint NOT NULL,
     living_space smallint NOT NULL,
