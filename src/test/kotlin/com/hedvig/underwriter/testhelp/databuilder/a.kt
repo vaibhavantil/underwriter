@@ -10,7 +10,7 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
@@ -104,12 +104,12 @@ class a {
     }
 
     data class SwedishApartmentQuoteRequestDataBuilder(
-        val street: String  = "",
-        val city: String  = "",
-        val zipCode: String  = "",
-        val householdSize: Int  = 3,
-        val livingSpace: Int  = 2,
-        val subType: ApartmentProductSubType  = ApartmentProductSubType.BRF,
+        val street: String = "",
+        val city: String = "",
+        val zipCode: String = "",
+        val householdSize: Int = 3,
+        val livingSpace: Int = 2,
+        val subType: ApartmentProductSubType = ApartmentProductSubType.BRF,
         val floor: Int? = null
     ) : DataBuilder<QuoteRequestData.SwedishApartment> {
         override fun build() = QuoteRequestData.SwedishApartment(
@@ -125,10 +125,10 @@ class a {
 
     data class SwedishApartmentQuoteRequestBuilder(
         val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
-        val firstName: String  = "",
-        val lastName: String  = "",
-        val ssn: String  = "191212121212",
-        val email: String  = "em@i.l",
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
         val quotingPartner: Partner = Partner.HEDVIG,
         val memberId: String? = null,
         val originatingProductId: UUID? = null,
@@ -143,7 +143,7 @@ class a {
             lastName = lastName,
             email = email,
             currentInsurer = currentInsurer,
-            birthDate = ssn?.birthDateFromSsn(),
+            birthDate = ssn?.birthDateFromSwedishSsn(),
             ssn = ssn,
             quotingPartner = quotingPartner,
             productType = productType,
@@ -157,15 +157,15 @@ class a {
 
     data class SwedishHouseQuoteRequestDataBuilder(
         val street: String = "",
-        val city: String  = "",
-        val zipCode: String  = "",
-        val householdSize: Int  = 3,
-        val livingSpace: Int  = 2,
-        val ancillaryArea: Int  = 50,
-        val yearOfConstruction: Int  = 100,
-        val numberOfBathrooms: Int  = 1,
-        val extraBuildings: List<ExtraBuildingRequestDto>  = emptyList(),
-        val isSubleted: Boolean  = false
+        val city: String = "",
+        val zipCode: String = "",
+        val householdSize: Int = 3,
+        val livingSpace: Int = 2,
+        val ancillaryArea: Int = 50,
+        val yearOfConstruction: Int = 1925,
+        val numberOfBathrooms: Int = 1,
+        val extraBuildings: List<ExtraBuildingRequestDto> = emptyList(),
+        val isSubleted: Boolean = false
     ) : DataBuilder<QuoteRequestData.SwedishHouse> {
         override fun build() = QuoteRequestData.SwedishHouse(
             street = street,
@@ -183,10 +183,10 @@ class a {
 
     data class SwedishHouseQuoteRequestBuilder(
         val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
-        val firstName: String  = "",
-        val lastName: String  = "",
-        val ssn: String  = "191212121212",
-        val email: String  = "em@i.l",
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
         val quotingPartner: Partner = Partner.HEDVIG,
         val memberId: String? = null,
         val originatingProductId: UUID? = null,
@@ -201,7 +201,7 @@ class a {
             lastName = lastName,
             email = email,
             currentInsurer = currentInsurer,
-            birthDate = ssn .birthDateFromSsn(),
+            birthDate = ssn.birthDateFromSwedishSsn(),
             ssn = ssn,
             quotingPartner = quotingPartner,
             productType = productType,
@@ -214,11 +214,11 @@ class a {
     }
 
     data class NorwegianHomeContentsQuoteRequestDataBuilder(
-        val street: String  = "",
-        val city: String  = "",
-        val zipCode: String  = "",
-        val coinsured: Int  = 3,
-        val livingSpace: Int  = 2,
+        val street: String = "",
+        val city: String = "",
+        val zipCode: String = "",
+        val coinsured: Int = 3,
+        val livingSpace: Int = 2,
         val isStudent: Boolean = false,
         val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val floor: Int? = null
@@ -236,10 +236,10 @@ class a {
 
     data class NorwegianHomeContentsQuoteRequestBuilder(
         val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
-        val firstName: String  = "",
-        val lastName: String  = "",
-        val ssn: String  = "191212121212",
-        val email: String  = "em@i.l",
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
         val quotingPartner: Partner = Partner.HEDVIG,
         val memberId: String? = null,
         val originatingProductId: UUID? = null,
@@ -254,7 +254,7 @@ class a {
             lastName = lastName,
             email = email,
             currentInsurer = currentInsurer,
-            birthDate = ssn.birthDateFromSsn(),
+            birthDate = ssn.birthDateFromSwedishSsn(),
             ssn = ssn,
             quotingPartner = quotingPartner,
             productType = productType,
@@ -267,7 +267,7 @@ class a {
     }
 
     data class NorwegianTravelQuoteRequestDataBuilder(
-        val coinsured: Int  = 3
+        val coinsured: Int = 3
     ) : DataBuilder<QuoteRequestData.NorwegianTravel> {
         override fun build() = QuoteRequestData.NorwegianTravel(
             coinsured = coinsured
@@ -276,10 +276,10 @@ class a {
 
     data class NorwegianTravelQuoteRequestBuilder(
         val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
-        val firstName: String  = "",
-        val lastName: String  = "",
-        val ssn: String  = "191212121212",
-        val email: String  = "em@i.l",
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
         val quotingPartner: Partner = Partner.HEDVIG,
         val memberId: String? = null,
         val originatingProductId: UUID? = null,
@@ -294,7 +294,7 @@ class a {
             lastName = lastName,
             email = email,
             currentInsurer = currentInsurer,
-            birthDate = ssn.birthDateFromSsn(),
+            birthDate = ssn.birthDateFromSwedishSsn(),
             ssn = ssn,
             quotingPartner = quotingPartner,
             productType = productType,

@@ -106,7 +106,7 @@ fun Quote.createQuoteDetails(
         QuoteDetails.NorwegianHomeContentsDetails(
             street = it.street,
             zipCode = it.zipCode,
-            coinsured = it.householdSize,
+            coinsured = it.coinsured,
             livingSpace = it.livingSpace,
             isStudent = it.isStudent,
             type = NorwegianHomeContentsType.valueOf(it.type.name)

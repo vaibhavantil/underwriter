@@ -2,7 +2,7 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -78,7 +78,7 @@ object SwedishStudentApartmentAgeNotMoreThan30Years : BaseGuideline<SwedishApart
     override val validate =
         { data: SwedishApartmentData ->
             (data.subType == ApartmentProductSubType.STUDENT_RENT || data.subType == ApartmentProductSubType.STUDENT_BRF) &&
-                data.ssn!!.birthDateFromSsn().until(
+                data.ssn!!.birthDateFromSwedishSsn().until(
                     LocalDate.now(),
                     ChronoUnit.YEARS
                 ) > 30

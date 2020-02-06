@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.service.model
 
 import com.hedvig.underwriter.model.QuoteData
-import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -16,6 +16,6 @@ interface PersonPolicyHolder<T : QuoteData> {
     fun age(): Long {
         val dateToday = LocalDate.now()
 
-        return this.ssn!!.birthDateFromSsn().until(dateToday, ChronoUnit.YEARS)
+        return this.ssn!!.birthDateFromSwedishSsn().until(dateToday, ChronoUnit.YEARS)
     }
 }

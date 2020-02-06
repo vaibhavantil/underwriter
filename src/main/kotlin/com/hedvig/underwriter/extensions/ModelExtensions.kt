@@ -12,7 +12,7 @@ import com.hedvig.underwriter.graphql.type.depricated.EditHouseInput
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
@@ -29,7 +29,7 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     lastName = this.lastName,
     email = this.email,
     currentInsurer = this.currentInsurer,
-    birthDate = this.ssn.birthDateFromSsn(),
+    birthDate = this.ssn.birthDateFromSwedishSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
     incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
@@ -74,7 +74,7 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     lastName = this.lastName,
     email = this.email,
     currentInsurer = this.currentInsurer,
-    birthDate = this.ssn?.birthDateFromSsn(),
+    birthDate = this.ssn?.birthDateFromSwedishSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
     incompleteQuoteData = when {

@@ -28,11 +28,14 @@ sealed class QuoteData {
     }
 }
 
-interface HomeInsurance {
+interface AddressInsurance {
     val street: String?
     val zipCode: String?
     val city: String?
     val livingSpace: Int?
+}
+
+interface HomeInsurance : AddressInsurance {
     val householdSize: Int?
 }
 
@@ -156,11 +159,11 @@ data class NorwegianHomeContentsData(
     override val street: String,
     override val city: String,
     override val zipCode: String,
-    override val householdSize: Int,
     override val livingSpace: Int,
+    val coinsured: Int,
     val isStudent: Boolean,
     val type: NorwegianHomeContentsType
-) : QuoteData(), HomeInsurance, PersonPolicyHolder<NorwegianHomeContentsData> {
+) : QuoteData(), AddressInsurance, PersonPolicyHolder<NorwegianHomeContentsData> {
 
     override fun updateName(firstName: String, lastName: String): NorwegianHomeContentsData {
         return this.copy(firstName = firstName, lastName = lastName)

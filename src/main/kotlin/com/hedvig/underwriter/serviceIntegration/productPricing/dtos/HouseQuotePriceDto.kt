@@ -2,7 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.model.birthDateFromSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import java.time.LocalDate
 import java.time.Year
 
@@ -22,7 +22,7 @@ data class HouseQuotePriceDto(
             val completeQuoteData = completeQuote.data
             if (completeQuoteData is SwedishHouseData) {
                 return HouseQuotePriceDto(
-                    birthDate = completeQuoteData.ssn!!.birthDateFromSsn(),
+                    birthDate = completeQuoteData.ssn!!.birthDateFromSwedishSsn(),
                     livingSpace = completeQuoteData.livingSpace!!,
                     houseHoldSize = completeQuoteData.householdSize!!,
                     zipCode = completeQuoteData.zipCode!!,

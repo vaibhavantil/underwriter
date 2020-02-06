@@ -9,7 +9,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-fun String.birthDateFromSsn(): LocalDate {
+fun String.birthDateFromSwedishSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     return LocalDate.parse(
         trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
@@ -17,6 +17,10 @@ fun String.birthDateFromSsn(): LocalDate {
             6
         ) + "-" + trimmedInput.substring(6, 8)
     )
+}
+
+fun String.birthDateFromNorwegianSsn(): LocalDate {
+    TODO()
 }
 
 data class DatabaseQuoteRevision(

@@ -34,6 +34,36 @@ class UnderwriterImplTest {
     }
 
     @Test
+    fun successfullyCreatesSwedishHouseQuote() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService)
+        val quoteRequest = a.SwedishHouseQuoteRequestBuilder().build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
+
+    @Test
+    fun successfullyCreatesNorwegianHomeQuote() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService)
+        val quoteRequest = a.SwedishHouseQuoteRequestBuilder().build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
+
+    @Test
     fun underwritingGuidelineHitAgeOnCreatesSwedishApartmentQuote() {
         val debtChecker = mockk<DebtChecker>()
         val productPricingService = mockk<ProductPricingService>()
