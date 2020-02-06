@@ -108,12 +108,12 @@ fun Quote.createQuoteDetails(
             zipCode = it.zipCode,
             coinsured = it.householdSize,
             livingSpace = it.livingSpace,
-            isStudent = it.isSudent,
+            isStudent = it.isStudent,
             type = NorwegianHomeContentsType.valueOf(it.type.name)
         )
     } ?: this.norwegianTravel?.let {
         QuoteDetails.NorwegianTravelDetails(
-            coinsured = it.coinsured
+            coinsured = it.coInsured
         )
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
