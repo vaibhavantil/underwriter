@@ -14,8 +14,8 @@ import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.House
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.util.toStockholmInstant
 import java.util.UUID
@@ -41,7 +41,7 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
 )
 
 fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() =
-    Apartment(
+    SwedishApartment(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -52,7 +52,7 @@ fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() =
     )
 
 fun CreateHouseInput.toIncompleteHouseQuoteDataDto() =
-    House(
+    SwedishHouse(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -90,7 +90,7 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
 )
 
 fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() =
-    Apartment(
+    SwedishApartment(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -101,7 +101,7 @@ fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() =
     )
 
 fun EditHouseInput.toIncompleteHouseQuoteDataDto() =
-    House(
+    SwedishHouse(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,

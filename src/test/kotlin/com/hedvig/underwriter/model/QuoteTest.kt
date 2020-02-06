@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.House
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
@@ -69,7 +69,7 @@ class QuoteTest {
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteQuoteData = House(
+                incompleteQuoteData = SwedishHouse(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,
@@ -120,7 +120,7 @@ class QuoteTest {
                 productType = ProductType.APARTMENT,
                 ssn = "201212121213",
                 currentInsurer = null,
-                incompleteQuoteData = Apartment(
+                incompleteQuoteData = SwedishApartment(
                     street = "Storgatan 2",
                     zipCode = null,
                     city = null,

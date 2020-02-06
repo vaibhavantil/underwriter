@@ -65,7 +65,7 @@ class UnderwriterImpl(
             initiatedFrom = initiatedFrom,
             attributedTo = quoteRequest.quotingPartner ?: Partner.HEDVIG,
             data = when (val quoteData = quoteRequest.incompleteQuoteData) {
-                is QuoteRequestData.Apartment ->
+                is QuoteRequestData.SwedishApartment ->
                     SwedishApartmentData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,
@@ -79,7 +79,7 @@ class UnderwriterImpl(
                         householdSize = quoteData.householdSize,
                         livingSpace = quoteData.livingSpace
                     )
-                is QuoteRequestData.House ->
+                is QuoteRequestData.SwedishHouse ->
                     SwedishHouseData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,

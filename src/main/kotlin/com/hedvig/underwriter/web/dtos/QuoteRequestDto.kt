@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.service.model.QuoteRequestData.Apartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.House
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -22,11 +22,11 @@ data class QuoteRequestDto(
     val productType: ProductType?,
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @field:JsonSubTypes(
-        JsonSubTypes.Type(value = Apartment::class, name = "apartment"),
-        JsonSubTypes.Type(value = House::class, name = "house")
+        JsonSubTypes.Type(value = SwedishApartment::class, name = "apartment"),
+        JsonSubTypes.Type(value = SwedishHouse::class, name = "house")
     ) val incompleteQuoteData: QuoteRequestData?,
-    val incompleteHouseQuoteData: House?,
-    val incompleteApartmentQuoteData: Apartment?,
+    val incompleteHouseQuoteData: SwedishHouse?,
+    val incompleteApartmentQuoteData: SwedishApartment?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,
