@@ -74,6 +74,10 @@ fun Quote.createCompleteQuoteResult(
             yearOfConstruction = house.yearOfConstruction!!,
             isSubleted = house.isSubleted!!
         )
+    } ?: this.norwegianHomeContents?.let {
+        CompleteQuoteDetails.UnknownQuoteDetails()
+    } ?: this.norwegianTravel?.let {
+        CompleteQuoteDetails.UnknownQuoteDetails()
     } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
 
 fun Quote.createQuoteDetails(

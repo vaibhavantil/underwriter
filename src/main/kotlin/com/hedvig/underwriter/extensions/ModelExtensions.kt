@@ -1,8 +1,16 @@
 package com.hedvig.underwriter.extensions
 
 import com.hedvig.underwriter.graphql.type.ApartmentType
+import com.hedvig.underwriter.graphql.type.CreateNorwegianHomeContentsInput
+import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
+import com.hedvig.underwriter.graphql.type.CreateSwedishApartmentInput
+import com.hedvig.underwriter.graphql.type.CreateSwedishHouseInput
+import com.hedvig.underwriter.graphql.type.EditNorwegianHomeContentsInput
+import com.hedvig.underwriter.graphql.type.EditNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
+import com.hedvig.underwriter.graphql.type.EditSwedishApartmentInput
+import com.hedvig.underwriter.graphql.type.EditSwedishHouseInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.graphql.type.ExtraBuildingType
 import com.hedvig.underwriter.graphql.type.depricated.CreateApartmentInput
@@ -10,12 +18,12 @@ import com.hedvig.underwriter.graphql.type.depricated.CreateHouseInput
 import com.hedvig.underwriter.graphql.type.depricated.EditApartmentInput
 import com.hedvig.underwriter.graphql.type.depricated.EditHouseInput
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
-import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
+import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.util.toStockholmInstant
 import java.util.UUID
@@ -32,7 +40,15 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     birthDate = this.ssn.birthDateFromSwedishSsn(),
     ssn = this.ssn,
     productType = this.getProductType(),
-    incompleteQuoteData = (if (this.house != null) this.house.toIncompleteHouseQuoteDataDto() else this.apartment!!.toIncompleteApartmentQuoteDataDto()),
+    incompleteQuoteData = when {
+        this.swedishApartment != null -> this.swedishApartment.toQuoteRequestData()
+        this.swedishHouse != null -> this.swedishHouse.toQuoteRequestData()
+        this.norweiganHomeContents != null -> this.norweiganHomeContents.toQuoteRequestData()
+        this.norweiganTravel != null -> this.norweiganTravel.toQuoteRequestData()
+        this.house != null -> this.house.toQuoteRequestData()
+        else -> this.apartment!!.toQuoteRequestData()
+    }
+    ,
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,
@@ -40,8 +56,8 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     dataCollectionId = this.dataCollectionId
 )
 
-fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() =
-    SwedishApartment(
+fun CreateApartmentInput.toQuoteRequestData() =
+    QuoteRequestData.SwedishApartment(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -51,8 +67,19 @@ fun CreateApartmentInput.toIncompleteApartmentQuoteDataDto() =
         floor = null
     )
 
-fun CreateHouseInput.toIncompleteHouseQuoteDataDto() =
-    SwedishHouse(
+fun CreateSwedishApartmentInput.toQuoteRequestData() =
+    QuoteRequestData.SwedishApartment(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        subType = this.type.toSubType(),
+        city = null,
+        floor = null
+    )
+
+fun CreateHouseInput.toQuoteRequestData() =
+    QuoteRequestData.SwedishHouse(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -63,6 +90,36 @@ fun CreateHouseInput.toIncompleteHouseQuoteDataDto() =
         extraBuildings = this.extraBuildings.toExtraBuilding(),
         numberOfBathrooms = this.numberOfBathrooms,
         city = null
+    )
+
+fun CreateSwedishHouseInput.toQuoteRequestData() =
+    QuoteRequestData.SwedishHouse(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        ancillaryArea = this.ancillarySpace,
+        yearOfConstruction = this.yearOfConstruction,
+        isSubleted = this.isSubleted,
+        extraBuildings = this.extraBuildings.toExtraBuilding(),
+        numberOfBathrooms = this.numberOfBathrooms,
+        city = null
+    )
+
+fun CreateNorwegianHomeContentsInput.toQuoteRequestData() =
+    QuoteRequestData.NorwegianHomeContents(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        coinsured = this.coinsured,
+        type = NorwegianHomeContentsType.valueOf(this.type.name),
+        isStudent = this.isStudent,
+        city = null
+    )
+
+fun CreateNorwegianTravelInput.toQuoteRequestData() =
+    QuoteRequestData.NorwegianTravel(
+        coinsured = this.coinsured
     )
 
 fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
@@ -78,8 +135,12 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     ssn = this.ssn,
     productType = this.getProductType(),
     incompleteQuoteData = when {
-        this.apartment != null -> this.apartment.toIncompleteApartmentQuoteDataDto()
-        this.house != null -> this.house.toIncompleteHouseQuoteDataDto()
+        this.swedishApartment != null -> this.swedishApartment.toQuoteRequestDataDto()
+        this.swedishHouse != null -> this.swedishHouse.toQuoteRequestDataDto()
+        this.norweiganHomeContents != null -> this.norweiganHomeContents.toQuoteRequestDataDto()
+        this.norweiganTravel != null -> this.norweiganTravel.toQuoteRequestDataDto()
+        this.apartment != null -> this.apartment.toQuoteRequestDataDto()
+        this.house != null -> this.house.toQuoteRequestDataDto()
         else -> null
     },
     quotingPartner = quotingPartner,
@@ -89,8 +150,8 @@ fun EditQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
     dataCollectionId = this.dataCollectionId
 )
 
-fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() =
-    SwedishApartment(
+fun EditSwedishApartmentInput.toQuoteRequestDataDto() =
+    QuoteRequestData.SwedishApartment(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,
@@ -100,8 +161,49 @@ fun EditApartmentInput.toIncompleteApartmentQuoteDataDto() =
         floor = null
     )
 
-fun EditHouseInput.toIncompleteHouseQuoteDataDto() =
-    SwedishHouse(
+fun EditSwedishHouseInput.toQuoteRequestDataDto() =
+    QuoteRequestData.SwedishHouse(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        ancillaryArea = this.ancillarySpace,
+        yearOfConstruction = this.yearOfConstruction,
+        isSubleted = this.isSubleted,
+        extraBuildings = this.extraBuildings?.toExtraBuilding(),
+        numberOfBathrooms = this.numberOfBathrooms,
+        city = null
+    )
+
+fun EditNorwegianHomeContentsInput.toQuoteRequestDataDto() =
+    QuoteRequestData.NorwegianHomeContents(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        coinsured = this.coinsured,
+        type = this.type?.let { NorwegianHomeContentsType.valueOf(it.name) },
+        isStudent = this.isStudent,
+        city = null
+    )
+
+fun EditNorwegianTravelInput.toQuoteRequestDataDto() =
+    QuoteRequestData.NorwegianTravel(
+        coinsured = coinsured
+    )
+
+fun EditApartmentInput.toQuoteRequestDataDto() =
+    QuoteRequestData.SwedishApartment(
+        street = this.street,
+        zipCode = this.zipCode,
+        livingSpace = this.livingSpace,
+        householdSize = this.householdSize,
+        subType = this.type?.toSubType(),
+        city = null,
+        floor = null
+    )
+
+fun EditHouseInput.toQuoteRequestDataDto() =
+    QuoteRequestData.SwedishHouse(
         street = this.street,
         zipCode = this.zipCode,
         livingSpace = this.livingSpace,

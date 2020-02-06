@@ -36,6 +36,8 @@ data class DatabaseQuoteRevision(
     val price: BigDecimal? = null,
     val quoteApartmentDataId: Int?,
     val quoteHouseDataId: Int?,
+    val quoteNorwegianHomeContentsDataId: Int?,
+    val quoteNorwegianTravelDataId: Int?,
     val memberId: String?,
     val breachedUnderwritingGuidelines: List<String>?,
     val underwritingGuidelinesBypassedBy: String?,
@@ -65,6 +67,14 @@ data class DatabaseQuoteRevision(
                 },
                 quoteHouseDataId = when (quote.data) {
                     is SwedishHouseData -> quote.data.internalId
+                    else -> null
+                },
+                quoteNorwegianHomeContentsDataId = when (quote.data) {
+                    is NorwegianHomeContentsData -> quote.data.internalId
+                    else -> null
+                },
+                quoteNorwegianTravelDataId = when (quote.data) {
+                    is NorwegianTravelData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,

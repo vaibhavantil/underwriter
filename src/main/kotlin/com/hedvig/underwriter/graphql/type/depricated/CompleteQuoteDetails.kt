@@ -24,4 +24,8 @@ sealed class CompleteQuoteDetails {
         val yearOfConstruction: Int,
         val isSubleted: Boolean
     ) : CompleteQuoteDetails()
+
+    data class UnknownQuoteDetails(
+        val unknown: String = "This is deprecated use quoteDetails instead!"
+    ) : CompleteQuoteDetails()
 }

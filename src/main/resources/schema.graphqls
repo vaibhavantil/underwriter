@@ -342,7 +342,11 @@ type MonetaryAmountV2 {
 
 union Quote = CompleteQuote | IncompleteQuote
 
-union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
+union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails | UnknownQuoteDetails
+
+type UnknownQuoteDetails {
+    unknown: String
+}
 
 union QuoteDetails =
     SwedishApartmentQuoteDetails

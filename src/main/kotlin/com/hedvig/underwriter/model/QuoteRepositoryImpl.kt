@@ -67,6 +67,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val quoteData: QuoteData = when {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
             databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
+            databaseQuote.quoteNorwegianHomeContentsDataId != null -> dao.findNorwegianHomeContentsQuoteData(databaseQuote.quoteNorwegianHomeContentsDataId)
+            databaseQuote.quoteNorwegianTravelDataId != null -> dao.findNorwegianTravelQuoteData(databaseQuote.quoteNorwegianTravelDataId)
             else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
         return Quote(

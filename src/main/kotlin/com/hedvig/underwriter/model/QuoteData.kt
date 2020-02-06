@@ -99,7 +99,7 @@ data class NorwegianHomeContentsData(
     override val ssn: String,
     override val firstName: String,
     override val lastName: String,
-    override val email: String,
+    override val email: String?,
 
     override val street: String,
     override val city: String?,
@@ -107,7 +107,8 @@ data class NorwegianHomeContentsData(
     override val livingSpace: Int,
     val coinsured: Int,
     val isStudent: Boolean,
-    val type: NorwegianHomeContentsType
+    val type: NorwegianHomeContentsType,
+    val internalId: Int? = null
 ) : QuoteData(), AddressInsurance, PersonPolicyHolder<NorwegianHomeContentsData> {
 
     override fun updateName(firstName: String, lastName: String): NorwegianHomeContentsData {
@@ -125,7 +126,8 @@ data class NorwegianTravelData(
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
-    val coinsured: Int
+    val coinsured: Int,
+    val internalId: Int? = null
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
 
     override fun updateName(firstName: String, lastName: String): NorwegianTravelData {

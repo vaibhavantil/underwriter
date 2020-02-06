@@ -23,6 +23,8 @@ interface QuoteDao {
                 price,
                 quote_apartment_data_id,
                 quote_house_data_id,
+                quote_norwegian_home_contents_data_id,
+                quote_norwegian_travel_data_id,
                 member_id,
                 breached_underwriting_guidelines,
                 underwriting_guidelines_bypassed_by,
@@ -42,6 +44,8 @@ interface QuoteDao {
                 :price,
                 :quoteApartmentDataId,
                 :quoteHouseDataId,
+                :quoteNorwegianHomeContentsDataId,
+                :quoteNorwegianTravelDataId,
                 :memberId,
                 :breachedUnderwritingGuidelines,
                 :underwritingGuidelinesBypassedBy,
@@ -182,7 +186,7 @@ interface QuoteDao {
 
     @SqlUpdate(
         """
-            INSERT INTO quote_revision_house_data
+            INSERT INTO quote_revision_norwegian_home_contents_data
             (
                 id,
                 ssn,
@@ -220,27 +224,21 @@ interface QuoteDao {
 
     @SqlQuery(
         """
-        SELECT * FROM quote_norwegian_home_contents_data WHERE internal_id = :id
+        SELECT * FROM quote_revision_norwegian_home_contents_data WHERE internal_id = :id
     """
     )
     fun findNorwegianHomeContentsQuoteData(@Bind id: Int): NorwegianHomeContentsData?
 
     @SqlUpdate(
         """
-            INSERT INTO quote_revision_house_data
+            INSERT INTO quote_revision_norwegian_travel_data
             (
                 id,
                 ssn,
                 first_name,
                 last_name,
                 email,
-                street,
-                city,
-                zip_code,
-                living_space,
-                coinsured,
-                is_student,
-                type
+                coinsured
             )
             VALUES
             (
@@ -259,7 +257,7 @@ interface QuoteDao {
 
     @SqlQuery(
         """
-        SELECT * FROM quote_norwegian_travel_data WHERE internal_id = :id
+        SELECT * FROM quote_revision_norwegian_travel_data WHERE internal_id = :id
     """
     )
     fun findNorwegianTravelQuoteData(@Bind id: Int): NorwegianTravelData?

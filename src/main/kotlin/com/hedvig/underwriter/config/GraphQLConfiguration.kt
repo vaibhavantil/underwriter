@@ -29,6 +29,7 @@ class GraphQLConfiguration {
                 dictionary = listOf(
                     CompleteQuoteDetails.CompleteApartmentQuoteDetails::class.java,
                     CompleteQuoteDetails.CompleteHouseQuoteDetails::class.java,
+                    CompleteQuoteDetails.UnknownQuoteDetails::class.java,
                     QuoteResult.CompleteQuote::class.java,
                     QuoteResult.IncompleteQuote::class.java,
                     QuoteResult.UnderwritingLimitsHit::class.java,
