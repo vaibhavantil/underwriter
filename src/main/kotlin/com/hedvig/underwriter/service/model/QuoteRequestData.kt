@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 
 sealed class QuoteRequestData {
@@ -28,5 +29,19 @@ sealed class QuoteRequestData {
         val householdSize: Int?,
         val floor: Int?,
         val subType: ApartmentProductSubType?
+    ) : QuoteRequestData()
+
+    data class NorwegianHomeContents(
+        val street: String?,
+        val zipCode: String?,
+        val city: String?,
+        val coinsured: Int?,
+        val livingSpace: Int?,
+        val isStudent: Boolean?,
+        val type: NorwegianHomeContentsType?
+    ) : QuoteRequestData()
+
+    data class NorwegianTravel(
+        val coinsured: Int?
     ) : QuoteRequestData()
 }

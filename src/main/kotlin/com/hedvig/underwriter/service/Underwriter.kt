@@ -81,6 +81,8 @@ class UnderwriterImpl(
                         ancillaryArea = quoteData.ancillaryArea,
                         yearOfConstruction = quoteData.yearOfConstruction
                     )
+                is QuoteRequestData.NorwegianHomeContents -> TODO()
+                is QuoteRequestData.NorwegianTravel -> TODO()
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
