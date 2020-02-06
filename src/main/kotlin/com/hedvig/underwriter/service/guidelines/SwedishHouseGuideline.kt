@@ -4,6 +4,20 @@ import com.hedvig.underwriter.model.SwedishHouseData
 
 interface SwedishHouseGuideline : BaseGuideline<SwedishHouseData>
 
+object SwedishHouseGuidelines {
+    val setOfRules = setOf(
+        SwedishHouseHouseholdSizeAtLeast1,
+        SwedishHouseLivingSpaceAtLeast1Sqm,
+        SwedishHouseHouseholdSizeNotMoreThan6,
+        SwedishHouseLivingSpaceNotMoreThan250Sqm,
+        SwedishHouseYearOfConstruction,
+        SwedishHouseNumberOfBathrooms,
+        SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm,
+        SwedishHouseExtraBuildingsSizeNotOverThan75Sqm,
+        SwedishHouseExtraBuildingsSizeAtLeast1Sqm
+    )
+}
+
 object SwedishHouseHouseholdSizeAtLeast1 : SwedishHouseGuideline {
     override val errorMessage: String = "breaches underwriting guideline household size, must be at least 1"
 

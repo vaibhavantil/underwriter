@@ -5,9 +5,16 @@ import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
-interface SwedishPersonGuideline : BaseGuideline<QuoteData>
+class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
+    val setOfRules = setOf(
+        SocialSecurityNumberFormat,
+        SocialSecurityDate,
+        AgeRestrictionGuideline,
+        PersonalDebt(debtChecker)
+    )
+}
 
-object SocialSecurityNumberFormat : SwedishPersonGuideline {
+object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
     override val errorMessage = "SSN Invalid length"
 
     override val skipAfter: Boolean
@@ -24,7 +31,7 @@ object SocialSecurityNumberFormat : SwedishPersonGuideline {
     }
 }
 
-object SocialSecurityDate : SwedishPersonGuideline {
+object SocialSecurityDate : BaseGuideline<QuoteData> {
     override val errorMessage = "Invalid SSN"
 
     override val skipAfter: Boolean
@@ -53,7 +60,7 @@ object SocialSecurityDate : SwedishPersonGuideline {
     }
 }
 
-object AgeRestrictionGuideline : SwedishPersonGuideline {
+object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val errorMessage = "member is younger than 18"
 
     override val skipAfter: Boolean
@@ -62,7 +69,7 @@ object AgeRestrictionGuideline : SwedishPersonGuideline {
     override val validate = { data: QuoteData -> (data as PersonPolicyHolder<*>).age() < 18 }
 }
 
-class PersonalDebt(val debtChecker: DebtChecker) : SwedishPersonGuideline {
+class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
     override val errorMessage = "fails debt check"
 
     override val skipAfter: Boolean

@@ -12,27 +12,11 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
-import com.hedvig.underwriter.service.guidelines.PersonalDebt
-import com.hedvig.underwriter.service.guidelines.SocialSecurityDate
-import com.hedvig.underwriter.service.guidelines.SocialSecurityNumberFormat
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeAtLeast1
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeNotMoreThan6
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceNotMoreThan250Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeNotOverThan75Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeAtLeast1
-import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeNotMoreThan6
-import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceNotMoreThan250Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfBathrooms
-import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseYearOfConstruction
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentAgeNotMoreThan30Years
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentHouseholdSizeNotMoreThan2
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm
+import com.hedvig.underwriter.service.guidelines.SwedishApartmentGuidelines
+import com.hedvig.underwriter.service.guidelines.SwedishHouseGuidelines
+import com.hedvig.underwriter.service.guidelines.SwedishPersonalGuidelines
+import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentGuidelines
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -155,52 +139,19 @@ class UnderwriterImpl(
         }
     }
 
-    // TODO: Change me
-    val swedishApartmentGuidelines = listOf(
-        SwedishApartmentHouseHoldSizeAtLeast1,
-        SwedishApartmentLivingSpaceAtLeast1Sqm,
-        SwedishApartmentHouseHoldSizeNotMoreThan6,
-        SwedishApartmentLivingSpaceNotMoreThan250Sqm
-    )
-
-    val swedishStudentApartmentGuidelines = listOf(
-        SwedishApartmentHouseHoldSizeAtLeast1,
-        SwedishApartmentLivingSpaceAtLeast1Sqm,
-        SwedishStudentApartmentHouseholdSizeNotMoreThan2,
-        SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm,
-        SwedishStudentApartmentAgeNotMoreThan30Years
-    )
-
-    val swedishHouseGuideline = listOf(
-        SwedishHouseHouseholdSizeAtLeast1,
-        SwedishHouseLivingSpaceAtLeast1Sqm,
-        SwedishHouseHouseholdSizeNotMoreThan6,
-        SwedishHouseLivingSpaceNotMoreThan250Sqm,
-        SwedishHouseYearOfConstruction,
-        SwedishHouseNumberOfBathrooms,
-        SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm,
-        SwedishHouseExtraBuildingsSizeNotOverThan75Sqm,
-        SwedishHouseExtraBuildingsSizeAtLeast1Sqm
-    )
-
-    val swedishPersonalGuidelines = listOf(
-        SocialSecurityNumberFormat,
-        SocialSecurityDate,
-        AgeRestrictionGuideline,
-        PersonalDebt(debtChecker)
-    )
-
     fun validateGuidelines(data: QuoteData): List<String> {
         val errors = mutableListOf<String>()
 
-        errors.addAll(runRules(data, swedishPersonalGuidelines))
+        errors.addAll(
+            runRules(data, SwedishPersonalGuidelines(debtChecker).setOfRules)
+        )
 
         when (data) {
-            is SwedishHouseData -> errors.addAll(runRules(data, swedishHouseGuideline))
+            is SwedishHouseData -> errors.addAll(runRules(data, SwedishHouseGuidelines.setOfRules))
             is SwedishApartmentData -> when (data.subType) {
                 ApartmentProductSubType.STUDENT_BRF, ApartmentProductSubType.STUDENT_RENT ->
-                    errors.addAll(runRules(data, swedishStudentApartmentGuidelines))
-                else -> errors.addAll(runRules(data, swedishApartmentGuidelines))
+                    errors.addAll(runRules(data, SwedishStudentApartmentGuidelines.setOfRules))
+                else -> errors.addAll(runRules(data, SwedishApartmentGuidelines.setOfRules))
             }
             is NorwegianHomeContentsData -> TODO("todo")
             is NorwegianTravelData -> TODO("todo")
@@ -210,7 +161,7 @@ class UnderwriterImpl(
 
     fun <T> runRules(
         data: T,
-        listOfRules: List<BaseGuideline<T>>
+        listOfRules: Set<BaseGuideline<T>>
     ): MutableList<String> {
         val guidelineErrors = mutableListOf<String>()
 
