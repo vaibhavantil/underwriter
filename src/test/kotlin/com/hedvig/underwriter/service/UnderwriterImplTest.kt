@@ -136,7 +136,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(listOf(AgeRestrictionGuideline.errorMessage))
+        assertThat(result.a.second).isEqualTo(listOf(AgeRestrictionGuideline.errorMessage))
     }
 
     @Test
@@ -159,7 +159,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishApartmentHouseHoldSizeAtLeast1.errorMessage,
                 SwedishApartmentLivingSpaceAtLeast1Sqm.errorMessage
@@ -187,7 +187,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishApartmentHouseHoldSizeNotMoreThan6.errorMessage,
                 SwedishApartmentLivingSpaceNotMoreThan250Sqm.errorMessage
@@ -217,7 +217,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishApartmentHouseHoldSizeAtLeast1.errorMessage,
                 SwedishApartmentLivingSpaceAtLeast1Sqm.errorMessage
@@ -247,7 +247,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishStudentApartmentHouseholdSizeNotMoreThan2.errorMessage,
                 SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm.errorMessage,
@@ -277,7 +277,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishHouseHouseholdSizeAtLeast1.errorMessage,
                 SwedishHouseLivingSpaceAtLeast1Sqm.errorMessage,
@@ -312,7 +312,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a).isEqualTo(
+        assertThat(result.a.second).isEqualTo(
             listOf(
                 SwedishHouseHouseholdSizeNotMoreThan6.errorMessage,
                 SwedishHouseLivingSpaceNotMoreThan250Sqm.errorMessage,
