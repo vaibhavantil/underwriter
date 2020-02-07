@@ -7,6 +7,7 @@ import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
@@ -40,7 +41,8 @@ import org.springframework.web.bind.annotation.RestController
 )
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
-    val memberService: MemberService
+    val memberService: MemberService,
+    val signService: SignService
 ) {
     @PostMapping
     fun createQuote(
@@ -81,7 +83,8 @@ class QuoteController @Autowired constructor(
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
         logger.error("completeQuote endpoint was used. incompleteQuoteId: $incompleteQuoteId underwritingGuidelinesBypassedBy: $underwritingGuidelinesBypassedBy")
-        return ResponseEntity.status(HttpStatus.GONE).body(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "endpoint is deprecated"))
+        return ResponseEntity.status(HttpStatus.GONE)
+            .body(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "endpoint is deprecated"))
     }
 
     @GetMapping("/{id}")
@@ -111,7 +114,7 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
-        return when (val errorOrQuote = quoteService.signQuote(completeQuoteId, body)) {
+        return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
@@ -145,7 +148,7 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/member/{memberId}/signed")
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
-        quoteService.memberSigned(memberId, signRequest)
+        signService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
     }
 
