@@ -5,6 +5,7 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
@@ -35,6 +36,9 @@ internal class GraphQlMutationsTest {
 
     @MockBean
     lateinit var productPricingService: ProductPricingService
+
+    @MockBean
+    lateinit var signService: SignService
 
     @Test
     fun createSuccessfulQuote() {

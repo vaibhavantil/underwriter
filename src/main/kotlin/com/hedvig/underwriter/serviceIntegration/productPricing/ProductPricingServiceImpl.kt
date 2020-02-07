@@ -16,7 +16,6 @@ import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 
 @Service
 @EnableFeignClients
