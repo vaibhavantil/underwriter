@@ -14,6 +14,7 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.service.SignServiceImpl
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.lang.IllegalStateException
 import java.util.Locale
@@ -119,7 +120,8 @@ fun Quote.createQuoteDetails(
         QuoteDetails.NorwegianTravelDetails(
             coinsured = it.coinsured
         )
-    } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
+    }
+    ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
 fun Quote.createIncompleteQuoteResult(
     localizationService: LocalizationService,
@@ -242,3 +244,13 @@ private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type)
     ExtraBuildingType.BOATHOUSE -> "Båthus"
     ExtraBuildingType.OTHER -> "Övrigt"
 }
+
+private const val SEK = "SEK"
+private const val NOK = "NOK"
+val Quote.currency: String
+    get() = when (this.data) {
+        is SwedishApartmentData -> SEK
+        is SwedishHouseData -> SEK
+        is NorwegianTravelData -> NOK
+        is NorwegianHomeContentsData -> NOK
+    }

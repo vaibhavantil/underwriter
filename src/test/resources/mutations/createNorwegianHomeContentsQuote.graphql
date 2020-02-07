@@ -1,15 +1,16 @@
 mutation {
     createQuote(input: {
-        id: "00000000-0000-0000-0000-000000000004"
+        id: "00000000-0000-0000-0000-000000000006"
         firstName: "first"
         lastName: "family"
         ssn: "191212121212"
-        apartment: {
-            street: "Kungsgatan 1"
+        norweiganHomeContents: {
+            street: "Kungsgatan 2"
             livingSpace: 30
             zipCode: "12345"
-            householdSize: 2
-            type: BRF
+            coinsured: 0
+            isSudent: false
+            type: OWN
         }
     }) {
         ... on UnderwritingLimitsHit {
@@ -40,7 +41,7 @@ mutation {
                     zipCode
                     livingSpace
                     householdSize
-                    apartnmentType: type
+                    apartmentType: type
                 }
                 ... on SwedishHouseQuoteDetails {
                     street

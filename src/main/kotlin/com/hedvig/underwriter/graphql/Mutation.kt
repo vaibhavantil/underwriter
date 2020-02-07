@@ -6,6 +6,7 @@ import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
+import com.hedvig.underwriter.extensions.currency
 import com.hedvig.underwriter.extensions.isAndroid
 import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.extensions.toHouseOrApartmentIncompleteQuoteDto
@@ -77,7 +78,7 @@ class Mutation @Autowired constructor(
                     localizationService,
                     textKeysLocaleResolver,
                     productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, "SEK"),
+                        Money.of(quote.price, quote.currency),
                         env.getToken()
                     )
                 )

@@ -2,14 +2,11 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.extensions.currency
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
@@ -132,7 +129,7 @@ class SignServiceImpl(
 
         val signedProductId = productPricingService.signedQuote(
             SignedQuoteRequest(
-                price = Money.of(quote.price, getCurrency(quote)),
+                price = Money.of(quote.price, quote.currency),
                 quote = quote,
                 referenceToken = signedRequest.referenceToken,
                 signature = signedRequest.signature,
@@ -186,16 +183,7 @@ class SignServiceImpl(
         return SignedQuoteResponseDto(signedProductId, signedAt)
     }
 
-    private fun getCurrency(quote: Quote): String = when (quote.data) {
-        is SwedishApartmentData -> SEK
-        is SwedishHouseData -> SEK
-        is NorwegianTravelData -> NOK
-        is NorwegianHomeContentsData -> NOK
-    }
-
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
-        const val SEK = "SEK"
-        const val NOK = "NOK"
     }
 }

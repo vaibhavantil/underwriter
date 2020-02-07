@@ -189,8 +189,8 @@ class UnderwriterImpl(
                 )
             ).price
             // TODO: This needs to be fixed should be done by the underwriter
-            is NorwegianHomeContentsData -> BigDecimal.ZERO
-            is NorwegianTravelData -> BigDecimal.ZERO
+            is NorwegianHomeContentsData -> BigDecimal.ONE
+            is NorwegianTravelData -> BigDecimal.ONE
         }
     }
 

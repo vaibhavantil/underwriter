@@ -44,7 +44,7 @@ mutation {
                     zipCode
                     livingSpace
                     householdSize
-                    apartnmentType: type
+                    apartmentType: type
                 }
                 ... on SwedishHouseQuoteDetails {
                     street

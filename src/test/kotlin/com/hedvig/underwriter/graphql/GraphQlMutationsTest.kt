@@ -4,6 +4,7 @@ import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -11,6 +12,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -183,7 +185,7 @@ internal class GraphQlMutationsTest {
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["householdSize"].intValue() == 2)
-        assert(createQuote["quoteDetails"]["apartnmentType"].textValue() == "BRF")
+        assert(createQuote["quoteDetails"]["apartmentType"].textValue() == "BRF")
     }
 
     @Test
@@ -233,6 +235,96 @@ internal class GraphQlMutationsTest {
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["householdSize"].intValue() == 2)
+    }
+
+    @Test
+    fun createSuccessfulNorwegianHomeContentsQuote() {
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
+                NorwegianHomeContentsQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    coinsured = 0,
+                    type = NorwegianHomeContentsType.OWN,
+                    isStudent = false
+                )
+            )
+        ).thenReturn(
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+        )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "NOK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createNorwegianHomeContentsQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000006")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "NOK")
+        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
+        assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
+        assert(createQuote["quoteDetails"]["coinsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["norwegianType"].textValue() == "OWN")
+    }
+
+    @Test
+    fun createSuccessfulNorwegianTravelQuote() {
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
+                NorwegianHomeContentsQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    coinsured = 0,
+                    type = NorwegianHomeContentsType.OWN,
+                    isStudent = false
+                )
+            )
+        ).thenReturn(
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+        )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "NOK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "NOK")
+        assert(createQuote["quoteDetails"]["coinsured"].intValue() == 0)
     }
 
     @Test
