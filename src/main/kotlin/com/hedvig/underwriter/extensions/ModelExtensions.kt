@@ -47,8 +47,7 @@ fun CreateQuoteInput.toHouseOrApartmentIncompleteQuoteDto(
         this.norweiganTravel != null -> this.norweiganTravel.toQuoteRequestData()
         this.house != null -> this.house.toQuoteRequestData()
         else -> this.apartment!!.toQuoteRequestData()
-    }
-    ,
+    },
     quotingPartner = quotingPartner,
     memberId = memberId,
     originatingProductId = originatingProductId,

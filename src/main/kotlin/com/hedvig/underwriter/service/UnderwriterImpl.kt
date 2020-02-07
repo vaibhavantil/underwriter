@@ -26,11 +26,11 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 
 @Service
 class UnderwriterImpl(
@@ -158,7 +158,7 @@ class UnderwriterImpl(
             QuoteInitiatedFrom.IOS,
             QuoteInitiatedFrom.ANDROID -> {
                 if (breachedUnderwritingGuidelines != listOf(PersonalDebt.ERROR_MESSAGE)) {
-                    logger.error("Got breached breached underwriting guidelines from a controlled flow. Quote: $quote Breached underwriting guidelines: $breachedUnderwritingGuidelines")
+                    logger.error("Breached underwriting guidelines from a controlled flow. Quote: $quote Breached underwriting guidelines: $breachedUnderwritingGuidelines")
                 }
             }
             QuoteInitiatedFrom.HOPE,
