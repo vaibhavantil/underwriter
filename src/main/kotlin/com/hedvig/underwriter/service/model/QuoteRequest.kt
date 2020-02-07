@@ -24,8 +24,14 @@ data class QuoteRequest(
 ) {
     companion object {
         fun from(quoteRequestDto: QuoteRequestDto): QuoteRequest {
-            if (quoteRequestDto.incompleteQuoteData == null && quoteRequestDto.incompleteHouseQuoteData == null && quoteRequestDto.incompleteApartmentQuoteData == null) {
-                throw RuntimeException("Cannot create House or Apartment quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData are all null")
+            if (
+                quoteRequestDto.incompleteQuoteData == null &&
+                quoteRequestDto.incompleteHouseQuoteData == null &&
+                quoteRequestDto.incompleteApartmentQuoteData == null &&
+                quoteRequestDto.norwegianHomeContentsData == null &&
+                quoteRequestDto.norwegianTravelData == null
+            ) {
+                throw RuntimeException("Cannot create quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData, norwegianHomeContentsData, norwegianTravelData are all null")
             }
 
             return QuoteRequest(
@@ -39,6 +45,8 @@ data class QuoteRequest(
                 incompleteQuoteData = when {
                     quoteRequestDto.incompleteApartmentQuoteData != null -> quoteRequestDto.incompleteApartmentQuoteData
                     quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.incompleteHouseQuoteData
+                    quoteRequestDto.norwegianHomeContentsData != null -> quoteRequestDto.norwegianHomeContentsData
+                    quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.norwegianTravelData
                     else -> quoteRequestDto.incompleteQuoteData
                 },
                 productType = quoteRequestDto.productType,
