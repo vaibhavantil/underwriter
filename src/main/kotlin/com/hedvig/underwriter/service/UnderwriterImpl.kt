@@ -15,6 +15,7 @@ import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentsGuidelines
 import com.hedvig.underwriter.service.guidelines.NorwegianTravelGuidelines
+import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishHouseGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishPersonalGuidelines
@@ -25,6 +26,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
@@ -123,7 +125,10 @@ class UnderwriterImpl(
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
-    override fun updateQuote(quote: Quote, underwritingGuidelinesBypassedBy: String?): Either<Pair<Quote, List<String>>, Quote> {
+    override fun updateQuote(
+        quote: Quote,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<Pair<Quote, List<String>>, Quote> {
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
@@ -138,10 +143,29 @@ class UnderwriterImpl(
             )
         }
 
-        return if (breachedUnderwritingGuidelines.isEmpty())
+        return if (breachedUnderwritingGuidelines.isEmpty()) {
             Either.right(complete(quote))
-        else
+        } else {
+            logBreachedUnderwritingGuidelines(quote, breachedUnderwritingGuidelines)
             Either.left(quote to breachedUnderwritingGuidelines)
+        }
+    }
+
+    private fun logBreachedUnderwritingGuidelines(quote: Quote, breachedUnderwritingGuidelines: List<String>) {
+        when (quote.initiatedFrom) {
+            QuoteInitiatedFrom.WEBONBOARDING,
+            QuoteInitiatedFrom.APP,
+            QuoteInitiatedFrom.IOS,
+            QuoteInitiatedFrom.ANDROID -> {
+                if (breachedUnderwritingGuidelines != listOf(PersonalDebt.ERROR_MESSAGE)) {
+                    logger.error("Got breached breached underwriting guidelines from a controlled flow. Quote: $quote Breached underwriting guidelines: $breachedUnderwritingGuidelines")
+                }
+            }
+            QuoteInitiatedFrom.HOPE,
+            QuoteInitiatedFrom.RAPIO -> {
+                // no-op
+            }
+        }
     }
 
     private fun complete(quote: Quote): Quote {
@@ -174,30 +198,47 @@ class UnderwriterImpl(
         val errors = mutableListOf<String>()
 
         errors.addAll(
-            runRules(data, SwedishPersonalGuidelines(
-                debtChecker
-            ).setOfRules)
+            runRules(
+                data, SwedishPersonalGuidelines(
+                    debtChecker
+                ).setOfRules
+            )
         )
 
         when (data) {
-            is SwedishHouseData -> errors.addAll(runRules(data,
-                SwedishHouseGuidelines.setOfRules
-            ))
+            is SwedishHouseData -> errors.addAll(
+                runRules(
+                    data,
+                    SwedishHouseGuidelines.setOfRules
+                )
+            )
             is SwedishApartmentData -> when (data.subType) {
                 ApartmentProductSubType.STUDENT_BRF, ApartmentProductSubType.STUDENT_RENT ->
-                    errors.addAll(runRules(data,
-                        SwedishStudentApartmentGuidelines.setOfRules
-                    ))
-                else -> errors.addAll(runRules(data,
-                    SwedishApartmentGuidelines.setOfRules
-                ))
+                    errors.addAll(
+                        runRules(
+                            data,
+                            SwedishStudentApartmentGuidelines.setOfRules
+                        )
+                    )
+                else -> errors.addAll(
+                    runRules(
+                        data,
+                        SwedishApartmentGuidelines.setOfRules
+                    )
+                )
             }
-            is NorwegianHomeContentsData -> errors.addAll(runRules(data,
-                NorwegianHomeContentsGuidelines.setOfRules
-            ))
-            is NorwegianTravelData -> errors.addAll(runRules(data,
-                NorwegianTravelGuidelines.setOfRules
-            ))
+            is NorwegianHomeContentsData -> errors.addAll(
+                runRules(
+                    data,
+                    NorwegianHomeContentsGuidelines.setOfRules
+                )
+            )
+            is NorwegianTravelData -> errors.addAll(
+                runRules(
+                    data,
+                    NorwegianTravelGuidelines.setOfRules
+                )
+            )
         }
         return errors
     }
@@ -218,5 +259,9 @@ class UnderwriterImpl(
             }
         }
         return guidelineErrors
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(UnderwriterImpl::class.java)
     }
 }

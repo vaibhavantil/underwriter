@@ -70,7 +70,7 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
 }
 
 class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val errorMessage = "fails debt check"
+    override val errorMessage = ERROR_MESSAGE
 
     override val skipAfter: Boolean
         get() = true
@@ -78,4 +78,8 @@ class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
     private fun debtCheck(data: QuoteData): List<String> = debtChecker.passesDebtCheck(data as PersonPolicyHolder<*>)
 
     override val validate = { data: QuoteData -> debtCheck(data).isNotEmpty() }
+
+    companion object {
+        const val ERROR_MESSAGE = "fails debt check"
+    }
 }
