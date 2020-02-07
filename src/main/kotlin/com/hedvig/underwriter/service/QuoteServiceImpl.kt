@@ -80,8 +80,8 @@ class QuoteServiceImpl(
                     .bimap(
                         { errors ->
                             throw QuoteCompletionFailedException(
-                                "Unable to complete quote: $errors",
-                                errors
+                                "Unable to complete quote: ${errors.second}",
+                                errors.second
                             )
                         },
                         { quote -> quote }
@@ -146,14 +146,17 @@ class QuoteServiceImpl(
         val quoteId = id ?: UUID.randomUUID()
         val breachedGuidelinesOrQuote =
             underwriter.createQuote(incompleteQuoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
-        if (breachedGuidelinesOrQuote is Either.Right) {
-            quoteRepository.insert(breachedGuidelinesOrQuote.b)
+        val quote = when (breachedGuidelinesOrQuote) {
+            is Either.Left -> breachedGuidelinesOrQuote.a.first
+            is Either.Right -> breachedGuidelinesOrQuote.b
         }
+        quoteRepository.insert(quote)
+
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
     private fun transformCompleteQuoteReturn(
-        potentiallySavedQuote: Either<List<String>, Quote>,
+        potentiallySavedQuote: Either<Pair<Quote, List<String>>, Quote>,
         quoteId: UUID
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         return potentiallySavedQuote.bimap(
@@ -165,7 +168,7 @@ class QuoteServiceImpl(
                 ErrorResponseDto(
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
                     "quote cannot be calculated, underwriting guidelines are breached",
-                    breachedUnderwritingGuidelines
+                    breachedUnderwritingGuidelines.second
                 )
             },
             { completeQuote ->
