@@ -9,6 +9,8 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit4.SpringRunner
+import java.time.Year
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +44,7 @@ internal class GraphQlMutationsTest {
     lateinit var signService: SignService
 
     @Test
-    fun createSuccessfulQuote() {
+    fun createSuccessfulOldApartmentQuote() {
         Mockito.`when`(
             productPricingService.priceFromProductPricingForApartmentQuote(
                 ApartmentQuotePriceDto(
@@ -73,7 +76,7 @@ internal class GraphQlMutationsTest {
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
-        val response = graphQLTestTemplate.perform("/mutations/createQuote.graphql", null)
+        val response = graphQLTestTemplate.perform("/mutations/createApartmentQuote.graphql", null)
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
@@ -85,6 +88,151 @@ internal class GraphQlMutationsTest {
         assert(createQuote["details"]["livingSpace"].intValue() == 30)
         assert(createQuote["details"]["householdSize"].intValue() == 2)
         assert(createQuote["details"]["type"].textValue() == "BRF")
+    }
+
+    @Test
+    fun createSuccessfulOldHouseQuote() {
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForHouseQuote(
+                HouseQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    houseHoldSize = 2,
+                    ancillaryArea = 100,
+                    yearOfConstruction = Year.of(1925),
+                    numberOfBathrooms = 1,
+                    extraBuildings = emptyList(),
+                    isSubleted = false
+                )
+            )
+        ).thenReturn(
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+        )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "SEK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createHouseQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000003")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
+        assert(createQuote["details"]["street"].textValue() == "Kungsgatan 1")
+        assert(createQuote["details"]["zipCode"].textValue() == "12345")
+        assert(createQuote["details"]["livingSpace"].intValue() == 30)
+        assert(createQuote["details"]["householdSize"].intValue() == 2)
+    }
+
+    @Test
+    fun createSuccessfulSwedishApartmentQuote() {
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForApartmentQuote(
+                ApartmentQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    houseHoldSize = 2,
+                    houseType = ApartmentProductSubType.BRF,
+                    isStudent = false
+                )
+            )
+        ).thenReturn(
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+        )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "SEK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createSwedishApartmentQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000004")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
+        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 1")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
+        assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
+        assert(createQuote["quoteDetails"]["householdSize"].intValue() == 2)
+        assert(createQuote["quoteDetails"]["apartnmentType"].textValue() == "BRF")
+    }
+
+    @Test
+    fun createSuccessfulSwedishHouseQuote() {
+        Mockito.`when`(
+            productPricingService.priceFromProductPricingForHouseQuote(
+                HouseQuotePriceDto(
+                    birthDate = LocalDate.of(1912, 12, 12),
+                    livingSpace = 30,
+                    zipCode = "12345",
+                    houseHoldSize = 2,
+                    ancillaryArea = 100,
+                    yearOfConstruction = Year.of(1925),
+                    numberOfBathrooms = 1,
+                    extraBuildings = emptyList(),
+                    isSubleted = false
+                )
+            )
+        ).thenReturn(
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+        )
+        Mockito.`when`(
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "SEK"), "123"
+            )
+        ).thenReturn(
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+                null
+            )
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createSwedishHouseQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000005")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
+        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 1")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
+        assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
+        assert(createQuote["quoteDetails"]["householdSize"].intValue() == 2)
     }
 
     @Test

@@ -1,0 +1,69 @@
+mutation {
+    createQuote(input: {
+        id: "00000000-0000-0000-0000-000000000004"
+        firstName: "first"
+        lastName: "family"
+        ssn: "191212121212"
+        apartment: {
+            street: "Kungsgatan 1"
+            livingSpace: 30
+            zipCode: "12345"
+            householdSize: 2
+            type: BRF
+        }
+    }) {
+        ... on UnderwritingLimitsHit {
+            limits {
+                description
+            }
+        }
+        ... on CompleteQuote {
+            id
+            insuranceCost {
+                monthlyGross {
+                    amount
+                    currency
+                }
+                monthlyDiscount {
+                    amount
+                    currency
+                }
+                monthlyNet {
+                    amount
+                    currency
+                }
+                freeUntil
+            }
+            quoteDetails {
+                ... on SwedishApartmentQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    apartnmentType: type
+                }
+                ... on SwedishHouseQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    ancillarySpace
+                    extraBuildings {
+                        __typename
+                    }
+                }
+                ... on NorwegianHomeContentsDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    coinsured
+                    isStudent
+                    norwegianType: type
+                }
+                ... on NorwegianTravelDetails {
+                    coinsured
+                }
+            }
+        }
+    }
+}
