@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.service.model
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
@@ -16,7 +18,13 @@ data class QuoteRequest(
     val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType?,
-    val incompleteQuoteData: QuoteRequestData?,
+    @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @field:JsonSubTypes(
+        JsonSubTypes.Type(value = QuoteRequestData.SwedishApartment::class, name = "apartment"),
+        JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel")
+    ) val incompleteQuoteData: QuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
     val startDate: Instant?,
