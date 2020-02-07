@@ -14,7 +14,6 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.service.SignServiceImpl
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.lang.IllegalStateException
 import java.util.Locale
