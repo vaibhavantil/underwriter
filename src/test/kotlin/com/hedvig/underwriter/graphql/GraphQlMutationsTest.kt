@@ -12,6 +12,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTravelQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -286,14 +287,9 @@ internal class GraphQlMutationsTest {
     @Test
     fun createSuccessfulNorwegianTravelQuote() {
         Mockito.`when`(
-            productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
-                NorwegianHomeContentsQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    coinsured = 0,
-                    type = NorwegianHomeContentsType.OWN,
-                    isStudent = false
+            productPricingService.priceFromProductPricingForNorwegianTravelQuote(
+                NorwegianTravelQuotePriceDto(
+                    coinsured = 0
                 )
             )
         ).thenReturn(
