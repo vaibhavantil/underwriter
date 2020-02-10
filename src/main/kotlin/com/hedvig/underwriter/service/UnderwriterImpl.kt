@@ -26,6 +26,8 @@ import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTravelQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
@@ -180,18 +182,17 @@ class UnderwriterImpl(
     private fun getPriceRetrievedFromProductPricing(quote: Quote): BigDecimal {
         return when (quote.data) {
             is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto.from(
-                    quote
-                )
+                ApartmentQuotePriceDto.from(quote)
             ).price
             is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
-                HouseQuotePriceDto.from(
-                    quote
-                )
+                HouseQuotePriceDto.from(quote)
             ).price
-            // TODO: This needs to be fixed should be done by the underwriter
-            is NorwegianHomeContentsData -> BigDecimal.ONE
-            is NorwegianTravelData -> BigDecimal.ONE
+            is NorwegianHomeContentsData -> productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
+                NorwegianHomeContentsQuotePriceDto.from(quote)
+            ).price
+            is NorwegianTravelData -> productPricingService.priceFromProductPricingForNorwegianTravelQuote(
+                NorwegianTravelQuotePriceDto.from(quote)
+            ).price
         }
     }
 
