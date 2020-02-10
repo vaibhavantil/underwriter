@@ -14,6 +14,7 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentsGuidelines
+import com.hedvig.underwriter.service.guidelines.NorwegianPersonGuidelines
 import com.hedvig.underwriter.service.guidelines.NorwegianTravelGuidelines
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentGuidelines
@@ -197,51 +198,57 @@ class UnderwriterImpl(
     fun validateGuidelines(data: QuoteData): List<String> {
         val errors = mutableListOf<String>()
 
-        errors.addAll(
-            runRules(
-                data, SwedishPersonalGuidelines(
-                    debtChecker
-                ).setOfRules
-            )
-        )
+        errors.addAll(validatePersonalGuidelines(data))
 
+        errors.addAll(validateProductGuidelines(data)        )
+        return errors
+    }
+
+    private fun validatePersonalGuidelines(data: QuoteData): List<String> =
         when (data) {
-            is SwedishHouseData -> errors.addAll(
+            is SwedishApartmentData,
+            is SwedishHouseData ->
+                runRules(
+                    data, SwedishPersonalGuidelines(
+                        debtChecker
+                    ).setOfRules
+                )
+            is NorwegianHomeContentsData,
+            is NorwegianTravelData -> runRules(
+                data, NorwegianPersonGuidelines.setOfRules
+            )
+        }
+
+    private fun validateProductGuidelines(data: QuoteData): List<String> =
+        when (data) {
+            is SwedishHouseData ->
                 runRules(
                     data,
                     SwedishHouseGuidelines.setOfRules
                 )
-            )
             is SwedishApartmentData -> when (data.subType) {
                 ApartmentProductSubType.STUDENT_BRF, ApartmentProductSubType.STUDENT_RENT ->
-                    errors.addAll(
-                        runRules(
-                            data,
-                            SwedishStudentApartmentGuidelines.setOfRules
-                        )
+                    runRules(
+                        data,
+                        SwedishStudentApartmentGuidelines.setOfRules
                     )
-                else -> errors.addAll(
+                else ->
                     runRules(
                         data,
                         SwedishApartmentGuidelines.setOfRules
                     )
-                )
             }
-            is NorwegianHomeContentsData -> errors.addAll(
+            is NorwegianHomeContentsData ->
                 runRules(
                     data,
                     NorwegianHomeContentsGuidelines.setOfRules
                 )
-            )
-            is NorwegianTravelData -> errors.addAll(
+            is NorwegianTravelData ->
                 runRules(
                     data,
                     NorwegianTravelGuidelines.setOfRules
                 )
-            )
         }
-        return errors
-    }
 
     fun <T> runRules(
         data: T,
