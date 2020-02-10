@@ -2,6 +2,11 @@ package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.graphql.type.depricated.CreateApartmentInput
 import com.hedvig.underwriter.graphql.type.depricated.CreateHouseInput
+import com.hedvig.underwriter.model.Partner
+import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.util.toStockholmInstant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -22,4 +27,38 @@ data class CreateQuoteInput(
     val norweiganHomeContents: CreateNorwegianHomeContentsInput?,
     val norweiganTravel: CreateNorwegianTravelInput?,
     val dataCollectionId: UUID?
-)
+) {
+    fun toHouseOrApartmentIncompleteQuoteDto(
+        quotingPartner: Partner? = null,
+        memberId: String? = null,
+        originatingProductId: UUID? = null
+    ) = QuoteRequest(
+    firstName = this.firstName,
+    lastName = this.lastName,
+    email = this.email,
+    currentInsurer = this.currentInsurer,
+    birthDate = this.ssn.birthDateFromSwedishSsn(),
+    ssn = this.ssn,
+    productType = this.getProductType(),
+    incompleteQuoteData = when {
+        this.swedishApartment != null -> this.swedishApartment.toQuoteRequestData()
+        this.swedishHouse != null -> this.swedishHouse.toQuoteRequestData()
+        this.norweiganHomeContents != null -> this.norweiganHomeContents.toQuoteRequestData()
+        this.norweiganTravel != null -> this.norweiganTravel.toQuoteRequestData()
+        this.house != null -> this.house.toQuoteRequestData()
+        else -> this.apartment!!.toQuoteRequestData()
+    },
+    quotingPartner = quotingPartner,
+    memberId = memberId,
+    originatingProductId = originatingProductId,
+    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
+    dataCollectionId = this.dataCollectionId
+    )
+
+    fun getProductType(): ProductType =
+        this.apartment?.let {
+            ProductType.APARTMENT
+        } ?: this.house?.let {
+            ProductType.HOUSE
+        } ?: ProductType.UNKNOWN
+}

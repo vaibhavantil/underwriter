@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.graphql.type.depricated
 
+import com.hedvig.underwriter.extensions.toExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
+import com.hedvig.underwriter.service.model.QuoteRequestData
 
 @Deprecated("Use EditSwedishHouseInput")
 data class EditHouseInput(
@@ -13,4 +15,18 @@ data class EditHouseInput(
     val numberOfBathrooms: Int?,
     val isSubleted: Boolean?,
     val extraBuildings: List<ExtraBuildingInput>?
-)
+) {
+    fun toQuoteRequestDataDto() =
+        QuoteRequestData.SwedishHouse(
+            street = this.street,
+            zipCode = this.zipCode,
+            livingSpace = this.livingSpace,
+            householdSize = this.householdSize,
+            ancillaryArea = this.ancillarySpace,
+            yearOfConstruction = this.yearOfConstruction,
+            isSubleted = this.isSubleted,
+            extraBuildings = this.extraBuildings?.toExtraBuilding(),
+            numberOfBathrooms = this.numberOfBathrooms,
+            city = null
+        )
+}

@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
+import com.hedvig.underwriter.service.model.QuoteRequestData
+
 data class EditNorwegianHomeContentsInput(
     val street: String?,
     val zipCode: String?,
@@ -7,4 +9,15 @@ data class EditNorwegianHomeContentsInput(
     val livingSpace: Int?,
     val isStudent: Boolean?,
     val type: NorwegianHomeContentsType?
-)
+) {
+    fun toQuoteRequestDataDto() =
+        QuoteRequestData.NorwegianHomeContents(
+            street = this.street,
+            zipCode = this.zipCode,
+            livingSpace = this.livingSpace,
+            coinsured = this.coinsured,
+            type = this.type?.let { com.hedvig.underwriter.model.NorwegianHomeContentsType.valueOf(it.name) },
+            isStudent = this.isStudent,
+            city = null
+        )
+}

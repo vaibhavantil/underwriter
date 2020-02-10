@@ -4,14 +4,6 @@ import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createCompleteQuoteResult
-import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
-import com.hedvig.underwriter.extensions.createQuoteDetails
-import com.hedvig.underwriter.extensions.email
-import com.hedvig.underwriter.extensions.firstName
-import com.hedvig.underwriter.extensions.lastName
-import com.hedvig.underwriter.extensions.ssn
-import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.graphql.type.CurrentInsurer
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.QuoteResult
