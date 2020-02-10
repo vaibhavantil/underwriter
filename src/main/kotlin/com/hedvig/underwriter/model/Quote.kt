@@ -20,7 +20,22 @@ fun String.birthDateFromSwedishSsn(): LocalDate {
 }
 
 fun String.birthDateFromNorwegianSsn(): LocalDate {
-    TODO()
+    return LocalDate.parse(this.birthDateStringFromNorwegianSsn())
+}
+
+fun String.birthDateStringFromNorwegianSsn(): String {
+    val trimmedInput = this.trim().replace("-", "").replace(" ", "")
+    val day = trimmedInput.substring(0, 2)
+    val month = trimmedInput.substring(2, 4)
+    val twoDigitYear = trimmedInput.substring(4, 6).toInt()
+    val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+
+    val year = if (twoDigitYear > breakPoint) {
+        "19$this"
+    } else {
+        "20$this"
+    }
+    return "$year-$month-$day"
 }
 
 data class DatabaseQuoteRevision(

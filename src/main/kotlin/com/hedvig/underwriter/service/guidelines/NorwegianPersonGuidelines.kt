@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.service.guidelines
 
-import com.hedvig.underwriter.model.QuoteData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.birthDateStringFromNorwegianSsn
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
 object NorwegianPersonGuidelines {
@@ -11,28 +13,28 @@ object NorwegianPersonGuidelines {
     )
 }
 
-object NorwegianSecurityNumberFormat : BaseGuideline<QuoteData> {
+object NorwegianSecurityNumberFormat : BaseGuideline<NorwegianHomeContentsData> {
     override val errorMessage = "SSN Invalid length"
 
     override val skipAfter: Boolean
         get() = true
 
-    private fun getSSNLength(data: QuoteData): Int = TODO()
+    private fun getSSNLength(data: NorwegianHomeContentsData): Int =
+        (data as PersonPolicyHolder<*>).ssn!!.trim().replace("-", "").replace(
+            " ",
+            ""
+        ).length
 
-    override val validate = { data: QuoteData ->
-        TODO()
+    override val validate = { data: NorwegianHomeContentsData ->
+        getSSNLength(data) != 11
     }
 }
 
-object NorwegianSocialSecurityDate : BaseGuideline<QuoteData> {
+object NorwegianSocialSecurityDate : BaseGuideline<NorwegianHomeContentsData> {
     override val errorMessage = "Invalid SSN"
 
     override val skipAfter: Boolean
         get() = true
-
-    private fun getPossibleDateFromSSN(data: QuoteData): String {
-        TODO()
-    }
 
     private fun tryParse(input: String): Boolean {
         return try {
@@ -42,7 +44,7 @@ object NorwegianSocialSecurityDate : BaseGuideline<QuoteData> {
         }
     }
 
-    override val validate = { data: QuoteData ->
-        !tryParse(getPossibleDateFromSSN(data))
+    override val validate = { data: NorwegianHomeContentsData ->
+        !tryParse(data.ssn.birthDateStringFromNorwegianSsn())
     }
 }

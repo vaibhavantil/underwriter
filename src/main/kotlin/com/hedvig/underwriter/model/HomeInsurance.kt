@@ -1,5 +1,5 @@
 package com.hedvig.underwriter.model
 
-interface HomeInsurance : AddressInsurance {
+interface HomeInsurance : AddressData {
     val householdSize: Int?
 }

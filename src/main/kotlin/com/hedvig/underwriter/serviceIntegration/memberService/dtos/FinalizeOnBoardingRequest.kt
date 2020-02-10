@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
-import com.hedvig.underwriter.model.AddressInsurance
+import com.hedvig.underwriter.model.AddressData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
@@ -20,7 +20,7 @@ class FinalizeOnBoardingRequest(
             email: String,
             phoneNumber: String? = null
         ): FinalizeOnBoardingRequest {
-            val addressInsurance = quote.data as AddressInsurance
+            val addressInsurance = quote.data as AddressData
             val personPolicyHolder = quote.data as PersonPolicyHolder<*>
 
             return FinalizeOnBoardingRequest(

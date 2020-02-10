@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.model
 
-interface AddressInsurance {
+interface AddressData {
     val street: String?
     val zipCode: String?
     val city: String?

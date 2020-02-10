@@ -110,7 +110,7 @@ data class NorwegianHomeContentsData(
     val isStudent: Boolean,
     val type: NorwegianHomeContentsType,
     val internalId: Int? = null
-) : QuoteData(), AddressInsurance, PersonPolicyHolder<NorwegianHomeContentsData> {
+) : QuoteData(), AddressData, PersonPolicyHolder<NorwegianHomeContentsData> {
 
     override fun updateName(firstName: String, lastName: String): NorwegianHomeContentsData {
         return this.copy(firstName = firstName, lastName = lastName)
