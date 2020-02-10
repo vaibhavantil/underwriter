@@ -3,7 +3,7 @@ mutation {
         id: "00000000-0000-0000-0000-000000000006"
         firstName: "first"
         lastName: "family"
-        ssn: "191212121212"
+        ssn: "12121201234"
         norweiganHomeContents: {
             street: "Kungsgatan 2"
             livingSpace: 30

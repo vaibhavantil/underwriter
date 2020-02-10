@@ -31,9 +31,9 @@ fun String.birthDateStringFromNorwegianSsn(): String {
     val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
 
     val year = if (twoDigitYear > breakPoint) {
-        "19$this"
+        "19$twoDigitYear"
     } else {
-        "20$this"
+        "20$twoDigitYear"
     }
     return "$year-$month-$day"
 }

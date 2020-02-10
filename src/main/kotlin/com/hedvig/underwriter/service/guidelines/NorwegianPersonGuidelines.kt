@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.service.guidelines
 
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.birthDateStringFromNorwegianSsn
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
@@ -13,24 +13,24 @@ object NorwegianPersonGuidelines {
     )
 }
 
-object NorwegianSecurityNumberFormat : BaseGuideline<NorwegianHomeContentsData> {
+object NorwegianSecurityNumberFormat : BaseGuideline<QuoteData> {
     override val errorMessage = "SSN Invalid length"
 
     override val skipAfter: Boolean
         get() = true
 
-    private fun getSSNLength(data: NorwegianHomeContentsData): Int =
+    private fun getSSNLength(data: QuoteData): Int =
         (data as PersonPolicyHolder<*>).ssn!!.trim().replace("-", "").replace(
             " ",
             ""
         ).length
 
-    override val validate = { data: NorwegianHomeContentsData ->
+    override val validate = { data: QuoteData ->
         getSSNLength(data) != 11
     }
 }
 
-object NorwegianSocialSecurityDate : BaseGuideline<NorwegianHomeContentsData> {
+object NorwegianSocialSecurityDate : BaseGuideline<QuoteData> {
     override val errorMessage = "Invalid SSN"
 
     override val skipAfter: Boolean
@@ -44,7 +44,7 @@ object NorwegianSocialSecurityDate : BaseGuideline<NorwegianHomeContentsData> {
         }
     }
 
-    override val validate = { data: NorwegianHomeContentsData ->
-        !tryParse(data.ssn.birthDateStringFromNorwegianSsn())
+    override val validate = { data: QuoteData ->
+        !tryParse((data as PersonPolicyHolder<*>).ssn!!.birthDateStringFromNorwegianSsn())
     }
 }
