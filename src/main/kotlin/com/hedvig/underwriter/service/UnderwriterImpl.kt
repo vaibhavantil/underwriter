@@ -200,7 +200,7 @@ class UnderwriterImpl(
 
         errors.addAll(validatePersonalGuidelines(data))
 
-        errors.addAll(validateProductGuidelines(data)        )
+        errors.addAll(validateProductGuidelines(data))
         return errors
     }
 

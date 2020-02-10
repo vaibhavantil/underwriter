@@ -1,12 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
 import com.hedvig.underwriter.model.AddressInsurance
-import com.hedvig.underwriter.model.HomeInsurance
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 class FinalizeOnBoardingRequest(

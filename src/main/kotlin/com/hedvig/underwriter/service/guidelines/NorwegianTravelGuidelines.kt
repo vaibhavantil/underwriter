@@ -11,5 +11,5 @@ object NorwegianTravelGuidelines {
 object NorwegianTravelCoinsuredCantBeNegative : BaseGuideline<NorwegianTravelData> {
     override val errorMessage: String = "coinsured cant be negative"
 
-    override val validate = { data: NorwegianTravelData -> data.coinsured!! < 0}
+    override val validate = { data: NorwegianTravelData -> data.coinsured!! < 0 }
 }

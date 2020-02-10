@@ -1,8 +1,6 @@
 package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.QuoteData
-import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
 object NorwegianPersonGuidelines {
