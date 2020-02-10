@@ -1,7 +1,12 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
+import com.hedvig.underwriter.model.AddressInsurance
 import com.hedvig.underwriter.model.HomeInsurance
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 class FinalizeOnBoardingRequest(
@@ -20,7 +25,7 @@ class FinalizeOnBoardingRequest(
             email: String,
             phoneNumber: String? = null
         ): FinalizeOnBoardingRequest {
-            val homeInsurance = quote.data as HomeInsurance
+            val addressInsurance = quote.data as AddressInsurance
             val personPolicyHolder = quote.data as PersonPolicyHolder<*>
 
             return FinalizeOnBoardingRequest(
@@ -31,9 +36,9 @@ class FinalizeOnBoardingRequest(
                 email = email,
                 phoneNumber = phoneNumber,
                 address = Address(
-                    street = homeInsurance.street!!,
-                    city = homeInsurance.city ?: "",
-                    zipCode = homeInsurance.zipCode!!,
+                    street = addressInsurance.street!!,
+                    city = addressInsurance.city ?: "",
+                    zipCode = addressInsurance.zipCode!!,
                     apartmentNo = "",
                     floor = 0
                 )
