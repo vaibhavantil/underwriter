@@ -8,7 +8,7 @@ mutation {
             street: "Kungsgatan 2"
             livingSpace: 30
             zipCode: "12345"
-            coinsured: 0
+            coInsured: 0
             isSudent: false
             type: OWN
         }
@@ -57,12 +57,12 @@ mutation {
                     street
                     zipCode
                     livingSpace
-                    coinsured
+                    coInsured
                     isStudent
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
-                    coinsured
+                    coInsured
                 }
             }
         }

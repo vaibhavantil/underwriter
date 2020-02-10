@@ -35,13 +35,13 @@ sealed class QuoteRequestData {
         val street: String?,
         val zipCode: String?,
         val city: String?,
-        val coinsured: Int?,
+        val coInsured: Int?,
         val livingSpace: Int?,
         val isStudent: Boolean?,
         val type: NorwegianHomeContentsType?
     ) : QuoteRequestData()
 
     data class NorwegianTravel(
-        val coinsured: Int?
+        val coInsured: Int?
     ) : QuoteRequestData()
 }

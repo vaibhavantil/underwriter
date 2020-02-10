@@ -4,17 +4,17 @@ import com.hedvig.underwriter.model.NorwegianHomeContentsData
 
 object NorwegianHomeContentsGuidelines {
     val setOfRules = setOf(
-        NorwegianHomeContentCoinsuredCantBeNegative,
+        NorwegianHomeContentcoInsuredCantBeNegative,
         NorwegianHomeContentLivingSpaceAtLeast1Sqm,
-        NorwegianHomeContentsCoinsuredNotMoreThan5,
+        NorwegianHomeContentscoInsuredNotMoreThan5,
         NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm
     )
 }
 
-object NorwegianHomeContentCoinsuredCantBeNegative : BaseGuideline<NorwegianHomeContentsData> {
-    override val errorMessage: String = "coinsured cant be negative"
+object NorwegianHomeContentcoInsuredCantBeNegative : BaseGuideline<NorwegianHomeContentsData> {
+    override val errorMessage: String = "coInsured cant be negative"
 
-    override val validate = { data: NorwegianHomeContentsData -> data.coinsured!! < 0 }
+    override val validate = { data: NorwegianHomeContentsData -> data.coInsured!! < 0 }
 }
 
 object NorwegianHomeContentLivingSpaceAtLeast1Sqm : BaseGuideline<NorwegianHomeContentsData> {
@@ -23,10 +23,10 @@ object NorwegianHomeContentLivingSpaceAtLeast1Sqm : BaseGuideline<NorwegianHomeC
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace!! < 1 }
 }
 
-object NorwegianHomeContentsCoinsuredNotMoreThan5 : BaseGuideline<NorwegianHomeContentsData> {
-    override val errorMessage: String = "coinsured size must be less than or equal to 5"
+object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeContentsData> {
+    override val errorMessage: String = "coInsured size must be less than or equal to 5"
 
-    override val validate = { data: NorwegianHomeContentsData -> data.coinsured!! > 5 }
+    override val validate = { data: NorwegianHomeContentsData -> data.coInsured!! > 5 }
 }
 
 object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<NorwegianHomeContentsData> {

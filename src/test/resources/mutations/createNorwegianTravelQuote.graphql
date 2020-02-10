@@ -5,7 +5,7 @@ mutation {
         lastName: "family"
         ssn: "12121201234"
         norweiganTravel: {
-            coinsured: 0
+            coInsured: 0
         }
     }) {
         ... on UnderwritingLimitsHit {
@@ -52,12 +52,12 @@ mutation {
                     street
                     zipCode
                     livingSpace
-                    coinsured
+                    coInsured
                     isStudent
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
-                    coinsured
+                    coInsured
                 }
             }
         }

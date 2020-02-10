@@ -101,7 +101,7 @@ class UnderwriterImpl(
                         zipCode = quoteData.zipCode!!,
                         city = quoteData.city,
                         isStudent = quoteData.isStudent!!,
-                        coinsured = quoteData.coinsured!!,
+                        coInsured = quoteData.coInsured!!,
                         livingSpace = quoteData.livingSpace!!
                     )
                 is QuoteRequestData.NorwegianTravel ->
@@ -111,7 +111,7 @@ class UnderwriterImpl(
                         firstName = quoteRequest.firstName!!,
                         lastName = quoteRequest.lastName!!,
                         email = quoteRequest.email,
-                        coinsured = quoteData.coinsured!!
+                        coInsured = quoteData.coInsured!!
                     )
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },

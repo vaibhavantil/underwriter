@@ -232,7 +232,7 @@ class a {
         val street: String = "",
         val city: String = "",
         val zipCode: String = "",
-        val coinsured: Int = 3,
+        val coInsured: Int = 3,
         val livingSpace: Int = 2,
         val isStudent: Boolean = false,
         val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
@@ -243,7 +243,7 @@ class a {
             zipCode = zipCode,
             city = city,
             livingSpace = livingSpace,
-            coinsured = coinsured,
+            coInsured = coInsured,
             isStudent = isStudent,
             type = type
         )
@@ -282,10 +282,10 @@ class a {
     }
 
     data class NorwegianTravelQuoteRequestDataBuilder(
-        val coinsured: Int = 3
+        val coInsured: Int = 3
     ) : DataBuilder<QuoteRequestData.NorwegianTravel> {
         override fun build() = QuoteRequestData.NorwegianTravel(
-            coinsured = coinsured
+            coInsured = coInsured
         )
     }
 

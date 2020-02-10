@@ -35,7 +35,7 @@ input CreateQuoteInput {
 input CreateNorwegianHomeContentsInput {
     street: String!
     zipCode: String!
-    coinsured: Int!
+    coInsured: Int!
     livingSpace: Int!
     isSudent: Boolean!
     type: NorwegianHomeContentsType!
@@ -47,7 +47,7 @@ enum NorwegianHomeContentsType {
 }
 
 input CreateNorwegianTravelInput {
-    coinsured: Int!
+    coInsured: Int!
 }
 
 input CreateApartmentInput {
@@ -149,14 +149,14 @@ input EditSwedishHouseInput {
 input EditNorwegianHomeContentsInput {
     street: String
     zipCode: String
-    coinsured: Int
+    coInsured: Int
     livingSpace: Int
     isSudent: Boolean!
     type: NorwegianHomeContentsType
 }
 
 input EditNorwegianTravelInput {
-    coinsured: Int
+    coInsured: Int
 }
 
 input ExtraBuildingInput {
@@ -397,14 +397,14 @@ type SwedishHouseQuoteDetails {
 type NorwegianHomeContentsDetails {
     street: String!
     zipCode: String!
-    coinsured: Int!
+    coInsured: Int!
     livingSpace: Int!
     isStudent: Boolean!
     type: NorwegianHomeContentsType!
 }
 
 type NorwegianTravelDetails {
-    coinsured: Int!
+    coInsured: Int!
 }
 
 type IncompleteQuote {

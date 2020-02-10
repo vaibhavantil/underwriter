@@ -9,7 +9,7 @@ import java.time.LocalDate
 data class NorwegianHomeContentsQuotePriceDto(
     var birthDate: LocalDate,
     var livingSpace: Int,
-    var coinsured: Int,
+    var coInsured: Int,
     var zipCode: String,
     var type: NorwegianHomeContentsType,
     var isStudent: Boolean
@@ -21,7 +21,7 @@ data class NorwegianHomeContentsQuotePriceDto(
                 return NorwegianHomeContentsQuotePriceDto(
                     birthDate = quoteData.ssn.birthDateFromNorwegianSsn(),
                     livingSpace = quoteData.livingSpace,
-                    coinsured = quoteData.coinsured,
+                    coInsured = quoteData.coInsured,
                     zipCode = quoteData.zipCode,
                     type = quoteData.type,
                     isStudent = quoteData.isStudent

@@ -60,12 +60,12 @@ mutation {
                     street
                     zipCode
                     livingSpace
-                    coinsured
+                    coInsured
                     isStudent
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
-                    coinsured
+                    coInsured
                 }
             }
         }

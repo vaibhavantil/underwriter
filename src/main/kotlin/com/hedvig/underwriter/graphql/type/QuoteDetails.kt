@@ -24,13 +24,13 @@ sealed class QuoteDetails {
     data class NorwegianHomeContentsDetails(
         val street: String,
         val zipCode: String,
-        val coinsured: Int,
+        val coInsured: Int,
         val livingSpace: Int,
         val isStudent: Boolean,
         val type: NorwegianHomeContentsType
     ) : QuoteDetails()
 
     data class NorwegianTravelDetails(
-        val coinsured: Int
+        val coInsured: Int
     ) : QuoteDetails()
 }

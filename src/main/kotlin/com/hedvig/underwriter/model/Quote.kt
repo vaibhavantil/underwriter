@@ -18,6 +18,36 @@ import java.time.LocalDate
 import java.util.Locale
 import java.util.UUID
 
+val Quote.firstName
+    get() = (data as? PersonPolicyHolder<*>)?.firstName
+        ?: throw RuntimeException("No firstName on Quote! $this")
+
+val Quote.lastName
+    get() = (data as? PersonPolicyHolder<*>)?.lastName
+        ?: throw RuntimeException("No lastName on Quote! $this")
+
+val Quote.ssn
+    get() = (data as? PersonPolicyHolder<*>)?.ssn
+        ?: throw RuntimeException("No ssn on Quote! $this")
+
+val Quote.email
+    get() = (data as? PersonPolicyHolder<*>)?.email
+
+val Quote.swedishApartment
+    get() = (data as? SwedishApartmentData)
+
+val Quote.swedishHouse
+    get() = (data as? SwedishHouseData)
+
+val Quote.norwegianHomeContents
+    get() = (data as? NorwegianHomeContentsData)
+
+val Quote.norwegianTravel
+    get() = (data as? NorwegianTravelData)
+
+val Quote.validTo
+    get() = this.createdAt.plusSeconds(this.validity)!!
+
 fun String.birthDateFromSwedishSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     return LocalDate.parse(
@@ -144,36 +174,6 @@ data class Quote(
             !data.isComplete -> false
             else -> true
         }
-
-    val firstName
-        get() = (data as? PersonPolicyHolder<*>)?.firstName
-            ?: throw RuntimeException("No firstName on Quote! $this")
-
-    val lastName
-        get() = (data as? PersonPolicyHolder<*>)?.lastName
-            ?: throw RuntimeException("No lastName on Quote! $this")
-
-    val ssn
-        get() = (data as? PersonPolicyHolder<*>)?.ssn
-            ?: throw RuntimeException("No ssn on Quote! $this")
-
-    val email
-        get() = (data as? PersonPolicyHolder<*>)?.email
-
-    val swedishApartment
-        get() = (data as? SwedishApartmentData)
-
-    val swedishHouse
-        get() = (data as? SwedishHouseData)
-
-    val norwegianHomeContents
-        get() = (data as? NorwegianHomeContentsData)
-
-    val norwegianTravel
-        get() = (data as? NorwegianTravelData)
-
-    val validTo
-        get() = this.createdAt.plusSeconds(this.validity)!!
 
     val currency: String
         get() = when (this.data) {
@@ -344,14 +344,14 @@ data class Quote(
             QuoteDetails.NorwegianHomeContentsDetails(
                 street = it.street,
                 zipCode = it.zipCode,
-                coinsured = it.coinsured,
+                coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
                 isStudent = it.isStudent,
                 type = NorwegianHomeContentsType.valueOf(it.type.name)
             )
         } ?: this.norwegianTravel?.let {
             QuoteDetails.NorwegianTravelDetails(
-                coinsured = it.coinsured
+                coInsured = it.coInsured
             )
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")

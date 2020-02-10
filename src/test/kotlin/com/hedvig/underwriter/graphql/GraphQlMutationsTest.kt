@@ -245,7 +245,7 @@ internal class GraphQlMutationsTest {
                     birthDate = LocalDate.of(1912, 12, 12),
                     livingSpace = 30,
                     zipCode = "12345",
-                    coinsured = 0,
+                    coInsured = 0,
                     type = NorwegianHomeContentsType.OWN,
                     isStudent = false
                 )
@@ -280,7 +280,7 @@ internal class GraphQlMutationsTest {
         assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "12345")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
-        assert(createQuote["quoteDetails"]["coinsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
         assert(createQuote["quoteDetails"]["norwegianType"].textValue() == "OWN")
     }
 
@@ -289,7 +289,7 @@ internal class GraphQlMutationsTest {
         Mockito.`when`(
             productPricingService.priceFromProductPricingForNorwegianTravelQuote(
                 NorwegianTravelQuotePriceDto(
-                    coinsured = 0
+                    coInsured = 0
                 )
             )
         ).thenReturn(
@@ -319,7 +319,7 @@ internal class GraphQlMutationsTest {
         assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "NOK")
-        assert(createQuote["quoteDetails"]["coinsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
     }
 
     @Test

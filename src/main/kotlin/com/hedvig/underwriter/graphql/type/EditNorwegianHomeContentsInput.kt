@@ -5,7 +5,7 @@ import com.hedvig.underwriter.service.model.QuoteRequestData
 data class EditNorwegianHomeContentsInput(
     val street: String?,
     val zipCode: String?,
-    val coinsured: Int?,
+    val coInsured: Int?,
     val livingSpace: Int?,
     val isStudent: Boolean?,
     val type: NorwegianHomeContentsType?
@@ -15,7 +15,7 @@ data class EditNorwegianHomeContentsInput(
             street = this.street,
             zipCode = this.zipCode,
             livingSpace = this.livingSpace,
-            coinsured = this.coinsured,
+            coInsured = this.coInsured,
             type = this.type?.let { com.hedvig.underwriter.model.NorwegianHomeContentsType.valueOf(it.name) },
             isStudent = this.isStudent,
             city = null

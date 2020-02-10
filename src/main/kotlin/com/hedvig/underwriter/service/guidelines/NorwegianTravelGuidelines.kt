@@ -4,12 +4,12 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 
 object NorwegianTravelGuidelines {
     val setOfRules = setOf(
-        NorwegianTravelCoinsuredCantBeNegative
+        NorwegianTravelcoInsuredCantBeNegative
     )
 }
 
-object NorwegianTravelCoinsuredCantBeNegative : BaseGuideline<NorwegianTravelData> {
-    override val errorMessage: String = "coinsured cant be negative"
+object NorwegianTravelcoInsuredCantBeNegative : BaseGuideline<NorwegianTravelData> {
+    override val errorMessage: String = "coInsured cant be negative"
 
-    override val validate = { data: NorwegianTravelData -> data.coinsured!! < 0 }
+    override val validate = { data: NorwegianTravelData -> data.coInsured!! < 0 }
 }

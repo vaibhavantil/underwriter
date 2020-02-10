@@ -8,6 +8,11 @@ import com.hedvig.underwriter.graphql.type.CurrentInsurer
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.email
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
+import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import graphql.schema.DataFetchingEnvironment
 import java.time.LocalDate
