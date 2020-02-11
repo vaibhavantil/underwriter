@@ -23,7 +23,6 @@ import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
-import java.lang.IllegalStateException
 import java.time.LocalDate
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
@@ -86,7 +85,10 @@ class Mutation @Autowired constructor(
 
     fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): QuoteResult =
         responseForEditedQuote(
-            quoteService.updateQuote(input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()), input.id),
+            quoteService.updateQuote(
+                input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
+                input.id
+            ),
             env
         )
 
@@ -132,20 +134,20 @@ class Mutation @Autowired constructor(
             )
         }
         ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE ->
-            throw IllegalStateException("Member has existing insurance")
+            throw IllegalStateException("Member has existing insurance [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED ->
-            throw IllegalStateException("Quote has expired")
+            throw IllegalStateException("Quote has expired [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.NO_SUCH_QUOTE ->
-            throw IllegalStateException("No such quote")
+            throw IllegalStateException("No such quote [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.INVALID_STATE ->
-            throw IllegalStateException("Invalid state")
+            throw IllegalStateException("Invalid state [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.UNKNOWN_ERROR_CODE ->
-            throw IllegalStateException("Unknown error code")
+            throw IllegalStateException("Unknown error code [Error Message: ${errorResponse.errorMessage}]")
     }
 
     fun DataFetchingEnvironment.isAndroid() =
         this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isAndroid() ?: false
-            ?: false
+        ?: false
 
     fun DataFetchingEnvironment.isIOS() =
         this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isIOS() ?: false

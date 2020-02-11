@@ -47,7 +47,7 @@ class QuoteServiceImpl(
             return Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.INVALID_STATE,
-                    "quote must be quoted to update but was really ${quote.state}"
+                    "quote [Id: ${quote.id}] must be quoted to update but was really ${quote.state} [Quote: $quote]"
                 )
             )
         }
@@ -71,14 +71,14 @@ class QuoteServiceImpl(
                 Either.left(
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote cannot be calculated, underwriting guidelines are breached",
+                        "quote [Id: ${quote.id}] cannot be calculated, underwriting guidelines are breached [Quote: $quote]",
                         breachedUnderwritingGuidelines
                     )
                 )
             } ?: Either.left(
                 ErrorResponseDto(
                     ErrorCodes.UNKNOWN_ERROR_CODE,
-                    "Unable to complete quote"
+                    "Unable to complete quote [Quote: $quote]"
                 )
             )
         }
@@ -146,7 +146,7 @@ class QuoteServiceImpl(
                 )
                 ErrorResponseDto(
                     ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                    "quote cannot be calculated, underwriting guidelines are breached",
+                    "quote cannot be calculated, underwriting guidelines are breached [Quote: ${breachedUnderwritingGuidelines.first}",
                     breachedUnderwritingGuidelines.second
                 )
             },
@@ -180,7 +180,7 @@ class QuoteServiceImpl(
             return Either.left(
                 ErrorResponseDto(
                     errorCode = ErrorCodes.UNKNOWN_ERROR_CODE,
-                    errorMessage = "No activation date given"
+                    errorMessage = "No activation date given [QuoteId : $completeQuoteId]"
                 )
             )
         }
@@ -207,17 +207,16 @@ class QuoteServiceImpl(
         if (quote.state == QuoteState.EXPIRED) {
             return ErrorResponseDto(
                 ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
-                "cannot sign quote it has expired"
+                "cannot sign quote it has expired [Quote: $quote]"
             )
         }
 
         if (quote.state == QuoteState.SIGNED) {
             return ErrorResponseDto(
                 ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                "quote is already signed"
+                "quote is already signed [Quote: $quote]"
             )
         }
-
         return null
     }
 }
