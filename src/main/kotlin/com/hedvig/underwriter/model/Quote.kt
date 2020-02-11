@@ -1,20 +1,54 @@
 package com.hedvig.underwriter.model
 
-import arrow.core.Either
-import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
+import com.hedvig.service.LocalizationService
+import com.hedvig.underwriter.graphql.type.ApartmentType
+import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
+import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType
+import com.hedvig.underwriter.graphql.type.QuoteDetails
+import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
+import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
+import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.util.Locale
 import java.util.UUID
 
-fun String.birthDateFromSsn(): LocalDate {
+val Quote.firstName
+    get() = (data as? PersonPolicyHolder<*>)?.firstName
+        ?: throw RuntimeException("No firstName on Quote! $this")
+
+val Quote.lastName
+    get() = (data as? PersonPolicyHolder<*>)?.lastName
+        ?: throw RuntimeException("No lastName on Quote! $this")
+
+val Quote.ssn
+    get() = (data as? PersonPolicyHolder<*>)?.ssn
+        ?: throw RuntimeException("No ssn on Quote! $this")
+
+val Quote.email
+    get() = (data as? PersonPolicyHolder<*>)?.email
+
+val Quote.swedishApartment
+    get() = (data as? SwedishApartmentData)
+
+val Quote.swedishHouse
+    get() = (data as? SwedishHouseData)
+
+val Quote.norwegianHomeContents
+    get() = (data as? NorwegianHomeContentsData)
+
+val Quote.norwegianTravel
+    get() = (data as? NorwegianTravelData)
+
+val Quote.validTo
+    get() = this.createdAt.plusSeconds(this.validity)!!
+
+fun String.birthDateFromSwedishSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     return LocalDate.parse(
         trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
@@ -22,6 +56,25 @@ fun String.birthDateFromSsn(): LocalDate {
             6
         ) + "-" + trimmedInput.substring(6, 8)
     )
+}
+
+fun String.birthDateFromNorwegianSsn(): LocalDate {
+    return LocalDate.parse(this.birthDateStringFromNorwegianSsn())
+}
+
+fun String.birthDateStringFromNorwegianSsn(): String {
+    val trimmedInput = this.trim().replace("-", "").replace(" ", "")
+    val day = trimmedInput.substring(0, 2)
+    val month = trimmedInput.substring(2, 4)
+    val twoDigitYear = trimmedInput.substring(4, 6).toInt()
+    val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+
+    val year = if (twoDigitYear > breakPoint) {
+        "19$twoDigitYear"
+    } else {
+        "20$twoDigitYear"
+    }
+    return "$year-$month-$day"
 }
 
 data class DatabaseQuoteRevision(
@@ -37,6 +90,8 @@ data class DatabaseQuoteRevision(
     val price: BigDecimal? = null,
     val quoteApartmentDataId: Int?,
     val quoteHouseDataId: Int?,
+    val quoteNorwegianHomeContentsDataId: Int?,
+    val quoteNorwegianTravelDataId: Int?,
     val memberId: String?,
     val breachedUnderwritingGuidelines: List<String>?,
     val underwritingGuidelinesBypassedBy: String?,
@@ -61,11 +116,19 @@ data class DatabaseQuoteRevision(
                 startDate = quote.startDate,
                 price = quote.price,
                 quoteApartmentDataId = when (quote.data) {
-                    is ApartmentData -> quote.data.internalId
+                    is SwedishApartmentData -> quote.data.internalId
                     else -> null
                 },
                 quoteHouseDataId = when (quote.data) {
-                    is HouseData -> quote.data.internalId
+                    is SwedishHouseData -> quote.data.internalId
+                    else -> null
+                },
+                quoteNorwegianHomeContentsDataId = when (quote.data) {
+                    is NorwegianHomeContentsData -> quote.data.internalId
+                    else -> null
+                },
+                quoteNorwegianTravelDataId = when (quote.data) {
+                    is NorwegianTravelData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,
@@ -112,46 +175,49 @@ data class Quote(
             else -> true
         }
 
-    private fun getPriceRetrievedFromProductPricing(productPricingService: ProductPricingService): BigDecimal {
-        return when (this.data) {
-            is ApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(ApartmentQuotePriceDto.from(this)).price
-            is HouseData -> productPricingService.priceFromProductPricingForHouseQuote(HouseQuotePriceDto.from(this)).price
+    val currency: String
+        get() = when (this.data) {
+            is SwedishApartmentData -> SEK
+            is SwedishHouseData -> SEK
+            is NorwegianTravelData -> NOK
+            is NorwegianHomeContentsData -> NOK
         }
-    }
 
-    fun update(houseOrApartmentIncompleteQuoteDto: HouseOrApartmentIncompleteQuoteDto): Quote {
+    fun update(quoteRequest: QuoteRequest): Quote {
         var newQuote = copy(
-            productType = houseOrApartmentIncompleteQuoteDto.productType ?: productType,
-            startDate = houseOrApartmentIncompleteQuoteDto.startDate?.toStockholmLocalDate() ?: startDate,
+            productType = quoteRequest.productType ?: productType,
+            startDate = quoteRequest.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
-                is ApartmentData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email,
-                    subType = when (val quoteData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData) {
-                        is IncompleteApartmentQuoteDataDto? -> quoteData?.subType ?: data.subType
+                is SwedishApartmentData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email,
+                    subType = when (val quoteData = quoteRequest.incompleteQuoteData) {
+                        is SwedishApartment? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
                 ) as QuoteData // This cast removes an IntellJ warning
-                is HouseData -> data.copy(
-                    ssn = houseOrApartmentIncompleteQuoteDto.ssn ?: data.ssn,
-                    firstName = houseOrApartmentIncompleteQuoteDto.firstName ?: data.firstName,
-                    lastName = houseOrApartmentIncompleteQuoteDto.lastName ?: data.lastName,
-                    email = houseOrApartmentIncompleteQuoteDto.email ?: data.email
+                is SwedishHouseData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
                 ) as QuoteData // This cast removes an IntellJ warning
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
         )
 
-        val requestData = houseOrApartmentIncompleteQuoteDto.incompleteQuoteData
+        val requestData = quoteRequest.incompleteQuoteData
         if (
-            requestData is IncompleteApartmentQuoteDataDto
+            requestData is SwedishApartment
         ) {
-            val newQuoteData: ApartmentData = when (newQuote.data) {
-                is ApartmentData -> newQuote.data as ApartmentData
-                is HouseData -> {
-                    val houseData = newQuote.data as HouseData
-                    ApartmentData(
+            val newQuoteData: SwedishApartmentData = when (newQuote.data) {
+                is SwedishApartmentData -> newQuote.data as SwedishApartmentData
+                is SwedishHouseData -> {
+                    val houseData = newQuote.data as SwedishHouseData
+                    SwedishApartmentData(
                         id = houseData.id,
                         firstName = houseData.firstName,
                         lastName = houseData.lastName,
@@ -164,6 +230,8 @@ data class Quote(
                         livingSpace = houseData.livingSpace
                     )
                 }
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -177,13 +245,13 @@ data class Quote(
             )
         }
         if (
-            requestData is IncompleteHouseQuoteDataDto
+            requestData is SwedishHouse
         ) {
-            val newQuoteData: HouseData = when (newQuote.data) {
-                is HouseData -> newQuote.data as HouseData
-                is ApartmentData -> {
-                    val apartmentData = newQuote.data as ApartmentData
-                    HouseData(
+            val newQuoteData: SwedishHouseData = when (newQuote.data) {
+                is SwedishHouseData -> newQuote.data as SwedishHouseData
+                is SwedishApartmentData -> {
+                    val apartmentData = newQuote.data as SwedishApartmentData
+                    SwedishHouseData(
                         id = apartmentData.id,
                         firstName = apartmentData.firstName,
                         lastName = apartmentData.lastName,
@@ -196,6 +264,8 @@ data class Quote(
                         livingSpace = apartmentData.livingSpace
                     )
                 }
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
             newQuote = newQuote.copy(
                 data = newQuoteData.copy(
@@ -216,49 +286,110 @@ data class Quote(
         return newQuote
     }
 
-    fun complete(
-        debtChecker: DebtChecker,
-        productPricingService: ProductPricingService,
-        underwritingGuidelinesBypassedBy: String? = null
-    ): Either<List<String>, Quote> {
-        val quoteData = this.data
-        val breachedUnderwritingGuidelines = mutableListOf<String>()
-        val bypassUnderwritingGuidelines = underwritingGuidelinesBypassedBy != null
-
-        breachedUnderwritingGuidelines.addAll(quoteData.passUwGuidelines())
-
-        if (quoteData is PersonPolicyHolder<*>) {
-            if (quoteData.age() < 18)
-                breachedUnderwritingGuidelines.add("member is younger than 18")
-            if (!quoteData.ssnIsValid())
-                breachedUnderwritingGuidelines.add("invalid ssn")
-
-            if (breachedUnderwritingGuidelines.isEmpty()) {
-                breachedUnderwritingGuidelines.addAll(debtChecker.passesDebtCheck(quoteData))
-            }
-        }
-
-        val newQuote = copy(data = quoteData, breachedUnderwritingGuidelines = breachedUnderwritingGuidelines)
-
-        if (breachedUnderwritingGuidelines.isNotEmpty() && bypassUnderwritingGuidelines) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy!!,
-                    state = QuoteState.QUOTED
-                )
+    fun createIncompleteQuoteResult(
+        localizationService: LocalizationService,
+        locale: Locale
+    ): IncompleteQuoteDetails? =
+        this.swedishApartment?.let { apartment ->
+            IncompleteQuoteDetails.IncompleteApartmentQuoteDetails(
+                street = apartment.street,
+                zipCode = apartment.zipCode,
+                householdSize = apartment.householdSize,
+                livingSpace = apartment.livingSpace,
+                type = apartment.subType?.let { ApartmentType.valueOf(it.name) }
+            )
+        } ?: this.swedishHouse?.let { house ->
+            IncompleteQuoteDetails.IncompleteHouseQuoteDetails(
+                street = house.street,
+                zipCode = house.zipCode,
+                householdSize = house.householdSize,
+                livingSpace = house.livingSpace,
+                ancillarySpace = house.ancillaryArea,
+                extraBuildings = house.extraBuildings?.map { extraBuildingInput ->
+                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
+                },
+                numberOfBathrooms = house.numberOfBathrooms,
+                yearOfConstruction = house.yearOfConstruction,
+                isSubleted = house.isSubleted
             )
         }
 
-        if (breachedUnderwritingGuidelines.isEmpty()) {
-            return Either.right(
-                newQuote.copy(
-                    price = getPriceRetrievedFromProductPricing(productPricingService),
-                    state = QuoteState.QUOTED
-                )
+    fun createQuoteDetails(
+        localizationService: LocalizationService,
+        locale: Locale
+    ): QuoteDetails =
+        this.swedishApartment?.let { apartment ->
+            QuoteDetails.SwedishApartmentQuoteDetails(
+                street = apartment.street!!,
+                zipCode = apartment.zipCode!!,
+                householdSize = apartment.householdSize!!,
+                livingSpace = apartment.livingSpace!!,
+                type = ApartmentType.valueOf(apartment.subType!!.name)
+            )
+        } ?: this.swedishHouse?.let { house ->
+            QuoteDetails.SwedishHouseQuoteDetails(
+                street = house.street!!,
+                zipCode = house.zipCode!!,
+                householdSize = house.householdSize!!,
+                livingSpace = house.livingSpace!!,
+                ancillarySpace = house.ancillaryArea!!,
+                extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
+                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
+                },
+                numberOfBathrooms = house.numberOfBathrooms!!,
+                yearOfConstruction = house.yearOfConstruction!!,
+                isSubleted = house.isSubleted!!
+            )
+        } ?: this.norwegianHomeContents?.let {
+            QuoteDetails.NorwegianHomeContentsDetails(
+                street = it.street,
+                zipCode = it.zipCode,
+                coInsured = it.coInsured,
+                livingSpace = it.livingSpace,
+                isStudent = it.isStudent,
+                type = NorwegianHomeContentsType.valueOf(it.type.name)
+            )
+        } ?: this.norwegianTravel?.let {
+            QuoteDetails.NorwegianTravelDetails(
+                coInsured = it.coInsured
             )
         }
+        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
-        return Either.left(breachedUnderwritingGuidelines)
+    fun createCompleteQuoteResult(
+        localizationService: LocalizationService,
+        locale: Locale
+    ): CompleteQuoteDetails =
+        this.swedishApartment?.let { apartment ->
+            CompleteQuoteDetails.CompleteApartmentQuoteDetails(
+                street = apartment.street!!,
+                zipCode = apartment.zipCode!!,
+                householdSize = apartment.householdSize!!,
+                livingSpace = apartment.livingSpace!!,
+                type = ApartmentType.valueOf(apartment.subType!!.name)
+            )
+        } ?: this.swedishHouse?.let { house ->
+            CompleteQuoteDetails.CompleteHouseQuoteDetails(
+                street = house.street!!,
+                zipCode = house.zipCode!!,
+                householdSize = house.householdSize!!,
+                livingSpace = house.livingSpace!!,
+                ancillarySpace = house.ancillaryArea!!,
+                extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
+                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
+                },
+                numberOfBathrooms = house.numberOfBathrooms!!,
+                yearOfConstruction = house.yearOfConstruction!!,
+                isSubleted = house.isSubleted!!
+            )
+        } ?: this.norwegianHomeContents?.let {
+            CompleteQuoteDetails.UnknownQuoteDetails()
+        } ?: this.norwegianTravel?.let {
+            CompleteQuoteDetails.UnknownQuoteDetails()
+        } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
+
+    companion object {
+        private const val SEK = "SEK"
+        private const val NOK = "NOK"
     }
 }

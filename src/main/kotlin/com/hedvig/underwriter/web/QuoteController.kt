@@ -1,4 +1,5 @@
 package com.hedvig.underwriter.web
+
 import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.underwriter.extensions.isAndroid
@@ -6,10 +7,13 @@ import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.service.dtos.HouseOrApartmentIncompleteQuoteDto
+import com.hedvig.underwriter.service.SignService
+import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
@@ -17,7 +21,9 @@ import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 import javax.validation.constraints.Email
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -35,14 +41,15 @@ import org.springframework.web.bind.annotation.RestController
 )
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
-    val memberService: MemberService
+    val memberService: MemberService,
+    val signService: SignService
 ) {
     @PostMapping
     fun createQuote(
         @Valid @RequestBody requestDto: QuoteRequestDto,
         httpServletRequest: HttpServletRequest
     ): ResponseEntity<out Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(requestDto)
+        val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(requestDto)
 
         val quoteInitiatedFrom = when {
             httpServletRequest.isAndroid() -> QuoteInitiatedFrom.ANDROID
@@ -54,7 +61,6 @@ class QuoteController @Autowired constructor(
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
-            shouldComplete = requestDto.shouldComplete,
             underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
         )
             .bimap(
@@ -76,12 +82,9 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-
-        return when (val quoteOrError =
-            quoteService.completeQuote(incompleteQuoteId, underwritingGuidelinesBypassedBy)) {
-            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
-            is Either.Right -> ResponseEntity.status(200).body(quoteOrError.b)
-        }
+        logger.error("completeQuote endpoint was used. incompleteQuoteId: $incompleteQuoteId underwritingGuidelinesBypassedBy: $underwritingGuidelinesBypassedBy")
+        return ResponseEntity.status(HttpStatus.GONE)
+            .body(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "endpoint is deprecated"))
     }
 
     @GetMapping("/{id}")
@@ -100,7 +103,7 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-        val houseOrApartmentIncompleteQuoteDto = HouseOrApartmentIncompleteQuoteDto.from(quoteRequestDto)
+        val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(quoteRequestDto)
 
         return when (val quoteOrError =
             quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
@@ -111,7 +114,7 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/{completeQuoteId}/sign")
     fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
-        return when (val errorOrQuote = quoteService.signQuote(completeQuoteId, body)) {
+        return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
@@ -145,7 +148,11 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/member/{memberId}/signed")
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
-        quoteService.memberSigned(memberId, signRequest)
+        signService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(QuoteController::class.java)
     }
 }

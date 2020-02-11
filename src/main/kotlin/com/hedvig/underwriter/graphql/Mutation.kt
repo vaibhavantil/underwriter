@@ -8,7 +8,6 @@ import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.isAndroid
 import com.hedvig.underwriter.extensions.isIOS
-import com.hedvig.underwriter.extensions.toHouseOrApartmentIncompleteQuoteDto
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.QuoteResult
@@ -57,7 +56,6 @@ class Mutation @Autowired constructor(
                 env.isIOS() -> QuoteInitiatedFrom.IOS
                 else -> QuoteInitiatedFrom.WEBONBOARDING
             },
-            shouldComplete = true,
             underwritingGuidelinesBypassedBy = null
         )
 
@@ -78,7 +76,7 @@ class Mutation @Autowired constructor(
                     localizationService,
                     textKeysLocaleResolver,
                     productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, "SEK"),
+                        Money.of(quote.price, quote.currency),
                         env.getToken()
                     )
                 )

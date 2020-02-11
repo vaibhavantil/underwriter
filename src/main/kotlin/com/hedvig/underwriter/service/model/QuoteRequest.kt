@@ -1,17 +1,15 @@
-package com.hedvig.underwriter.service.dtos
+package com.hedvig.underwriter.service.model
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.web.dtos.IncompleteApartmentQuoteDataDto
-import com.hedvig.underwriter.web.dtos.IncompleteHouseQuoteDataDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-data class HouseOrApartmentIncompleteQuoteDto(
+data class QuoteRequest(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
@@ -22,21 +20,29 @@ data class HouseOrApartmentIncompleteQuoteDto(
     val productType: ProductType?,
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @field:JsonSubTypes(
-        JsonSubTypes.Type(value = IncompleteApartmentQuoteDataDto::class, name = "apartment"),
-        JsonSubTypes.Type(value = IncompleteHouseQuoteDataDto::class, name = "house")
-    ) var incompleteQuoteData: com.hedvig.underwriter.web.dtos.IncompleteQuoteRequestData?,
+        JsonSubTypes.Type(value = QuoteRequestData.SwedishApartment::class, name = "apartment"),
+        JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel")
+    ) val incompleteQuoteData: QuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
     val startDate: Instant?,
     val dataCollectionId: UUID?
 ) {
     companion object {
-        fun from(quoteRequestDto: QuoteRequestDto): HouseOrApartmentIncompleteQuoteDto {
-            if (quoteRequestDto.incompleteQuoteData == null && quoteRequestDto.incompleteHouseQuoteData == null && quoteRequestDto.incompleteApartmentQuoteData == null) {
-                throw RuntimeException("Cannot create House or Apartment quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData are all null")
+        fun from(quoteRequestDto: QuoteRequestDto): QuoteRequest {
+            if (
+                quoteRequestDto.incompleteQuoteData == null &&
+                quoteRequestDto.incompleteHouseQuoteData == null &&
+                quoteRequestDto.incompleteApartmentQuoteData == null &&
+                quoteRequestDto.norwegianHomeContentsData == null &&
+                quoteRequestDto.norwegianTravelData == null
+            ) {
+                throw RuntimeException("Cannot create quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData, norwegianHomeContentsData, norwegianTravelData are all null")
             }
 
-            return HouseOrApartmentIncompleteQuoteDto(
+            return QuoteRequest(
                 firstName = quoteRequestDto.firstName,
                 lastName = quoteRequestDto.lastName,
                 email = quoteRequestDto.email,
@@ -47,6 +53,8 @@ data class HouseOrApartmentIncompleteQuoteDto(
                 incompleteQuoteData = when {
                     quoteRequestDto.incompleteApartmentQuoteData != null -> quoteRequestDto.incompleteApartmentQuoteData
                     quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.incompleteHouseQuoteData
+                    quoteRequestDto.norwegianHomeContentsData != null -> quoteRequestDto.norwegianHomeContentsData
+                    quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.norwegianTravelData
                     else -> quoteRequestDto.incompleteQuoteData
                 },
                 productType = quoteRequestDto.productType,

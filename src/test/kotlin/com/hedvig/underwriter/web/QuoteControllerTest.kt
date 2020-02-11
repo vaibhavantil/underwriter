@@ -1,14 +1,15 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.ApartmentData
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.ninjasquad.springmockk.MockkBean
@@ -41,6 +42,9 @@ internal class QuoteControllerTest {
     lateinit var quoteService: QuoteService
 
     @MockkBean
+    lateinit var signService: SignService
+
+    @MockkBean
     lateinit var memberService: MemberService
 
     val createQuoteRequestJson = """
@@ -61,7 +65,19 @@ internal class QuoteControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
 
-        every { quoteService.createQuote(any(), shouldComplete = any(), underwritingGuidelinesBypassedBy = any(), initiatedFrom = QuoteInitiatedFrom.RAPIO) } returns Either.Right(CompleteQuoteResponseDto(UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"), BigDecimal.TEN, Instant.now()))
+        every {
+            quoteService.createQuote(
+                any(),
+                underwritingGuidelinesBypassedBy = any(),
+                initiatedFrom = QuoteInitiatedFrom.RAPIO
+            )
+        } returns Either.Right(
+            CompleteQuoteResponseDto(
+                UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"),
+                BigDecimal.TEN,
+                Instant.now()
+            )
+        )
 
         val result = mockMvc.perform(request)
 
@@ -80,7 +96,7 @@ internal class QuoteControllerTest {
             state = QuoteState.INCOMPLETE,
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
-            data = ApartmentData(
+            data = SwedishApartmentData(
                 id = UUID.randomUUID(),
                 street = "123 Baker street",
                 city = "Stockholm",
@@ -121,7 +137,7 @@ internal class QuoteControllerTest {
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.COMPRICER,
             data =
-            ApartmentData(
+            SwedishApartmentData(
                 street = "123 Baker street",
                 zipCode = "11216",
                 livingSpace = 33,

@@ -4,17 +4,15 @@ import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.createCompleteQuoteResult
-import com.hedvig.underwriter.extensions.createIncompleteQuoteResult
-import com.hedvig.underwriter.extensions.email
-import com.hedvig.underwriter.extensions.firstName
-import com.hedvig.underwriter.extensions.lastName
-import com.hedvig.underwriter.extensions.ssn
-import com.hedvig.underwriter.extensions.validTo
 import com.hedvig.underwriter.graphql.type.CurrentInsurer
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.email
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
+import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import graphql.schema.DataFetchingEnvironment
 import java.time.LocalDate
@@ -37,6 +35,10 @@ fun Quote.getCompleteQuoteResult(
     ),
     insuranceCost = insuranceCost,
     details = createCompleteQuoteResult(
+        localizationService,
+        textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+    ),
+    quoteDetails = createQuoteDetails(
         localizationService,
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
     ),

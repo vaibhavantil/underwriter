@@ -22,13 +22,43 @@ input CreateQuoteInput {
     currentInsurer: String
     ssn: String!
     startDate: LocalDate
-    apartment: CreateApartmentInput
-    house: CreateHouseInput
+    apartment: CreateApartmentInput @depricated(reason: "Use swedishApartment")
+    house: CreateHouseInput @depricated(reason: "Use swedishHouse")
+    swedishApartment: CreateSwedishApartmentInput
+    swedishHouse: CreateSwedishHouseInput
+    norweiganHomeContents: CreateNorwegianHomeContentsInput
+    norweiganTravel: CreateNorwegianTravelInput
     email: String
     dataCollectionId: ID
 }
 
+input CreateNorwegianHomeContentsInput {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    livingSpace: Int!
+    isSudent: Boolean!
+    type: NorwegianHomeContentsType!
+}
+
+enum NorwegianHomeContentsType {
+    RENT
+    OWN
+}
+
+input CreateNorwegianTravelInput {
+    coInsured: Int!
+}
+
 input CreateApartmentInput {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    type: ApartmentType!
+}
+
+input CreateSwedishApartmentInput {
     street: String!
     zipCode: String!
     householdSize: Int!
@@ -48,6 +78,18 @@ input CreateHouseInput {
     extraBuildings: [ExtraBuildingInput!]! # Empty list represents no additional buildings. Hence null is not allowed.
 }
 
+input CreateSwedishHouseInput {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    ancillarySpace: Int!
+    yearOfConstruction: Int!
+    numberOfBathrooms: Int!
+    isSubleted: Boolean!
+    extraBuildings: [ExtraBuildingInput!]! # Empty list represents no additional buildings. Hence null is not allowed.
+}
+
 input EditQuoteInput {
     id: ID!
     firstName: String
@@ -55,12 +97,24 @@ input EditQuoteInput {
     currentInsurer: String
     ssn: String
     startDate: LocalDate
-    apartment: EditApartmentInput
-    house: EditHouseInput
+    apartment: EditApartmentInput @depricated(reason: "Use swedishApartment")
+    swedishApartment: EditSwedishApartmentInput
+    house: EditHouseInput @depricated(reason: "Use swedishHouse")
+    swedishHouse: EditSwedishHouseInput
+    norweiganHomeContents: EditNorwegianHomeContentsInput
+    norweiganTravel: EditNorwegianTravelInput
     email: String
 }
 
 input EditApartmentInput {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    type: ApartmentType
+}
+
+input EditSwedishApartmentInput {
     street: String
     zipCode: String
     householdSize: Int
@@ -78,6 +132,31 @@ input EditHouseInput {
     numberOfBathrooms: Int
     isSubleted: Boolean
     extraBuildings: [ExtraBuildingInput!]
+}
+
+input EditSwedishHouseInput {
+    street: String
+    zipCode: String
+    householdSize: Int
+    livingSpace: Int
+    ancillarySpace: Int
+    yearOfConstruction: Int
+    numberOfBathrooms: Int
+    isSubleted: Boolean
+    extraBuildings: [ExtraBuildingInput!]
+}
+
+input EditNorwegianHomeContentsInput {
+    street: String
+    zipCode: String
+    coInsured: Int
+    livingSpace: Int
+    isSudent: Boolean!
+    type: NorwegianHomeContentsType
+}
+
+input EditNorwegianTravelInput {
+    coInsured: Int
 }
 
 input ExtraBuildingInput {
@@ -128,7 +207,8 @@ type CompleteQuote {
     firstName: String!
     lastName: String!
     ssn: String!
-    details: CompleteQuoteDetails!
+    details: CompleteQuoteDetails! @depricated(reason: "Use quoteDetails")
+    quoteDetails: QuoteDetails!
     startDate: LocalDate
     expiresAt: LocalDate!
     email: String
@@ -262,7 +342,17 @@ type MonetaryAmountV2 {
 
 union Quote = CompleteQuote | IncompleteQuote
 
-union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails
+union CompleteQuoteDetails = CompleteApartmentQuoteDetails | CompleteHouseQuoteDetails | UnknownQuoteDetails
+
+type UnknownQuoteDetails {
+    unknown: String
+}
+
+union QuoteDetails =
+    SwedishApartmentQuoteDetails
+    | SwedishHouseQuoteDetails
+    | NorwegianHomeContentsDetails
+    | NorwegianTravelDetails
 
 type CompleteApartmentQuoteDetails {
     street: String!
@@ -282,6 +372,39 @@ type CompleteHouseQuoteDetails {
     numberOfBathrooms: Int!
     yearOfConstruction: Int!
     isSubleted: Boolean!
+}
+
+type SwedishApartmentQuoteDetails {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    type: ApartmentType!
+}
+
+type SwedishHouseQuoteDetails {
+    street: String!
+    zipCode: String!
+    householdSize: Int!
+    livingSpace: Int!
+    ancillarySpace: Int!
+    extraBuildings: [ExtraBuilding!]!
+    numberOfBathrooms: Int!
+    yearOfConstruction: Int!
+    isSubleted: Boolean!
+}
+
+type NorwegianHomeContentsDetails {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    livingSpace: Int!
+    isStudent: Boolean!
+    type: NorwegianHomeContentsType!
+}
+
+type NorwegianTravelDetails {
+    coInsured: Int!
 }
 
 type IncompleteQuote {

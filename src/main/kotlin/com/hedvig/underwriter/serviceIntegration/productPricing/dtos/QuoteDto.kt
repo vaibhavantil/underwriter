@@ -1,13 +1,15 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -35,9 +37,9 @@ data class QuoteDto(
 ) {
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
-            when (quote.data) {
-                is ApartmentData -> {
-                    return QuoteDto(
+            return when (quote.data) {
+                is SwedishApartmentData -> {
+                    QuoteDto(
                         id = quote.id,
                         createdAt = quote.createdAt,
                         price = quote.price,
@@ -58,8 +60,8 @@ data class QuoteDto(
                     )
                 }
 
-                is HouseData -> {
-                    return QuoteDto(
+                is SwedishHouseData -> {
+                    QuoteDto(
                         id = quote.id,
                         createdAt = quote.createdAt,
                         price = quote.price,
@@ -79,6 +81,8 @@ data class QuoteDto(
                         dataCollectionId = quote.dataCollectionId
                     )
                 }
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
         }
     }

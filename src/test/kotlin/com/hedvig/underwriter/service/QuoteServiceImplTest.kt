@@ -36,7 +36,10 @@ import org.springframework.http.ResponseEntity
 class QuoteServiceImplTest {
 
     @MockK
-    lateinit var debtChecker: DebtChecker
+    lateinit var quoteService: QuoteService
+
+    @MockK
+    lateinit var underwriter: Underwriter
 
     @MockK
     lateinit var memberService: MemberService
@@ -53,19 +56,23 @@ class QuoteServiceImplTest {
     @MockK
     lateinit var env: Environment
 
+    lateinit var cut: SignService
+
     @Before
-    fun setUp() = MockKAnnotations.init(this, relaxUnitFun = true)
+    fun setUp() {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+        cut = SignServiceImpl(quoteService, quoteRepository, memberService, productPricingService, customerIO, env)
+    }
 
     @Test
     fun givenPartnerSendsPartnerIdToCustomerIO() {
-
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
-
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
+
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.signedQuote(
@@ -84,13 +91,13 @@ class QuoteServiceImplTest {
 
     @Test
     fun givenPartnerIsHedvigSendPartnerIdToCustomerIO() {
-        val cut = QuoteServiceImpl(debtChecker, memberService, productPricingService, quoteRepository, customerIO, env)
-
         val quoteId = UUID.randomUUID()
         val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
+
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.signedQuote(
@@ -109,12 +116,10 @@ class QuoteServiceImplTest {
     @Test
     fun activatesQuoteByCreatingModifiedProduct() {
         val service = QuoteServiceImpl(
-            debtChecker = debtChecker,
+            underwriter = underwriter,
             memberService = memberService,
             productPricingService = productPricingService,
-            quoteRepository = quoteRepository,
-            customerIOClient = customerIO,
-            env = env
+            quoteRepository = quoteRepository
         )
 
         val quote = a.QuoteBuilder(originatingProductId = UUID.randomUUID(), memberId = "12345").build()

@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.service
 
-import com.hedvig.underwriter.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

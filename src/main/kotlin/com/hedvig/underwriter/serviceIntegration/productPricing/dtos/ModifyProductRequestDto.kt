@@ -1,8 +1,10 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.ApartmentData
-import com.hedvig.underwriter.model.HouseData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
@@ -36,7 +38,7 @@ data class ModifyProductRequestDto(
             previousInsuranceTerminationDate: LocalDate
         ): ModifyProductRequestDto =
             when (quote.data) {
-                is ApartmentData -> ModifyProductRequestDto(
+                is SwedishApartmentData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
                         ?: throw IllegalArgumentException("Originating product id must be present to modify a product"),
                     memberId = quote.memberId
@@ -53,13 +55,13 @@ data class ModifyProductRequestDto(
                     price = quote.price!!
                 )
 
-                is HouseData -> ModifyProductRequestDto(
+                is SwedishHouseData -> ModifyProductRequestDto(
                     idToBeReplaced = quote.originatingProductId
                         ?: throw IllegalArgumentException("Originating product id must be present to modify a product"),
                     memberId = quote.memberId
                         ?: throw IllegalArgumentException("memberId must be present in order to modify a product"),
                     isStudent = when (quote.data) {
-                        is ApartmentData -> quote.data.isStudent
+                        is SwedishApartmentData -> quote.data.isStudent
                         else -> false
                     },
                     street = quote.data.street!!,
@@ -77,6 +79,8 @@ data class ModifyProductRequestDto(
                     extraBuildings = quote.data.extraBuildings?.map { extraBuilding -> extraBuilding.toDto() },
                     isSubleted = quote.data.isSubleted!!
                 )
+                is NorwegianHomeContentsData -> TODO()
+                is NorwegianTravelData -> TODO()
             }
     }
 }

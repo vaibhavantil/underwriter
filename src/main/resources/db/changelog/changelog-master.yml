@@ -26,3 +26,10 @@ databaseChangeLog:
   - include:
       file: ./migrations/20200108-1000-add-email-and-data-collection-id-to-quote.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20200205-0930-support-for-norwegian-quotes.sql
+      relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20200210-1600-rename-coinsured-to-co-insured.sql
+      relativeToChangelogFile: true
+
