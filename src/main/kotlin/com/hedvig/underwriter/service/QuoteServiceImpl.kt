@@ -43,10 +43,7 @@ class QuoteServiceImpl(
                 ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id")
             )
 
-        if (quote.state != QuoteState.QUOTED) {
-            if (quote.state == QuoteState.INCOMPLETE) {
-                logger.error("updating quote that is in incomplete state. quote: $quote")
-            }
+        if (quote.state != QuoteState.QUOTED || quote.state != QuoteState.INCOMPLETE) {
             return Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.INVALID_STATE,
