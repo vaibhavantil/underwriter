@@ -1,7 +1,14 @@
 package com.hedvig.underwriter.service.model
 
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.QuoteData
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
+import com.hedvig.underwriter.model.birthDateStringFromNorwegianSsn
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -16,6 +23,13 @@ interface PersonPolicyHolder<T : QuoteData> {
     fun age(): Long {
         val dateToday = LocalDate.now()
 
-        return this.ssn!!.birthDateFromSwedishSsn().until(dateToday, ChronoUnit.YEARS)
+        return when (this) {
+            is NorwegianHomeContentsData,
+            is NorwegianTravelData -> this.ssn!!.birthDateFromNorwegianSsn().until(dateToday, ChronoUnit.YEARS)
+            is SwedishApartmentData,
+            is SwedishHouseData -> this.ssn!!.birthDateFromSwedishSsn().until(dateToday, ChronoUnit.YEARS)
+            else -> throw RuntimeException("Can't get age from QuoteData: $this")
+        }
+
     }
 }
