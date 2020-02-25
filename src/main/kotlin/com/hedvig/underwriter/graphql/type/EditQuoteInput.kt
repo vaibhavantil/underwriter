@@ -39,8 +39,8 @@ data class EditQuoteInput(
         lastName = this.lastName,
         email = this.email,
         currentInsurer = this.currentInsurer,
-        birthDate = this.birthDate ?:  when {
-            this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null  -> this.ssn?.birthDateFromSwedishSsn()
+        birthDate = this.birthDate ?: when {
+            this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
             this.norweiganHomeContents != null || this.norweiganTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
             else -> null
         },

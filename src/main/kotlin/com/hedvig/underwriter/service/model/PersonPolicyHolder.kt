@@ -17,6 +17,6 @@ interface PersonPolicyHolder<T : QuoteData> {
     fun age(): Long {
         val dateToday = LocalDate.now()
 
-        return this.birthDate?.until(dateToday, ChronoUnit.YEARS) ?:  throw RuntimeException("Can't get age from QuoteData: $this")
+        return this.birthDate?.until(dateToday, ChronoUnit.YEARS) ?: throw RuntimeException("Can't get age from QuoteData: $this")
     }
 }

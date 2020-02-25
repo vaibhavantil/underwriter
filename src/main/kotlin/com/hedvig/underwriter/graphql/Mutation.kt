@@ -53,7 +53,6 @@ class Mutation @Autowired constructor(
             else -> createQuoteInput
         }
 
-
         val completeQuote = quoteService.createQuote(
             input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
             input.id,

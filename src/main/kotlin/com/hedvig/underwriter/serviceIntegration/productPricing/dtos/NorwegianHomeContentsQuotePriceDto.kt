@@ -3,7 +3,6 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import java.time.LocalDate
 
 data class NorwegianHomeContentsQuotePriceDto(
