@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
-import java.util.UUID
 import org.jdbi.v3.json.Json
+import java.util.UUID
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -111,6 +111,7 @@ data class NorwegianHomeContentsData(
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     val type: NorwegianHomeContentsType,
+    @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), AddressData, PersonPolicyHolder<NorwegianHomeContentsData> {
 
@@ -133,6 +134,7 @@ data class NorwegianTravelData(
     override val lastName: String? = null,
     override val email: String? = null,
     val coInsured: Int,
+    @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
 
