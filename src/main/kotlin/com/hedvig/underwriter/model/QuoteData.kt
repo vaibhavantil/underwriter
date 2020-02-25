@@ -11,7 +11,9 @@ import org.jdbi.v3.json.Json
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = SwedishApartmentData::class, name = "apartment"),
-    JsonSubTypes.Type(value = SwedishHouseData::class, name = "house")
+    JsonSubTypes.Type(value = SwedishHouseData::class, name = "house"),
+    JsonSubTypes.Type(value = NorwegianHomeContentsData::class, name = "norwegianHomeContentsData"),
+    JsonSubTypes.Type(value = NorwegianTravelData::class, name = "norwegianTravelData")
 )
 sealed class QuoteData {
     abstract val isComplete: Boolean
@@ -116,9 +118,13 @@ data class NorwegianHomeContentsData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
-    // TODO: Let's remove the consept of complete
+    // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
-        get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
+        get() = when (null) {
+            ssn, firstName, lastName, street, zipCode, coInsured, livingSpace -> false
+            else -> true
+        }
+
 }
 
 data class NorwegianTravelData(
@@ -135,7 +141,11 @@ data class NorwegianTravelData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
-    // TODO: Let's remove the consept of complete
-    override val isComplete: kotlin.Boolean
-        get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
+    // TODO: Let's remove the concept of complete
+    override val isComplete: Boolean
+        get() = when (null) {
+            ssn, firstName, lastName, coInsured -> false
+            else -> true
+        }
+
 }

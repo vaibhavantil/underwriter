@@ -37,53 +37,25 @@ data class QuoteDto(
 ) {
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
-            return when (quote.data) {
-                is SwedishApartmentData -> {
-                    QuoteDto(
-                        id = quote.id,
-                        createdAt = quote.createdAt,
-                        price = quote.price,
-                        productType = quote.productType,
-                        state = quote.state,
-                        initiatedFrom = quote.initiatedFrom,
-                        attributedTo = quote.attributedTo,
-                        data = quote.data,
-                        currentInsurer = quote.currentInsurer,
-                        startDate = quote.startDate,
-                        validity = quote.validity,
-                        memberId = quote.memberId,
-                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
-                        isComplete = quote.isComplete,
-                        originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId,
-                        dataCollectionId = quote.dataCollectionId
-                    )
-                }
-
-                is SwedishHouseData -> {
-                    QuoteDto(
-                        id = quote.id,
-                        createdAt = quote.createdAt,
-                        price = quote.price,
-                        productType = quote.productType,
-                        state = quote.state,
-                        initiatedFrom = quote.initiatedFrom,
-                        attributedTo = quote.attributedTo,
-                        data = quote.data,
-                        currentInsurer = quote.currentInsurer,
-                        startDate = quote.startDate,
-                        validity = quote.validity,
-                        memberId = quote.memberId,
-                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
-                        isComplete = quote.isComplete,
-                        originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId,
-                        dataCollectionId = quote.dataCollectionId
-                    )
-                }
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
-            }
+            return QuoteDto(
+                id = quote.id,
+                createdAt = quote.createdAt,
+                price = quote.price,
+                productType = quote.productType,
+                state = quote.state,
+                initiatedFrom = quote.initiatedFrom,
+                attributedTo = quote.attributedTo,
+                data = quote.data,
+                currentInsurer = quote.currentInsurer,
+                startDate = quote.startDate,
+                validity = quote.validity,
+                memberId = quote.memberId,
+                breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
+                isComplete = quote.isComplete,
+                originatingProductId = quote.originatingProductId,
+                signedProductId = quote.signedProductId,
+                dataCollectionId = quote.dataCollectionId
+            )
         }
     }
 }
