@@ -61,6 +61,7 @@ class UnderwriterImpl(
                     SwedishApartmentData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,
+                        birthDate = quoteRequest.birthDate,
                         firstName = quoteRequest.firstName,
                         lastName = quoteRequest.lastName,
                         email = quoteRequest.email,
@@ -75,6 +76,7 @@ class UnderwriterImpl(
                     SwedishHouseData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn,
+                        birthDate = quoteRequest.birthDate,
                         firstName = quoteRequest.firstName,
                         lastName = quoteRequest.lastName,
                         email = quoteRequest.email,
@@ -93,6 +95,7 @@ class UnderwriterImpl(
                     NorwegianHomeContentsData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn!!,
+                        birthDate = quoteRequest.birthDate!!,
                         firstName = quoteRequest.firstName!!,
                         lastName = quoteRequest.lastName!!,
                         email = quoteRequest.email,
@@ -108,6 +111,7 @@ class UnderwriterImpl(
                     NorwegianTravelData(
                         id = UUID.randomUUID(),
                         ssn = quoteRequest.ssn!!,
+                        birthDate = quoteRequest.birthDate!!,
                         firstName = quoteRequest.firstName!!,
                         lastName = quoteRequest.lastName!!,
                         email = quoteRequest.email,

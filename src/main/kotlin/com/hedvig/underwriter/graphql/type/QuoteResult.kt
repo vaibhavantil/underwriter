@@ -13,6 +13,7 @@ sealed class QuoteResult {
         val lastName: String,
         val currentInsurer: CurrentInsurer?,
         val ssn: String,
+        val birthDate: LocalDate,
         val price: MonetaryAmountV2,
         val insuranceCost: InsuranceCost,
         @Deprecated("use quoteDetails")
@@ -29,6 +30,7 @@ sealed class QuoteResult {
         val id: UUID,
         val firstName: String?,
         val lastName: String?,
+        val birthDate: LocalDate?,
         val currentInsurer: CurrentInsurer?,
         val details: IncompleteQuoteDetails?,
         val startDate: LocalDate?,

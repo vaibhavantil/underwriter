@@ -80,9 +80,9 @@ interface QuoteDao {
     @SqlUpdate(
         """
             INSERT INTO quote_revision_apartment_data
-            (id, ssn, first_name, last_name, email, street, city, zip_code, household_size, living_space, sub_type)
+            (id, ssn, birth_date, first_name, last_name, email, street, city, zip_code, household_size, living_space, sub_type)
             VALUES
-            (:id, :ssn, :firstName, :lastName, :email, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
+            (:id, :ssn, :birthDate, :firstName, :lastName, :email, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
             RETURNING *
         """
     )
@@ -137,6 +137,7 @@ interface QuoteDao {
             (
                 id,
                 ssn,
+                birth_date,
                 first_name,
                 last_name,
                 email,
@@ -156,6 +157,7 @@ interface QuoteDao {
             (
                 :id,
                 :ssn,
+                :birthDate,
                 :firstName,
                 :lastName,
                 :email,
@@ -190,6 +192,7 @@ interface QuoteDao {
             (
                 id,
                 ssn,
+                birth_date,
                 first_name,
                 last_name,
                 email,
@@ -205,6 +208,7 @@ interface QuoteDao {
             (
                 :id,
                 :ssn,
+                :birthDate,
                 :firstName,
                 :lastName,
                 :email,
@@ -235,6 +239,7 @@ interface QuoteDao {
             (
                 id,
                 ssn,
+                birth_date,
                 first_name,
                 last_name,
                 email,
@@ -244,6 +249,7 @@ interface QuoteDao {
             (
                 :id,
                 :ssn,
+                :birthDate,
                 :firstName,
                 :lastName,
                 :email,

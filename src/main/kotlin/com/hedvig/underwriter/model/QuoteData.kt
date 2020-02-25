@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.util.UUID
 import org.jdbi.v3.json.Json
+import java.time.LocalDate
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
@@ -32,6 +33,7 @@ sealed class QuoteData {
 data class SwedishHouseData(
     override val id: UUID,
     override val ssn: String? = null,
+    override val birthDate: LocalDate? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
@@ -66,6 +68,7 @@ data class SwedishHouseData(
 data class SwedishApartmentData(
     override val id: UUID,
     override val ssn: String? = null,
+    override val birthDate: LocalDate? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
@@ -98,7 +101,8 @@ data class SwedishApartmentData(
 
 data class NorwegianHomeContentsData(
     override val id: UUID,
-    override val ssn: String,
+    override val ssn: String? = null,
+    override val birthDate: LocalDate,
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
@@ -130,8 +134,9 @@ data class NorwegianHomeContentsData(
 data class NorwegianTravelData(
     override val id: UUID,
     override val ssn: String? = null,
-    override val firstName: String? = null,
-    override val lastName: String? = null,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
     override val email: String? = null,
     val coInsured: Int,
     @JsonIgnore

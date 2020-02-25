@@ -8,6 +8,7 @@ import com.hedvig.underwriter.graphql.type.CurrentInsurer
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
@@ -29,6 +30,7 @@ fun Quote.getCompleteQuoteResult(
     email = email,
     currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     ssn = ssn,
+    birthDate = birthDate,
     price = MonetaryAmountV2(
         price!!.toPlainString(),
         "SEK"
@@ -56,6 +58,7 @@ fun Quote.getIncompleteQuoteResult(
     firstName = firstName,
     lastName = lastName,
     email = email,
+    birthDate = birthDate,
     currentInsurer = currentInsurer?.let { CurrentInsurer.create(it) },
     details = createIncompleteQuoteResult(
         localizationService,
