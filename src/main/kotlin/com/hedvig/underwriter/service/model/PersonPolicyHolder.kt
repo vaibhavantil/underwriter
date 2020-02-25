@@ -7,7 +7,6 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
-import com.hedvig.underwriter.model.birthDateStringFromNorwegianSsn
 import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -30,6 +29,5 @@ interface PersonPolicyHolder<T : QuoteData> {
             is SwedishHouseData -> this.ssn!!.birthDateFromSwedishSsn().until(dateToday, ChronoUnit.YEARS)
             else -> throw RuntimeException("Can't get age from QuoteData: $this")
         }
-
     }
 }

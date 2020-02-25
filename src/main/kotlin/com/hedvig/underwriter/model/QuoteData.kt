@@ -124,7 +124,6 @@ data class NorwegianHomeContentsData(
             ssn, firstName, lastName, street, zipCode, coInsured, livingSpace -> false
             else -> true
         }
-
 }
 
 data class NorwegianTravelData(
@@ -147,5 +146,4 @@ data class NorwegianTravelData(
             ssn, firstName, lastName, coInsured -> false
             else -> true
         }
-
 }
