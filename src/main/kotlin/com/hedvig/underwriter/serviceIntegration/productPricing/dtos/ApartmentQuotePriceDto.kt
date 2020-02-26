@@ -19,7 +19,7 @@ data class ApartmentQuotePriceDto(
             val quoteData = quote.data
             if (quoteData is SwedishApartmentData) {
                 return ApartmentQuotePriceDto(
-                    birthDate = quoteData.ssn!!.birthDateFromSwedishSsn(),
+                    birthDate = quoteData.birthDate ?: quoteData.ssn!!.birthDateFromSwedishSsn(),
                     livingSpace = quoteData.livingSpace!!,
                     houseHoldSize = quoteData.householdSize!!,
                     zipCode = quoteData.zipCode!!,

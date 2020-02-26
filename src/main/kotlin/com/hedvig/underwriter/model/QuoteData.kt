@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import java.time.LocalDate
 import java.util.UUID
 import org.jdbi.v3.json.Json
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = SwedishApartmentData::class, name = "apartment"),
-    JsonSubTypes.Type(value = SwedishHouseData::class, name = "house")
+    JsonSubTypes.Type(value = SwedishHouseData::class, name = "house"),
+    JsonSubTypes.Type(value = NorwegianHomeContentsData::class, name = "norwegianHomeContentsData"),
+    JsonSubTypes.Type(value = NorwegianTravelData::class, name = "norwegianTravelData")
 )
 sealed class QuoteData {
     abstract val isComplete: Boolean
@@ -30,6 +33,7 @@ sealed class QuoteData {
 data class SwedishHouseData(
     override val id: UUID,
     override val ssn: String? = null,
+    override val birthDate: LocalDate? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
@@ -64,6 +68,7 @@ data class SwedishHouseData(
 data class SwedishApartmentData(
     override val id: UUID,
     override val ssn: String? = null,
+    override val birthDate: LocalDate? = null,
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
@@ -96,7 +101,8 @@ data class SwedishApartmentData(
 
 data class NorwegianHomeContentsData(
     override val id: UUID,
-    override val ssn: String,
+    override val ssn: String? = null,
+    override val birthDate: LocalDate,
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
@@ -109,6 +115,7 @@ data class NorwegianHomeContentsData(
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     val type: NorwegianHomeContentsType,
+    @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), AddressData, PersonPolicyHolder<NorwegianHomeContentsData> {
 
@@ -116,18 +123,23 @@ data class NorwegianHomeContentsData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
-    // TODO: Let's remove the consept of complete
+    // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
-        get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
+        get() = when (null) {
+            ssn, firstName, lastName, street, zipCode, coInsured, livingSpace -> false
+            else -> true
+        }
 }
 
 data class NorwegianTravelData(
     override val id: UUID,
     override val ssn: String? = null,
-    override val firstName: String? = null,
-    override val lastName: String? = null,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
     override val email: String? = null,
     val coInsured: Int,
+    @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
 
@@ -135,7 +147,10 @@ data class NorwegianTravelData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
-    // TODO: Let's remove the consept of complete
-    override val isComplete: kotlin.Boolean
-        get() = TODO("not implemented") // To change initializer of created properties use File | Settings | File Templates.
+    // TODO: Let's remove the concept of complete
+    override val isComplete: Boolean
+        get() = when (null) {
+            ssn, firstName, lastName, coInsured -> false
+            else -> true
+        }
 }

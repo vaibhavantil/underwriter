@@ -4,6 +4,7 @@ import com.hedvig.underwriter.graphql.type.depricated.EditApartmentInput
 import com.hedvig.underwriter.graphql.type.depricated.EditHouseInput
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.util.toStockholmInstant
@@ -17,6 +18,7 @@ data class EditQuoteInput(
     val email: String?,
     val currentInsurer: String?,
     val ssn: String?,
+    val birthDate: LocalDate?,
     val startDate: LocalDate?,
     @Deprecated("Use swedishApartment")
     val apartment: EditApartmentInput?,
@@ -37,7 +39,11 @@ data class EditQuoteInput(
         lastName = this.lastName,
         email = this.email,
         currentInsurer = this.currentInsurer,
-        birthDate = this.ssn?.birthDateFromSwedishSsn(),
+        birthDate = this.birthDate ?: when {
+            this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
+            this.norweiganHomeContents != null || this.norweiganTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
+            else -> null
+        },
         ssn = this.ssn,
         productType = this.getProductType(),
         incompleteQuoteData = when {

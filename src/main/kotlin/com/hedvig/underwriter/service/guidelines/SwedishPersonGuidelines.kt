@@ -10,7 +10,8 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
         SocialSecurityNumberFormat,
         SocialSecurityDate,
         AgeRestrictionGuideline,
-        PersonalDebt(debtChecker)
+        PersonalDebt(debtChecker),
+        SocialSecurityNumberMatchesBirthDate
     )
 }
 
@@ -31,21 +32,19 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
     }
 }
 
+object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
+    override val errorMessage = "Birth date does not match SSN"
+
+    override val validate = { data: QuoteData ->
+        !LocalDate.parse(getPossibleDateFromSSN(data)).isEqual((data as PersonPolicyHolder<*>).birthDate)
+    }
+}
+
 object SocialSecurityDate : BaseGuideline<QuoteData> {
     override val errorMessage = "Invalid SSN"
 
     override val skipAfter: Boolean
         get() = true
-
-    private fun getPossibleDateFromSSN(data: QuoteData): String {
-        var trimmedInput = (data as PersonPolicyHolder<*>).ssn!!.trim()
-        trimmedInput = trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
-            4,
-            6
-        ) + "-" + trimmedInput.substring(6, 8)
-
-        return trimmedInput
-    }
 
     private fun tryParse(input: String): Boolean {
         return try {
@@ -82,4 +81,14 @@ class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
     companion object {
         const val ERROR_MESSAGE = "fails debt check"
     }
+}
+
+private fun getPossibleDateFromSSN(data: QuoteData): String {
+    var trimmedInput = (data as PersonPolicyHolder<*>).ssn!!.trim()
+    trimmedInput = trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
+        4,
+        6
+    ) + "-" + trimmedInput.substring(6, 8)
+
+    return trimmedInput
 }

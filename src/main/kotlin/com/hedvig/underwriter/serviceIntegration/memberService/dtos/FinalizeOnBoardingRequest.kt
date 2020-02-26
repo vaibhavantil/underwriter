@@ -10,7 +10,7 @@ import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 class FinalizeOnBoardingRequest(
     val memberId: String,
-    val ssn: String,
+    val ssn: String?,
     val firstName: String,
     val lastName: String,
     val email: String,
@@ -33,7 +33,7 @@ class FinalizeOnBoardingRequest(
 
                     FinalizeOnBoardingRequest(
                         memberId = quote.memberId!!,
-                        ssn = personPolicyHolder.ssn!!,
+                        ssn = personPolicyHolder.ssn,
                         firstName = personPolicyHolder.firstName!!,
                         lastName = personPolicyHolder.lastName!!,
                         email = email,
@@ -50,7 +50,7 @@ class FinalizeOnBoardingRequest(
                 is NorwegianTravelData ->
                     FinalizeOnBoardingRequest(
                         memberId = quote.memberId!!,
-                        ssn = quote.data.ssn!!,
+                        ssn = quote.data.ssn,
                         firstName = quote.data.firstName!!,
                         lastName = quote.data.lastName!!,
                         email = email,

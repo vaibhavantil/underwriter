@@ -22,7 +22,7 @@ data class HouseQuotePriceDto(
             val completeQuoteData = completeQuote.data
             if (completeQuoteData is SwedishHouseData) {
                 return HouseQuotePriceDto(
-                    birthDate = completeQuoteData.ssn!!.birthDateFromSwedishSsn(),
+                    birthDate = completeQuoteData.birthDate ?: completeQuoteData.ssn!!.birthDateFromSwedishSsn(),
                     livingSpace = completeQuoteData.livingSpace!!,
                     houseHoldSize = completeQuoteData.householdSize!!,
                     zipCode = completeQuoteData.zipCode!!,

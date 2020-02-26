@@ -30,6 +30,10 @@ val Quote.ssn
     get() = (data as? PersonPolicyHolder<*>)?.ssn
         ?: throw RuntimeException("No ssn on Quote! $this")
 
+val Quote.birthDate
+    get() = (data as? PersonPolicyHolder<*>)?.birthDate
+        ?: throw RuntimeException("No birthDate on Quote! $this")
+
 val Quote.email
     get() = (data as? PersonPolicyHolder<*>)?.email
 
@@ -190,6 +194,7 @@ data class Quote(
             data = when (data) {
                 is SwedishApartmentData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email,
@@ -200,6 +205,7 @@ data class Quote(
                 ) as QuoteData // This cast removes an IntellJ warning
                 is SwedishHouseData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email
@@ -223,6 +229,7 @@ data class Quote(
                         lastName = houseData.lastName,
                         email = houseData.email,
                         ssn = houseData.ssn,
+                        birthDate = houseData.birthDate,
                         street = houseData.street,
                         zipCode = houseData.zipCode,
                         city = houseData.city,
@@ -257,6 +264,7 @@ data class Quote(
                         lastName = apartmentData.lastName,
                         email = apartmentData.email,
                         ssn = apartmentData.ssn,
+                        birthDate = apartmentData.birthDate,
                         street = apartmentData.street,
                         zipCode = apartmentData.zipCode,
                         city = apartmentData.city,

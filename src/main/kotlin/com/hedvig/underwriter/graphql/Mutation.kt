@@ -40,12 +40,18 @@ class Mutation @Autowired constructor(
     // Do to discrepancy between the graphql schema and how the graphql library is implemented
     // we can but should never return QuoteResult.IncompleteQuote
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
-        val ssn = if (createQuoteInput.ssn.length == 10) {
-            addCenturyToSSN(createQuoteInput.ssn)
-        } else {
-            createQuoteInput.ssn
+        val input = when {
+            createQuoteInput.apartment != null || createQuoteInput.house != null ||
+            createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
+                val ssn = if (createQuoteInput.ssn!!.length == 10) {
+                    addCenturyToSSN(createQuoteInput.ssn)
+                } else {
+                    createQuoteInput.ssn
+                }
+                createQuoteInput.copy(ssn = ssn)
+            }
+            else -> createQuoteInput
         }
-        val input = createQuoteInput.copy(ssn = ssn)
 
         val completeQuote = quoteService.createQuote(
             input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),

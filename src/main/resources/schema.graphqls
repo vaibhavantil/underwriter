@@ -20,7 +20,8 @@ input CreateQuoteInput {
     firstName: String!
     lastName: String!
     currentInsurer: String
-    ssn: String!
+    ssn: String
+    birthDate: LocalDate
     startDate: LocalDate
     apartment: CreateApartmentInput @depricated(reason: "Use swedishApartment")
     house: CreateHouseInput @depricated(reason: "Use swedishHouse")
@@ -96,6 +97,7 @@ input EditQuoteInput {
     lastName: String
     currentInsurer: String
     ssn: String
+    birthDate: LocalDate
     startDate: LocalDate
     apartment: EditApartmentInput @depricated(reason: "Use swedishApartment")
     swedishApartment: EditSwedishApartmentInput
@@ -207,6 +209,7 @@ type CompleteQuote {
     firstName: String!
     lastName: String!
     ssn: String!
+    birthDate: LocalDate!
     details: CompleteQuoteDetails! @depricated(reason: "Use quoteDetails")
     quoteDetails: QuoteDetails!
     startDate: LocalDate

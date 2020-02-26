@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -23,7 +24,7 @@ data class QuoteDto(
     val state: QuoteState,
     val initiatedFrom: QuoteInitiatedFrom,
     val attributedTo: Partner,
-    val data: com.hedvig.underwriter.model.QuoteData,
+    val data: QuoteData,
     val currentInsurer: String? = null,
     val startDate: LocalDate? = null,
     val validity: Long,
@@ -35,55 +36,33 @@ data class QuoteDto(
     val signedProductId: UUID?,
     val dataCollectionId: UUID? = null
 ) {
+
+    val signMethod = when (this.data) {
+        is SwedishApartmentData, is SwedishHouseData -> SignMethod.SWEDISH_BANK_ID
+        is NorwegianHomeContentsData, is NorwegianTravelData -> SignMethod.NORWEGIAN_BANK_ID
+    }
+
     companion object {
         fun fromQuote(quote: Quote): QuoteDto {
-            return when (quote.data) {
-                is SwedishApartmentData -> {
-                    QuoteDto(
-                        id = quote.id,
-                        createdAt = quote.createdAt,
-                        price = quote.price,
-                        productType = quote.productType,
-                        state = quote.state,
-                        initiatedFrom = quote.initiatedFrom,
-                        attributedTo = quote.attributedTo,
-                        data = quote.data,
-                        currentInsurer = quote.currentInsurer,
-                        startDate = quote.startDate,
-                        validity = quote.validity,
-                        memberId = quote.memberId,
-                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
-                        isComplete = quote.isComplete,
-                        originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId,
-                        dataCollectionId = quote.dataCollectionId
-                    )
-                }
-
-                is SwedishHouseData -> {
-                    QuoteDto(
-                        id = quote.id,
-                        createdAt = quote.createdAt,
-                        price = quote.price,
-                        productType = quote.productType,
-                        state = quote.state,
-                        initiatedFrom = quote.initiatedFrom,
-                        attributedTo = quote.attributedTo,
-                        data = quote.data,
-                        currentInsurer = quote.currentInsurer,
-                        startDate = quote.startDate,
-                        validity = quote.validity,
-                        memberId = quote.memberId,
-                        breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
-                        isComplete = quote.isComplete,
-                        originatingProductId = quote.originatingProductId,
-                        signedProductId = quote.signedProductId,
-                        dataCollectionId = quote.dataCollectionId
-                    )
-                }
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
-            }
+            return QuoteDto(
+                id = quote.id,
+                createdAt = quote.createdAt,
+                price = quote.price,
+                productType = quote.productType,
+                state = quote.state,
+                initiatedFrom = quote.initiatedFrom,
+                attributedTo = quote.attributedTo,
+                data = quote.data,
+                currentInsurer = quote.currentInsurer,
+                startDate = quote.startDate,
+                validity = quote.validity,
+                memberId = quote.memberId,
+                breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
+                isComplete = quote.isComplete,
+                originatingProductId = quote.originatingProductId,
+                signedProductId = quote.signedProductId,
+                dataCollectionId = quote.dataCollectionId
+            )
         }
     }
 }
