@@ -12,6 +12,8 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import java.lang.RuntimeException
+import java.math.BigDecimal
+import kotlin.random.Random
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
@@ -34,11 +36,11 @@ class ProductPricingServiceImpl @Autowired constructor(
     }
 
     override fun priceFromProductPricingForNorwegianHomeContentsQuote(norwegianHomeContentsQuotePriceDto: NorwegianHomeContentsQuotePriceDto): QuotePriceResponseDto {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+        return QuotePriceResponseDto(BigDecimal(Random.nextInt(9000, 9999).plus(0.42)))
     }
 
     override fun priceFromProductPricingForNorwegianTravelQuote(norwegianTravelQuotePriceDto: NorwegianTravelQuotePriceDto): QuotePriceResponseDto {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+        return QuotePriceResponseDto(BigDecimal(Random.nextInt(9000, 9999).plus(0.42)))
     }
 
     override fun signedQuote(
