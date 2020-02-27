@@ -12,12 +12,12 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import java.lang.RuntimeException
+import java.math.BigDecimal
+import kotlin.random.Random
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
-import kotlin.random.Random
 
 @Service
 @EnableFeignClients
