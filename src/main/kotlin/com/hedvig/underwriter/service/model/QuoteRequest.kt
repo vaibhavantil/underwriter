@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
+import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate
@@ -47,7 +49,13 @@ data class QuoteRequest(
                 lastName = quoteRequestDto.lastName,
                 email = quoteRequestDto.email,
                 currentInsurer = quoteRequestDto.currentInsurer,
-                birthDate = quoteRequestDto.birthDate,
+                birthDate = quoteRequestDto.birthDate ?: when {
+                    quoteRequestDto.incompleteApartmentQuoteData != null ||
+                        quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.ssn?.birthDateFromSwedishSsn()
+                    quoteRequestDto.norwegianHomeContentsData != null ||
+                        quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.ssn?.birthDateFromNorwegianSsn()
+                    else -> null
+                },
                 ssn = quoteRequestDto.ssn,
                 quotingPartner = quoteRequestDto.quotingPartner,
                 incompleteQuoteData = when {

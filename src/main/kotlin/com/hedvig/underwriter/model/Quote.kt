@@ -8,6 +8,9 @@ import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianHomeContents
+import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianTravel
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import com.hedvig.underwriter.util.toStockholmLocalDate
@@ -202,94 +205,129 @@ data class Quote(
                         is SwedishApartment? -> quoteData?.subType ?: data.subType
                         else -> null
                     }
-                ) as QuoteData // This cast removes an IntellJ warning
+                )
                 is SwedishHouseData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email
-                ) as QuoteData // This cast removes an IntellJ warning
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
+                )
+                is NorwegianHomeContentsData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
+                )
+                is NorwegianTravelData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
+                )
             }
         )
 
-        val requestData = quoteRequest.incompleteQuoteData
-        if (
-            requestData is SwedishApartment
-        ) {
-            val newQuoteData: SwedishApartmentData = when (newQuote.data) {
-                is SwedishApartmentData -> newQuote.data as SwedishApartmentData
-                is SwedishHouseData -> {
-                    val houseData = newQuote.data as SwedishHouseData
-                    SwedishApartmentData(
-                        id = houseData.id,
-                        firstName = houseData.firstName,
-                        lastName = houseData.lastName,
-                        email = houseData.email,
-                        ssn = houseData.ssn,
-                        birthDate = houseData.birthDate,
-                        street = houseData.street,
-                        zipCode = houseData.zipCode,
-                        city = houseData.city,
-                        householdSize = houseData.householdSize,
-                        livingSpace = houseData.livingSpace
-                    )
+        when (val requestData = quoteRequest.incompleteQuoteData) {
+            is SwedishApartment -> {
+                val newQuoteData: SwedishApartmentData = when (val data = newQuote.data) {
+                    is SwedishApartmentData -> data
+                    is SwedishHouseData -> {
+                        SwedishApartmentData(
+                            id = data.id,
+                            firstName = data.firstName,
+                            lastName = data.lastName,
+                            email = data.email,
+                            ssn = data.ssn,
+                            birthDate = data.birthDate,
+                            street = data.street,
+                            zipCode = data.zipCode,
+                            city = data.city,
+                            householdSize = data.householdSize,
+                            livingSpace = data.livingSpace
+                        )
+                    }
+                    else -> throw IllegalTypeCangeOnQuote(newQuote.data, requestData)
                 }
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
-            }
-            newQuote = newQuote.copy(
-                data = newQuoteData.copy(
-                    street = requestData.street ?: newQuoteData.street,
-                    zipCode = requestData.zipCode ?: newQuoteData.zipCode,
-                    city = requestData.city ?: newQuoteData.city,
-                    householdSize = requestData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
-                    subType = requestData.subType ?: newQuoteData.subType
-                )
-            )
-        }
-        if (
-            requestData is SwedishHouse
-        ) {
-            val newQuoteData: SwedishHouseData = when (newQuote.data) {
-                is SwedishHouseData -> newQuote.data as SwedishHouseData
-                is SwedishApartmentData -> {
-                    val apartmentData = newQuote.data as SwedishApartmentData
-                    SwedishHouseData(
-                        id = apartmentData.id,
-                        firstName = apartmentData.firstName,
-                        lastName = apartmentData.lastName,
-                        email = apartmentData.email,
-                        ssn = apartmentData.ssn,
-                        birthDate = apartmentData.birthDate,
-                        street = apartmentData.street,
-                        zipCode = apartmentData.zipCode,
-                        city = apartmentData.city,
-                        householdSize = apartmentData.householdSize,
-                        livingSpace = apartmentData.livingSpace
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        city = requestData.city ?: newQuoteData.city,
+                        householdSize = requestData.householdSize ?: newQuoteData.householdSize,
+                        livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                        subType = requestData.subType ?: newQuoteData.subType
                     )
-                }
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
-            }
-            newQuote = newQuote.copy(
-                data = newQuoteData.copy(
-                    street = requestData.street ?: newQuoteData.street,
-                    zipCode = requestData.zipCode ?: newQuoteData.zipCode,
-                    city = requestData.city ?: newQuoteData.city,
-                    householdSize = requestData.householdSize ?: newQuoteData.householdSize,
-                    livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
-                    numberOfBathrooms = requestData.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
-                    isSubleted = requestData.isSubleted ?: newQuoteData.isSubleted,
-                    extraBuildings = requestData.extraBuildings?.map((ExtraBuilding)::from)
-                        ?: newQuoteData.extraBuildings,
-                    ancillaryArea = requestData.ancillaryArea ?: newQuoteData.ancillaryArea,
-                    yearOfConstruction = requestData.yearOfConstruction ?: newQuoteData.yearOfConstruction
                 )
-            )
+            }
+            is SwedishHouse -> {
+                val newQuoteData: SwedishHouseData = when (val data = newQuote.data) {
+                    is SwedishHouseData -> newQuote.data as SwedishHouseData
+                    is SwedishApartmentData -> {
+                        SwedishHouseData(
+                            id = data.id,
+                            firstName = data.firstName,
+                            lastName = data.lastName,
+                            email = data.email,
+                            ssn = data.ssn,
+                            birthDate = data.birthDate,
+                            street = data.street,
+                            zipCode = data.zipCode,
+                            city = data.city,
+                            householdSize = data.householdSize,
+                            livingSpace = data.livingSpace
+                        )
+                    }
+                    else -> throw IllegalTypeCangeOnQuote(newQuote.data, requestData)
+                }
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        city = requestData.city ?: newQuoteData.city,
+                        householdSize = requestData.householdSize ?: newQuoteData.householdSize,
+                        livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                        numberOfBathrooms = requestData.numberOfBathrooms ?: newQuoteData.numberOfBathrooms,
+                        isSubleted = requestData.isSubleted ?: newQuoteData.isSubleted,
+                        extraBuildings = requestData.extraBuildings?.map((ExtraBuilding)::from)
+                            ?: newQuoteData.extraBuildings,
+                        ancillaryArea = requestData.ancillaryArea ?: newQuoteData.ancillaryArea,
+                        yearOfConstruction = requestData.yearOfConstruction ?: newQuoteData.yearOfConstruction
+                    )
+                )
+            }
+            is NorwegianHomeContents -> {
+                val newQuoteData: NorwegianHomeContentsData = when (newQuote.data) {
+                    is NorwegianHomeContentsData -> newQuote.data as NorwegianHomeContentsData
+                    else -> throw IllegalTypeCangeOnQuote(newQuote.data, requestData)
+                }
+
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        city = requestData.city ?: newQuoteData.city,
+                        livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured,
+                        isStudent = requestData.isStudent ?: newQuoteData.isStudent,
+                        type = requestData.type ?: newQuoteData.type
+                    )
+                )
+            }
+            is NorwegianTravel -> {
+                val newQuoteData: NorwegianTravelData = when (newQuote.data) {
+                    is NorwegianHomeContentsData -> newQuote.data as NorwegianTravelData
+                    else -> throw IllegalTypeCangeOnQuote(newQuote.data, requestData)
+                }
+
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured
+                    )
+                )
+            }
         }
         return newQuote
     }
@@ -394,10 +432,18 @@ data class Quote(
             CompleteQuoteDetails.UnknownQuoteDetails()
         } ?: this.norwegianTravel?.let {
             CompleteQuoteDetails.UnknownQuoteDetails()
-        } ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
+        }
+        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
 
     companion object {
         private const val SEK = "SEK"
         private const val NOK = "NOK"
     }
 }
+
+class IllegalTypeCangeOnQuote(
+    quoteData: QuoteData,
+    requestData: QuoteRequestData
+) : Exception(
+    "Illegal to cange from type [${quoteData::class}] to [${requestData::class}]. [QuoteData: $quoteData] [QuoteRequestData: $requestData]"
+)
