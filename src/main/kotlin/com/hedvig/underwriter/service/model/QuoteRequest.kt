@@ -50,7 +50,8 @@ data class QuoteRequest(
                 email = quoteRequestDto.email,
                 currentInsurer = quoteRequestDto.currentInsurer,
                 birthDate = quoteRequestDto.birthDate ?: when {
-                    quoteRequestDto.incompleteApartmentQuoteData != null ||
+                    quoteRequestDto.incompleteQuoteData != null ||
+                        quoteRequestDto.incompleteApartmentQuoteData != null ||
                         quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.ssn?.birthDateFromSwedishSsn()
                     quoteRequestDto.norwegianHomeContentsData != null ||
                         quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.ssn?.birthDateFromNorwegianSsn()
