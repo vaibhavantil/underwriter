@@ -433,7 +433,7 @@ data class Quote(
         } ?: this.norwegianTravel?.let {
             CompleteQuoteDetails.UnknownQuoteDetails()
         }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse` data")
+        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
     companion object {
         private const val SEK = "SEK"
