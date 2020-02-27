@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.hedvig.underwriter.testhelp.JdbiRule
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
@@ -12,7 +13,6 @@ import org.jdbi.v3.jackson2.Jackson2Config
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
 
 class QuoteRepositoryImplTest {
     @get:Rule
@@ -513,7 +513,6 @@ class QuoteRepositoryImplTest {
 
         assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
     }
-
 
     @Test
     fun updatesNorwegianTravelQuotes() {
