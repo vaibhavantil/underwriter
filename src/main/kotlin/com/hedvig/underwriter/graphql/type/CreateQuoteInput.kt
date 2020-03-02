@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.hedvig.underwriter.graphql.type.depricated.CreateApartmentInput
 import com.hedvig.underwriter.graphql.type.depricated.CreateHouseInput
 import com.hedvig.underwriter.model.Partner
@@ -61,6 +62,7 @@ data class CreateQuoteInput(
     dataCollectionId = this.dataCollectionId
     )
 
+    @JsonIgnore
     fun getProductType(): ProductType =
         this.apartment?.let {
             ProductType.APARTMENT
