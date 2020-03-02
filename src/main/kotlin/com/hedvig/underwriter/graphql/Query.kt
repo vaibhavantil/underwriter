@@ -5,12 +5,9 @@ import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import graphql.schema.DataFetchingEnvironment
 import java.util.UUID
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
