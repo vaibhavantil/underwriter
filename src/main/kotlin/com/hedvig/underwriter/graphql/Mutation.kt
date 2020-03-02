@@ -25,7 +25,6 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -120,7 +119,6 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val quote = errorOrQuote.b
 
-
                 typeMapper.mapToCompleteQuoteResult(
                     quote,
                     when (quote.data) {
@@ -138,9 +136,6 @@ class Mutation @Autowired constructor(
                     },
                     textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
-
-
-
             }
         }
 

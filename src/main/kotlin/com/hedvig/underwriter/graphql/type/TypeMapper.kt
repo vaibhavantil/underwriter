@@ -117,72 +117,72 @@ class TypeMapper(
             ExtraBuildingType.GARAGE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingGarage(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.CARPORT -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingCarport(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.SHED -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingShed(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.STOREHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingStorehouse(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.FRIGGEBOD -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingFriggebod(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.ATTEFALL -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingAttefall(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.OUTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingOuthouse(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.GUESTHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingGuesthouse(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.GAZEBO -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingGazebo(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.GREENHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingGreenhouse(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.SAUNA -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingSauna(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.BARN -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingBarn(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.BOATHOUSE -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingBoathouse(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
             ExtraBuildingType.OTHER -> com.hedvig.underwriter.graphql.type.ExtraBuilding.ExtraBuildingOther(
                 area = extraBuilding.area,
                 hasWaterConnected = extraBuilding.hasWaterConnected,
-                displayName = extraBuilding.type.getDisplayName(localizationService, locale)
+                displayName = extractDisplayName(extraBuilding.type, locale)
             )
         }
     }
@@ -279,4 +279,6 @@ class TypeMapper(
             CompleteQuoteDetails.UnknownQuoteDetails()
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
+
+    private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String = localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
 }
