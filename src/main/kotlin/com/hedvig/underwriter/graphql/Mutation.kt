@@ -29,11 +29,11 @@ import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
+import java.math.BigDecimal
 import java.time.LocalDate
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.math.BigDecimal
 
 @Component
 class Mutation @Autowired constructor(
@@ -128,7 +128,7 @@ class Mutation @Autowired constructor(
                         env,
                         localizationService,
                         textKeysLocaleResolver,
-                        //TODO once campaign service is up to speed lets remove this when
+                        // TODO once campaign service is up to speed lets remove this when
                         when (quote.data) {
                             is SwedishHouseData,
                             is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
