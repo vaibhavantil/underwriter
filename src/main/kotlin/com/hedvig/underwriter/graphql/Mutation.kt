@@ -87,10 +87,7 @@ class Mutation @Autowired constructor(
                     env,
                     localizationService,
                     textKeysLocaleResolver,
-                    productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, quote.currency),
-                        env.getToken()
-                    )
+                    quoteService.calculateInsuranceCost(quote)
                 )
             }
         }
@@ -128,21 +125,7 @@ class Mutation @Autowired constructor(
                         env,
                         localizationService,
                         textKeysLocaleResolver,
-                        // TODO once campaign service is up to speed lets remove this when
-                        when (quote.data) {
-                            is SwedishHouseData,
-                            is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
-                                Money.of(quote.price, "SEK"), env.getToken()
-                            )
-                            is NorwegianHomeContentsData,
-                            is NorwegianTravelData -> InsuranceCost(
-                                monthlyGross = MonetaryAmountV2.Companion.of(quote.price!!, "NOK"),
-                                monthlyDiscount = MonetaryAmountV2.Companion.of(BigDecimal.ZERO, "NOK"),
-                                monthlyNet = MonetaryAmountV2.Companion.of(quote.price, "NOK"),
-                                freeUntil = null
-                            )
-                        }
-
+                        quoteService.calculateInsuranceCost(quote)
                     )
                 } else {
                     quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)

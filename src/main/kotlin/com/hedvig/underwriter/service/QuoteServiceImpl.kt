@@ -2,10 +2,16 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
@@ -17,10 +23,13 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import org.javamoney.moneta.Money
 import java.time.LocalDate
 import java.util.UUID
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import java.lang.RuntimeException
+import java.math.BigDecimal
 
 @Service
 class QuoteServiceImpl(
@@ -218,5 +227,25 @@ class QuoteServiceImpl(
             )
         }
         return null
+    }
+
+    override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
+        val memberId = quote.memberId
+            ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
+
+        // TODO once campaign service is up to speed lets remove this when
+        return when (quote.data) {
+            is SwedishHouseData,
+            is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
+                Money.of(quote.price, "SEK"), memberId
+            )
+            is NorwegianHomeContentsData,
+            is NorwegianTravelData -> InsuranceCost(
+                monthlyGross = MonetaryAmountV2.of(quote.price!!, "NOK"),
+                monthlyDiscount = MonetaryAmountV2.of(BigDecimal.ZERO, "NOK"),
+                monthlyNet = MonetaryAmountV2.of(quote.price, "NOK"),
+                freeUntil = null
+            )
+        }
     }
 }

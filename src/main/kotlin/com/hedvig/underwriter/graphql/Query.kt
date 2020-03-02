@@ -17,10 +17,8 @@ import org.springframework.stereotype.Component
 @Component
 class Query @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
     private val localizationService: LocalizationService,
-    private val textKeysLocaleResolver: TextKeysLocaleResolver,
-    private val quoteRepository: QuoteRepository
+    private val textKeysLocaleResolver: TextKeysLocaleResolver
 ) : GraphQLQueryResolver {
 
     // Do to discrepancy between the graphql schema and how the graphql library is implemented
@@ -40,10 +38,7 @@ class Query @Autowired constructor(
                 env,
                 localizationService,
                 textKeysLocaleResolver,
-                productPricingService.calculateInsuranceCost(
-                    Money.of(price!!, "SEK"),
-                    env.getToken()
-                )
+                quoteService.calculateInsuranceCost(this)
             )
         }
         else -> {
