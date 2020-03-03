@@ -40,9 +40,6 @@ import org.springframework.http.ResponseEntity
 class QuoteServiceImplTest {
 
     @MockK
-    lateinit var quoteService: QuoteService
-
-    @MockK
     lateinit var underwriter: Underwriter
 
     @MockK
@@ -54,77 +51,16 @@ class QuoteServiceImplTest {
     @MockK
     lateinit var quoteRepository: QuoteRepository
 
-    @MockK
-    lateinit var customerIO: CustomerIO
-
-    @MockK
-    lateinit var env: Environment
-
-    lateinit var cut: SignService
+    lateinit var cut: QuoteService
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        cut = SignServiceImpl(quoteService, quoteRepository, memberService, productPricingService, customerIO, env)
-    }
-
-    @Test
-    fun givenPartnerSendsPartnerIdToCustomerIO() {
-        val quoteId = UUID.randomUUID()
-        val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
-
-        every { quoteRepository.find(any()) } returns quote
-        every { quoteRepository.update(any(), any()) } returnsArgument 0
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
-
-        every { memberService.createMember() } returns "1234"
-        every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
-                any()
-            )
-        } returns SignedProductResponseDto(UUID.randomUUID())
-        every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
-        every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
-        every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
-
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
-        verify { customerIO.postSignUpdate(ofType(Quote::class)) }
-    }
-
-    @Test
-    fun givenPartnerIsHedvigSendPartnerIdToCustomerIO() {
-        val quoteId = UUID.randomUUID()
-        val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
-
-        every { quoteRepository.find(any()) } returns quote
-        every { quoteRepository.update(any(), any()) } returnsArgument 0
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
-
-        every { memberService.createMember() } returns "1234"
-        every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
-                any()
-            )
-        } returns SignedProductResponseDto(UUID.randomUUID())
-        every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
-        every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
-
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
-        verify { customerIO.postSignUpdate(any()) }
+        cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository)
     }
 
     @Test
     fun activatesQuoteByCreatingModifiedProduct() {
-        val service = QuoteServiceImpl(
-            underwriter = underwriter,
-            memberService = memberService,
-            productPricingService = productPricingService,
-            quoteRepository = quoteRepository
-        )
 
         val quote = a.QuoteBuilder(originatingProductId = UUID.randomUUID(), memberId = "12345").build()
 
@@ -143,7 +79,7 @@ class QuoteServiceImplTest {
         } returns signedQuote
         every { productPricingService.createModifiedProductFromQuote(any()) } returns createdProductResponse
 
-        val result = service.activateQuote(
+        val result = cut.activateQuote(
             completeQuoteId = quote.id,
             activationDate = LocalDate.now().plusDays(10)
         )
