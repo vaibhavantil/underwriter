@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service
 @Service
 class SignServiceImpl(
     val quoteService: QuoteService,
+    //FIXME: SignService should only use quoteService in my opinion, but I'm not up for doing that refactor now.
     val quoteRepository: QuoteRepository,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
@@ -108,6 +110,10 @@ class SignServiceImpl(
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
+    }
+
+    override fun startSigningQuotes(quoteIds: List<UUID>): StartSignResponse {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun signQuoteWithMemberId(

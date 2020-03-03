@@ -5,9 +5,13 @@ import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
@@ -18,6 +22,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,13 +52,15 @@ class SignServiceImplTest {
     lateinit var quoteRepository: QuoteRepository
 
     @MockK
+    lateinit var signSessionRepository: SignSessionRepository
+
+    @MockK
     lateinit var customerIO: CustomerIO
 
     @MockK
     lateinit var env: Environment
 
     lateinit var cut: SignService
-
 
     @Before
     fun setUp() {
@@ -108,5 +115,80 @@ class SignServiceImplTest {
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
+    }
+
+    @Test
+    fun startSigningOfSwedishQuote_startSwedishSign() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0]).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse.Success("autoStartToken")
+
+        val result = cut.startSigningQuotes(quoteIds)
+
+        assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
+    }
+
+    @Test
+    fun startSigningOfSwedishQuotes_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0]).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse.Failed("some error")
+
+        val result = cut.startSigningQuotes(quoteIds)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
+    fun startSigningOfNorwegianQuote_startNorwegianSign() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder()).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse.Success("redirect url")
+
+        val result = cut.startSigningQuotes(quoteIds)
+
+        assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+    }
+
+    @Test
+    fun startSigningOfNorwegianQuotes_startNorwegianSign() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder()).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianTravelDataBuilder()).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse.Success("redirect url")
+
+        val result = cut.startSigningQuotes(quoteIds)
+
+        assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+    }
+
+    @Test
+    fun startSigningOfSwedishAndNorwegianQuotes_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder()).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.SwedishHouseDataBuilder()).build()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds)
+
+        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 }

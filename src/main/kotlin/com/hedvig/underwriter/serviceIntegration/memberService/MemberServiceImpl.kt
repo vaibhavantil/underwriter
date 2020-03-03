@@ -7,6 +7,8 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClientResponseException
+import java.util.UUID
 
 @Service
 @EnableFeignClients
@@ -71,5 +74,13 @@ class MemberServiceImpl @Autowired constructor(
     override fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String?) {
         logger.debug("Finalizing web on boarding by populating member-service")
         client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
+    }
+
+    override fun startSwedishBankIdSignQuotes(underwriterSessionReference: UUID): StartSwedishBankIdSignResponse {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun startNorwegianBankIdSignQuotes(underwriterSessionReference: UUID): StartNorwegianBankIdSignResponse {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
