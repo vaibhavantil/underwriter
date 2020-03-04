@@ -3,6 +3,8 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.getOrElse
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.Quote
@@ -22,9 +24,11 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -147,5 +151,29 @@ class QuoteServiceImplTest {
         assertThat(result).isInstanceOf(Either.Right::class.java)
         assertThat(result.getOrElse { null }).isEqualTo(signedQuote)
         verify(exactly = 1) { productPricingService.createModifiedProductFromQuote(any()) } // FIXME better assertion?
+    }
+
+    @Test
+    fun calculateInsuranceCost() {
+        val service = QuoteServiceImpl(
+            underwriter = underwriter,
+            memberService = memberService,
+            productPricingService = productPricingService,
+            quoteRepository = quoteRepository
+        )
+
+        every { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") } returns
+            InsuranceCost(
+                MonetaryAmountV2.of(BigDecimal.TEN, "SEK"),
+                MonetaryAmountV2.of(BigDecimal.ZERO, "SEK"),
+                MonetaryAmountV2.of(BigDecimal.TEN, "SEK"),
+                null
+            )
+
+        val quote = a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
+
+        val result = service.calculateInsuranceCost(quote)
+
+        verify(exactly = 1) { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") }
     }
 }

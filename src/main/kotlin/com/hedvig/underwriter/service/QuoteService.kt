@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -44,4 +45,6 @@ interface QuoteService {
     ): Either<ErrorResponseDto, Quote>
 
     fun getQuoteStateNotSignableErrorOrNull(quote: Quote): ErrorResponseDto?
+
+    fun calculateInsuranceCost(quote: Quote): InsuranceCost
 }

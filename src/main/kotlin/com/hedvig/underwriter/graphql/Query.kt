@@ -7,17 +7,14 @@ import com.hedvig.localization.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import graphql.schema.DataFetchingEnvironment
 import java.util.UUID
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class Query @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLQueryResolver {
@@ -32,12 +29,10 @@ class Query @Autowired constructor(
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
         ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
 
+
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
-        productPricingService.calculateInsuranceCost(
-            Money.of(price!!, "SEK"),
-            env.getToken()
-        ),
+        quoteService.calculateInsuranceCost(this),
         textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
     )
 }

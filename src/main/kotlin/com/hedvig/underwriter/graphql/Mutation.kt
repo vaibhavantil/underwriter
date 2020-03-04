@@ -3,43 +3,32 @@ package com.hedvig.underwriter.graphql
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
-import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.localization.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.isAndroid
 import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
-import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
-import java.math.BigDecimal
-import java.time.LocalDate
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
@@ -82,10 +71,7 @@ class Mutation @Autowired constructor(
 
                 typeMapper.mapToCompleteQuoteResult(
                     quote,
-                    productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, quote.currency),
-                        env.getToken()
-                    ),
+                    quoteService.calculateInsuranceCost(quote),
                     textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
             }
@@ -113,7 +99,10 @@ class Mutation @Autowired constructor(
             env
         )
 
-    private fun responseForEditedQuote(errorOrQuote: Either<ErrorResponseDto, Quote>, env: DataFetchingEnvironment): CreateQuoteResult =
+    private fun responseForEditedQuote(
+        errorOrQuote: Either<ErrorResponseDto, Quote>,
+        env: DataFetchingEnvironment
+    ): CreateQuoteResult =
         when (errorOrQuote) {
             is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
             is Either.Right -> {
@@ -121,19 +110,7 @@ class Mutation @Autowired constructor(
 
                 typeMapper.mapToCompleteQuoteResult(
                     quote,
-                    when (quote.data) {
-                        is SwedishHouseData,
-                        is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
-                            Money.of(quote.price, "SEK"), env.getToken()
-                        )
-                        is NorwegianHomeContentsData,
-                        is NorwegianTravelData -> InsuranceCost(
-                            monthlyGross = MonetaryAmountV2.Companion.of(quote.price!!, "NOK"),
-                            monthlyDiscount = MonetaryAmountV2.Companion.of(BigDecimal.ZERO, "NOK"),
-                            monthlyNet = MonetaryAmountV2.Companion.of(quote.price, "NOK"),
-                            freeUntil = null
-                        )
-                    },
+                    quoteService.calculateInsuranceCost(quote),
                     textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
             }
