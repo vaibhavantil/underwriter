@@ -6,11 +6,13 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
@@ -38,6 +40,7 @@ class SignServiceImpl(
     val quoteRepository: QuoteRepository,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
+    val signSessionRepository: SignSessionRepository,
     val customerIO: CustomerIO,
     val env: Environment
 ) : SignService {
@@ -113,7 +116,12 @@ class SignServiceImpl(
     }
 
     override fun startSigningQuotes(quoteIds: List<UUID>): StartSignResponse {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val signSessionId = signSessionRepository.insert(quoteIds)
+
+        return when (val response = memberService.startSwedishBankIdSignQuotes(signSessionId)) {
+            is StartSwedishBankIdSignResponse.Success -> StartSignResponse.SwedishBankIdSession(signSessionId, response.autoStartToken)
+            is StartSwedishBankIdSignResponse.Failed -> TODO()
+        }
     }
 
     private fun signQuoteWithMemberId(
