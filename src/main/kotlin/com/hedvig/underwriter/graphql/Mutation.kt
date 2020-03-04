@@ -33,8 +33,6 @@ class Mutation @Autowired constructor(
     private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
 
-    // Do to discrepancy between the graphql schema and how the graphql library is implemented
-    // we can but should never return QuoteResult.IncompleteQuote
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
         val input = when {
             createQuoteInput.apartment != null || createQuoteInput.house != null ||

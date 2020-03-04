@@ -18,9 +18,7 @@ class Query @Autowired constructor(
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLQueryResolver {
-
-    // Do to discrepancy between the graphql schema and how the graphql library is implemented
-    // we can but should never return QuoteResult.UnderwritingLimitsHit
+    
     fun quote(id: UUID, env: DataFetchingEnvironment) = quoteService.getQuote(id)?.let { quote ->
         quote.toResult(env)
     } ?: throw IllegalStateException("No quote with id '$id' was found!")
