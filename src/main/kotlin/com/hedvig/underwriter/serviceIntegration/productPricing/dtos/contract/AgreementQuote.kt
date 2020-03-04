@@ -89,7 +89,7 @@ sealed class AgreementQuote(
                     city = quote.data.city,
                     country = CountryCode.SE
                 ),
-                coInsured = List(quote.data.householdSize!! -1) { CoInsuredDto(null, null, null) },
+                coInsured = List(quote.data.householdSize!! - 1) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace!!.toLong(),
                 lineOfBusiness = SwedishApartmentLineOfBusiness.from(quote.data.subType!!)
             )
@@ -105,7 +105,7 @@ sealed class AgreementQuote(
                     city = quote.data.city,
                     country = CountryCode.SE
                 ),
-                coInsured = List(quote.data.householdSize!! -1) { CoInsuredDto(null, null, null) },
+                coInsured = List(quote.data.householdSize!! - 1) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace!!.toLong(),
                 ancillaryArea = quote.data.ancillaryArea!!.toLong(),
                 yearOfConstruction = quote.data.yearOfConstruction!!,
