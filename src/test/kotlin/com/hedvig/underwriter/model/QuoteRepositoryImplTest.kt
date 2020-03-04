@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.hedvig.underwriter.testhelp.JdbiRule
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaGetter
@@ -458,6 +459,90 @@ class QuoteRepositoryImplTest {
         val updatedQuote = quote.copy(
             state = QuoteState.SIGNED,
             data = (quote.data as SwedishHouseData).copy(
+                firstName = "John",
+                lastName = "Watson"
+            ),
+            memberId = "123456"
+        )
+        quoteDao.update(updatedQuote)
+
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun updatesNorwegianHomContentsQuotes() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = NorwegianHomeContentsData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "12121212120",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                city = "London",
+                id = UUID.randomUUID(),
+                isStudent = false,
+                coInsured = 1,
+                type = NorwegianHomeContentsType.OWN,
+                email = "em@i.l"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null
+        )
+        quoteDao.insert(quote, timestamp)
+
+        val updatedQuote = quote.copy(
+            state = QuoteState.SIGNED,
+            data = (quote.data as NorwegianHomeContentsData).copy(
+                firstName = "John",
+                lastName = "Watson"
+            ),
+            memberId = "123456"
+        )
+        quoteDao.update(updatedQuote)
+
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun updatesNorwegianTravelQuotes() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = NorwegianTravelData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "12121212120",
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null
+        )
+        quoteDao.insert(quote, timestamp)
+
+        val updatedQuote = quote.copy(
+            state = QuoteState.SIGNED,
+            data = (quote.data as NorwegianTravelData).copy(
                 firstName = "John",
                 lastName = "Watson"
             ),

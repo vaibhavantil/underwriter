@@ -2,7 +2,6 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
-import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.service.LocalizationService
 import com.hedvig.service.TextKeysLocaleResolver
@@ -24,7 +23,6 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
 import graphql.servlet.context.GraphQLServletContext
 import java.time.LocalDate
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -42,7 +40,7 @@ class Mutation @Autowired constructor(
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
         val input = when {
             createQuoteInput.apartment != null || createQuoteInput.house != null ||
-            createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
+                createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
                 val ssn = if (createQuoteInput.ssn!!.length == 10) {
                     addCenturyToSSN(createQuoteInput.ssn)
                 } else {
@@ -80,10 +78,7 @@ class Mutation @Autowired constructor(
                     env,
                     localizationService,
                     textKeysLocaleResolver,
-                    productPricingService.calculateInsuranceCost(
-                        Money.of(quote.price, quote.currency),
-                        env.getToken()
-                    )
+                    quoteService.calculateInsuranceCost(quote)
                 )
             }
         }
@@ -121,9 +116,7 @@ class Mutation @Autowired constructor(
                         env,
                         localizationService,
                         textKeysLocaleResolver,
-                        productPricingService.calculateInsuranceCost(
-                            Money.of(quote.price, "SEK"), env.getToken()
-                        )
+                        quoteService.calculateInsuranceCost(quote)
                     )
                 } else {
                     quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
