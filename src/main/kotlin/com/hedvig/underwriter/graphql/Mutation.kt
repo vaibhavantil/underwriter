@@ -6,7 +6,7 @@ import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
-import com.hedvig.service.TextKeysLocaleResolver
+import com.hedvig.localization.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.isAndroid
 import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput

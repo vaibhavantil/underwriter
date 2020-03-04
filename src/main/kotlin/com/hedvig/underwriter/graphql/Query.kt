@@ -3,7 +3,7 @@ package com.hedvig.underwriter.graphql
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
-import com.hedvig.service.TextKeysLocaleResolver
+import com.hedvig.localization.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
