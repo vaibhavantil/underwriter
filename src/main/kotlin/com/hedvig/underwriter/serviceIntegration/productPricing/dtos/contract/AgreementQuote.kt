@@ -19,7 +19,6 @@ import java.util.UUID
     JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel")
 )
 sealed class AgreementQuote {
-
     abstract val quoteId: UUID
     abstract val fromDate: LocalDate?
     abstract val toDate: LocalDate?

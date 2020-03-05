@@ -16,17 +16,13 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlready
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
@@ -35,6 +31,9 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
 class QuoteServiceImplTest {
@@ -79,11 +78,11 @@ class QuoteServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
+            productPricingService.createContract(
+                any(),
                 any()
             )
-        } returns SignedProductResponseDto(UUID.randomUUID())
+        } returns listOf(CreateContractResponse(contractId = UUID.randomUUID(), quoteId = quoteId))
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
@@ -104,11 +103,11 @@ class QuoteServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
+            productPricingService.createContract(
+                any(),
                 any()
             )
-        } returns SignedProductResponseDto(UUID.randomUUID())
+        } returns listOf(CreateContractResponse(contractId = UUID.randomUUID(), quoteId = quoteId))
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         every { env.activeProfiles } returns arrayOf<String>()
