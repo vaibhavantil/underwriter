@@ -18,7 +18,7 @@ class Query @Autowired constructor(
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLQueryResolver {
-    
+
     fun quote(id: UUID, env: DataFetchingEnvironment) = quoteService.getQuote(id)?.let { quote ->
         quote.toResult(env)
     } ?: throw IllegalStateException("No quote with id '$id' was found!")
@@ -26,7 +26,6 @@ class Query @Autowired constructor(
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
         ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
-
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
