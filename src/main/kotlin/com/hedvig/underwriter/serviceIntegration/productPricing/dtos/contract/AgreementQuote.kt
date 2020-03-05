@@ -18,13 +18,14 @@ import java.util.UUID
     JsonSubTypes.Type(value = AgreementQuote.NorwegianHomeContentQuote::class, name = "NorwegianHomeContent"),
     JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel")
 )
-sealed class AgreementQuote(
-    open val quoteId: UUID,
-    open val fromDate: LocalDate?,
-    open val toDate: LocalDate?,
-    open val premium: BigDecimal,
-    open val currency: String
-) {
+sealed class AgreementQuote {
+
+    abstract val quoteId: UUID
+    abstract val fromDate: LocalDate?
+    abstract val toDate: LocalDate?
+    abstract val premium: BigDecimal
+    abstract val currency: String
+
     data class SwedishApartmentQuote(
         override val quoteId: UUID,
         override val fromDate: LocalDate?,
@@ -35,7 +36,7 @@ sealed class AgreementQuote(
         val coInsured: List<CoInsuredDto>,
         val squareMeters: Long,
         val lineOfBusiness: SwedishApartmentLineOfBusiness
-    ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
+    ) : AgreementQuote()
 
     data class SwedishHouseQuote(
         override val quoteId: UUID,
@@ -51,7 +52,7 @@ sealed class AgreementQuote(
         val numberOfBathrooms: Int,
         val extraBuildings: List<ExtraBuildingDto>,
         val isSubleted: Boolean
-    ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
+    ) : AgreementQuote()
 
     data class NorwegianHomeContentQuote(
         override val quoteId: UUID,
@@ -63,7 +64,7 @@ sealed class AgreementQuote(
         val coInsured: List<CoInsuredDto>,
         val squareMeters: Long,
         val lineOfBusiness: NorwegianHomeContentLineOfBusiness
-    ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
+    ) : AgreementQuote()
 
     data class NorwegianTravelQuote(
         override val quoteId: UUID,
@@ -72,7 +73,7 @@ sealed class AgreementQuote(
         override val premium: BigDecimal,
         override val currency: String,
         val coInsured: List<CoInsuredDto>
-    ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
+    ) : AgreementQuote()
 
     companion object {
         fun from(quote: Quote) = when (quote.data) {
