@@ -68,8 +68,9 @@ internal class QuoteControllerTest {
         every {
             quoteService.createQuote(
                 any(),
+                initiatedFrom = QuoteInitiatedFrom.RAPIO,
                 underwritingGuidelinesBypassedBy = any(),
-                initiatedFrom = QuoteInitiatedFrom.RAPIO
+                updateMemberService = false
             )
         } returns Either.Right(
             CompleteQuoteResponseDto(

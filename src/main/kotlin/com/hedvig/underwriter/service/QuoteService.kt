@@ -26,7 +26,8 @@ interface QuoteService {
         incompleteQuoteData: QuoteRequest,
         id: UUID? = null,
         initiatedFrom: QuoteInitiatedFrom,
-        underwritingGuidelinesBypassedBy: String?
+        underwritingGuidelinesBypassedBy: String?,
+        updateMemberService: Boolean
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
 
     fun updateQuote(
