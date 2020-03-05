@@ -7,7 +7,6 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.neovisionaries.i18n.CountryCode
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
@@ -20,30 +19,30 @@ import java.util.UUID
     JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel")
 )
 sealed class AgreementQuote(
-    val quoteId: UUID,
-    val fromDate: LocalDate?,
-    val toDate: LocalDate?,
-    val premium: BigDecimal,
-    val currency: String
+    open val quoteId: UUID,
+    open val fromDate: LocalDate?,
+    open val toDate: LocalDate?,
+    open val premium: BigDecimal,
+    open val currency: String
 ) {
-    class SwedishApartmentQuote(
-        quoteId: UUID,
-        fromDate: LocalDate?,
-        toDate: LocalDate?,
-        premium: BigDecimal,
-        currency: String,
+    data class SwedishApartmentQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
         val address: AddressDto,
         val coInsured: List<CoInsuredDto>,
         val squareMeters: Long,
         val lineOfBusiness: SwedishApartmentLineOfBusiness
     ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
 
-    class SwedishHouseQuote(
-        quoteId: UUID,
-        fromDate: LocalDate?,
-        toDate: LocalDate?,
-        premium: BigDecimal,
-        currency: String,
+    data class SwedishHouseQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
         val address: AddressDto,
         val coInsured: List<CoInsuredDto>,
         val squareMeters: Long,
@@ -54,24 +53,24 @@ sealed class AgreementQuote(
         val isSubleted: Boolean
     ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
 
-    class NorwegianHomeContentQuote(
-        quoteId: UUID,
-        fromDate: LocalDate?,
-        toDate: LocalDate?,
-        premium: BigDecimal,
-        currency: String,
+    data class NorwegianHomeContentQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
         val address: AddressDto,
         val coInsured: List<CoInsuredDto>,
         val squareMeters: Long,
         val lineOfBusiness: NorwegianHomeContentLineOfBusiness
     ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
 
-    class NorwegianTravelQuote(
-        quoteId: UUID,
-        fromDate: LocalDate?,
-        toDate: LocalDate?,
-        premium: BigDecimal,
-        currency: String,
+    data class NorwegianTravelQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
         val coInsured: List<CoInsuredDto>
     ) : AgreementQuote(quoteId, fromDate, toDate, premium, currency)
 
@@ -83,12 +82,7 @@ sealed class AgreementQuote(
                 toDate = null,
                 premium = quote.price!!,
                 currency = quote.currency,
-                address = AddressDto(
-                    street = quote.data.street!!,
-                    postalCode = quote.data.zipCode!!,
-                    city = quote.data.city,
-                    country = CountryCode.SE
-                ),
+                address = AddressDto.from(quote.data),
                 coInsured = List(quote.data.householdSize!! - 1) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace!!.toLong(),
                 lineOfBusiness = SwedishApartmentLineOfBusiness.from(quote.data.subType!!)
@@ -99,12 +93,7 @@ sealed class AgreementQuote(
                 toDate = null,
                 premium = quote.price!!,
                 currency = quote.currency,
-                address = AddressDto(
-                    street = quote.data.street!!,
-                    postalCode = quote.data.zipCode!!,
-                    city = quote.data.city,
-                    country = CountryCode.SE
-                ),
+                address = AddressDto.from(quote.data),
                 coInsured = List(quote.data.householdSize!! - 1) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace!!.toLong(),
                 ancillaryArea = quote.data.ancillaryArea!!.toLong(),
@@ -119,12 +108,7 @@ sealed class AgreementQuote(
                 toDate = null,
                 premium = quote.price!!,
                 currency = quote.currency,
-                address = AddressDto(
-                    street = quote.data.street,
-                    postalCode = quote.data.zipCode,
-                    city = quote.data.city,
-                    country = CountryCode.NO
-                ),
+                address = AddressDto.from(quote.data),
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace.toLong(),
                 lineOfBusiness = NorwegianHomeContentLineOfBusiness.from(quote.data.type, quote.data.isStudent)

@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
-class CreateMandateRequest(
+data class CreateMandateRequest(
     val firstName: String,
     val lastName: String,
     val ssn: String,

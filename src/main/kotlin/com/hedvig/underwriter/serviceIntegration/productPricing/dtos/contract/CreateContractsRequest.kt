@@ -7,7 +7,7 @@ import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.web.dtos.SignRequest
 
-class CreateContractsRequest(
+data class CreateContractsRequest(
     val memberId: String,
     val mandate: CreateMandateRequest,
     val currentInsurer: String?,
