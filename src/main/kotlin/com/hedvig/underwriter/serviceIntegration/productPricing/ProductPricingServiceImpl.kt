@@ -62,6 +62,6 @@ class ProductPricingServiceImpl @Autowired constructor(
     override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
 
-    override fun createContract(quotes: List<Quote>, signedRequest: SignRequest): List<CreateContractResponse> =
+    override fun createContractsFromQuotes(quotes: List<Quote>, signedRequest: SignRequest): List<CreateContractResponse> =
         productPricingClient.createContract(CreateContractsRequest.from(quotes, signedRequest))
 }

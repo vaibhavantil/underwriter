@@ -78,11 +78,11 @@ class QuoteServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.createContract(
+            productPricingService.createContractsFromQuotes(
                 any(),
                 any()
             )
-        } returns listOf(CreateContractResponse(contractId = UUID.randomUUID(), quoteId = quoteId))
+        } returns listOf(CreateContractResponse(agreementId = UUID.randomUUID(), quoteId = quoteId))
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
@@ -103,11 +103,11 @@ class QuoteServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.createContract(
+            productPricingService.createContractsFromQuotes(
                 any(),
                 any()
             )
-        } returns listOf(CreateContractResponse(contractId = UUID.randomUUID(), quoteId = quoteId))
+        } returns listOf(CreateContractResponse(agreementId = UUID.randomUUID(), quoteId = quoteId))
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         every { env.activeProfiles } returns arrayOf<String>()

@@ -124,9 +124,9 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        val createdContractId = productPricingService.createContract(listOf(quote), signedRequest).first().contractId
+        val createdAgreementId = productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
 
-        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = createdContractId))
+        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = createdAgreementId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
@@ -168,7 +168,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(createdContractId, signedAt)
+        return SignedQuoteResponseDto(createdAgreementId, signedAt)
     }
 
     companion object {

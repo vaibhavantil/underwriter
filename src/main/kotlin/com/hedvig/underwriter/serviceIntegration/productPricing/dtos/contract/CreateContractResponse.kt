@@ -4,5 +4,6 @@ import java.util.UUID
 
 data class CreateContractResponse(
     val quoteId: UUID,
+    val agreementId: UUID,
     val contractId: UUID
 )
