@@ -1,11 +1,5 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.service.LocalizationService
-import com.hedvig.underwriter.graphql.type.ApartmentType
-import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
-import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType
-import com.hedvig.underwriter.graphql.type.QuoteDetails
-import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
@@ -14,11 +8,9 @@ import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianTravel
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
-import java.util.Locale
 import java.util.UUID
 
 val Quote.firstName
@@ -331,109 +323,6 @@ data class Quote(
         }
         return newQuote
     }
-
-    fun createIncompleteQuoteResult(
-        localizationService: LocalizationService,
-        locale: Locale
-    ): IncompleteQuoteDetails? =
-        this.swedishApartment?.let { apartment ->
-            IncompleteQuoteDetails.IncompleteApartmentQuoteDetails(
-                street = apartment.street,
-                zipCode = apartment.zipCode,
-                householdSize = apartment.householdSize,
-                livingSpace = apartment.livingSpace,
-                type = apartment.subType?.let { ApartmentType.valueOf(it.name) }
-            )
-        } ?: this.swedishHouse?.let { house ->
-            IncompleteQuoteDetails.IncompleteHouseQuoteDetails(
-                street = house.street,
-                zipCode = house.zipCode,
-                householdSize = house.householdSize,
-                livingSpace = house.livingSpace,
-                ancillarySpace = house.ancillaryArea,
-                extraBuildings = house.extraBuildings?.map { extraBuildingInput ->
-                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
-                },
-                numberOfBathrooms = house.numberOfBathrooms,
-                yearOfConstruction = house.yearOfConstruction,
-                isSubleted = house.isSubleted
-            )
-        }
-
-    fun createQuoteDetails(
-        localizationService: LocalizationService,
-        locale: Locale
-    ): QuoteDetails =
-        this.swedishApartment?.let { apartment ->
-            QuoteDetails.SwedishApartmentQuoteDetails(
-                street = apartment.street!!,
-                zipCode = apartment.zipCode!!,
-                householdSize = apartment.householdSize!!,
-                livingSpace = apartment.livingSpace!!,
-                type = ApartmentType.valueOf(apartment.subType!!.name)
-            )
-        } ?: this.swedishHouse?.let { house ->
-            QuoteDetails.SwedishHouseQuoteDetails(
-                street = house.street!!,
-                zipCode = house.zipCode!!,
-                householdSize = house.householdSize!!,
-                livingSpace = house.livingSpace!!,
-                ancillarySpace = house.ancillaryArea!!,
-                extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
-                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
-                },
-                numberOfBathrooms = house.numberOfBathrooms!!,
-                yearOfConstruction = house.yearOfConstruction!!,
-                isSubleted = house.isSubleted!!
-            )
-        } ?: this.norwegianHomeContents?.let {
-            QuoteDetails.NorwegianHomeContentsDetails(
-                street = it.street,
-                zipCode = it.zipCode,
-                coInsured = it.coInsured,
-                livingSpace = it.livingSpace,
-                isStudent = it.isStudent,
-                type = NorwegianHomeContentsType.valueOf(it.type.name)
-            )
-        } ?: this.norwegianTravel?.let {
-            QuoteDetails.NorwegianTravelDetails(
-                coInsured = it.coInsured
-            )
-        }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
-
-    fun createCompleteQuoteResult(
-        localizationService: LocalizationService,
-        locale: Locale
-    ): CompleteQuoteDetails =
-        this.swedishApartment?.let { apartment ->
-            CompleteQuoteDetails.CompleteApartmentQuoteDetails(
-                street = apartment.street!!,
-                zipCode = apartment.zipCode!!,
-                householdSize = apartment.householdSize!!,
-                livingSpace = apartment.livingSpace!!,
-                type = ApartmentType.valueOf(apartment.subType!!.name)
-            )
-        } ?: this.swedishHouse?.let { house ->
-            CompleteQuoteDetails.CompleteHouseQuoteDetails(
-                street = house.street!!,
-                zipCode = house.zipCode!!,
-                householdSize = house.householdSize!!,
-                livingSpace = house.livingSpace!!,
-                ancillarySpace = house.ancillaryArea!!,
-                extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
-                    extraBuildingInput.toGraphQLResponseObject(localizationService, locale)
-                },
-                numberOfBathrooms = house.numberOfBathrooms!!,
-                yearOfConstruction = house.yearOfConstruction!!,
-                isSubleted = house.isSubleted!!
-            )
-        } ?: this.norwegianHomeContents?.let {
-            CompleteQuoteDetails.UnknownQuoteDetails()
-        } ?: this.norwegianTravel?.let {
-            CompleteQuoteDetails.UnknownQuoteDetails()
-        }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
     companion object {
         private const val SEK = "SEK"
