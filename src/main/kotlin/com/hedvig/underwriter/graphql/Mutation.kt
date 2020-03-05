@@ -2,22 +2,22 @@ package com.hedvig.underwriter.graphql
 
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
+import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
-import com.hedvig.service.LocalizationService
-import com.hedvig.service.TextKeysLocaleResolver
+import com.hedvig.localization.service.TextKeysLocaleResolver
 import com.hedvig.underwriter.extensions.isAndroid
 import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
+import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
-import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
+import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
+import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
@@ -29,15 +29,11 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
-    private val productPricingService: ProductPricingService,
-    private val localizationService: LocalizationService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
-    private val memberService: MemberService
+    private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
 
-    // Do to discrepancy between the graphql schema and how the graphql library is implemented
-    // we can but should never return QuoteResult.IncompleteQuote
-    fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): QuoteResult {
+    fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
         val input = when {
             createQuoteInput.apartment != null || createQuoteInput.house != null ||
                 createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
@@ -59,7 +55,8 @@ class Mutation @Autowired constructor(
                 env.isIOS() -> QuoteInitiatedFrom.IOS
                 else -> QuoteInitiatedFrom.WEBONBOARDING
             },
-            underwritingGuidelinesBypassedBy = null
+            underwritingGuidelinesBypassedBy = null,
+            updateMemberService = true
         )
 
         return when (completeQuote) {
@@ -69,22 +66,17 @@ class Mutation @Autowired constructor(
 
                 val quote = quoteService.getQuote(completeQuoteResponseDto.id)
                     ?: throw RuntimeException("Quote must not be null!")
-                env.getTokenOrNull()?.let { memberId ->
-                    // This should be removed when underwriter handles sign
-                    memberService.finalizeOnboarding(quote.copy(memberId = memberId), "")
-                }
 
-                quote.getCompleteQuoteResult(
-                    env,
-                    localizationService,
-                    textKeysLocaleResolver,
-                    quoteService.calculateInsuranceCost(quote)
+                typeMapper.mapToCompleteQuoteResult(
+                    quote,
+                    quoteService.calculateInsuranceCost(quote),
+                    textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
             }
         }
     }
 
-    fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): QuoteResult =
+    fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult =
         responseForEditedQuote(
             quoteService.updateQuote(
                 input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
@@ -93,40 +85,38 @@ class Mutation @Autowired constructor(
             env
         )
 
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment) =
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment): CreateQuoteResult =
         responseForEditedQuote(
             quoteService.removeCurrentInsurerFromQuote(input.id),
             env
         )
 
-    fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment) =
+    fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment): CreateQuoteResult =
         responseForEditedQuote(
             quoteService.removeStartDateFromQuote(input.id),
             env
         )
 
-    fun responseForEditedQuote(errorOrQuote: Either<ErrorResponseDto, Quote>, env: DataFetchingEnvironment) =
+    private fun responseForEditedQuote(
+        errorOrQuote: Either<ErrorResponseDto, Quote>,
+        env: DataFetchingEnvironment
+    ): CreateQuoteResult =
         when (errorOrQuote) {
             is Either.Left -> getQuoteResultFromError(errorOrQuote.a)
             is Either.Right -> {
                 val quote = errorOrQuote.b
 
-                if (quote.isComplete) {
-                    quote.getCompleteQuoteResult(
-                        env,
-                        localizationService,
-                        textKeysLocaleResolver,
-                        quoteService.calculateInsuranceCost(quote)
-                    )
-                } else {
-                    quote.getIncompleteQuoteResult(env, localizationService, textKeysLocaleResolver)
-                }
+                typeMapper.mapToCompleteQuoteResult(
+                    quote,
+                    quoteService.calculateInsuranceCost(quote),
+                    textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+                )
             }
         }
 
-    fun getQuoteResultFromError(errorResponse: ErrorResponseDto) = when (errorResponse.errorCode) {
+    private fun getQuoteResultFromError(errorResponse: ErrorResponseDto) = when (errorResponse.errorCode) {
         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
-            QuoteResult.UnderwritingLimitsHit(
+            UnderwritingLimitsHit(
                 errorResponse.breachedUnderwritingGuidelines?.map { description ->
                     UnderwritingLimit(description)
                 } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
