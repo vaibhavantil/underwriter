@@ -23,6 +23,9 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
@@ -31,9 +34,6 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
 class QuoteServiceImplTest {
