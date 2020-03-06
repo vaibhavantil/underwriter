@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.AddAgreementRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
@@ -10,6 +11,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.AddAgreementResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import feign.Headers
@@ -65,4 +67,9 @@ interface ProductPricingClient {
     fun createContract(
         @Valid @RequestBody request: CreateContractsRequest
     ): List<CreateContractResponse>
+
+    @PostMapping("/_/agreements/add")
+    fun addAgreement(
+        @Valid @RequestBody request: AddAgreementRequest
+    ): AddAgreementResponse
 }

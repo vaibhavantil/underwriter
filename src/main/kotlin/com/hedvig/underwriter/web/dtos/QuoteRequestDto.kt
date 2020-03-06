@@ -21,8 +21,11 @@ data class QuoteRequestDto(
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @field:JsonSubTypes(
         JsonSubTypes.Type(value = QuoteRequestData.SwedishApartment::class, name = "apartment"),
-        JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house")
-    ) val incompleteQuoteData: QuoteRequestData?,
+        JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel")
+    )
+    val incompleteQuoteData: QuoteRequestData?,
     val incompleteHouseQuoteData: QuoteRequestData.SwedishHouse?,
     val incompleteApartmentQuoteData: QuoteRequestData.SwedishApartment?,
     val norwegianHomeContentsData: QuoteRequestData.NorwegianHomeContents?,

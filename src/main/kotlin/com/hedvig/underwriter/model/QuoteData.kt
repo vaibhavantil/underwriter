@@ -24,8 +24,8 @@ sealed class QuoteData {
         return when (this) {
             is SwedishHouseData -> ProductType.HOUSE
             is SwedishApartmentData -> ProductType.APARTMENT
-            is NorwegianHomeContentsData -> ProductType.UNKNOWN
-            is NorwegianTravelData -> ProductType.UNKNOWN
+            is NorwegianHomeContentsData -> ProductType.HOME_CONTENT
+            is NorwegianTravelData -> ProductType.TRAVEL
         }
     }
 }
