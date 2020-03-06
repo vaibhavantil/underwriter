@@ -5,6 +5,7 @@ import com.hedvig.underwriter.graphql.type.ExtraBuilding
 import com.hedvig.underwriter.graphql.type.IncompleteQuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
+import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
@@ -32,7 +33,7 @@ class GraphQLConfiguration {
                     CompleteQuoteDetails.UnknownQuoteDetails::class.java,
                     QuoteResult.CompleteQuote::class.java,
                     QuoteResult.IncompleteQuote::class.java,
-                    QuoteResult.UnderwritingLimitsHit::class.java,
+                    UnderwritingLimitsHit::class.java,
                     QuoteDetails.SwedishApartmentQuoteDetails::class.java,
                     QuoteDetails.SwedishHouseQuoteDetails::class.java,
                     QuoteDetails.NorwegianHomeContentsDetails::class.java,

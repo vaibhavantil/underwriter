@@ -61,7 +61,8 @@ class QuoteController @Autowired constructor(
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
             initiatedFrom = quoteInitiatedFrom,
-            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy
+            underwritingGuidelinesBypassedBy = requestDto.underwritingGuidelinesBypassedBy,
+            updateMemberService = false
         )
             .bimap(
                 { ResponseEntity.status(422).body(it) },

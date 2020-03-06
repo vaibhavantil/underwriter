@@ -23,7 +23,7 @@ sealed class QuoteResult {
         val expiresAt: LocalDate,
         val email: String?,
         val dataCollectionId: UUID?
-    ) : QuoteResult()
+    ) : QuoteResult(), CreateQuoteResult
 
     @Deprecated("Incomplete is depricated")
     data class IncompleteQuote(
@@ -36,9 +36,5 @@ sealed class QuoteResult {
         val startDate: LocalDate?,
         val email: String?,
         val dataCollectionId: UUID?
-    ) : QuoteResult()
-
-    data class UnderwritingLimitsHit(
-        val limits: List<UnderwritingLimit>
     ) : QuoteResult()
 }

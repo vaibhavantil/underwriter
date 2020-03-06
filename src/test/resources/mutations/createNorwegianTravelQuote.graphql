@@ -1,13 +1,5 @@
-mutation {
-    createQuote(input: {
-        id: "00000000-0000-0000-0000-000000000007"
-        firstName: "first"
-        lastName: "family"
-        ssn: "12121201234"
-        norweiganTravel: {
-            coInsured: 0
-        }
-    }) {
+mutation create($input:CreateQuoteInput!) {
+    createQuote(input: $input) {
         ... on UnderwritingLimitsHit {
             limits {
                 description

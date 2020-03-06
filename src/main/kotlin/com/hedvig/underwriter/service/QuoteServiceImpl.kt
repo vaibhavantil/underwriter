@@ -12,6 +12,7 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
@@ -129,7 +130,8 @@ class QuoteServiceImpl(
         incompleteQuoteData: QuoteRequest,
         id: UUID?,
         initiatedFrom: QuoteInitiatedFrom,
-        underwritingGuidelinesBypassedBy: String?
+        underwritingGuidelinesBypassedBy: String?,
+        updateMemberService: Boolean
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quoteId = id ?: UUID.randomUUID()
         val breachedGuidelinesOrQuote =
@@ -139,6 +141,10 @@ class QuoteServiceImpl(
             is Either.Right -> breachedGuidelinesOrQuote.b
         }
         quoteRepository.insert(quote)
+
+        if (updateMemberService && quote.memberId != null) {
+            memberService.finalizeOnboarding(quote, quote.email ?: "")
+        }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }

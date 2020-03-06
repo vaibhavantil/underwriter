@@ -1,7 +1,10 @@
 package com.hedvig.underwriter.graphql
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
+import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
@@ -14,40 +17,46 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuoteP
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTravelQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import io.mockk.verify
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Year
+import java.util.UUID
 import org.javamoney.moneta.Money
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-internal class GraphQlMutationsTest {
+internal class GraphQlMutationsIntegrationTest {
 
     @Autowired
     private lateinit var graphQLTestTemplate: GraphQLTestTemplate
 
-    @MockBean
+    @MockkBean(relaxUnitFun = true)
     lateinit var memberService: MemberService
 
-    @MockBean
-    lateinit var depthChecker: DebtChecker
+    @MockkBean()
+    lateinit var debtChecker: DebtChecker
 
-    @MockBean
+    @MockkBean
     lateinit var productPricingService: ProductPricingService
 
-    @MockBean
+    @MockkBean
     lateinit var signService: SignService
+
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
 
     @Test
     fun createSuccessfulOldApartmentQuote() {
-        Mockito.`when`(
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForApartmentQuote(
                 ApartmentQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -58,23 +67,20 @@ internal class GraphQlMutationsTest {
                     isStudent = false
                 )
             )
-        ).thenReturn(
-            QuotePriceResponseDto(
-                BigDecimal.ONE
-            )
-        )
-        Mockito.`when`(
+        } returns
+            QuotePriceResponseDto(BigDecimal.ONE)
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "SEK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -94,7 +100,8 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulOldHouseQuote() {
-        Mockito.`when`(
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForHouseQuote(
                 HouseQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -108,23 +115,22 @@ internal class GraphQlMutationsTest {
                     isSubleted = false
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
-        Mockito.`when`(
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "SEK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -143,7 +149,8 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulSwedishApartmentQuote() {
-        Mockito.`when`(
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForApartmentQuote(
                 ApartmentQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -154,23 +161,22 @@ internal class GraphQlMutationsTest {
                     isStudent = false
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
-        Mockito.`when`(
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "SEK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -190,7 +196,10 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulSwedishHouseQuote() {
-        Mockito.`when`(
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
             productPricingService.priceFromProductPricingForHouseQuote(
                 HouseQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -204,23 +213,22 @@ internal class GraphQlMutationsTest {
                     isSubleted = false
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
-        Mockito.`when`(
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "SEK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -239,7 +247,8 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulNorwegianHomeContentsQuote() {
-        Mockito.`when`(
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
                 NorwegianHomeContentsQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -250,23 +259,22 @@ internal class GraphQlMutationsTest {
                     isStudent = false
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
-        Mockito.`when`(
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "NOK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -286,45 +294,116 @@ internal class GraphQlMutationsTest {
 
     @Test
     fun createSuccessfulNorwegianTravelQuote() {
-        Mockito.`when`(
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForNorwegianTravelQuote(
                 NorwegianTravelQuotePriceDto(
                     coInsured = 0
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
-        Mockito.`when`(
+
+        every {
             productPricingService.calculateInsuranceCost(
                 Money.of(BigDecimal.ONE, "NOK"), "123"
             )
-        ).thenReturn(
+        } returns
             InsuranceCost(
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
                 null
             )
-        )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
-        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", null)
+        val createQuoteInput = CreateQuoteInput(
+            UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
+            "",
+            "",
+            null,
+            null,
+            "1212121212",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            CreateNorwegianTravelInput(0),
+            null
+        )
+
+        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", objectMapper.valueToTree(mapOf("input" to createQuoteInput)))
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
-        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
+        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "NOK")
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
     }
 
     @Test
+    fun createQuoteFinalizeOnbaordingInMemberServiceQuote() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
+            productPricingService.priceFromProductPricingForNorwegianTravelQuote(
+                NorwegianTravelQuotePriceDto(
+                    coInsured = 0
+                )
+            )
+        } returns
+            QuotePriceResponseDto(
+                BigDecimal.ONE
+            )
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal.ONE, "NOK"), "123"
+            )
+        } returns
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "NOK"),
+                null
+            )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val createQuoteInput = CreateQuoteInput(
+            UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+            "",
+            "",
+            null,
+            null,
+            "1212121212",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            CreateNorwegianTravelInput(0),
+            null
+        )
+        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", ObjectMapper().valueToTree(mapOf("input" to createQuoteInput)))
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        verify { memberService.finalizeOnboarding(any(), "") }
+    }
+
+    @Test
     fun createUnderwritingLimitsHitQuote() {
-        Mockito.`when`(
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every {
             productPricingService.priceFromProductPricingForApartmentQuote(
                 ApartmentQuotePriceDto(
                     birthDate = LocalDate.of(1912, 12, 12),
@@ -335,11 +414,10 @@ internal class GraphQlMutationsTest {
                     isStudent = false
                 )
             )
-        ).thenReturn(
+        } returns
             QuotePriceResponseDto(
                 BigDecimal.ONE
             )
-        )
 
         val response = graphQLTestTemplate.perform("/mutations/createUnderwritingLimitHitQuote.graphql", null)
         val createQuote = response.readTree()["data"]["createQuote"]

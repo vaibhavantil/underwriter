@@ -1,8 +1,5 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.service.LocalizationService
-import java.util.Locale
-
 enum class ExtraBuildingType {
     GARAGE,
     CARPORT,
@@ -19,23 +16,20 @@ enum class ExtraBuildingType {
     BOATHOUSE,
     OTHER;
 
-    fun getDisplayName(localizationService: LocalizationService, locale: Locale): String =
-        localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${this.name}") ?: getDefaultDisplayName(this)
-
-    private fun getDefaultDisplayName(type: ExtraBuildingType): String = when (type) {
-        ExtraBuildingType.GARAGE -> "Garage"
-        ExtraBuildingType.CARPORT -> "Carport"
-        ExtraBuildingType.SHED -> "Skjul"
-        ExtraBuildingType.STOREHOUSE -> "Förråd"
-        ExtraBuildingType.FRIGGEBOD -> "Friggebod"
-        ExtraBuildingType.ATTEFALL -> "Attefallshus"
-        ExtraBuildingType.OUTHOUSE -> "Uthus"
-        ExtraBuildingType.GUESTHOUSE -> "Gästhus"
-        ExtraBuildingType.GAZEBO -> "Lusthus"
-        ExtraBuildingType.GREENHOUSE -> "Växthus"
-        ExtraBuildingType.SAUNA -> "Bastu"
-        ExtraBuildingType.BARN -> "Lada"
-        ExtraBuildingType.BOATHOUSE -> "Båthus"
-        ExtraBuildingType.OTHER -> "Övrigt"
+    fun getDefaultDisplayName(): String = when (this) {
+        GARAGE -> "Garage"
+        CARPORT -> "Carport"
+        SHED -> "Skjul"
+        STOREHOUSE -> "Förråd"
+        FRIGGEBOD -> "Friggebod"
+        ATTEFALL -> "Attefallshus"
+        OUTHOUSE -> "Uthus"
+        GUESTHOUSE -> "Gästhus"
+        GAZEBO -> "Lusthus"
+        GREENHOUSE -> "Växthus"
+        SAUNA -> "Bastu"
+        BARN -> "Lada"
+        BOATHOUSE -> "Båthus"
+        OTHER -> "Övrigt"
     }
 }
