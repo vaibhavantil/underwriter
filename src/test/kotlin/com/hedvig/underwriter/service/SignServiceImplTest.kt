@@ -133,7 +133,7 @@ class SignServiceImplTest {
         assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
     }
 
-   /* @Test
+   @Test
     fun startSigningOfSwedishQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote = a.QuoteBuilder(id = quoteIds[0]).build()
@@ -141,14 +141,14 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse.Failed("some error")
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse(autoStartToken = null, internalErrorMessage = "Failed")
 
         val result = cut.startSigningQuotes(quoteIds)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
-    @Test
+    /* @Test
     fun startSigningOfNorwegianQuote_startNorwegianSign() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder()).build()

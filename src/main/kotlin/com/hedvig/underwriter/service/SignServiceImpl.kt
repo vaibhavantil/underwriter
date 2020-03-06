@@ -121,7 +121,7 @@ class SignServiceImpl(
         val response = memberService.startSwedishBankIdSignQuotes(signSessionId)
         return response.autoStartToken?.let { autoStartToken ->
             StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
-        } ?: TODO()
+        } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
     }
 
     private fun signQuoteWithMemberId(
