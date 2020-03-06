@@ -1,11 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
-sealed class StartNorwegianBankIdSignResponse {
-    data class Success(
-        val redirectUrl: String
-    ): StartNorwegianBankIdSignResponse()
-
-    data class Failed(
-        val errorMessage: String
-    ): StartNorwegianBankIdSignResponse()
-}
+data class StartNorwegianBankIdSignResponse(
+    val redirectUrl: String?,
+    val internalErrorMessage: String? = null,
+    val errorMessages: List<NorwegianAuthenticationResponseError>? = null
+)

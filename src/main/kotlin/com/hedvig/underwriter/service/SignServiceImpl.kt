@@ -118,10 +118,10 @@ class SignServiceImpl(
     override fun startSigningQuotes(quoteIds: List<UUID>): StartSignResponse {
         val signSessionId = signSessionRepository.insert(quoteIds)
 
-        return when (val response = memberService.startSwedishBankIdSignQuotes(signSessionId)) {
-            is StartSwedishBankIdSignResponse.Success -> StartSignResponse.SwedishBankIdSession(signSessionId, response.autoStartToken)
-            is StartSwedishBankIdSignResponse.Failed -> TODO()
-        }
+        val response = memberService.startSwedishBankIdSignQuotes(signSessionId)
+        return response.autoStartToken?.let { autoStartToken ->
+            StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
+        } ?: TODO()
     }
 
     private fun signQuoteWithMemberId(

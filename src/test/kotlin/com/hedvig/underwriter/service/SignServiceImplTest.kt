@@ -125,7 +125,7 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse.Success("autoStartToken")
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse("autoStartToken")
 
         val result = cut.startSigningQuotes(quoteIds)
 
