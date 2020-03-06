@@ -2,17 +2,20 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
@@ -24,14 +27,14 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.UUID
 
 @Service
 class SignServiceImpl(
@@ -116,12 +119,54 @@ class SignServiceImpl(
     }
 
     override fun startSigningQuotes(quoteIds: List<UUID>): StartSignResponse {
-        val signSessionId = signSessionRepository.insert(quoteIds)
 
-        val response = memberService.startSwedishBankIdSignQuotes(signSessionId)
-        return response.autoStartToken?.let { autoStartToken ->
-            StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
-        } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
+        val quotes = quoteService.getQuotes(quoteIds)
+
+        when (getSignMethodFromQuotes(quotes)) {
+            BundledQuotesSignMethod.SWEDISH_BANK_ID -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val response = memberService.startSwedishBankIdSignQuotes(signSessionId)
+
+                return response.autoStartToken?.let { autoStartToken ->
+                    StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
+                } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
+            }
+            BundledQuotesSignMethod.NORWEGIAN_BANK_ID -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val response = memberService.startNorwegianBankIdSignQuotes(signSessionId)
+
+                return response.redirectUrl?.let {redirectUrl ->
+                    StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
+                } ?: response.internalErrorMessage?.let {
+                    StartSignResponse.FailedToStartSign(it)
+                } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
+            }
+            BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED ->
+                return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
+        }
+    }
+
+    private fun getSignMethodFromQuotes(quotes: List<Quote>): BundledQuotesSignMethod {
+        return when (quotes.size) {
+            1 ->
+                when(quotes[0].data) {
+                    is SwedishApartmentData,
+                    is SwedishHouseData -> BundledQuotesSignMethod.SWEDISH_BANK_ID
+                    is NorwegianHomeContentsData,
+                    is NorwegianTravelData -> BundledQuotesSignMethod.NORWEGIAN_BANK_ID
+                }
+            2 -> if (
+                quotes.any { quote -> quote.data is NorwegianHomeContentsData }
+                && quotes.any { quote -> quote.data is NorwegianTravelData }
+            ) {
+                BundledQuotesSignMethod.NORWEGIAN_BANK_ID
+            } else {
+                BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED
+            }
+            else -> BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED
+        }
     }
 
     private fun signQuoteWithMemberId(
