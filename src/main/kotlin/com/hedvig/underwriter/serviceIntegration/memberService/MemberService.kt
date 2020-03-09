@@ -10,9 +10,9 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import java.util.UUID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.UUID
 
 interface MemberService {
     val logger: Logger

@@ -7,14 +7,14 @@ sealed class StartSignResponse {
     data class SwedishBankIdSession(
         val session: UUID,
         val autoStartToken: String
-    ): StartSignResponse()
+    ) : StartSignResponse()
 
     data class NorwegianBankIdSession(
         val session: UUID,
         val redirectUrl: String
-    ): StartSignResponse()
+    ) : StartSignResponse()
 
     data class FailedToStartSign(
         val errorMessage: String
-    ): StartSignResponse()
+    ) : StartSignResponse()
 }

@@ -28,19 +28,19 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.javamoney.moneta.Money
-import org.slf4j.LoggerFactory
-import org.springframework.core.env.Environment
-import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
+import org.javamoney.moneta.Money
+import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
+import org.springframework.stereotype.Service
 
 @Service
 class SignServiceImpl(
     val quoteService: QuoteService,
-    //FIXME: SignService should only use quoteService in my opinion, but I'm not up for doing that refactor now.
+    // FIXME: SignService should only use quoteService in my opinion, but I'm not up for doing that refactor now.
     val quoteRepository: QuoteRepository,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
@@ -240,8 +240,8 @@ class SignServiceImpl(
                     is NorwegianTravelData -> BundledQuotesSign.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
                 }
             2 -> if (
-                quotes.any { quote -> quote.data is NorwegianHomeContentsData }
-                && quotes.any { quote -> quote.data is NorwegianTravelData }
+                quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
+                quotes.any { quote -> quote.data is NorwegianTravelData }
             ) {
                 var ssn: String? = null
                 quotes.forEach { quote ->

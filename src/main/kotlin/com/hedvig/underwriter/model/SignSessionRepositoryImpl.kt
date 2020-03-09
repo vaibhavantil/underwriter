@@ -1,9 +1,9 @@
 package com.hedvig.underwriter.model
 
-import org.springframework.stereotype.Component
+import java.util.UUID
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.attach
-import java.util.UUID
+import org.springframework.stereotype.Component
 
 @Component
 class SignSessionRepositoryImpl(private val jdbi: Jdbi) : SignSessionRepository {
@@ -19,6 +19,6 @@ class SignSessionRepositoryImpl(private val jdbi: Jdbi) : SignSessionRepository 
     }
 
     override fun find(signSessionId: UUID): SignSession {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 }

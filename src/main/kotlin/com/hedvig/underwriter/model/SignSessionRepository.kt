@@ -6,4 +6,3 @@ interface SignSessionRepository {
     fun find(signSessionId: UUID): SignSession
     fun insert(quoteIds: List<UUID>): UUID
 }
-

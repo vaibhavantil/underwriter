@@ -1,8 +1,7 @@
 package com.hedvig.underwriter.model
 
-import org.jdbi.v3.sqlobject.statement.SqlBatch
-import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import java.util.UUID
+import org.jdbi.v3.sqlobject.statement.SqlUpdate
 
 interface SignSessionDao {
 

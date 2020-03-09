@@ -6,12 +6,12 @@ sealed class BundledQuotesSign {
         val memberId: String,
         val ssn: String,
         val isSwitching: Boolean
-    ): BundledQuotesSign()
+    ) : BundledQuotesSign()
 
     data class NorwegianBankId(
         val memberId: String,
         val ssn: String
-    ): BundledQuotesSign()
+    ) : BundledQuotesSign()
 
-    object CanNotBeBundled: BundledQuotesSign()
+    object CanNotBeBundled : BundledQuotesSign()
 }

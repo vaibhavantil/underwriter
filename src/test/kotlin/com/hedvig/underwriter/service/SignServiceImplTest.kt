@@ -22,6 +22,8 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import java.time.LocalDate
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -29,9 +31,6 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
-import java.time.LocalDate
-import java.util.UUID
-
 
 @RunWith(MockitoJUnitRunner::class)
 class SignServiceImplTest {
@@ -65,7 +64,15 @@ class SignServiceImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        cut = SignServiceImpl(quoteService, quoteRepository, memberService, productPricingService, signSessionRepository, customerIO, env)
+        cut = SignServiceImpl(
+            quoteService,
+            quoteRepository,
+            memberService,
+            productPricingService,
+            signSessionRepository,
+            customerIO,
+            env
+        )
     }
 
     @Test
@@ -125,7 +132,9 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse("autoStartToken")
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse(
+            "autoStartToken"
+        )
 
         val result = cut.startSigningQuotes(quoteIds)
 
@@ -133,7 +142,7 @@ class SignServiceImplTest {
         assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
     }
 
-   @Test
+    @Test
     fun startSigningOfSwedishQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote = a.QuoteBuilder(id = quoteIds[0]).build()
@@ -141,7 +150,10 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse(autoStartToken = null, internalErrorMessage = "Failed")
+        every { memberService.startSwedishBankIdSignQuotes(signSessionReference) } returns StartSwedishBankIdSignResponse(
+            autoStartToken = null,
+            internalErrorMessage = "Failed"
+        )
 
         val result = cut.startSigningQuotes(quoteIds)
 
@@ -157,7 +169,9 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse("redirect url")
+        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse(
+            "redirect url"
+        )
 
         val result = cut.startSigningQuotes(quoteIds)
 
@@ -173,7 +187,9 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse("redirect url")
+        every { memberService.startNorwegianBankIdSignQuotes(signSessionReference) } returns StartNorwegianBankIdSignResponse(
+            "redirect url"
+        )
 
         val result = cut.startSigningQuotes(quoteIds)
 
