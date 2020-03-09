@@ -8,7 +8,7 @@ CREATE TABLE sign_sessions (
 
 CREATE TABLE sign_session_quote_revision (
     sign_session_id uuid references sign_sessions(id),
-    master_quote_id integer references master_quotes(id),
+    master_quote_id uuid references master_quotes(id),
     PRIMARY KEY(sign_session_id, master_quote_id)
 );
 

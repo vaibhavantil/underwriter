@@ -12,12 +12,14 @@ import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
+import com.hedvig.underwriter.graphql.type.SignQuotesInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
+    private val signService: SignService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
@@ -97,6 +100,9 @@ class Mutation @Autowired constructor(
             env
         )
 
+    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) =
+        signService.startSigningQuotes(input.quoteIds, env.getEndUserIp())
+
     private fun responseForEditedQuote(
         errorOrQuote: Either<ErrorResponseDto, Quote>,
         env: DataFetchingEnvironment
@@ -149,6 +155,15 @@ class Mutation @Autowired constructor(
             "19$ssn"
         } else {
             "20$ssn"
+        }
+    }
+
+    fun DataFetchingEnvironment.getEndUserIp(): String? {
+        val ip = this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("x-forwarded-for")
+        return if (ip?.contains(",") == true) {
+            ip.split(",").first()
+        } else {
+            ip
         }
     }
 }

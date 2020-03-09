@@ -36,6 +36,6 @@ databaseChangeLog:
       file: ./migrations/20200225-1130-add-birth-date-to-quote-data.sql
       relativeToChangelogFile: true
   - include:
-      file: ./migrations/20200225-1130-add-birth-date-to-quote-data.sql
+      file: ./migrations/20200304-0940-add-sign-session-table.sql
       relativeToChangelogFile: true
 

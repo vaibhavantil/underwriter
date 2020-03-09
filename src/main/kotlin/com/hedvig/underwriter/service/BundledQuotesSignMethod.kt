@@ -1,7 +1,17 @@
 package com.hedvig.underwriter.service
 
-enum class BundledQuotesSignMethod {
-    SWEDISH_BANK_ID,
-    NORWEGIAN_BANK_ID,
-    CAN_NOT_BE_BUNDLED
+sealed class BundledQuotesSign {
+
+    data class SwedishBankId(
+        val memberId: String,
+        val ssn: String,
+        val isSwitching: Boolean
+    ): BundledQuotesSign()
+
+    data class NorwegianBankId(
+        val memberId: String,
+        val ssn: String
+    ): BundledQuotesSign()
+
+    object CanNotBeBundled: BundledQuotesSign()
 }

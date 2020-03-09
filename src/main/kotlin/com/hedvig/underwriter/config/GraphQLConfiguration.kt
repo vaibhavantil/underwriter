@@ -7,6 +7,7 @@ import com.hedvig.underwriter.graphql.type.QuoteDetails
 import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
+import com.hedvig.underwriter.service.model.StartSignResponse
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
 import org.springframework.context.annotation.Bean
@@ -40,6 +41,9 @@ class GraphQLConfiguration {
                     QuoteDetails.NorwegianTravelDetails::class.java,
                     IncompleteQuoteDetails.IncompleteApartmentQuoteDetails::class.java,
                     IncompleteQuoteDetails.IncompleteHouseQuoteDetails::class.java,
+                    StartSignResponse.SwedishBankIdSession::class.java,
+                    StartSignResponse.NorwegianBankIdSession::class.java,
+                    StartSignResponse.FailedToStartSign::class.java,
                     ExtraBuilding.ExtraBuildingGarage::class.java,
                     ExtraBuilding.ExtraBuildingCarport::class.java,
                     ExtraBuilding.ExtraBuildingShed::class.java,

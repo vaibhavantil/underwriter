@@ -14,20 +14,19 @@ interface SignSessionDao {
             VALUES (
                 :id
             )
-            RETURNING *
     """
     )
-    fun insert(id: UUID): UUID
+    fun insert(id: UUID)
 
-    @SqlBatch(
+    @SqlUpdate(
         """
             INSERT INTO sign_session_quote_revision (
-                sign_session_id, name
+                sign_session_id, master_quote_id
             ) 
             VALUES (
-                id, master_quote_id
+                :signSessionId, :masterQuoteId
             )
     """
     )
-    fun insert(id: UUID, quoteIds: List<UUID>)
+    fun insert(signSessionId: UUID, masterQuoteId: UUID)
 }

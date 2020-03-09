@@ -36,10 +36,16 @@ interface MemberService {
     fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String? = null)
 
     fun startSwedishBankIdSignQuotes(
-        underwriterSessionReference: UUID
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        ipAddress: String,
+        isSwitching: Boolean
     ): StartSwedishBankIdSignResponse
 
     fun startNorwegianBankIdSignQuotes(
-        underwriterSessionReference: UUID
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String
     ): StartNorwegianBankIdSignResponse
 }

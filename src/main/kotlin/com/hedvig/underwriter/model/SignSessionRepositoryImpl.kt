@@ -13,7 +13,7 @@ class SignSessionRepositoryImpl(private val jdbi: Jdbi) : SignSessionRepository 
         jdbi.useTransaction<RuntimeException> { h ->
             val dao = h.attach<SignSessionDao>()
             dao.insert(signSessionId)
-            dao.insert(signSessionId, quoteIds)
+            quoteIds.forEach { quoteId -> dao.insert(signSessionId, quoteId) }
         }
         return signSessionId
     }

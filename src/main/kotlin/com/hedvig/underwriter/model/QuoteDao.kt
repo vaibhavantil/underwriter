@@ -4,6 +4,7 @@ import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
+import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
@@ -76,6 +77,23 @@ interface QuoteDao {
         """
     )
     fun find(@Bind quoteId: UUID): DatabaseQuoteRevision?
+
+    @SqlQuery(
+        """
+            SELECT
+            DISTINCT ON (qr.master_quote_id)
+
+            qr.*,
+            mq.created_at,
+            mq.initiated_from
+
+            FROM quote_revisions qr
+            INNER JOIN master_quotes mq
+                ON mq.id = qr.master_quote_id
+            WHERE qr.master_quote_id in (<quoteIds>)
+        """
+    )
+    fun find(@BindList("quoteIds") quoteIds: List<UUID>): List<DatabaseQuoteRevision?>
 
     @SqlUpdate(
         """

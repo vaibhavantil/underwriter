@@ -17,6 +17,7 @@ interface SignService {
     fun memberSigned(memberId: String, signedRequest: SignRequest)
 
     fun startSigningQuotes(
-        quoteIds: List<UUID>
+        quoteIds: List<UUID>,
+        ipAddress: String?
     ): StartSignResponse
 }

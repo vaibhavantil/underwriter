@@ -10,6 +10,8 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatus
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartNorwegianBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
@@ -76,11 +78,21 @@ class MemberServiceImpl @Autowired constructor(
         client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
     }
 
-    override fun startSwedishBankIdSignQuotes(underwriterSessionReference: UUID): StartSwedishBankIdSignResponse {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun startSwedishBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        ipAddress: String,
+        isSwitching: Boolean
+    ): StartSwedishBankIdSignResponse {
+        return client.startSwedishBankIdSign(memberId, UnderwriterStartSwedishBankIdSignSessionRequest(underwriterSessionReference, ssn, ipAddress, isSwitching)).body!!
     }
 
-    override fun startNorwegianBankIdSignQuotes(underwriterSessionReference: UUID): StartNorwegianBankIdSignResponse {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun startNorwegianBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String
+    ): StartNorwegianBankIdSignResponse {
+        return client.startNorwegianSing(memberId, UnderwriterStartNorwegianBankIdSignSessionRequest(underwriterSessionReference, ssn)).body!!
     }
 }

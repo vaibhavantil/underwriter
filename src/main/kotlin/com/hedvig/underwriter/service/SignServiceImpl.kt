@@ -11,6 +11,7 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignResponse
@@ -118,54 +119,38 @@ class SignServiceImpl(
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
-    override fun startSigningQuotes(quoteIds: List<UUID>): StartSignResponse {
+    override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
 
         val quotes = quoteService.getQuotes(quoteIds)
 
-        when (getSignMethodFromQuotes(quotes)) {
-            BundledQuotesSignMethod.SWEDISH_BANK_ID -> {
+        when (val data = getSignDataFromQuotes(quotes)) {
+            is BundledQuotesSign.SwedishBankId -> {
                 val signSessionId = signSessionRepository.insert(quoteIds)
 
-                val response = memberService.startSwedishBankIdSignQuotes(signSessionId)
+                val ip = ipAddress ?: run {
+                    logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quotes]")
+                    "127.0.0.1"
+                }
+
+                val response = memberService.startSwedishBankIdSignQuotes(data.memberId.toLong(), signSessionId, ip, data.ssn, data.isSwitching)
 
                 return response.autoStartToken?.let { autoStartToken ->
                     StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
                 } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
             }
-            BundledQuotesSignMethod.NORWEGIAN_BANK_ID -> {
+            is BundledQuotesSign.NorwegianBankId -> {
                 val signSessionId = signSessionRepository.insert(quoteIds)
 
-                val response = memberService.startNorwegianBankIdSignQuotes(signSessionId)
+                val response = memberService.startNorwegianBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn)
 
-                return response.redirectUrl?.let {redirectUrl ->
+                return response.redirectUrl?.let { redirectUrl ->
                     StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
                 } ?: response.internalErrorMessage?.let {
                     StartSignResponse.FailedToStartSign(it)
                 } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
             }
-            BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED ->
+            is BundledQuotesSign.CanNotBeBundled ->
                 return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
-        }
-    }
-
-    private fun getSignMethodFromQuotes(quotes: List<Quote>): BundledQuotesSignMethod {
-        return when (quotes.size) {
-            1 ->
-                when(quotes[0].data) {
-                    is SwedishApartmentData,
-                    is SwedishHouseData -> BundledQuotesSignMethod.SWEDISH_BANK_ID
-                    is NorwegianHomeContentsData,
-                    is NorwegianTravelData -> BundledQuotesSignMethod.NORWEGIAN_BANK_ID
-                }
-            2 -> if (
-                quotes.any { quote -> quote.data is NorwegianHomeContentsData }
-                && quotes.any { quote -> quote.data is NorwegianTravelData }
-            ) {
-                BundledQuotesSignMethod.NORWEGIAN_BANK_ID
-            } else {
-                BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED
-            }
-            else -> BundledQuotesSignMethod.CAN_NOT_BE_BUNDLED
         }
     }
 
@@ -239,6 +224,42 @@ class SignServiceImpl(
         }
 
         return SignedQuoteResponseDto(signedProductId, signedAt)
+    }
+
+    private fun getSignDataFromQuotes(quotes: List<Quote>): BundledQuotesSign {
+        return when (quotes.size) {
+            1 ->
+                when (quotes[0].data) {
+                    is SwedishApartmentData,
+                    is SwedishHouseData -> BundledQuotesSign.SwedishBankId(
+                        quotes[0].memberId!!,
+                        quotes[0].ssn,
+                        quotes[0].currentInsurer != null
+                    )
+                    is NorwegianHomeContentsData,
+                    is NorwegianTravelData -> BundledQuotesSign.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
+                }
+            2 -> if (
+                quotes.any { quote -> quote.data is NorwegianHomeContentsData }
+                && quotes.any { quote -> quote.data is NorwegianTravelData }
+            ) {
+                var ssn: String? = null
+                quotes.forEach { quote ->
+                    if (quote.data is PersonPolicyHolder<*>) {
+                        quote.data.ssn?.let {
+                            ssn = it
+                            return@forEach
+                        }
+                    } else {
+                        throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
+                    }
+                }
+                BundledQuotesSign.NorwegianBankId(quotes[0].memberId!!, ssn!!)
+            } else {
+                BundledQuotesSign.CanNotBeBundled
+            }
+            else -> BundledQuotesSign.CanNotBeBundled
+        }
     }
 
     companion object {

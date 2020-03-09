@@ -256,6 +256,12 @@ class QuoteServiceImpl(
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val quotes = quoteRepository.findQuotes(quoteIds)
+
+        return if (quotes.all { it != null }) {
+            quotes.filterNotNull()
+        } else {
+            throw RuntimeException("Could not find all quotes in list: $quoteIds")
+        }
     }
 }

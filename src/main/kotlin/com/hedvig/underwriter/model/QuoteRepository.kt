@@ -5,6 +5,7 @@ import java.util.UUID
 
 interface QuoteRepository {
     fun find(quoteId: UUID): Quote?
+    fun findQuotes(quoteIds: List<UUID>): List<Quote?>
     fun insert(quote: Quote, timestamp: Instant = Instant.now())
     fun findByMemberId(memberId: String): List<Quote>
     fun findOneByMemberId(memberId: String): Quote?
