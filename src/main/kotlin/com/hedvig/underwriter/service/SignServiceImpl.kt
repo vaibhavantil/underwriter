@@ -132,7 +132,7 @@ class SignServiceImpl(
                     "127.0.0.1"
                 }
 
-                val response = memberService.startSwedishBankIdSignQuotes(data.memberId.toLong(), signSessionId, ip, data.ssn, data.isSwitching)
+                val response = memberService.startSwedishBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn, ip, data.isSwitching)
 
                 return response.autoStartToken?.let { autoStartToken ->
                     StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)

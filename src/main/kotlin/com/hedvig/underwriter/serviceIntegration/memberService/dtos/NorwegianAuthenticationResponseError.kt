@@ -4,8 +4,3 @@ data class NorwegianAuthenticationResponseError(
     val code: Int,
     val description: String
 )
-
-data class NorwegianAuthenticationResponseError(
-    val code: Int,
-    val description: String
-)
