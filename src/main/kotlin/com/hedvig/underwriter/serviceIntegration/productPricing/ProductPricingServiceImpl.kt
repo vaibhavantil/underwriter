@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
@@ -11,6 +12,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTr
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
+import com.hedvig.underwriter.web.dtos.SignRequest
 import java.lang.RuntimeException
 import java.math.BigDecimal
 import kotlin.random.Random
@@ -57,4 +61,7 @@ class ProductPricingServiceImpl @Autowired constructor(
 
     override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
+
+    override fun createContractsFromQuotes(quotes: List<Quote>, signedRequest: SignRequest): List<CreateContractResponse> =
+        productPricingClient.createContract(CreateContractsRequest.from(quotes, signedRequest))
 }
