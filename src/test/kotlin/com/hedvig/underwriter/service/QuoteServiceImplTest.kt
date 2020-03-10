@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import arrow.core.Right
 import arrow.core.getOrElse
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost

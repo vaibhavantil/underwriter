@@ -20,7 +20,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
@@ -32,7 +31,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
-import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -170,18 +168,9 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        val signedProductId = productPricingService.signedQuote(
-            SignedQuoteRequest(
-                price = Money.of(quote.price, quote.currency),
-                quote = quote,
-                referenceToken = signedRequest.referenceToken,
-                signature = signedRequest.signature,
-                oscpResponse = signedRequest.oscpResponse
-            ),
-            quote.memberId
-        ).id
+        val createdAgreementId = productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
 
-        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = signedProductId))
+        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = createdAgreementId))
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
         quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
@@ -223,7 +212,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(signedProductId, signedAt)
+        return SignedQuoteResponseDto(createdAgreementId, signedAt)
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): BundledQuotesSign {

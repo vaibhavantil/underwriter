@@ -17,6 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
@@ -87,11 +88,11 @@ class SignServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
+            productPricingService.createContractsFromQuotes(
+                any(),
                 any()
             )
-        } returns SignedProductResponseDto(UUID.randomUUID())
+        } returns listOf(CreateContractResponse(agreementId = UUID.randomUUID(), quoteId = quoteId, contractId = UUID.randomUUID()))
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
@@ -112,11 +113,11 @@ class SignServiceImplTest {
 
         every { memberService.createMember() } returns "1234"
         every {
-            productPricingService.signedQuote(
-                any<SignedQuoteRequest>(),
+            productPricingService.createContractsFromQuotes(
+                any(),
                 any()
             )
-        } returns SignedProductResponseDto(UUID.randomUUID())
+        } returns listOf(CreateContractResponse(agreementId = UUID.randomUUID(), quoteId = quoteId, contractId = UUID.randomUUID()))
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
         every { env.activeProfiles } returns arrayOf<String>()
