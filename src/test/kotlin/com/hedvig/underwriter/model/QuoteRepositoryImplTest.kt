@@ -680,10 +680,10 @@ class QuoteRepositoryImplTest {
         quoteDao.insert(quote2, timestamp)
         quoteDao.insert(quote3, timestamp)
 
-        val updatedQuote =  quote1.copy(memberId = "1234567", currentInsurer = "ICA")
+        val updatedQuote = quote1.copy(memberId = "1234567", currentInsurer = "ICA")
         quoteDao.update(updatedQuote)
 
-        val updatedQuote3 =  quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
+        val updatedQuote3 = quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
         quoteDao.update(updatedQuote3)
 
         val quotes = quoteDao.findQuotes(listOf(quote1Id, quote2Id, quote3Id))
