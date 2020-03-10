@@ -91,6 +91,7 @@ interface QuoteDao {
             INNER JOIN master_quotes mq
                 ON mq.id = qr.master_quote_id
             WHERE qr.master_quote_id in (<quoteIds>)
+            ORDER BY qr.master_quote_id ASC, qr.id DESC
         """
     )
     fun find(@BindList("quoteIds") quoteIds: List<UUID>): List<DatabaseQuoteRevision?>

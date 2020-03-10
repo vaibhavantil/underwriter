@@ -3,10 +3,11 @@ package com.hedvig.underwriter.graphql
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
+import com.hedvig.graphql.commons.extensions.getEndUserIp
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
+import com.hedvig.graphql.commons.extensions.isAndroid
+import com.hedvig.graphql.commons.extensions.isIOS
 import com.hedvig.localization.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.isAndroid
-import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -23,7 +24,6 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
-import graphql.servlet.context.GraphQLServletContext
 import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -140,13 +140,6 @@ class Mutation @Autowired constructor(
             throw IllegalStateException("Unknown error code [Error Message: ${errorResponse.errorMessage}]")
     }
 
-    fun DataFetchingEnvironment.isAndroid() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isAndroid() ?: false
-        ?: false
-
-    fun DataFetchingEnvironment.isIOS() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isIOS() ?: false
-
     private fun addCenturyToSSN(ssn: String): String {
         val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
         val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
@@ -155,15 +148,6 @@ class Mutation @Autowired constructor(
             "19$ssn"
         } else {
             "20$ssn"
-        }
-    }
-
-    fun DataFetchingEnvironment.getEndUserIp(): String? {
-        val ip = this.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("x-forwarded-for")
-        return if (ip?.contains(",") == true) {
-            ip.split(",").first()
-        } else {
-            ip
         }
     }
 }

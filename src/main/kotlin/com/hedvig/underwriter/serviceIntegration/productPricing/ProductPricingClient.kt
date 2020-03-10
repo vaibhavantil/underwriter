@@ -10,6 +10,8 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import feign.Headers
 import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
@@ -58,4 +60,9 @@ interface ProductPricingClient {
     fun redeemCampaign(
         @Valid @RequestBody req: RedeemCampaignDto
     ): ResponseEntity<Void>
+
+    @PostMapping("/_/contracts/create")
+    fun createContract(
+        @Valid @RequestBody request: CreateContractsRequest
+    ): List<CreateContractResponse>
 }

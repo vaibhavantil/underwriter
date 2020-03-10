@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.model
 
+import java.time.Instant
 import java.util.UUID
+import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 
 interface SignSessionDao {
@@ -8,18 +10,18 @@ interface SignSessionDao {
     @SqlUpdate(
         """
             INSERT INTO sign_sessions (
-                id
+                id, created_at
             )
             VALUES (
-                :id
+                :id, :createdAt
             )
     """
     )
-    fun insert(id: UUID)
+    fun insert(id: UUID, @Bind createdAt: Instant = Instant.now())
 
     @SqlUpdate(
         """
-            INSERT INTO sign_session_quote_revision (
+            INSERT INTO sign_session_master_quote (
                 sign_session_id, master_quote_id
             ) 
             VALUES (

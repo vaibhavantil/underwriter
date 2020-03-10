@@ -17,8 +17,4 @@ class SignSessionRepositoryImpl(private val jdbi: Jdbi) : SignSessionRepository 
         }
         return signSessionId
     }
-
-    override fun find(signSessionId: UUID): SignSession {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
-    }
 }
