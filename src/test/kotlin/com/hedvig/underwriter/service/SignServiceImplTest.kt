@@ -15,8 +15,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegi
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
