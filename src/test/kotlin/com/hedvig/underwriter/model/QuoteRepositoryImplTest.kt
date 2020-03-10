@@ -592,6 +592,107 @@ class QuoteRepositoryImplTest {
         assertQuotesDeepEqualExceptInternalId(breachedUnderwritingGuidelinesQuote, quoteDao.find(quote.id))
     }
 
+    @Test
+    fun insertMultipleQuotes_updateQuotes_getLatestRevision_inList() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote1Id = UUID.randomUUID()
+        val quote1 = Quote(
+            id = quote1Id,
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = SwedishApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
+        )
+        val quote2Id = UUID.randomUUID()
+        val quote2 = Quote(
+            id = quote2Id,
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = SwedishApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "1337",
+            breachedUnderwritingGuidelines = null,
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
+        )
+
+        val quote3Id = UUID.randomUUID()
+        val quote3 = Quote(
+            id = quote3Id,
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.INCOMPLETE,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = SwedishApartmentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                ssn = "199003041234",
+                street = "221 Baker street",
+                zipCode = "11216",
+                livingSpace = 33,
+                householdSize = 4,
+                city = "London",
+                id = UUID.randomUUID(),
+                subType = ApartmentProductSubType.BRF
+            ),
+            currentInsurer = null,
+            memberId = "1337",
+            breachedUnderwritingGuidelines = null,
+            originatingProductId = UUID.randomUUID(),
+            signedProductId = UUID.randomUUID()
+        )
+        quoteDao.insert(quote1, timestamp)
+        quoteDao.insert(quote2, timestamp)
+        quoteDao.insert(quote3, timestamp)
+
+        val updatedQuote =  quote1.copy(memberId = "1234567", currentInsurer = "ICA")
+        quoteDao.update(updatedQuote)
+
+        val updatedQuote3 =  quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
+        quoteDao.update(updatedQuote3)
+
+        val quotes = quoteDao.findQuotes(listOf(quote1Id, quote2Id, quote3Id))
+
+        assertThat(quotes.size).isEqualTo(3)
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quotes.first { quote -> quote?.id?.equals(quote1Id) ?: false })
+        assertQuotesDeepEqualExceptInternalId(updatedQuote3, quotes.first { quote -> quote?.id?.equals(quote3Id) ?: false })
+    }
+
     private fun assertQuotesDeepEqualExceptInternalId(
         expected: Quote,
         result: Quote?
