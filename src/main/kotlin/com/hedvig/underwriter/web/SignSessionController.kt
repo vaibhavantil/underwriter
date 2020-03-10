@@ -3,13 +3,13 @@ package com.hedvig.underwriter.web
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.web.dtos.SignRequest
+import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @RestController
 @RequestMapping(

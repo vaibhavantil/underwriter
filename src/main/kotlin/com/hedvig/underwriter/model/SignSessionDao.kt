@@ -3,6 +3,7 @@ package com.hedvig.underwriter.model
 import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
+import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 
 interface SignSessionDao {
@@ -30,4 +31,13 @@ interface SignSessionDao {
     """
     )
     fun insert(signSessionId: UUID, masterQuoteId: UUID)
+
+    @SqlQuery(
+        """
+            SELECT master_quote_id 
+            FROM sign_session_master_quote
+            WHERE sign_session_id = :sessionId
+        """
+    )
+    fun find(sessionId: UUID): List<UUID>
 }
