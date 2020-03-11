@@ -35,4 +35,6 @@ interface ProductPricingService {
     fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost
 
     fun createContractsFromQuotes(quotes: List<Quote>, signedRequest: SignRequest): List<CreateContractResponse>
+
+    fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse>
 }

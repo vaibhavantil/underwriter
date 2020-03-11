@@ -104,7 +104,8 @@ class SignServiceImpl(
                         oscpResponse = completeSignSessionData.oscpResponse
                     )
                 )
-            is CompleteSignSessionData.NoExtraDataNeeded -> TODO("create createContractsFromQuotes without signature")
+            is CompleteSignSessionData.NoMandate ->
+                productPricingService.createContractsFromQuotesNoMandate(quotes)
         }
         quotes.forEach { quote ->
             val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
@@ -112,7 +113,11 @@ class SignServiceImpl(
         }
     }
 
-    private fun finishingUpSignedQuote(quote: Quote, signedContractId: UUID, signStartedInMemberService: Boolean): SignedQuoteResponseDto {
+    private fun finishingUpSignedQuote(
+        quote: Quote,
+        signedContractId: UUID,
+        signStartedInMemberService: Boolean
+    ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
             quote.copy(signedProductId = signedContractId)
         )

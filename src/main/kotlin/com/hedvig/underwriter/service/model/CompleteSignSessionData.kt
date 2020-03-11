@@ -8,5 +8,5 @@ sealed class CompleteSignSessionData {
         val oscpResponse: String
     ) : CompleteSignSessionData()
 
-    object NoExtraDataNeeded : CompleteSignSessionData()
+    object NoMandate : CompleteSignSessionData()
 }

@@ -38,7 +38,7 @@ class SignSessionController @Autowired constructor(
         @PathVariable sessionId: UUID
     ) {
         signService.completedSignSession(
-            sessionId, CompleteSignSessionData.NoExtraDataNeeded
+            sessionId, CompleteSignSessionData.NoMandate
         )
     }
 }
