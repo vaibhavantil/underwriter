@@ -51,8 +51,12 @@ class SignServiceImpl(
     override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
 
         val quotes = quoteService.getQuotes(quoteIds)
-
-        // TODO use quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+        quotes.forEach { quote ->
+            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            if (quoteNotSignableErrorDto != null) {
+                return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
+            }
+        }
 
         when (val data = getSignDataFromQuotes(quotes)) {
             is BundledQuotesSign.SwedishBankId -> {
