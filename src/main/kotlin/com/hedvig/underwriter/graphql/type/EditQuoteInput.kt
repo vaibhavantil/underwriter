@@ -30,7 +30,7 @@ data class EditQuoteInput(
     val norweiganTravel: EditNorwegianTravelInput?,
     val dataCollectionId: UUID?
 ) {
-    fun toHouseOrApartmentIncompleteQuoteDto(
+    fun toQuoteRequest(
         quotingPartner: Partner? = null,
         memberId: String? = null,
         originatingProductId: UUID? = null
