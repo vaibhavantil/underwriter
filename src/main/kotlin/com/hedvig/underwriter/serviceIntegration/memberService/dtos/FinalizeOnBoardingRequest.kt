@@ -6,7 +6,11 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.model.birthDate
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import java.time.LocalDate
 
 class FinalizeOnBoardingRequest(
     val memberId: String,
@@ -15,7 +19,8 @@ class FinalizeOnBoardingRequest(
     val lastName: String,
     val email: String,
     val phoneNumber: String?,
-    val address: Address?
+    val address: Address?,
+    val birthDate: LocalDate?
 ) {
     companion object {
 
@@ -44,18 +49,20 @@ class FinalizeOnBoardingRequest(
                             zipCode = addressInsurance.zipCode!!,
                             apartmentNo = "",
                             floor = 0
-                        )
+                        ),
+                        birthDate = quote.birthDate
                     )
                 }
                 is NorwegianTravelData ->
                     FinalizeOnBoardingRequest(
                         memberId = quote.memberId!!,
                         ssn = quote.data.ssn,
-                        firstName = quote.data.firstName!!,
-                        lastName = quote.data.lastName!!,
+                        firstName = quote.firstName,
+                        lastName = quote.lastName,
                         email = email,
                         phoneNumber = phoneNumber,
-                        address = null
+                        address = null,
+                        birthDate = quote.birthDate
                     )
             }
     }

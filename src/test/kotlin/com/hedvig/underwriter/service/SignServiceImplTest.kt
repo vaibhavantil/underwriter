@@ -17,6 +17,8 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -132,6 +134,7 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { memberService.startSwedishBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn, ipAddress, false) } returns StartSwedishBankIdSignResponse(
             "autoStartToken"
         )
@@ -149,6 +152,7 @@ class SignServiceImplTest {
         val signSessionReference = UUID.randomUUID()
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every { memberService.startSwedishBankIdSignQuotes(memberId.toLong(), signSessionReference, quote.ssn, ipAddress, false) } returns StartSwedishBankIdSignResponse(
             autoStartToken = null,
@@ -162,6 +166,19 @@ class SignServiceImplTest {
     }
 
     @Test
+    fun startSigningOfSwedishQuotes_getQuoteStateNotSignableErrorOrNullReturnsError_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns ErrorResponseDto(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "")
+
+        val result = cut.startSigningQuotes(quoteIds, ipAddress)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
     fun startSigningOfNorwegianQuote_startNorwegianSign() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
@@ -169,6 +186,7 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn) } returns StartNorwegianBankIdSignResponse(
             "redirect url"
         )
@@ -187,6 +205,7 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn) } returns StartNorwegianBankIdSignResponse(
             "redirect url"
         )
@@ -203,6 +222,7 @@ class SignServiceImplTest {
         val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.SwedishHouseDataBuilder()).build()
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         val result = cut.startSigningQuotes(quoteIds, ipAddress)
 
@@ -230,6 +250,7 @@ class SignServiceImplTest {
         val quote3 = a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianTravelDataBuilder()).build()
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         val result = cut.startSigningQuotes(quoteIds, ipAddress)
 
