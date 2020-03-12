@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import java.time.LocalDate
@@ -49,4 +50,6 @@ interface QuoteService {
     fun calculateInsuranceCost(quote: Quote): InsuranceCost
 
     fun getQuotes(quoteIds: List<UUID>): List<Quote>
+
+    fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote>
 }

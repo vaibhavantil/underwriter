@@ -75,11 +75,11 @@ sealed class AgreementQuote {
     ) : AgreementQuote()
 
     companion object {
-        fun from(quote: Quote) = when (quote.data) {
+        fun from(quote: Quote, fromDate: LocalDate? = null, toDate: LocalDate? = null) = when (quote.data) {
             is SwedishApartmentData -> SwedishApartmentQuote(
                 quoteId = quote.id,
-                fromDate = quote.startDate,
-                toDate = null,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
                 premium = quote.price!!,
                 currency = quote.currency,
                 address = AddressDto.from(quote.data),
@@ -89,8 +89,8 @@ sealed class AgreementQuote {
             )
             is SwedishHouseData -> SwedishHouseQuote(
                 quoteId = quote.id,
-                fromDate = quote.startDate,
-                toDate = null,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
                 premium = quote.price!!,
                 currency = quote.currency,
                 address = AddressDto.from(quote.data),
@@ -104,8 +104,8 @@ sealed class AgreementQuote {
             )
             is NorwegianHomeContentsData -> NorwegianHomeContentQuote(
                 quoteId = quote.id,
-                fromDate = quote.startDate,
-                toDate = null,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
                 premium = quote.price!!,
                 currency = quote.currency,
                 address = AddressDto.from(quote.data),
@@ -115,8 +115,8 @@ sealed class AgreementQuote {
             )
             is NorwegianTravelData -> NorwegianTravelQuote(
                 quoteId = quote.id,
-                fromDate = quote.startDate,
-                toDate = null,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
                 premium = quote.price!!,
                 currency = quote.currency,
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
