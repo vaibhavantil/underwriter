@@ -30,7 +30,6 @@ import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.util.UUID
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
