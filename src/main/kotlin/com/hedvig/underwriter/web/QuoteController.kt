@@ -2,8 +2,8 @@ package com.hedvig.underwriter.web
 
 import arrow.core.Either
 import arrow.core.getOrHandle
-import com.hedvig.underwriter.extensions.isAndroid
-import com.hedvig.underwriter.extensions.isIOS
+import com.hedvig.graphql.commons.extensions.isAndroid
+import com.hedvig.graphql.commons.extensions.isIOS
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService

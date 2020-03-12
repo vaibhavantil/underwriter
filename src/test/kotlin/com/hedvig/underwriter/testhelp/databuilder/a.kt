@@ -1,8 +1,11 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.ONE_DAY
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
@@ -11,6 +14,7 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
@@ -102,6 +106,115 @@ class a {
             householdSize,
             livingSpace,
             subType,
+            internalId
+        )
+    }
+
+    data class SwedishHouseDataBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
+        val ssn: String? = "191212121212",
+        val birthDate: LocalDate? = LocalDate.of(1912, 12, 12),
+        val firstName: String? = "",
+        val lastName: String? = "",
+        val email: String? = "em@i.l",
+
+        val street: String = "",
+        val city: String = "",
+        val zipCode: String = "",
+        val householdSize: Int = 3,
+        val livingSpace: Int = 2,
+        val ancillaryArea: Int = 50,
+        val yearOfConstruction: Int = 1925,
+        val numberOfBathrooms: Int = 1,
+        val extraBuildings: List<ExtraBuilding> = emptyList(),
+        val isSubleted: Boolean = false,
+        val internalId: Int? = null
+    ) : DataBuilder<QuoteData> {
+
+        override fun build() = SwedishHouseData(
+            id,
+            ssn,
+            birthDate,
+            firstName,
+            lastName,
+            email,
+            street,
+            zipCode,
+            city,
+            livingSpace,
+            householdSize,
+            ancillaryArea,
+            yearOfConstruction,
+            numberOfBathrooms,
+            extraBuildings,
+            isSubleted,
+            null,
+            internalId
+        )
+    }
+
+    data class NorwegianHomeContentDataBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
+        val ssn: String? = "191212121212",
+        val birthDate: LocalDate = LocalDate.of(1912, 12, 12),
+        val firstName: String = "",
+        val lastName: String = "",
+        val email: String? = "em@i.l",
+
+        val street: String = "",
+        val city: String? = "",
+        val zipCode: String = "",
+        val coInsured: Int = 3,
+        val livingSpace: Int = 2,
+        val isStudent: Boolean = false,
+        val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
+        val internalId: Int? = null
+    ) : DataBuilder<QuoteData> {
+
+        override fun build() = NorwegianHomeContentsData(
+            id,
+            ssn,
+            birthDate,
+            firstName,
+            lastName,
+            email,
+            street,
+            city,
+            zipCode,
+            coInsured,
+            livingSpace,
+            isStudent,
+            type,
+            internalId
+        )
+    }
+
+    data class NorwegianTravelDataBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
+        val ssn: String? = "191212121212",
+        val birthDate: LocalDate = LocalDate.of(1912, 12, 12),
+        val firstName: String = "",
+        val lastName: String = "",
+        val email: String? = "em@i.l",
+
+        val street: String = "",
+        val city: String? = "",
+        val zipCode: String = "",
+        val coInsured: Int = 3,
+        val livingSpace: Int = 2,
+        val isStudent: Boolean = false,
+        val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
+        val internalId: Int? = null
+    ) : DataBuilder<QuoteData> {
+
+        override fun build() = NorwegianTravelData(
+            id,
+            ssn,
+            birthDate,
+            firstName,
+            lastName,
+            email,
+            coInsured,
             internalId
         )
     }

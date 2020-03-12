@@ -2,12 +2,19 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -31,9 +38,11 @@ import org.springframework.stereotype.Service
 @Service
 class SignServiceImpl(
     val quoteService: QuoteService,
+    // FIXME: SignService should only use quoteService in my opinion, but I'm not up for doing that refactor now.
     val quoteRepository: QuoteRepository,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
+    val signSessionRepository: SignSessionRepository,
     val customerIO: CustomerIO,
     val env: Environment
 ) : SignService {
@@ -108,6 +117,41 @@ class SignServiceImpl(
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
+    override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
+
+        val quotes = quoteService.getQuotes(quoteIds)
+
+        when (val data = getSignDataFromQuotes(quotes)) {
+            is QuotesSignData.SwedishBankId -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val ip = ipAddress ?: run {
+                    logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quotes]")
+                    "127.0.0.1"
+                }
+
+                val response = memberService.startSwedishBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn, ip, data.isSwitching)
+
+                return response.autoStartToken?.let { autoStartToken ->
+                    StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
+                } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
+            }
+            is QuotesSignData.NorwegianBankId -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val response = memberService.startNorwegianBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn)
+
+                return response.redirectUrl?.let { redirectUrl ->
+                    StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
+                } ?: response.internalErrorMessage?.let {
+                    StartSignResponse.FailedToStartSign(it)
+                } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
+            }
+            is QuotesSignData.CanNotBeBundled ->
+                return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
+        }
+    }
+
     private fun signQuoteWithMemberId(
         quote: Quote,
         signedInMemberService: Boolean,
@@ -169,6 +213,42 @@ class SignServiceImpl(
         }
 
         return SignedQuoteResponseDto(createdAgreementId, signedAt)
+    }
+
+    private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
+        return when (quotes.size) {
+            1 ->
+                when (quotes[0].data) {
+                    is SwedishApartmentData,
+                    is SwedishHouseData -> QuotesSignData.SwedishBankId(
+                        quotes[0].memberId!!,
+                        quotes[0].ssn,
+                        quotes[0].currentInsurer != null
+                    )
+                    is NorwegianHomeContentsData,
+                    is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
+                }
+            2 -> if (
+                quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
+                quotes.any { quote -> quote.data is NorwegianTravelData }
+            ) {
+                var ssn: String? = null
+                quotes.forEach { quote ->
+                    if (quote.data is PersonPolicyHolder<*>) {
+                        quote.data.ssn?.let {
+                            ssn = it
+                            return@forEach
+                        }
+                    } else {
+                        throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
+                    }
+                }
+                QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn!!)
+            } else {
+                QuotesSignData.CanNotBeBundled
+            }
+            else -> QuotesSignData.CanNotBeBundled
+        }
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
@@ -14,4 +15,9 @@ interface SignService {
     ): Either<ErrorResponseDto, SignedQuoteResponseDto>
 
     fun memberSigned(memberId: String, signedRequest: SignRequest)
+
+    fun startSigningQuotes(
+        quoteIds: List<UUID>,
+        ipAddress: String?
+    ): StartSignResponse
 }

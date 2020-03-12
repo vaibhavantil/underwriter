@@ -4,10 +4,13 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
+import java.util.UUID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -31,4 +34,18 @@ interface MemberService {
     fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse
 
     fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String? = null)
+
+    fun startSwedishBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        ipAddress: String,
+        isSwitching: Boolean
+    ): StartSwedishBankIdSignResponse
+
+    fun startNorwegianBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String
+    ): StartNorwegianBankIdSignResponse
 }

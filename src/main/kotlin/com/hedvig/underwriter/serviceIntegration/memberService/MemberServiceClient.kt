@@ -4,7 +4,11 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBo
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartNorwegianBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.Headers
@@ -50,4 +54,16 @@ interface MemberServiceClient {
         @PathVariable("memberId") memberId: String,
         @RequestBody req: FinalizeOnBoardingRequest
     ): ResponseEntity<*>
+
+    @PostMapping("swedish/bankid/{memberId}")
+    fun startSwedishBankIdSign(
+        @PathVariable("memberId") memberId: Long,
+        @RequestBody request: UnderwriterStartSwedishBankIdSignSessionRequest
+    ): ResponseEntity<StartSwedishBankIdSignResponse>
+
+    @PostMapping("_/member/start/sign/norwegian/bankid/{memberId}")
+    fun startNorwegianSing(
+        @PathVariable("memberId") memberId: Long,
+        @RequestBody request: UnderwriterStartNorwegianBankIdSignSessionRequest
+    ): ResponseEntity<StartNorwegianBankIdSignResponse>
 }

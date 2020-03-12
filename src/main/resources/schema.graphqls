@@ -13,6 +13,7 @@ type Mutation {
     editQuote(input: EditQuoteInput!): CreateQuoteResult!
     removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
     removeStartDate(input : RemoveStartDateInput!): CreateQuoteResult!
+    signQuotes(input: SignQuotesInput!): StartSignResponse
 }
 
 input CreateQuoteInput {
@@ -165,6 +166,10 @@ input ExtraBuildingInput {
     type: ExtraBuildingType!
     area: Int!
     hasWaterConnected: Boolean!
+}
+
+input SignQuotesInput {
+    quoteIds: [ID!]!
 }
 
 enum ExtraBuildingType {
@@ -447,6 +452,23 @@ type InsuranceCost {
     monthlyDiscount: MonetaryAmountV2!,
     monthlyNet: MonetaryAmountV2!,
     freeUntil: LocalDate
+}
+
+union StartSignResponse =
+    SwedishBankIdSession
+    | NorwegianBankIdSession
+    | FailedToStartSign
+
+type SwedishBankIdSession {
+    autoStartToken: String
+}
+
+type NorwegianBankIdSession {
+    redirectUrl: String
+}
+
+type FailedToStartSign {
+    errorMessage: String
 }
 
 scalar LocalDate

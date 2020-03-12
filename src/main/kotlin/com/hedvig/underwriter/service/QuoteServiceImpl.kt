@@ -256,6 +256,16 @@ class QuoteServiceImpl(
         }
     }
 
+    override fun getQuotes(quoteIds: List<UUID>): List<Quote> {
+        val quotes = quoteRepository.findQuotes(quoteIds)
+
+        return if (quotes.all { it != null }) {
+            quotes.filterNotNull()
+        } else {
+            throw RuntimeException("Could not find all quotes in list: $quoteIds")
+        }
+    }
+
     override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")

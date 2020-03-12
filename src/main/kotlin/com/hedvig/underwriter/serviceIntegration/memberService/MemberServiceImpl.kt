@@ -7,11 +7,16 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartNorwegianBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
+import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
@@ -71,5 +76,23 @@ class MemberServiceImpl @Autowired constructor(
     override fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String?) {
         logger.debug("Finalizing web on boarding by populating member-service")
         client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
+    }
+
+    override fun startSwedishBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        ipAddress: String,
+        isSwitching: Boolean
+    ): StartSwedishBankIdSignResponse {
+        return client.startSwedishBankIdSign(memberId, UnderwriterStartSwedishBankIdSignSessionRequest(underwriterSessionReference, ssn, ipAddress, isSwitching)).body!!
+    }
+
+    override fun startNorwegianBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String
+    ): StartNorwegianBankIdSignResponse {
+        return client.startNorwegianSing(memberId, UnderwriterStartNorwegianBankIdSignSessionRequest(underwriterSessionReference, ssn)).body!!
     }
 }

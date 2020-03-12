@@ -3,25 +3,27 @@ package com.hedvig.underwriter.graphql
 import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
+import com.hedvig.graphql.commons.extensions.getEndUserIp
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
+import com.hedvig.graphql.commons.extensions.isAndroid
+import com.hedvig.graphql.commons.extensions.isIOS
 import com.hedvig.localization.service.TextKeysLocaleResolver
-import com.hedvig.underwriter.extensions.isAndroid
-import com.hedvig.underwriter.extensions.isIOS
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
+import com.hedvig.underwriter.graphql.type.SignQuotesInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
-import graphql.servlet.context.GraphQLServletContext
 import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component
 @Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
+    private val signService: SignService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
@@ -97,6 +100,9 @@ class Mutation @Autowired constructor(
             env
         )
 
+    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) =
+        signService.startSigningQuotes(input.quoteIds, env.getEndUserIp())
+
     private fun responseForEditedQuote(
         errorOrQuote: Either<ErrorResponseDto, Quote>,
         env: DataFetchingEnvironment
@@ -133,13 +139,6 @@ class Mutation @Autowired constructor(
         ErrorCodes.UNKNOWN_ERROR_CODE ->
             throw IllegalStateException("Unknown error code [Error Message: ${errorResponse.errorMessage}]")
     }
-
-    fun DataFetchingEnvironment.isAndroid() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isAndroid() ?: false
-        ?: false
-
-    fun DataFetchingEnvironment.isIOS() =
-        this.getContext<GraphQLServletContext?>()?.httpServletRequest?.isIOS() ?: false
 
     private fun addCenturyToSSN(ssn: String): String {
         val personalIdentityNumberYear = ssn.substring(0, 2).toInt()

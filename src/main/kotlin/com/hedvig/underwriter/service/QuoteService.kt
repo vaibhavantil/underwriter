@@ -48,5 +48,8 @@ interface QuoteService {
     fun getQuoteStateNotSignableErrorOrNull(quote: Quote): ErrorResponseDto?
 
     fun calculateInsuranceCost(quote: Quote): InsuranceCost
+
+    fun getQuotes(quoteIds: List<UUID>): List<Quote>
+
     fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote>
 }
