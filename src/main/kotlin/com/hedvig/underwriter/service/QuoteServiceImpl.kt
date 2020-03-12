@@ -21,6 +21,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -181,7 +182,7 @@ class QuoteServiceImpl(
         previousProductTerminationDate: LocalDate?
     ): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(completeQuoteId)
-            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to activate")
 
         val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
         if (quoteNotSignableErrorDto != null) {
@@ -253,5 +254,29 @@ class QuoteServiceImpl(
                 freeUntil = null
             )
         }
+    }
+
+    override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote> {
+        val quote = getQuote(request.quoteId)
+            ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
+
+        val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
+        if (quoteNotSignableErrorDto != null) {
+            Either.left(quoteNotSignableErrorDto)
+        }
+
+        val response = productPricingService.addAgreementFromQuote(
+            quote = quote,
+            request = request
+        )
+
+        val updatedQuote = quoteRepository.update(
+            quote.copy(
+                signedProductId = response.agreementId,
+                state = QuoteState.SIGNED
+            )
+        )
+
+        return Either.right(updatedQuote)
     }
 }
