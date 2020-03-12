@@ -9,7 +9,7 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 
 data class CreateContractsRequest(
     val memberId: String,
-    val mandate: CreateMandateRequest,
+    val mandate: CreateMandateRequest?,
     val currentInsurer: String?,
     val signSource: QuoteInitiatedFrom,
     val quotes: List<AgreementQuote>
@@ -27,6 +27,17 @@ data class CreateContractsRequest(
                     signature = signedRequest.signature,
                     oscpResponse = signedRequest.oscpResponse
                 ),
+                currentInsurer = firstQuote.currentInsurer,
+                signSource = firstQuote.initiatedFrom,
+                quotes = quotes.map { quote -> AgreementQuote.from(quote) }
+            )
+        }
+
+        fun fromQuotesNoMandate(quotes: List<Quote>): CreateContractsRequest {
+            val firstQuote = quotes.first()
+            return CreateContractsRequest(
+                memberId = firstQuote.memberId!!,
+                mandate = null,
                 currentInsurer = firstQuote.currentInsurer,
                 signSource = firstQuote.initiatedFrom,
                 quotes = quotes.map { quote -> AgreementQuote.from(quote) }

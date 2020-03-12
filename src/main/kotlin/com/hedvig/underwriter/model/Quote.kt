@@ -11,6 +11,7 @@ import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 
 val Quote.firstName
@@ -66,10 +67,10 @@ fun String.birthDateStringFromNorwegianSsn(): String {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     val day = trimmedInput.substring(0, 2)
     val month = trimmedInput.substring(2, 4)
-    val twoDigitYear = trimmedInput.substring(4, 6).toInt()
+    val twoDigitYear = trimmedInput.substring(4, 6)
     val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
 
-    val year = if (twoDigitYear > breakPoint) {
+    val year = if (twoDigitYear.toInt() > breakPoint) {
         "19$twoDigitYear"
     } else {
         "20$twoDigitYear"
@@ -329,6 +330,13 @@ data class Quote(
         this.swedishApartment != null || this.swedishHouse != null -> this.ssn.birthDateFromSwedishSsn()
         this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn.birthDateFromNorwegianSsn()
         else -> null
+    }
+
+    fun getTimeZoneId() = when (this.data) {
+        is SwedishHouseData,
+        is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
+        is NorwegianHomeContentsData,
+        is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
     }
 
     companion object {

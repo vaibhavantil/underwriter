@@ -13,6 +13,7 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
@@ -29,7 +30,6 @@ import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.util.UUID
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -46,6 +46,128 @@ class SignServiceImpl(
     val customerIO: CustomerIO,
     val env: Environment
 ) : SignService {
+
+    override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
+
+        val quotes = quoteService.getQuotes(quoteIds)
+        quotes.forEach { quote ->
+            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            if (quoteNotSignableErrorDto != null) {
+                return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
+            }
+        }
+
+        when (val data = getSignDataFromQuotes(quotes)) {
+            is QuotesSignData.SwedishBankId -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val ip = ipAddress ?: run {
+                    logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quotes]")
+                    "127.0.0.1"
+                }
+
+                val response = memberService.startSwedishBankIdSignQuotes(
+                    data.memberId.toLong(),
+                    signSessionId,
+                    data.ssn,
+                    ip,
+                    data.isSwitching
+                )
+
+                return response.autoStartToken?.let { autoStartToken ->
+                    StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
+                } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
+            }
+            is QuotesSignData.NorwegianBankId -> {
+                val signSessionId = signSessionRepository.insert(quoteIds)
+
+                val response =
+                    memberService.startNorwegianBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn)
+
+                return response.redirectUrl?.let { redirectUrl ->
+                    StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
+                } ?: response.internalErrorMessage?.let {
+                    StartSignResponse.FailedToStartSign(it)
+                } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
+            }
+            is QuotesSignData.CanNotBeBundled ->
+                return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
+        }
+    }
+
+    override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
+        val quotes = quoteService.getQuotes(signSessionRepository.find(signSessionId))
+
+        val createContractResponse = when (completeSignSessionData) {
+            is CompleteSignSessionData.SwedishBankIdDataComplete ->
+                productPricingService.createContractsFromQuotes(
+                    quotes, SignRequest(
+                        referenceToken = completeSignSessionData.referenceToken,
+                        signature = completeSignSessionData.signature,
+                        oscpResponse = completeSignSessionData.oscpResponse
+                    )
+                )
+            is CompleteSignSessionData.NoMandate ->
+                productPricingService.createContractsFromQuotesNoMandate(quotes)
+        }
+        quotes.forEach { quote ->
+            val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
+            finishingUpSignedQuote(quote, signedContractId, false)
+        }
+    }
+
+    private fun finishingUpSignedQuote(
+        quote: Quote,
+        signedContractId: UUID,
+        signStartedInMemberService: Boolean
+    ): SignedQuoteResponseDto {
+        val quoteWithProductId = quoteRepository.update(
+            quote.copy(signedProductId = signedContractId)
+        )
+        checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+
+        quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
+            try {
+                productPricingService.redeemCampaign(
+                    RedeemCampaignDto(
+                        quoteWithProductId.memberId,
+                        campaignCode,
+                        LocalDate.now(quote.getTimeZoneId())
+                    )
+                )
+            } catch (e: FeignException) {
+                logger.error("Failed to redeem $campaignCode for partner ${quoteWithProductId.attributedTo} with response ${e.message}")
+            }
+        }
+
+        if (!signStartedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
+            memberService.signQuote(
+                quoteWithProductId.memberId.toLong(),
+                UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
+            )
+        }
+
+        val signedAt = Instant.now()
+        val signedQuote = quoteWithProductId.copy(state = QuoteState.SIGNED)
+
+        quoteRepository.update(signedQuote, signedAt)
+
+        val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
+        try {
+            if (activeProfiles.isNotEmpty()) {
+                logger.error("customerIOClient is null even thou $activeProfiles is set")
+            }
+            customerIO.postSignUpdate(quoteWithProductId)
+        } catch (ex: Exception) {
+            logger.error(
+                "Something went wrong while posting a signing update to customerIO " +
+                    "[ActiveProfile: $activeProfiles] [SignQuote: $signedQuote]"
+            )
+        }
+
+        return SignedQuoteResponseDto(signedContractId, signedAt)
+    }
+
     override fun signQuote(
         completeQuoteId: UUID,
         body: SignQuoteRequest
@@ -117,44 +239,9 @@ class SignServiceImpl(
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
-    override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
-
-        val quotes = quoteService.getQuotes(quoteIds)
-
-        when (val data = getSignDataFromQuotes(quotes)) {
-            is QuotesSignData.SwedishBankId -> {
-                val signSessionId = signSessionRepository.insert(quoteIds)
-
-                val ip = ipAddress ?: run {
-                    logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quotes]")
-                    "127.0.0.1"
-                }
-
-                val response = memberService.startSwedishBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn, ip, data.isSwitching)
-
-                return response.autoStartToken?.let { autoStartToken ->
-                    StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
-                } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
-            }
-            is QuotesSignData.NorwegianBankId -> {
-                val signSessionId = signSessionRepository.insert(quoteIds)
-
-                val response = memberService.startNorwegianBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn)
-
-                return response.redirectUrl?.let { redirectUrl ->
-                    StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
-                } ?: response.internalErrorMessage?.let {
-                    StartSignResponse.FailedToStartSign(it)
-                } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
-            }
-            is QuotesSignData.CanNotBeBundled ->
-                return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
-        }
-    }
-
     private fun signQuoteWithMemberId(
         quote: Quote,
-        signedInMemberService: Boolean,
+        signStartedInMemberService: Boolean,
         signedRequest: SignRequest,
         email: String?
     ): SignedQuoteResponseDto {
@@ -168,51 +255,10 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        val createdAgreementId = productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
+        val createdAgreementId =
+            productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
 
-        val quoteWithProductId = quoteRepository.update(quote.copy(signedProductId = createdAgreementId))
-        checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
-
-        quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
-            try {
-                productPricingService.redeemCampaign(
-                    RedeemCampaignDto(
-                        quoteWithProductId.memberId,
-                        campaignCode,
-                        LocalDate.now(ZoneId.of("Europe/Stockholm"))
-                    )
-                )
-            } catch (e: FeignException) {
-                logger.error("Failed to redeem $campaignCode for partner ${quoteWithProductId.attributedTo} with response ${e.message}")
-            }
-        }
-
-        if (!signedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
-            memberService.signQuote(
-                quoteWithProductId.memberId.toLong(),
-                UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
-            )
-        }
-
-        val signedAt = Instant.now()
-        val signedQuote = quoteWithProductId.copy(state = QuoteState.SIGNED)
-
-        quoteRepository.update(signedQuote, signedAt)
-
-        val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
-        try {
-            if (activeProfiles.isNotEmpty()) {
-                logger.error("customerIOClient is null even thou $activeProfiles is set")
-            }
-            customerIO.postSignUpdate(quoteWithProductId)
-        } catch (ex: Exception) {
-            logger.error(
-                "Something went wrong while posting a signing update to customerIO " +
-                    "[ActiveProfile: $activeProfiles] [SignQuote: $signedQuote]"
-            )
-        }
-
-        return SignedQuoteResponseDto(createdAgreementId, signedAt)
+        return finishingUpSignedQuote(quote, createdAgreementId, signStartedInMemberService)
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {

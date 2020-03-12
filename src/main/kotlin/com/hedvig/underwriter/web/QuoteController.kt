@@ -161,6 +161,7 @@ class QuoteController @Autowired constructor(
         return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
     }
 
+    @Deprecated("Should start sign session from `/_/v1/signSession` and complete it there")
     @PostMapping("/member/{memberId}/signed")
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         signService.memberSigned(memberId, signRequest)
