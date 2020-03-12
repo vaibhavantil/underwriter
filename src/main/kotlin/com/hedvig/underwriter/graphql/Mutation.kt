@@ -51,7 +51,7 @@ class Mutation @Autowired constructor(
         }
 
         val completeQuote = quoteService.createQuote(
-            input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
+            input.toQuoteRequest(memberId = env.getTokenOrNull()),
             input.id,
             initiatedFrom = when {
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID
@@ -82,7 +82,7 @@ class Mutation @Autowired constructor(
     fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult =
         responseForEditedQuote(
             quoteService.updateQuote(
-                input.toHouseOrApartmentIncompleteQuoteDto(memberId = env.getTokenOrNull()),
+                input.toQuoteRequest(memberId = env.getTokenOrNull()),
                 input.id
             ),
             env

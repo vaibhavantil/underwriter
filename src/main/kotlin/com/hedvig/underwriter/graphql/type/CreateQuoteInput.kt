@@ -31,7 +31,7 @@ data class CreateQuoteInput(
     val norweiganTravel: CreateNorwegianTravelInput?,
     val dataCollectionId: UUID?
 ) {
-    fun toHouseOrApartmentIncompleteQuoteDto(
+    fun toQuoteRequest(
         quotingPartner: Partner? = null,
         memberId: String? = null,
         originatingProductId: UUID? = null
