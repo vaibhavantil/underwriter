@@ -12,6 +12,7 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
@@ -128,6 +129,19 @@ class QuoteController @Autowired constructor(
     ): ResponseEntity<Any> {
         val result =
             quoteService.activateQuote(completeQuoteId, requestBody.activationDate, requestBody.terminationDate)
+
+        return when (result) {
+            is Either.Left -> ResponseEntity.status(422).body(result.a)
+            is Either.Right -> ResponseEntity.ok(result.b)
+            else -> throw IllegalStateException("Result should be either left or right but was ${result::class.java}")
+        }
+    }
+
+    @PostMapping("/add/agreement")
+    fun addAgreementToContractTimeline(
+        @Valid @RequestBody request: AddAgreementFromQuoteRequest
+    ): ResponseEntity<Any> {
+        val result = quoteService.addAgreementFromQuote(request)
 
         return when (result) {
             is Either.Left -> ResponseEntity.status(422).body(result.a)

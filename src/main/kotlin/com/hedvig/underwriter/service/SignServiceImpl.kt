@@ -59,7 +59,7 @@ class SignServiceImpl(
         }
 
         when (val data = getSignDataFromQuotes(quotes)) {
-            is BundledQuotesSign.SwedishBankId -> {
+            is QuotesSignData.SwedishBankId -> {
                 val signSessionId = signSessionRepository.insert(quoteIds)
 
                 val ip = ipAddress ?: run {
@@ -79,7 +79,7 @@ class SignServiceImpl(
                     StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
                 } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
             }
-            is BundledQuotesSign.NorwegianBankId -> {
+            is QuotesSignData.NorwegianBankId -> {
                 val signSessionId = signSessionRepository.insert(quoteIds)
 
                 val response =
@@ -91,7 +91,7 @@ class SignServiceImpl(
                     StartSignResponse.FailedToStartSign(it)
                 } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
             }
-            is BundledQuotesSign.CanNotBeBundled ->
+            is QuotesSignData.CanNotBeBundled ->
                 return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
         }
     }
@@ -262,18 +262,18 @@ class SignServiceImpl(
         return finishingUpSignedQuote(quote, createdAgreementId, signStartedInMemberService)
     }
 
-    private fun getSignDataFromQuotes(quotes: List<Quote>): BundledQuotesSign {
+    private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
         return when (quotes.size) {
             1 ->
                 when (quotes[0].data) {
                     is SwedishApartmentData,
-                    is SwedishHouseData -> BundledQuotesSign.SwedishBankId(
+                    is SwedishHouseData -> QuotesSignData.SwedishBankId(
                         quotes[0].memberId!!,
                         quotes[0].ssn,
                         quotes[0].currentInsurer != null
                     )
                     is NorwegianHomeContentsData,
-                    is NorwegianTravelData -> BundledQuotesSign.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
+                    is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
                 }
             2 -> if (
                 quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
@@ -290,11 +290,11 @@ class SignServiceImpl(
                         throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
                     }
                 }
-                BundledQuotesSign.NorwegianBankId(quotes[0].memberId!!, ssn!!)
+                QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn!!)
             } else {
-                BundledQuotesSign.CanNotBeBundled
+                QuotesSignData.CanNotBeBundled
             }
-            else -> BundledQuotesSign.CanNotBeBundled
+            else -> QuotesSignData.CanNotBeBundled
         }
     }
 

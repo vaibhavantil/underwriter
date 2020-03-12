@@ -35,13 +35,13 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return findQuote(databaseQuote, dao)
     }
 
-    override fun findQuotes(quoteIds: List<UUID>): List<Quote?> =
-        jdbi.inTransaction<List<Quote?>, RuntimeException> { h -> findQuotes(quoteIds, h) }
+    override fun findQuotes(quoteIds: List<UUID>): List<Quote> =
+        jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findQuotes(quoteIds, h) }
 
-    private fun findQuotes(quoteIds: List<UUID>, h: Handle): List<Quote?> {
+    private fun findQuotes(quoteIds: List<UUID>, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()
         val databaseQuote = dao.find(quoteIds)
-        return databaseQuote.map { it?.let { findQuote(it, dao) } }
+        return databaseQuote.mapNotNull { findQuote(it, dao) }
     }
 
     override fun findByMemberId(memberId: String): List<Quote> =

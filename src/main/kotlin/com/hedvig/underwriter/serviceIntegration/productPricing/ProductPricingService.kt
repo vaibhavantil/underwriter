@@ -12,7 +12,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceR
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.AddAgreementResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
+import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
@@ -29,6 +31,8 @@ interface ProductPricingService {
     fun signedQuote(signedQuoteRequest: SignedQuoteRequest, memberId: String): SignedProductResponseDto
 
     fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto
+
+    fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest): AddAgreementResponse
 
     fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto): ResponseEntity<Void>
 
