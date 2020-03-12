@@ -1,17 +1,17 @@
 package com.hedvig.underwriter.service
 
-sealed class BundledQuotesSign {
+sealed class QuotesSignData {
 
     data class SwedishBankId(
         val memberId: String,
         val ssn: String,
         val isSwitching: Boolean
-    ) : BundledQuotesSign()
+    ) : QuotesSignData()
 
     data class NorwegianBankId(
         val memberId: String,
         val ssn: String
-    ) : BundledQuotesSign()
+    ) : QuotesSignData()
 
-    object CanNotBeBundled : BundledQuotesSign()
+    object CanNotBeBundled : QuotesSignData()
 }
