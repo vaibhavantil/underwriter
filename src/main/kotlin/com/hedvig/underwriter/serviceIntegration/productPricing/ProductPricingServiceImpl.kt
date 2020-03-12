@@ -69,4 +69,7 @@ class ProductPricingServiceImpl @Autowired constructor(
         signedRequest: SignRequest
     ): List<CreateContractResponse> =
         productPricingClient.createContract(CreateContractsRequest.from(quotes, signedRequest))
+
+    override fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse> =
+        productPricingClient.createContract(CreateContractsRequest.fromQuotesNoMandate(quotes))
 }
