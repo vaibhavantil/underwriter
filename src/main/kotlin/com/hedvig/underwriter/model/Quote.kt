@@ -11,6 +11,7 @@ import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 
 val Quote.firstName
@@ -322,6 +323,13 @@ data class Quote(
             }
         }
         return newQuote
+    }
+
+    fun getTimeZoneId() = when (this.data) {
+        is SwedishHouseData,
+        is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
+        is NorwegianHomeContentsData,
+        is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
     }
 
     companion object {

@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(
-    "/_/v1/sign/session"
+    "/_/v1/signSession"
 )
 class SignSessionController @Autowired constructor(
     val signService: SignService
 ) {
 
-    @PostMapping("/swedish/bankid/{sessionId}/completed")
+    @PostMapping("/swedishBankid/{sessionId}/completed")
     fun swedishQuoteWasSigned(
         @PathVariable sessionId: UUID,
         @RequestBody requestBody: SignRequest

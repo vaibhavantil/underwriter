@@ -133,7 +133,7 @@ class SignServiceImpl(
                     RedeemCampaignDto(
                         quoteWithProductId.memberId,
                         campaignCode,
-                        LocalDate.now(ZoneId.of("Europe/Stockholm"))
+                        LocalDate.now(quote.getTimeZoneId())
                     )
                 )
             } catch (e: FeignException) {
