@@ -27,6 +27,7 @@ val Quote.ssn
 
 val Quote.birthDate
     get() = (data as? PersonPolicyHolder<*>)?.birthDate
+        ?: recoverBirthDateFromSSN()
         ?: throw RuntimeException("No birthDate on Quote! $this")
 
 val Quote.email
@@ -322,6 +323,12 @@ data class Quote(
             }
         }
         return newQuote
+    }
+
+    fun recoverBirthDateFromSSN() = when {
+        this.swedishApartment != null || this.swedishHouse != null -> this.ssn.birthDateFromSwedishSsn()
+        this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn.birthDateFromNorwegianSsn()
+        else -> null
     }
 
     companion object {
