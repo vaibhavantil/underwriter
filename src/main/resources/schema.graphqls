@@ -415,6 +415,7 @@ type NorwegianHomeContentsDetails {
 
 type NorwegianTravelDetails {
     coInsured: Int!
+    isYouth: Boolean!
 }
 
 type IncompleteQuote {

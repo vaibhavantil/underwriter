@@ -4,6 +4,7 @@ import com.hedvig.underwriter.service.model.QuoteRequestData
 
 data class CreateNorwegianTravelInput(
     val coInsured: Int,
+    @get:JvmName("getIsYouth")
     val isYouth: Boolean
 ) {
     fun toQuoteRequestData() =

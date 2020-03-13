@@ -1,13 +1,17 @@
 package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 object NorwegianHomeContentsGuidelines {
     val setOfRules = setOf(
         NorwegianHomeContentcoInsuredCantBeNegative,
         NorwegianHomeContentLivingSpaceAtLeast1Sqm,
         NorwegianHomeContentscoInsuredNotMoreThan5,
-        NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm
+        NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm,
+        NorwegianYouthHomeContentsAgeNotMoreThan34Years
     )
 }
 
@@ -34,4 +38,18 @@ object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<Norwegi
         "living space must be less than or equal to 250 sqm"
 
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace!! > 250 }
+}
+
+object NorwegianYouthHomeContentsAgeNotMoreThan34Years : BaseGuideline<NorwegianHomeContentsData> {
+    override val errorMessage: String =
+        "breaches underwriting guidelines member must be 34 years old or younger"
+
+    override val validate =
+        { data: NorwegianHomeContentsData ->
+            (data.isYouth) &&
+                data.birthDate.until(
+                    LocalDate.now(),
+                    ChronoUnit.YEARS
+                ) > 34
+        }
 }

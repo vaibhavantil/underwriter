@@ -7,6 +7,7 @@ data class CreateNorwegianHomeContentsInput(
     val zipCode: String,
     val coInsured: Int,
     val livingSpace: Int,
+    @get:JvmName("getIsYouth")
     val isYouth: Boolean,
     val type: NorwegianHomeContentsType
 ) {

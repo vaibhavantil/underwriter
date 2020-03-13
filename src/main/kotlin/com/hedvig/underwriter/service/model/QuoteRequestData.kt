@@ -37,12 +37,14 @@ sealed class QuoteRequestData {
         val city: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
+        @field:JsonProperty("youth")
         val isYouth: Boolean?,
         val type: NorwegianHomeContentsType?
     ) : QuoteRequestData()
 
     data class NorwegianTravel(
         val coInsured: Int?,
+        @field:JsonProperty("youth")
         val isYouth: Boolean?
     ) : QuoteRequestData()
 }

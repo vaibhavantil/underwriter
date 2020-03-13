@@ -298,7 +298,8 @@ internal class GraphQlMutationsIntegrationTest {
         every {
             productPricingService.priceFromProductPricingForNorwegianTravelQuote(
                 NorwegianTravelQuotePriceDto(
-                    coInsured = 0
+                    coInsured = 0,
+                    isYouth = false
                 )
             )
         } returns
@@ -354,7 +355,8 @@ internal class GraphQlMutationsIntegrationTest {
         every {
             productPricingService.priceFromProductPricingForNorwegianTravelQuote(
                 NorwegianTravelQuotePriceDto(
-                    coInsured = 0
+                    coInsured = 0,
+                    isYouth = false
                 )
             )
         } returns

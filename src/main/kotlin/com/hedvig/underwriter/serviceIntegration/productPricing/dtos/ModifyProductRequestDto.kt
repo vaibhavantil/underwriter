@@ -12,7 +12,9 @@ import java.util.UUID
 data class ModifyProductRequestDto(
     val idToBeReplaced: UUID,
     val memberId: String,
+    @get:JvmName("getIsStudent")
     val isStudent: Boolean? = null,
+    @get:JvmName("getIsYouth")
     val isYouth: Boolean? = null,
     val street: String,
     val city: String?,
