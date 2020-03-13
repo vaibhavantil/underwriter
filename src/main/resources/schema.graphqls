@@ -28,8 +28,8 @@ input CreateQuoteInput {
     house: CreateHouseInput @depricated(reason: "Use swedishHouse")
     swedishApartment: CreateSwedishApartmentInput
     swedishHouse: CreateSwedishHouseInput
-    norweiganHomeContents: CreateNorwegianHomeContentsInput
-    norweiganTravel: CreateNorwegianTravelInput
+    norwegianHomeContents: CreateNorwegianHomeContentsInput
+    norwegianTravel: CreateNorwegianTravelInput
     email: String
     dataCollectionId: ID
 }
@@ -104,8 +104,8 @@ input EditQuoteInput {
     swedishApartment: EditSwedishApartmentInput
     house: EditHouseInput @depricated(reason: "Use swedishHouse")
     swedishHouse: EditSwedishHouseInput
-    norweiganHomeContents: EditNorwegianHomeContentsInput
-    norweiganTravel: EditNorwegianTravelInput
+    norwegianHomeContents: EditNorwegianHomeContentsInput
+    norwegianTravel: EditNorwegianTravelInput
     email: String
 }
 

@@ -19,7 +19,7 @@ data class QuoteRequest(
     val birthDate: LocalDate?,
     val ssn: String?,
     val quotingPartner: Partner?,
-    val productType: ProductType?,
+    val productType: ProductType? = null,
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @field:JsonSubTypes(
         JsonSubTypes.Type(value = QuoteRequestData.SwedishApartment::class, name = "apartment"),
