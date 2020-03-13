@@ -1,7 +1,6 @@
 package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
