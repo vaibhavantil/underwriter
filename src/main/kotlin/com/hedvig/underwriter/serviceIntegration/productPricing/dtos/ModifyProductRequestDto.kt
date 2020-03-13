@@ -12,7 +12,8 @@ import java.util.UUID
 data class ModifyProductRequestDto(
     val idToBeReplaced: UUID,
     val memberId: String,
-    val isStudent: Boolean,
+    val isStudent: Boolean? = null,
+    val isYouth: Boolean? = null,
     val street: String,
     val city: String?,
     val zipCode: String,

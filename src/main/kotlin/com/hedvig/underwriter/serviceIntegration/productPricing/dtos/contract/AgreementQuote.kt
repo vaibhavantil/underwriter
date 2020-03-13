@@ -71,7 +71,8 @@ sealed class AgreementQuote {
         override val toDate: LocalDate?,
         override val premium: BigDecimal,
         override val currency: String,
-        val coInsured: List<CoInsuredDto>
+        val coInsured: List<CoInsuredDto>,
+        val lineOfBusiness: NorwegianTravelLineOfBusiness
     ) : AgreementQuote()
 
     companion object {
@@ -111,7 +112,7 @@ sealed class AgreementQuote {
                 address = AddressDto.from(quote.data),
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 squareMeters = quote.data.livingSpace.toLong(),
-                lineOfBusiness = NorwegianHomeContentLineOfBusiness.from(quote.data.type, quote.data.isStudent)
+                lineOfBusiness = NorwegianHomeContentLineOfBusiness.from(quote.data.type, quote.data.isYouth)
             )
             is NorwegianTravelData -> NorwegianTravelQuote(
                 quoteId = quote.id,
@@ -119,7 +120,8 @@ sealed class AgreementQuote {
                 toDate = toDate,
                 premium = quote.price!!,
                 currency = quote.currency,
-                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
+                lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.DEFAULT
             )
         }
     }

@@ -491,7 +491,7 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 city = "London",
                 id = UUID.randomUUID(),
-                isStudent = false,
+                isYouth = false,
                 coInsured = 1,
                 type = NorwegianHomeContentsType.OWN,
                 email = "em@i.l"
@@ -533,7 +533,8 @@ class QuoteRepositoryImplTest {
                 ssn = "12121212120",
                 id = UUID.randomUUID(),
                 coInsured = 1,
-                email = "em@i.l"
+                email = "em@i.l",
+                isYouth = false
             ),
             breachedUnderwritingGuidelines = null,
             currentInsurer = null

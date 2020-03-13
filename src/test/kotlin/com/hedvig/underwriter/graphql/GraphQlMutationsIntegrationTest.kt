@@ -256,7 +256,7 @@ internal class GraphQlMutationsIntegrationTest {
                     zipCode = "12345",
                     coInsured = 0,
                     type = NorwegianHomeContentsType.OWN,
-                    isStudent = false
+                    isYouth = false
                 )
             )
         } returns
@@ -334,7 +334,7 @@ internal class GraphQlMutationsIntegrationTest {
             null,
             null,
             null,
-            CreateNorwegianTravelInput(0),
+            CreateNorwegianTravelInput(0, false),
             null
         )
 
@@ -390,7 +390,7 @@ internal class GraphQlMutationsIntegrationTest {
             null,
             null,
             null,
-            CreateNorwegianTravelInput(0),
+            CreateNorwegianTravelInput(0, false),
             null
         )
         val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", ObjectMapper().valueToTree(mapOf("input" to createQuoteInput)))

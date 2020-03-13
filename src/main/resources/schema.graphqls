@@ -39,7 +39,7 @@ input CreateNorwegianHomeContentsInput {
     zipCode: String!
     coInsured: Int!
     livingSpace: Int!
-    isSudent: Boolean!
+    isYouth: Boolean!
     type: NorwegianHomeContentsType!
 }
 
@@ -50,6 +50,7 @@ enum NorwegianHomeContentsType {
 
 input CreateNorwegianTravelInput {
     coInsured: Int!
+    isYouth: Boolean!
 }
 
 input CreateApartmentInput {
@@ -154,12 +155,13 @@ input EditNorwegianHomeContentsInput {
     zipCode: String
     coInsured: Int
     livingSpace: Int
-    isSudent: Boolean!
+    isYouth: Boolean
     type: NorwegianHomeContentsType
 }
 
 input EditNorwegianTravelInput {
     coInsured: Int
+    isYouth: Boolean
 }
 
 input ExtraBuildingInput {
@@ -407,7 +409,7 @@ type NorwegianHomeContentsDetails {
     zipCode: String!
     coInsured: Int!
     livingSpace: Int!
-    isStudent: Boolean!
+    isYouth: Boolean!
     type: NorwegianHomeContentsType!
 }
 

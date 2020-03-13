@@ -9,7 +9,7 @@ mutation {
             livingSpace: 30
             zipCode: "12345"
             coInsured: 0
-            isSudent: false
+            isYouth: false
             type: OWN
         }
     }) {
@@ -58,11 +58,12 @@ mutation {
                     zipCode
                     livingSpace
                     coInsured
-                    isStudent
+                    isYouth
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
                     coInsured
+                    isYouth
                 }
             }
         }

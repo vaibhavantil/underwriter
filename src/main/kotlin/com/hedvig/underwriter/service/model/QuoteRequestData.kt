@@ -37,11 +37,12 @@ sealed class QuoteRequestData {
         val city: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
-        val isStudent: Boolean?,
+        val isYouth: Boolean?,
         val type: NorwegianHomeContentsType?
     ) : QuoteRequestData()
 
     data class NorwegianTravel(
-        val coInsured: Int?
+        val coInsured: Int?,
+        val isYouth: Boolean?
     ) : QuoteRequestData()
 }
