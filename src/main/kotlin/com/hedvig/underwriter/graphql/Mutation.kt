@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getEndUserIp
+import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
@@ -101,7 +102,7 @@ class Mutation @Autowired constructor(
         )
 
     fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) =
-        signService.startSigningQuotes(input.quoteIds, env.getEndUserIp())
+        signService.startSigningQuotes(input.quoteIds, env.getToken(), env.getEndUserIp())
 
     private fun responseForEditedQuote(
         errorOrQuote: Either<ErrorResponseDto, Quote>,

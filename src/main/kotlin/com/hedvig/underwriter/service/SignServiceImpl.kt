@@ -47,10 +47,20 @@ class SignServiceImpl(
     val env: Environment
 ) : SignService {
 
-    override fun startSigningQuotes(quoteIds: List<UUID>, ipAddress: String?): StartSignResponse {
+    override fun startSigningQuotes(quoteIds: List<UUID>, memberId: String, ipAddress: String?): StartSignResponse {
 
         val quotes = quoteService.getQuotes(quoteIds)
         quotes.forEach { quote ->
+            quote.memberId?.let { quoteMemberId ->
+                if (memberId != quoteMemberId) {
+                    logger.info("Member [id: $memberId] tried to sign quote with member id: $quoteMemberId. [Quotes: $quotes]")
+                    return StartSignResponse.FailedToStartSign(VARIOS_MEMBER_ID_ERROR_MESSAGE)
+                }
+            } ?: run {
+                logger.info("Member [id: $memberId] tried to sign quote without member id. [Quotes: $quotes]")
+                return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
+            }
+
             val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
             if (quoteNotSignableErrorDto != null) {
                 return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
@@ -299,5 +309,7 @@ class SignServiceImpl(
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
+        const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
+        const val VARIOS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
     }
 }

@@ -12,6 +12,7 @@ import java.util.UUID
 interface SignService {
     fun startSigningQuotes(
         quoteIds: List<UUID>,
+        memberId: String,
         ipAddress: String?
     ): StartSignResponse
 
