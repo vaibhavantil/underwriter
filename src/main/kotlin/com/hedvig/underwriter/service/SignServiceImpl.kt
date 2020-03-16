@@ -303,7 +303,7 @@ class SignServiceImpl(
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
-        val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
+        const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
         const val VARIOS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
     }
 }
