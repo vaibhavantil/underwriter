@@ -4,6 +4,8 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.localization.service.TextKeysLocaleResolver
+import com.hedvig.underwriter.graphql.type.BundledQuotes
+import com.hedvig.underwriter.graphql.type.BundledQuotesInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.QuoteService
@@ -26,6 +28,10 @@ class Query @Autowired constructor(
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
         ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
+
+    fun bundledQuotes(input: BundledQuotesInput, env: DataFetchingEnvironment): BundledQuotes {
+        TODO("Impl")
+    }
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
