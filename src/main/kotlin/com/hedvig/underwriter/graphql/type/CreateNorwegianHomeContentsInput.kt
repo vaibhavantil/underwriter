@@ -7,7 +7,8 @@ data class CreateNorwegianHomeContentsInput(
     val zipCode: String,
     val coInsured: Int,
     val livingSpace: Int,
-    val isStudent: Boolean,
+    @get:JvmName("getIsYouth")
+    val isYouth: Boolean,
     val type: NorwegianHomeContentsType
 ) {
     fun toQuoteRequestData() =
@@ -17,7 +18,7 @@ data class CreateNorwegianHomeContentsInput(
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
             type = com.hedvig.underwriter.model.NorwegianHomeContentsType.valueOf(this.type.name),
-            isStudent = this.isStudent,
+            isYouth = this.isYouth,
             city = null
         )
 }

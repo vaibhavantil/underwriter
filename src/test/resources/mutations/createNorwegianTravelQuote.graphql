@@ -45,11 +45,12 @@ mutation create($input:CreateQuoteInput!) {
                     zipCode
                     livingSpace
                     coInsured
-                    isStudent
+                    isYouth
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
                     coInsured
+                    isYouth
                 }
             }
         }

@@ -237,12 +237,13 @@ class TypeMapper(
                 zipCode = it.zipCode,
                 coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
-                isStudent = it.isStudent,
+                isYouth = it.isYouth,
                 type = NorwegianHomeContentsType.valueOf(it.type.name)
             )
         } ?: quote.norwegianTravel?.let {
             QuoteDetails.NorwegianTravelDetails(
-                coInsured = it.coInsured
+                coInsured = it.coInsured,
+                isYouth = it.isYouth
             )
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")

@@ -166,7 +166,7 @@ class a {
         val zipCode: String = "",
         val coInsured: Int = 3,
         val livingSpace: Int = 2,
-        val isStudent: Boolean = false,
+        val isYouth: Boolean = false,
         val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val internalId: Int? = null
     ) : DataBuilder<QuoteData> {
@@ -183,7 +183,7 @@ class a {
             zipCode,
             coInsured,
             livingSpace,
-            isStudent,
+            isYouth,
             type,
             internalId
         )
@@ -202,7 +202,7 @@ class a {
         val zipCode: String = "",
         val coInsured: Int = 3,
         val livingSpace: Int = 2,
-        val isStudent: Boolean = false,
+        val isYouth: Boolean = false,
         val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val internalId: Int? = null
     ) : DataBuilder<QuoteData> {
@@ -215,6 +215,7 @@ class a {
             lastName,
             email,
             coInsured,
+            isYouth,
             internalId
         )
     }
@@ -349,7 +350,7 @@ class a {
         val zipCode: String = "",
         val coInsured: Int = 3,
         val livingSpace: Int = 2,
-        val isStudent: Boolean = false,
+        val isYouth: Boolean = false,
         val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val floor: Int? = null
     ) : DataBuilder<QuoteRequestData.NorwegianHomeContents> {
@@ -359,7 +360,7 @@ class a {
             city = city,
             livingSpace = livingSpace,
             coInsured = coInsured,
-            isStudent = isStudent,
+            isYouth = isYouth,
             type = type
         )
     }
@@ -397,10 +398,12 @@ class a {
     }
 
     data class NorwegianTravelQuoteRequestDataBuilder(
-        val coInsured: Int = 3
+        val coInsured: Int = 3,
+        val isYouth: Boolean = false
     ) : DataBuilder<QuoteRequestData.NorwegianTravel> {
         override fun build() = QuoteRequestData.NorwegianTravel(
-            coInsured = coInsured
+            coInsured = coInsured,
+            isYouth = isYouth
         )
     }
 
