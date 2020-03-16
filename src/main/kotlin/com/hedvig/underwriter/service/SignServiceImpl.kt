@@ -52,8 +52,14 @@ class SignServiceImpl(
         val quotes = quoteService.getQuotes(quoteIds)
         quotes.forEach { quote ->
             quote.memberId?.let { quoteMemberId ->
-                if (memberId != quoteMemberId) return StartSignResponse.FailedToStartSign(VARIOS_MEMBER_ID_ERROR_MESSAGE)
-            } ?: return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
+                if (memberId != quoteMemberId) {
+                    logger.info("Member [id: $memberId] tried to sign quote with member id: $quoteMemberId. [Quotes: $quotes]")
+                    return StartSignResponse.FailedToStartSign(VARIOS_MEMBER_ID_ERROR_MESSAGE)
+                }
+            } ?: run {
+                logger.info("Member [id: $memberId] tried to sign quote without member id. [Quotes: $quotes]")
+                return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
+            }
 
             val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
             if (quoteNotSignableErrorDto != null) {
