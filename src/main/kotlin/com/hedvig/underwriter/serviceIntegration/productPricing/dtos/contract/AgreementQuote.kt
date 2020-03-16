@@ -121,7 +121,7 @@ sealed class AgreementQuote {
                 premium = quote.price!!,
                 currency = quote.currency,
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
-                lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.DEFAULT
+                lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
             )
         }
     }
