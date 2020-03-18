@@ -475,13 +475,28 @@ type FailedToStartSign {
     errorMessage: String
 }
 
-type BundledQuotesInput {
+input BundledQuotesInput {
     ids: [ID!]!
 }
 
 type BundledQuotes {
-    quotes: [CompleteQuote!]!
+    quotes: [BundledQuote!]!
     bundleCost: InsuranceCost!
+}
+
+type BundledQuote {
+    id: ID!
+    currentInsurer: CurrentInsurer
+    price: MonetaryAmountV2!
+    firstName: String!
+    lastName: String!
+    ssn: String!
+    birthDate: LocalDate!
+    quoteDetails: QuoteDetails!
+    startDate: LocalDate
+    expiresAt: LocalDate!
+    email: String
+    dataCollectionId: ID
 }
 
 scalar LocalDate

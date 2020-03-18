@@ -4,6 +4,7 @@ import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.AddAgreementRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
@@ -63,6 +64,9 @@ class ProductPricingServiceImpl @Autowired constructor(
 
     override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
+
+    override fun calculateBundleInsuranceCost(request: CalculateBundleInsuranceCostRequest, memberId: String): InsuranceCost =
+        productPricingClient.calculateBundleInsuranceCost(request, memberId).body!!
 
     override fun createContractsFromQuotes(
         quotes: List<Quote>,

@@ -5,7 +5,11 @@ import com.hedvig.localization.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
@@ -26,6 +30,34 @@ import org.springframework.stereotype.Component
 class TypeMapper(
     private val localizationService: LocalizationService
 ) {
+
+    fun mapToBundleQuote(
+        quote: Quote,
+        locale: Locale
+    ): BundledQuote {
+        return BundledQuote(
+            id = quote.id,
+            firstName = quote.firstName,
+            lastName = quote.lastName,
+            currentInsurer = quote.currentInsurer?.let { CurrentInsurer.create(it) },
+            ssn = quote.ssn,
+            birthDate = quote.birthDate,
+            price = MonetaryAmountV2(
+                quote.price!!.toPlainString(),
+                when (quote.data) {
+                    is SwedishHouseData,
+                    is SwedishApartmentData -> "SEK"
+                    is NorwegianHomeContentsData,
+                    is NorwegianTravelData -> "NOK"
+                }
+            ),
+            quoteDetails = mapToQuoteDetails(quote, locale),
+            startDate = quote.startDate,
+            expiresAt = quote.validTo.toStockholmLocalDate(),
+            email = quote.email,
+            dataCollectionId = quote.dataCollectionId
+        )
+    }
 
     fun mapToQuoteResult(
         quote: Quote,
@@ -281,5 +313,6 @@ class TypeMapper(
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
-    private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String = localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
+    private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
+        localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
 }

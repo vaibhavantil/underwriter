@@ -8,6 +8,7 @@ import com.hedvig.underwriter.graphql.type.BundledQuotes
 import com.hedvig.underwriter.graphql.type.BundledQuotesInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import graphql.schema.DataFetchingEnvironment
 import java.util.UUID
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 class Query @Autowired constructor(
     private val quoteService: QuoteService,
+    private val bundleQuotesService: BundleQuotesService,
     private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLQueryResolver {
@@ -27,11 +29,14 @@ class Query @Autowired constructor(
 
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
-        ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
+            ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
 
-    fun bundledQuotes(input: BundledQuotesInput, env: DataFetchingEnvironment): BundledQuotes {
-        TODO("Impl")
-    }
+    fun bundledQuotes(input: BundledQuotesInput, env: DataFetchingEnvironment): BundledQuotes =
+        bundleQuotesService.bundleQuotes(
+            env.getToken(),
+            input.ids,
+            textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+        )
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
