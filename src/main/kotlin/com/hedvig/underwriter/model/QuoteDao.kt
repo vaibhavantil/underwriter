@@ -221,7 +221,7 @@ interface QuoteDao {
                 living_space,
                 co_insured ,
                 type,
-                is_student
+                is_youth
             )
             VALUES
             (
@@ -237,7 +237,7 @@ interface QuoteDao {
                 :livingSpace,
                 :coInsured,
                 :type,
-                :isStudent
+                :isYouth
             )
             RETURNING *
     """
@@ -262,7 +262,8 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
-                co_insured 
+                co_insured,
+                is_youth
             )
             VALUES
             (
@@ -272,7 +273,8 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
-                :coInsured
+                :coInsured,
+                :isYouth
             )
             RETURNING *
     """

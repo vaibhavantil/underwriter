@@ -61,11 +61,12 @@ mutation {
                     zipCode
                     livingSpace
                     coInsured
-                    isStudent
+                    isYouth
                     norwegianType: type
                 }
                 ... on NorwegianTravelDetails {
                     coInsured
+                    isYouth
                 }
             }
         }

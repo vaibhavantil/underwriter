@@ -112,8 +112,8 @@ data class NorwegianHomeContentsData(
     override val zipCode: String,
     override val livingSpace: Int,
     val coInsured: Int,
-    @get:JvmName("getIsStudent")
-    val isStudent: Boolean,
+    @get:JvmName("getIsYouth")
+    val isYouth: Boolean,
     val type: NorwegianHomeContentsType,
     @JsonIgnore
     val internalId: Int? = null
@@ -139,6 +139,8 @@ data class NorwegianTravelData(
     override val lastName: String,
     override val email: String? = null,
     val coInsured: Int,
+    @get:JvmName("getIsYouth")
+    val isYouth: Boolean,
     @JsonIgnore
     val internalId: Int? = null
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {

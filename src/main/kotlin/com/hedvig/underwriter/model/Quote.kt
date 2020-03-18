@@ -305,7 +305,7 @@ data class Quote(
                         city = requestData.city ?: newQuoteData.city,
                         livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
-                        isStudent = requestData.isStudent ?: newQuoteData.isStudent,
+                        isYouth = requestData.isYouth ?: newQuoteData.isYouth,
                         type = requestData.type ?: newQuoteData.type
                     )
                 )
@@ -318,7 +318,8 @@ data class Quote(
 
                 newQuote = newQuote.copy(
                     data = newQuoteData.copy(
-                        coInsured = requestData.coInsured ?: newQuoteData.coInsured
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured,
+                        isYouth = requestData.isYouth ?: newQuoteData.isYouth
                     )
                 )
             }

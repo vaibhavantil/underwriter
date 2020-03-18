@@ -11,7 +11,7 @@ data class NorwegianHomeContentsQuotePriceDto(
     var coInsured: Int,
     var zipCode: String,
     var type: NorwegianHomeContentsType,
-    var isStudent: Boolean
+    var isYouth: Boolean
 ) {
     companion object {
         fun from(quote: Quote): NorwegianHomeContentsQuotePriceDto {
@@ -23,7 +23,7 @@ data class NorwegianHomeContentsQuotePriceDto(
                     coInsured = quoteData.coInsured,
                     zipCode = quoteData.zipCode,
                     type = quoteData.type,
-                    isStudent = quoteData.isStudent
+                    isYouth = quoteData.isYouth
                 )
             }
             throw RuntimeException("missing data cannot create home quote price dto")
