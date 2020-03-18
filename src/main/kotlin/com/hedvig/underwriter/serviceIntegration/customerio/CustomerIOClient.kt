@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody
 )
 interface CustomerIOClient {
     @PutMapping("/v1/customers/{id}")
-    fun put(@PathVariable id: String, @RequestBody data: Any): ResponseEntity<String>
+    fun put(@PathVariable id: String, @RequestBody data: Map<String, Any?>): ResponseEntity<String>
 }
 
 class FeignConfiguration(

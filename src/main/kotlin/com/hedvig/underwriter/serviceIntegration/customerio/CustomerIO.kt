@@ -19,7 +19,7 @@ class CustomerIO(val customerIOClient: CustomerIOClient) {
         if (quote.memberId != null) {
             val isSwitcher = quote.currentInsurer != null
             try {
-                val map = mutableMapOf(
+                val map = mapOf(
                     "partner_code" to quote.attributedTo.name,
                     "sign_source" to quote.initiatedFrom.name,
                     "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond(),
