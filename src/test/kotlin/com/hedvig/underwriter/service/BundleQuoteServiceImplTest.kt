@@ -13,15 +13,15 @@ import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
+import java.util.Locale
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.Locale
 
 @RunWith(MockitoJUnitRunner::class)
 class BundleQuoteServiceImplTest {

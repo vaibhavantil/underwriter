@@ -5,4 +5,3 @@ import java.util.UUID
 data class BundledQuotesInput(
     val ids: List<UUID>
 )
-

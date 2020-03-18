@@ -10,10 +10,10 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductType
-import org.javamoney.moneta.Money
-import org.springframework.stereotype.Component
 import java.util.Locale
 import java.util.UUID
+import org.javamoney.moneta.Money
+import org.springframework.stereotype.Component
 
 @Component
 class BundleQuotesServiceImpl(
@@ -55,5 +55,4 @@ class BundleQuotesServiceImpl(
             )
         }, insuranceCost)
     }
-
 }

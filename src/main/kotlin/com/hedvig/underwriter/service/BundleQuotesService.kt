@@ -7,4 +7,3 @@ import java.util.UUID
 interface BundleQuotesService {
     fun bundleQuotes(memberId: String, ids: List<UUID>, locale: Locale): BundledQuotes
 }
-
