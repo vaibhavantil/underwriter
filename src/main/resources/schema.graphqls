@@ -6,7 +6,7 @@ schema {
 type Query {
     quote(id: ID): Quote!
     lastQuoteOfMember: Quote!
-    quoteBundle(input: BundledQuotesInput!): QuoteBundle!
+    quoteBundle(input: QuoteBundleInput!): QuoteBundle!
 }
 
 type Mutation {
@@ -475,7 +475,7 @@ type FailedToStartSign {
     errorMessage: String
 }
 
-input BundledQuotesInput {
+input QuoteBundleInput {
     ids: [ID!]!
 }
 
