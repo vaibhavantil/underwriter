@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import org.javamoney.moneta.Money
+import javax.money.MonetaryAmount
 
 data class CalculateBundledPriceDto(
-    val grossPrice: Money,
+    val grossPrice: MonetaryAmount,
     val insuranceType: InsuranceType
 )

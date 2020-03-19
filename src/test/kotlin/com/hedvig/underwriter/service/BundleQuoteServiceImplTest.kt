@@ -162,7 +162,7 @@ class BundleQuoteServiceImplTest {
 
         val quote = a.QuoteBuilder(
             id = id,
-            data = a.ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_RENT),
+            data = a.ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF),
             price = BigDecimal.TEN
         ).build()
 

@@ -6,7 +6,7 @@ schema {
 type Query {
     quote(id: ID): Quote!
     lastQuoteOfMember: Quote!
-    bundledQuotes(input: BundledQuotesInput!): BundledQuotes!
+    quoteBundle(input: BundledQuotesInput!): QuoteBundle!
 }
 
 type Mutation {
@@ -479,7 +479,7 @@ input BundledQuotesInput {
     ids: [ID!]!
 }
 
-type BundledQuotes {
+type QuoteBundle {
     quotes: [BundledQuote!]!
     bundleCost: InsuranceCost!
 }
