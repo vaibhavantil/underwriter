@@ -44,12 +44,7 @@ class TypeMapper(
             birthDate = quote.birthDate,
             price = MonetaryAmountV2(
                 quote.price!!.toPlainString(),
-                when (quote.data) {
-                    is SwedishHouseData,
-                    is SwedishApartmentData -> "SEK"
-                    is NorwegianHomeContentsData,
-                    is NorwegianTravelData -> "NOK"
-                }
+                quote.currency
             ),
             quoteDetails = mapToQuoteDetails(quote, locale),
             startDate = quote.startDate,

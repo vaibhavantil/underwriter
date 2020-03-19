@@ -8,7 +8,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ProductType
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.InsuranceType
 import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -90,11 +90,11 @@ class BundleQuoteServiceImplTest {
                 listOf(
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "NOK"),
-                        ProductType.NORWEGIAN_YOUTH_HOME_CONTENTS
+                        InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS
                     ),
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "NOK"),
-                        ProductType.NORWEGIAN_YOUTH_TRAVEL
+                        InsuranceType.NORWEGIAN_YOUTH_TRAVEL
                     )
                 )
             )
@@ -145,11 +145,11 @@ class BundleQuoteServiceImplTest {
                 listOf(
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "NOK"),
-                        ProductType.NORWEGIAN_HOME_CONTENTS
+                        InsuranceType.NORWEGIAN_HOME_CONTENTS
                     ),
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "NOK"),
-                        ProductType.NORWEGIAN_TRAVEL
+                        InsuranceType.NORWEGIAN_TRAVEL
                     )
                 )
             )
@@ -195,7 +195,7 @@ class BundleQuoteServiceImplTest {
                 listOf(
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "SEK"),
-                        ProductType.SWEDISH_STUDENT_BRF
+                        InsuranceType.SWEDISH_STUDENT_BRF
                     )
                 )
             )
@@ -241,7 +241,7 @@ class BundleQuoteServiceImplTest {
                 listOf(
                     CalculateBundledPriceDto(
                         Money.of(BigDecimal.TEN, "SEK"),
-                        ProductType.SWEDISH_BRF
+                        InsuranceType.SWEDISH_BRF
                     )
                 )
             )
