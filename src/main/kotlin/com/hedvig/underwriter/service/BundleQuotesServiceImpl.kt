@@ -37,7 +37,7 @@ class BundleQuotesServiceImpl(
                                 ApartmentProductSubType.BRF,
                                 ApartmentProductSubType.STUDENT_BRF -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_BRF else InsuranceType.SWEDISH_BRF
                                 ApartmentProductSubType.RENT,
-                                ApartmentProductSubType.STUDENT_RENT ->  if (data.isStudent) InsuranceType.SWEDISH_STUDENT_RENT else InsuranceType.SWEDISH_RENT
+                                ApartmentProductSubType.STUDENT_RENT -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_RENT else InsuranceType.SWEDISH_RENT
                             }
                             is NorwegianHomeContentsData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS else InsuranceType.NORWEGIAN_HOME_CONTENTS
                             is NorwegianTravelData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_TRAVEL else InsuranceType.NORWEGIAN_TRAVEL

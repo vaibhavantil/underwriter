@@ -5,11 +5,7 @@ import com.hedvig.localization.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
