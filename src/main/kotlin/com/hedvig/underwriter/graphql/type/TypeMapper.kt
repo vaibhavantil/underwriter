@@ -27,6 +27,29 @@ class TypeMapper(
     private val localizationService: LocalizationService
 ) {
 
+    fun mapToBundleQuote(
+        quote: Quote,
+        locale: Locale
+    ): BundledQuote {
+        return BundledQuote(
+            id = quote.id,
+            firstName = quote.firstName,
+            lastName = quote.lastName,
+            currentInsurer = quote.currentInsurer?.let { CurrentInsurer.create(it) },
+            ssn = quote.ssn,
+            birthDate = quote.birthDate,
+            price = MonetaryAmountV2(
+                quote.price!!.toPlainString(),
+                quote.currency
+            ),
+            quoteDetails = mapToQuoteDetails(quote, locale),
+            startDate = quote.startDate,
+            expiresAt = quote.validTo.toStockholmLocalDate(),
+            email = quote.email,
+            dataCollectionId = quote.dataCollectionId
+        )
+    }
+
     fun mapToQuoteResult(
         quote: Quote,
         insuranceCost: InsuranceCost,
@@ -281,5 +304,6 @@ class TypeMapper(
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
-    private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String = localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
+    private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
+        localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
 }

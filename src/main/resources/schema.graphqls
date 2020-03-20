@@ -6,6 +6,7 @@ schema {
 type Query {
     quote(id: ID): Quote!
     lastQuoteOfMember: Quote!
+    quoteBundle(input: QuoteBundleInput!): QuoteBundle!
 }
 
 type Mutation {
@@ -13,7 +14,7 @@ type Mutation {
     editQuote(input: EditQuoteInput!): CreateQuoteResult!
     removeCurrentInsurer(input : RemoveCurrentInsurerInput!): CreateQuoteResult!
     removeStartDate(input : RemoveStartDateInput!): CreateQuoteResult!
-    signQuotes(input: SignQuotesInput!): StartSignResponse
+    signQuotes(input: SignQuotesInput!): StartSignResponse!
 }
 
 input CreateQuoteInput {
@@ -472,6 +473,30 @@ type NorwegianBankIdSession {
 
 type FailedToStartSign {
     errorMessage: String
+}
+
+input QuoteBundleInput {
+    ids: [ID!]!
+}
+
+type QuoteBundle {
+    quotes: [BundledQuote!]!
+    bundleCost: InsuranceCost!
+}
+
+type BundledQuote {
+    id: ID!
+    currentInsurer: CurrentInsurer
+    price: MonetaryAmountV2!
+    firstName: String!
+    lastName: String!
+    ssn: String!
+    birthDate: LocalDate!
+    quoteDetails: QuoteDetails!
+    startDate: LocalDate
+    expiresAt: LocalDate!
+    email: String
+    dataCollectionId: ID
 }
 
 scalar LocalDate
