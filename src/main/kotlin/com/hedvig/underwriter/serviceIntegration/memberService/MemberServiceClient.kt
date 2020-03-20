@@ -55,7 +55,7 @@ interface MemberServiceClient {
         @RequestBody req: FinalizeOnBoardingRequest
     ): ResponseEntity<*>
 
-    @PostMapping("swedish/bankid/{memberId}")
+    @PostMapping("_/member/start/sign/swedish/bankid/{memberId}")
     fun startSwedishBankIdSign(
         @PathVariable("memberId") memberId: Long,
         @RequestBody request: UnderwriterStartSwedishBankIdSignSessionRequest
