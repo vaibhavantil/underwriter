@@ -371,7 +371,7 @@ internal class GraphQlMutationsIntegrationTest {
             priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel(
                     holderMemberId = "123",
-                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
                     holderBirthDate = "1212121212".birthDateFromNorwegianSsn(),
                     numberCoInsured = 0,
                     lineOfBusiness = NorwegianTravelLineOfBusiness.REGULAR
