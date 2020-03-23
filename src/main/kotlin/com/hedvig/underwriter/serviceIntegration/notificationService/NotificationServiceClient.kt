@@ -13,6 +13,5 @@ import org.springframework.web.bind.annotation.RequestBody
 interface NotificationServiceClient {
 
     @PostMapping("_/customerio/{memberId}")
-    fun post(@PathVariable memberId:String, @RequestBody body: Map<String, Any?>):ResponseEntity<String>
-
+    fun post(@PathVariable memberId: String, @RequestBody body: Map<String, Any?>): ResponseEntity<String>
 }

@@ -1,10 +1,10 @@
 package com.hedvig.underwriter.serviceIntegration.customerio
 
 import com.hedvig.underwriter.model.Quote
-import mu.KotlinLogging
-import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.ZoneId
+import mu.KotlinLogging
+import org.springframework.stereotype.Component
 
 private val logger = KotlinLogging.logger {}
 

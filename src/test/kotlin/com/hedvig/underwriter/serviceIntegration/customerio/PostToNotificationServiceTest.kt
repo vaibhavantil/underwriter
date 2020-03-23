@@ -1,15 +1,13 @@
 package com.hedvig.underwriter.serviceIntegration.customerio
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationServiceClient as IntegrationClient
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import org.junit.Test
 import org.junit.Before
+import org.junit.Test
 import org.springframework.http.ResponseEntity
-
-import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationServiceClient as IntegrationClient
 
 class PostToNotificationServiceTest {
 
@@ -17,7 +15,7 @@ class PostToNotificationServiceTest {
     lateinit var notificationServiceClient: IntegrationClient
 
     @Before
-    fun setup(){
+    fun setup() {
         MockKAnnotations.init(this)
     }
 
