@@ -7,16 +7,19 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.ApartmentProductSubType
-import com.hedvig.underwriter.model.NorwegianHomeContentsType
+import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTravelQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -41,11 +44,14 @@ internal class GraphQlMutationsIntegrationTest {
     @MockkBean(relaxUnitFun = true)
     lateinit var memberService: MemberService
 
-    @MockkBean()
+    @MockkBean
     lateinit var debtChecker: DebtChecker
 
     @MockkBean
     lateinit var productPricingService: ProductPricingService
+
+    @MockkBean
+    lateinit var priceEngineService: PriceEngineService
 
     @MockkBean
     lateinit var signService: SignService
@@ -249,19 +255,21 @@ internal class GraphQlMutationsIntegrationTest {
     fun createSuccessfulNorwegianHomeContentsQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
         every {
-            productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
-                NorwegianHomeContentsQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    coInsured = 0,
-                    type = NorwegianHomeContentsType.OWN,
-                    isYouth = false
+            priceEngineService.queryNorwegianHomeContentPrice(
+                PriceQueryRequest.NorwegianHomeContent(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("00000000-0000-0000-0000-000000000006"),
+                    holderBirthDate = LocalDate.of(1912, 12, 12),
+                    numberCoInsured = 0,
+                    lineOfBusiness = NorwegianHomeContentLineOfBusiness.OWN,
+                    postalCode = "12345",
+                    squareMeters = 30
                 )
             )
         } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "NOK")
             )
 
         every {
@@ -296,15 +304,19 @@ internal class GraphQlMutationsIntegrationTest {
     fun createSuccessfulNorwegianTravelQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
         every {
-            productPricingService.priceFromProductPricingForNorwegianTravelQuote(
-                NorwegianTravelQuotePriceDto(
-                    coInsured = 0,
-                    isYouth = false
+            priceEngineService.queryNorwegianTravelPrice(
+                PriceQueryRequest.NorwegianTravel(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
+                    holderBirthDate = "1212121212".birthDateFromNorwegianSsn(),
+                    numberCoInsured = 0,
+                    lineOfBusiness = NorwegianTravelLineOfBusiness.REGULAR
                 )
             )
         } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "NOK")
             )
 
         every {
@@ -328,7 +340,7 @@ internal class GraphQlMutationsIntegrationTest {
             null,
             null,
             "1212121212",
-            null,
+            "1212121212".birthDateFromNorwegianSsn(),
             null,
             null,
             null,
@@ -339,7 +351,10 @@ internal class GraphQlMutationsIntegrationTest {
             null
         )
 
-        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", objectMapper.valueToTree(mapOf("input" to createQuoteInput)))
+        val response = graphQLTestTemplate.perform(
+            "/mutations/createNorwegianTravelQuote.graphql",
+            objectMapper.valueToTree(mapOf("input" to createQuoteInput))
+        )
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
@@ -353,15 +368,19 @@ internal class GraphQlMutationsIntegrationTest {
     fun createQuoteFinalizeOnbaordingInMemberServiceQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
         every {
-            productPricingService.priceFromProductPricingForNorwegianTravelQuote(
-                NorwegianTravelQuotePriceDto(
-                    coInsured = 0,
-                    isYouth = false
+            priceEngineService.queryNorwegianTravelPrice(
+                PriceQueryRequest.NorwegianTravel(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
+                    holderBirthDate = "1212121212".birthDateFromNorwegianSsn(),
+                    numberCoInsured = 0,
+                    lineOfBusiness = NorwegianTravelLineOfBusiness.REGULAR
                 )
             )
         } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "NOK")
             )
 
         every {
@@ -395,7 +414,10 @@ internal class GraphQlMutationsIntegrationTest {
             CreateNorwegianTravelInput(0, false),
             null
         )
-        val response = graphQLTestTemplate.perform("/mutations/createNorwegianTravelQuote.graphql", ObjectMapper().valueToTree(mapOf("input" to createQuoteInput)))
+        val response = graphQLTestTemplate.perform(
+            "/mutations/createNorwegianTravelQuote.graphql",
+            ObjectMapper().valueToTree(mapOf("input" to createQuoteInput))
+        )
         val createQuote = response.readTree()["data"]["createQuote"]
 
         verify { memberService.finalizeOnboarding(any(), "") }
