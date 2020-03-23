@@ -23,9 +23,38 @@ sealed class QuoteResult {
         val expiresAt: LocalDate,
         val email: String?,
         val dataCollectionId: UUID?
-    ) : QuoteResult(), CreateQuoteResult
+    ) : QuoteResult(), CreateQuoteResult {
+        val typeOfContract: TypeOfContract
+            get() = when(quoteDetails) {
+                is QuoteDetails.SwedishHouseQuoteDetails -> TypeOfContract.SE_HOUSE
+                is QuoteDetails.SwedishApartmentQuoteDetails -> when(quoteDetails.type) {
+                    ApartmentType.BRF -> TypeOfContract.SE_APARTMENT_BRF
+                    ApartmentType.RENT -> TypeOfContract.SE_APARTMENT_RENT
+                    ApartmentType.STUDENT_BRF -> TypeOfContract.SE_APARTMENT_STUDENT_BRF
+                    ApartmentType.STUDENT_RENT -> TypeOfContract.SE_APARTMENT_STUDENT_RENT
+                }
+                is QuoteDetails.NorwegianHomeContentsDetails -> when(quoteDetails.type) {
+                    NorwegianHomeContentsType.OWN -> {
+                        when {
+                            quoteDetails.isYouth -> TypeOfContract.NO_HOME_CONTENT_YOUTH_OWN
+                            else -> TypeOfContract.NO_HOME_CONTENT_OWN
+                        }
+                    }
+                    NorwegianHomeContentsType.RENT -> {
+                        when {
+                            quoteDetails.isYouth -> TypeOfContract.NO_HOME_CONTENT_YOUTH_RENT
+                            else -> TypeOfContract.NO_HOME_CONTENT_RENT
+                        }
+                    }
+                }
+                is QuoteDetails.NorwegianTravelDetails -> when {
+                    quoteDetails.isYouth -> TypeOfContract.NO_TRAVEL_YOUTH
+                    else -> TypeOfContract.NO_TRAVEL
+                }
+            }
+    }
 
-    @Deprecated("Incomplete is depricated")
+    @Deprecated("Incomplete is deprecated")
     data class IncompleteQuote(
         val id: UUID,
         val firstName: String?,

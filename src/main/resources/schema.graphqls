@@ -25,8 +25,8 @@ input CreateQuoteInput {
     ssn: String
     birthDate: LocalDate
     startDate: LocalDate
-    apartment: CreateApartmentInput @depricated(reason: "Use swedishApartment")
-    house: CreateHouseInput @depricated(reason: "Use swedishHouse")
+    apartment: CreateApartmentInput @deprecated(reason: "Use swedishApartment")
+    house: CreateHouseInput @deprecated(reason: "Use swedishHouse")
     swedishApartment: CreateSwedishApartmentInput
     swedishHouse: CreateSwedishHouseInput
     norwegianHomeContents: CreateNorwegianHomeContentsInput
@@ -102,9 +102,9 @@ input EditQuoteInput {
     ssn: String
     birthDate: LocalDate
     startDate: LocalDate
-    apartment: EditApartmentInput @depricated(reason: "Use swedishApartment")
+    apartment: EditApartmentInput @deprecated(reason: "Use swedishApartment")
     swedishApartment: EditSwedishApartmentInput
-    house: EditHouseInput @depricated(reason: "Use swedishHouse")
+    house: EditHouseInput @deprecated(reason: "Use swedishHouse")
     swedishHouse: EditSwedishHouseInput
     norwegianHomeContents: EditNorwegianHomeContentsInput
     norwegianTravel: EditNorwegianTravelInput
@@ -209,21 +209,36 @@ input RemoveStartDateInput {
 
 union CreateQuoteResult = CompleteQuote | UnderwritingLimitsHit
 
+enum TypeOfContract {
+    SE_HOUSE
+    SE_APARTMENT_BRF
+    SE_APARTMENT_RENT
+    SE_APARTMENT_STUDENT_BRF
+    SE_APARTMENT_STUDENT_RENT
+    NO_HOME_CONTENT_OWN
+    NO_HOME_CONTENT_RENT
+    NO_HOME_CONTENT_YOUTH_OWN
+    NO_HOME_CONTENT_YOUTH_RENT
+    NO_TRAVEL
+    NO_TRAVEL_YOUTH
+}
+
 type CompleteQuote {
     id: ID!
     currentInsurer: CurrentInsurer
-    price: MonetaryAmountV2! @depricated(reason: "Use insuranceCost")
+    price: MonetaryAmountV2! @deprecated(reason: "Use insuranceCost")
     insuranceCost: InsuranceCost!
     firstName: String!
     lastName: String!
     ssn: String!
     birthDate: LocalDate!
-    details: CompleteQuoteDetails! @depricated(reason: "Use quoteDetails")
+    details: CompleteQuoteDetails! @deprecated(reason: "Use quoteDetails")
     quoteDetails: QuoteDetails!
     startDate: LocalDate
     expiresAt: LocalDate!
     email: String
     dataCollectionId: ID
+    typeOfContract: TypeOfContract!
 }
 
 type CurrentInsurer {
