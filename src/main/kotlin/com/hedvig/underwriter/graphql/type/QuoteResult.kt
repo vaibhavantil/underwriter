@@ -35,21 +35,23 @@ sealed class QuoteResult {
                 }
                 is QuoteDetails.NorwegianHomeContentsDetails -> when (quoteDetails.type) {
                     NorwegianHomeContentsType.OWN -> {
-                        when {
-                            quoteDetails.isYouth -> TypeOfContract.NO_HOME_CONTENT_YOUTH_OWN
-                            else -> TypeOfContract.NO_HOME_CONTENT_OWN
+                        when (quoteDetails.isYouth) {
+                            true -> TypeOfContract.NO_HOME_CONTENT_YOUTH_OWN
+                            false -> TypeOfContract.NO_HOME_CONTENT_OWN
                         }
                     }
                     NorwegianHomeContentsType.RENT -> {
-                        when {
-                            quoteDetails.isYouth -> TypeOfContract.NO_HOME_CONTENT_YOUTH_RENT
-                            else -> TypeOfContract.NO_HOME_CONTENT_RENT
+                        when (quoteDetails.isYouth) {
+                            true -> TypeOfContract.NO_HOME_CONTENT_YOUTH_RENT
+                            false -> TypeOfContract.NO_HOME_CONTENT_RENT
                         }
                     }
                 }
-                is QuoteDetails.NorwegianTravelDetails -> when {
-                    quoteDetails.isYouth -> TypeOfContract.NO_TRAVEL_YOUTH
-                    else -> TypeOfContract.NO_TRAVEL
+                is QuoteDetails.NorwegianTravelDetails -> {
+                    when (quoteDetails.isYouth) {
+                        true -> TypeOfContract.NO_TRAVEL_YOUTH
+                        false -> TypeOfContract.NO_TRAVEL
+                    }
                 }
             }
     }
