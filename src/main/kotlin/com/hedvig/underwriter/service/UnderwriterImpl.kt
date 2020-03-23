@@ -23,11 +23,11 @@ import com.hedvig.underwriter.service.guidelines.SwedishPersonalGuidelines
 import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentGuidelines
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianHomeContentsQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.NorwegianTravelQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
@@ -37,8 +37,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class UnderwriterImpl(
-    val debtChecker: DebtChecker,
-    val productPricingService: ProductPricingService
+    private val debtChecker: DebtChecker,
+    private val productPricingService: ProductPricingService,
+    private val priceEngineService: PriceEngineService
 ) : Underwriter {
 
     override fun createQuote(
@@ -192,12 +193,12 @@ class UnderwriterImpl(
             is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
                 HouseQuotePriceDto.from(quote)
             ).price
-            is NorwegianHomeContentsData -> productPricingService.priceFromProductPricingForNorwegianHomeContentsQuote(
-                NorwegianHomeContentsQuotePriceDto.from(quote)
-            ).price
-            is NorwegianTravelData -> productPricingService.priceFromProductPricingForNorwegianTravelQuote(
-                NorwegianTravelQuotePriceDto.from(quote)
-            ).price
+            is NorwegianHomeContentsData -> priceEngineService.queryNorwegianHomeContentPrice(
+                PriceQueryRequest.NorwegianHomeContent.from(quote.id, quote.memberId, quote.data)
+            ).priceBigDecimal
+            is NorwegianTravelData -> priceEngineService.queryNorwegianTravelPrice(
+                PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
+            ).priceBigDecimal
         }
     }
 
