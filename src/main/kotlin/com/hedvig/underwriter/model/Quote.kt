@@ -26,6 +26,9 @@ val Quote.ssn
     get() = (data as? PersonPolicyHolder<*>)?.ssn
         ?: throw RuntimeException("No ssn on Quote! $this")
 
+val Quote.ssnMaybe
+    get() = (data as? PersonPolicyHolder<*>)?.ssn
+
 val Quote.birthDate
     get() = (data as? PersonPolicyHolder<*>)?.birthDate
         ?: recoverBirthDateFromSSN()

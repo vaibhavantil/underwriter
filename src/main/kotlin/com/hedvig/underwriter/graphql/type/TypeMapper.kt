@@ -12,21 +12,19 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.norwegianHomeContents
 import com.hedvig.underwriter.model.norwegianTravel
-import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.model.swedishApartment
 import com.hedvig.underwriter.model.swedishHouse
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import java.lang.IllegalStateException
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.util.Locale
-import org.springframework.stereotype.Component
 
 @Component
 class TypeMapper(
     private val localizationService: LocalizationService
 ) {
-
     fun mapToBundleQuote(
         quote: Quote,
         locale: Locale
@@ -36,7 +34,7 @@ class TypeMapper(
             firstName = quote.firstName,
             lastName = quote.lastName,
             currentInsurer = quote.currentInsurer?.let { CurrentInsurer.create(it) },
-            ssn = quote.ssn,
+            ssn = quote.ssnMaybe,
             birthDate = quote.birthDate,
             price = MonetaryAmountV2(
                 quote.price!!.toPlainString(),
@@ -111,7 +109,7 @@ class TypeMapper(
             lastName = quote.lastName,
             email = quote.email,
             currentInsurer = quote.currentInsurer?.let { CurrentInsurer.create(it) },
-            ssn = quote.ssn,
+            ssn = quote.ssnMaybe,
             birthDate = quote.birthDate,
             price = MonetaryAmountV2(
                 quote.price!!.toPlainString(),
