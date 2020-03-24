@@ -17,9 +17,9 @@ import com.hedvig.underwriter.model.swedishApartment
 import com.hedvig.underwriter.model.swedishHouse
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.util.Locale
+import org.springframework.stereotype.Component
 
 @Component
 class TypeMapper(
