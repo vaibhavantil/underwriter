@@ -230,7 +230,7 @@ type CompleteQuote {
     insuranceCost: InsuranceCost!
     firstName: String!
     lastName: String!
-    ssn: String!
+    ssn: String
     birthDate: LocalDate!
     details: CompleteQuoteDetails! @deprecated(reason: "Use quoteDetails")
     quoteDetails: QuoteDetails!
@@ -462,7 +462,6 @@ type IncompleteHouseQuoteDetails {
     extraBuildings: [ExtraBuilding!]
     numberOfBathrooms: Int
     yearOfConstruction: Int
-    numberOfBathrooms: Int
     isSubleted: Boolean
 }
 
@@ -505,7 +504,7 @@ type BundledQuote {
     price: MonetaryAmountV2!
     firstName: String!
     lastName: String!
-    ssn: String!
+    ssn: String
     birthDate: LocalDate!
     quoteDetails: QuoteDetails!
     startDate: LocalDate

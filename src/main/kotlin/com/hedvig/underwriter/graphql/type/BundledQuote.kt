@@ -9,7 +9,7 @@ data class BundledQuote(
     val firstName: String,
     val lastName: String,
     val currentInsurer: CurrentInsurer?,
-    val ssn: String,
+    val ssn: String?,
     val birthDate: LocalDate,
     val price: MonetaryAmountV2,
     val quoteDetails: QuoteDetails,
