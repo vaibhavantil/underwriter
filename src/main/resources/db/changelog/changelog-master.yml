@@ -41,4 +41,7 @@ databaseChangeLog:
   - include:
       file: ./migrations/20200313-1330-support-youth-norway.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20200324-1245-make-norwegian-ssn-nullable-and-11-characters.sql
+      relativeToChangelogFile: true
 
