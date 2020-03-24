@@ -5,9 +5,6 @@ enum class NorwegianTravelLineOfBusiness {
     YOUTH;
 
     companion object {
-        fun from(isYouth: Boolean): NorwegianTravelLineOfBusiness = when (isYouth) {
-            true -> YOUTH
-            false -> REGULAR
-        }
+        fun from(isYouth: Boolean): NorwegianTravelLineOfBusiness = if (isYouth) YOUTH else REGULAR
     }
 }
