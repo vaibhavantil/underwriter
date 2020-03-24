@@ -95,7 +95,7 @@ class UnderwriterImpl(
                 is QuoteRequestData.NorwegianHomeContents ->
                     NorwegianHomeContentsData(
                         id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
+                        ssn = quoteRequest.ssn ?: "",
                         birthDate = quoteRequest.birthDate!!,
                         firstName = quoteRequest.firstName!!,
                         lastName = quoteRequest.lastName!!,
@@ -111,7 +111,7 @@ class UnderwriterImpl(
                 is QuoteRequestData.NorwegianTravel ->
                     NorwegianTravelData(
                         id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
+                        ssn = quoteRequest.ssn ?: "",
                         birthDate = quoteRequest.birthDate!!,
                         firstName = quoteRequest.firstName!!,
                         lastName = quoteRequest.lastName!!,
