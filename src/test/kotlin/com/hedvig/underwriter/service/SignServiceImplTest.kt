@@ -8,7 +8,8 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.SignServiceImpl.Companion.SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE
-import com.hedvig.underwriter.service.SignServiceImpl.Companion.VARIOS_MEMBER_ID_ERROR_MESSAGE
+import com.hedvig.underwriter.service.SignServiceImpl.Companion.TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE
+import com.hedvig.underwriter.service.SignServiceImpl.Companion.VARIOUS_MEMBER_ID_ERROR_MESSAGE
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -141,7 +142,7 @@ class SignServiceImplTest {
             "autoStartToken"
         )
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         verify(exactly = 1) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
@@ -161,7 +162,7 @@ class SignServiceImplTest {
             internalErrorMessage = "Failed"
         )
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo("Failed")
@@ -175,7 +176,7 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns ErrorResponseDto(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "")
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
@@ -189,11 +190,11 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
-        every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn) } returns StartNorwegianBankIdSignResponse(
+        every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn, targetUrl, failedTargetUrl) } returns StartNorwegianBankIdSignResponse(
             "redirect url"
         )
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, null)
+        val result = cut.startSigningQuotes(quoteIds, memberId, null, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
     }
@@ -208,11 +209,11 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
-        every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn) } returns StartNorwegianBankIdSignResponse(
+        every { memberService.startNorwegianBankIdSignQuotes(quote.memberId!!.toLong(), signSessionReference, quote.ssn, targetUrl, failedTargetUrl) } returns StartNorwegianBankIdSignResponse(
             "redirect url"
         )
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
     }
@@ -226,7 +227,7 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
@@ -238,7 +239,7 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf()
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
@@ -254,7 +255,7 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
         every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
@@ -267,25 +268,10 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1)
 
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
-    }
-
-    @Test
-    fun failStartSignQuotesWithVariousMemberIds() {
-        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
-        val quote1 = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianHomeContentDataBuilder(), memberId = "1234").build()
-
-        every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
-
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress)
-
-        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
-        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(VARIOS_MEMBER_ID_ERROR_MESSAGE)
     }
 
     @Test
@@ -296,14 +282,30 @@ class SignServiceImplTest {
 
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
 
-        val result = cut.startSigningQuotes(quoteIds, "1234", ipAddress)
+        val result = cut.startSigningQuotes(quoteIds, "1234", ipAddress, targetUrl, failedTargetUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
-        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(VARIOS_MEMBER_ID_ERROR_MESSAGE)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(VARIOUS_MEMBER_ID_ERROR_MESSAGE)
+    }
+
+    @Test
+    fun failStartSignNorwegianQuotesNoTargetUrls() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote = a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
     }
 
     companion object {
         private val memberId = "1337"
         private val ipAddress = "127.0.0.1"
+        private val targetUrl = "http://hedvig.com"
+        private val failedTargetUrl = "http://hedvig.com"
     }
 }

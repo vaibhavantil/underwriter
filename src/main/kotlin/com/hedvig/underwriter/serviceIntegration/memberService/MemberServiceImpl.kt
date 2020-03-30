@@ -85,14 +85,27 @@ class MemberServiceImpl @Autowired constructor(
         ipAddress: String,
         isSwitching: Boolean
     ): StartSwedishBankIdSignResponse {
-        return client.startSwedishBankIdSign(memberId, UnderwriterStartSwedishBankIdSignSessionRequest(underwriterSessionReference, ssn, ipAddress, isSwitching)).body!!
+        return client.startSwedishBankIdSign(
+            memberId,
+            UnderwriterStartSwedishBankIdSignSessionRequest(underwriterSessionReference, ssn, ipAddress, isSwitching)
+        ).body!!
     }
 
     override fun startNorwegianBankIdSignQuotes(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String
+        ssn: String,
+        targetUrl: String,
+        failedTargetUrl: String
     ): StartNorwegianBankIdSignResponse {
-        return client.startNorwegianSing(memberId, UnderwriterStartNorwegianBankIdSignSessionRequest(underwriterSessionReference, ssn)).body!!
+        return client.startNorwegianSing(
+            memberId,
+            UnderwriterStartNorwegianBankIdSignSessionRequest(
+                underwriterSessionReference,
+                ssn,
+                targetUrl,
+                failedTargetUrl
+            )
+        ).body!!
     }
 }
