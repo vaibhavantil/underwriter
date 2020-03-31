@@ -74,7 +74,7 @@ interface ProductPricingClient {
         @Valid @RequestBody request: AddAgreementRequest
     ): AddAgreementResponse
 
-    @PostMapping("/_/underwriter/{memberId}/bundleInsuranceCost")
+    @PostMapping("/_/underwriter/{memberId}/calculate/bundleInsuranceCost")
     fun calculateBundleInsuranceCost(
         @Valid @RequestBody request: CalculateBundleInsuranceCostRequest,
         @PathVariable memberId: String
