@@ -173,6 +173,8 @@ input ExtraBuildingInput {
 
 input SignQuotesInput {
     quoteIds: [ID!]!
+    successUrl: String
+    failUrl: String
 }
 
 enum ExtraBuildingType {

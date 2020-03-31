@@ -46,6 +46,8 @@ interface MemberService {
     fun startNorwegianBankIdSignQuotes(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String
+        ssn: String,
+        successUrl: String,
+        failUrl: String
     ): StartNorwegianBankIdSignResponse
 }
