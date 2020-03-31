@@ -4,6 +4,6 @@ import java.util.UUID
 
 data class SignQuotesInput(
     val quoteIds: List<UUID>,
-    val targetUrl: String?,
-    val failedTargetUrl: String?
+    val successUrl: String?,
+    val failUrl: String?
 )

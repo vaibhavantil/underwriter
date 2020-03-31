@@ -14,8 +14,8 @@ interface SignService {
         quoteIds: List<UUID>,
         memberId: String,
         ipAddress: String?,
-        targetUrl: String?,
-        failedTargetUrl: String?
+        successUrl: String?,
+        failUrl: String?
     ): StartSignResponse
 
     fun completedSignSession(

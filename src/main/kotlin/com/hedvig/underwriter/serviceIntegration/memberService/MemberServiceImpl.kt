@@ -95,16 +95,16 @@ class MemberServiceImpl @Autowired constructor(
         memberId: Long,
         underwriterSessionReference: UUID,
         ssn: String,
-        targetUrl: String,
-        failedTargetUrl: String
+        successUrl: String,
+        failUrl: String
     ): StartNorwegianBankIdSignResponse {
         return client.startNorwegianSing(
             memberId,
             UnderwriterStartNorwegianBankIdSignSessionRequest(
                 underwriterSessionReference,
                 ssn,
-                targetUrl,
-                failedTargetUrl
+                successUrl,
+                failUrl
             )
         ).body!!
     }

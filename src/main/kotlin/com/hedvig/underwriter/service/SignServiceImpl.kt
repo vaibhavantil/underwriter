@@ -51,8 +51,8 @@ class SignServiceImpl(
         quoteIds: List<UUID>,
         memberId: String,
         ipAddress: String?,
-        targetUrl: String?,
-        failedTargetUrl: String?
+        successUrl: String?,
+        failUrl: String?
     ): StartSignResponse {
 
         val quotes = quoteService.getQuotes(quoteIds)
@@ -95,7 +95,7 @@ class SignServiceImpl(
                 } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
-                if (targetUrl == null || failedTargetUrl == null) {
+                if (successUrl == null || failUrl == null) {
                     return StartSignResponse.FailedToStartSign(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
                 }
 
@@ -106,8 +106,8 @@ class SignServiceImpl(
                         data.memberId.toLong(),
                         signSessionId,
                         data.ssn,
-                        targetUrl,
-                        failedTargetUrl
+                        successUrl,
+                        failUrl
                     )
 
                 return response.redirectUrl?.let { redirectUrl ->
@@ -327,6 +327,6 @@ class SignServiceImpl(
         val logger = LoggerFactory.getLogger(this.javaClass)!!
         const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
         const val VARIOUS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
-        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE = "Bad request: Must provide `targetUrl` and `failedTargetUrl` when starting norwegian sign"
+        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE = "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
     }
 }
