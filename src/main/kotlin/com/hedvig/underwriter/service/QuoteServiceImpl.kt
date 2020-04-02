@@ -240,18 +240,14 @@ class QuoteServiceImpl(
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
 
-        // TODO once campaign service is up to speed lets remove this when
         return when (quote.data) {
             is SwedishHouseData,
             is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
                 Money.of(quote.price, "SEK"), memberId
             )
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> InsuranceCost(
-                monthlyGross = MonetaryAmountV2.of(quote.price!!, "NOK"),
-                monthlyDiscount = MonetaryAmountV2.of(BigDecimal.ZERO, "NOK"),
-                monthlyNet = MonetaryAmountV2.of(quote.price, "NOK"),
-                freeUntil = null
+            is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
+                Money.of(quote.price, "NOK"), memberId
             )
         }
     }
