@@ -2,7 +2,6 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -26,7 +25,6 @@ import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import java.lang.RuntimeException
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 import org.javamoney.moneta.Money
