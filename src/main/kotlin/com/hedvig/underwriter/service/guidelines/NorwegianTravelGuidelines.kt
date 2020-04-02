@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.model.dayMonthAndTwoDigitYearFromNorwegianSsn
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -14,7 +15,7 @@ object NorwegianTravelGuidelines {
 object NorwegianTravelcoInsuredCantBeNegative : BaseGuideline<NorwegianTravelData> {
     override val errorMessage: String = "coInsured cant be negative"
 
-    override val validate = { data: NorwegianTravelData -> data.coInsured!! < 0 }
+    override val validate = { data: NorwegianTravelData -> data.coInsured < 0 }
 }
 
 object NorwegianYouthTravelAgeNotMoreThan34Years : BaseGuideline<NorwegianTravelData> {

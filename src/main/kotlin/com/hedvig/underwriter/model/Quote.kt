@@ -66,19 +66,24 @@ fun String.birthDateFromNorwegianSsn(): LocalDate {
     return LocalDate.parse(this.birthDateStringFromNorwegianSsn())
 }
 
-fun String.birthDateStringFromNorwegianSsn(): String {
+fun String.dayMonthAndTwoDigitYearFromNorwegianSsn(): Triple<String, String, String> {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     val day = trimmedInput.substring(0, 2)
     val month = trimmedInput.substring(2, 4)
     val twoDigitYear = trimmedInput.substring(4, 6)
+    return Triple(day, month, twoDigitYear)
+}
+
+fun String.birthDateStringFromNorwegianSsn(): String {
+    val dayMonthYear = this.dayMonthAndTwoDigitYearFromNorwegianSsn()
     val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
 
-    val year = if (twoDigitYear.toInt() > breakPoint) {
-        "19$twoDigitYear"
+    val year = if (dayMonthYear.third.toInt() > breakPoint) {
+        "19${dayMonthYear.third}"
     } else {
-        "20$twoDigitYear"
+        "20${dayMonthYear.third}"
     }
-    return "$year-$month-$day"
+    return "$year-${dayMonthYear.second}-${dayMonthYear.first}"
 }
 
 data class DatabaseQuoteRevision(

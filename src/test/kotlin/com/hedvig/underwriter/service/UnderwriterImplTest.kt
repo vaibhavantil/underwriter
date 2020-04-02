@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
+import com.hedvig.underwriter.service.guidelines.NorwegianSsnNotMatchesBirthDate
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeAtLeast1
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeNotMoreThan6
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceAtLeast1Sqm
@@ -338,5 +339,86 @@ class UnderwriterImplTest {
                 SwedishHouseExtraBuildingsSizeNotOverThan75Sqm.errorMessage
             )
         )
+    }
+
+    @Test
+    fun successfullyCreateNorwegianHomeContentsQuote() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+        val priceEngineService = mockk<PriceEngineService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
+        val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder().build()
+
+        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "NOK")
+        )
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenNorwegianSsnNotMatch() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+        val priceEngineService = mockk<PriceEngineService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
+        val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
+            ssn = "13121200000"
+        ).build()
+
+        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "NOK")
+        )
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                NorwegianSsnNotMatchesBirthDate.errorMessage
+            )
+        )
+    }
+
+    @Test
+    fun successfullyCreateNorwegianHomeContentsQuoteWhenSsnIsNull() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+        val priceEngineService = mockk<PriceEngineService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
+        val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
+            ssn = null
+        ).build()
+
+        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "NOK")
+        )
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
+
+    @Test
+    fun successfullyCreateNorwegianHomeTravelQuote() {
+        val debtChecker = mockk<DebtChecker>()
+        val productPricingService = mockk<ProductPricingService>()
+        val priceEngineService = mockk<PriceEngineService>()
+
+        val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
+        val quoteRequest = a.NorwegianTravelQuoteRequestBuilder().build()
+
+        every { priceEngineService.queryNorwegianTravelPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "NOK")
+        )
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
     }
 }
