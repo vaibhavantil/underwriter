@@ -6,8 +6,8 @@ import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 object NorwegianPersonGuidelines {
     val setOfRules = setOf(
-        AgeRestrictionGuideline,
-        NorwegianSsnNotMatchesBirthDate
+        AgeRestrictionGuideline
+        //TODO: re add this later `NorwegianSsnNotMatchesBirthDate` also when re adding it un ignore UnderwriterImplTest.underwritingGuidelineHitWhenNorwegianSsnNotMatch()
     )
 }
 

@@ -32,6 +32,7 @@ import java.math.BigDecimal
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -359,6 +360,7 @@ class UnderwriterImplTest {
         require(result is Either.Right)
     }
 
+    @Ignore
     @Test
     fun underwritingGuidelineHitWhenNorwegianSsnNotMatch() {
         val debtChecker = mockk<DebtChecker>()
