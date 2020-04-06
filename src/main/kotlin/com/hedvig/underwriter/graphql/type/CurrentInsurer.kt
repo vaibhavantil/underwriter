@@ -11,12 +11,14 @@ data class CurrentInsurer(
             "Folksam" to Pair("Folksam", true),
             "Trygg-Hansa" to Pair("Trygg-Hansa", true),
             "Länsförsäkringar" to Pair("Länsförsäkringar", false),
+            "Länsförsäkringar Stockholm" to Pair("Länsförsäkringar Stockholm", true),
             "Moderna" to Pair("Moderna", true),
             "Gjensidige" to Pair("Gjensidige", false),
             "Vardia" to Pair("Vardia", false),
             "Tre Kronor" to Pair("Tre Kronor", true),
             "ICA" to Pair("Ica", true),
-            "Dina Försäkringar" to Pair("Dina Försäkringar", false),
+            "Dina Försäkringar" to Pair("Dina Försäkringar", true),
+            "Aktsam" to Pair("Aktsam", true),
             "other" to Pair("Other", false)
         )
         private val norwegianInsurerMap = mapOf(
