@@ -12,7 +12,7 @@ object NorwegianHomeContentsGuidelines {
         NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm,
         NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm,
         NorwegianYouthHomeContentsAgeNotMoreThan30Years,
-        NorwegianYouthHomeContentsContentsCoInsuredNotMoreThan2
+        NorwegianYouthHomeContentsCoInsuredNotMoreThan2
     )
 }
 
@@ -41,7 +41,7 @@ object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<Norwegi
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace > 250 }
 }
 
-object NorwegianYouthHomeContentsContentsCoInsuredNotMoreThan2 : BaseGuideline<NorwegianHomeContentsData> {
+object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<NorwegianHomeContentsData> {
     override val errorMessage: String = "coInsured size must be less than or equal to 2"
 
     override val validate =

@@ -9,7 +9,7 @@ import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentscoInsuredN
 import com.hedvig.underwriter.service.guidelines.NorwegianSsnNotMatchesBirthDate
 import com.hedvig.underwriter.service.guidelines.NorwegianTravelCoInsuredNotMoreThan5
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsAgeNotMoreThan30Years
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsContentsCoInsuredNotMoreThan2
+import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsCoInsuredNotMoreThan2
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelAgeNotMoreThan30Years
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelCoInsuredNotMoreThan0
@@ -479,7 +479,7 @@ class UnderwriterImplTest {
             listOf(
                 NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm.errorMessage,
                 NorwegianYouthHomeContentsAgeNotMoreThan30Years.errorMessage,
-                NorwegianYouthHomeContentsContentsCoInsuredNotMoreThan2.errorMessage
+                NorwegianYouthHomeContentsCoInsuredNotMoreThan2.errorMessage
             )
         )
     }
