@@ -41,7 +41,6 @@ import java.time.LocalDate
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -102,7 +101,9 @@ class UnderwriterImplTest {
         val quoteRequest = a.SwedishHouseQuoteRequestBuilder().build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(BigDecimal.ONE)
+        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(
+            BigDecimal.ONE
+        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -119,7 +120,10 @@ class UnderwriterImplTest {
         val quoteId = UUID.randomUUID()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(quoteId, Money.of(BigDecimal.ONE, "NOK"))
+        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
+            quoteId,
+            Money.of(BigDecimal.ONE, "NOK")
+        )
 
         val result = cut.createQuote(quoteRequest, quoteId, QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -136,7 +140,10 @@ class UnderwriterImplTest {
         val quoteId = UUID.randomUUID()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { priceEngineService.queryNorwegianTravelPrice(any()) } returns PriceQueryResponse(quoteId, Money.of(BigDecimal.ONE, "NOK"))
+        every { priceEngineService.queryNorwegianTravelPrice(any()) } returns PriceQueryResponse(
+            quoteId,
+            Money.of(BigDecimal.ONE, "NOK")
+        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -369,7 +376,6 @@ class UnderwriterImplTest {
         require(result is Either.Right)
     }
 
-    @Ignore
     @Test
     fun underwritingGuidelineHitWhenNorwegianSsnNotMatch() {
         val debtChecker = mockk<DebtChecker>()
@@ -378,7 +384,7 @@ class UnderwriterImplTest {
 
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
-            ssn = "13121200000"
+            ssn = "24057408215"
         ).build()
 
         every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
@@ -465,7 +471,8 @@ class UnderwriterImplTest {
 
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
-            birthDate = LocalDate.now().minusYears(31).minusDays(1),
+            ssn = "28026400734",
+            birthDate = LocalDate.of(1964, 2, 28),
             data = a.NorwegianHomeContentsQuoteRequestDataBuilder(
                 coInsured = 3,
                 livingSpace = 51,
@@ -525,6 +532,7 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
+                NorwegianSsnNotMatchesBirthDate.errorMessage,
                 NorwegianYouthTravelAgeNotMoreThan30Years.errorMessage,
                 NorwegianYouthTravelCoInsuredNotMoreThan0.errorMessage
             )
