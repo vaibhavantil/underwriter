@@ -16,7 +16,7 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
-import com.hedvig.underwriter.web.dtos.QuoteRequestFromBackOfficeDto
+import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import java.util.UUID
@@ -72,9 +72,9 @@ class QuoteController @Autowired constructor(
             ).getOrHandle { it }
     }
 
-    @PostMapping("/createQuoteFromBackOffice")
-    fun createQuoteFromBackOffice(
-        @RequestBody quoteRequest: QuoteRequestFromBackOfficeDto
+    @PostMapping("/createQuoteFromAgreement")
+    fun createQuoteFromAgreement(
+        @RequestBody quoteRequest: QuoteRequestFromAgreementDto
     ): ResponseEntity<out Any> {
         return quoteService.createQuoteFromAgreement(
             agreementId = quoteRequest.agreementId,
