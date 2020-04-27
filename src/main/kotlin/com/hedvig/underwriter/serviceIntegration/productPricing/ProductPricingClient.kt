@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.AddAgreementRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
@@ -19,10 +20,12 @@ import feign.Headers
 import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import java.util.*
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -79,4 +82,9 @@ interface ProductPricingClient {
         @Valid @RequestBody request: CalculateBundleInsuranceCostRequest,
         @PathVariable memberId: String
     ): ResponseEntity<InsuranceCost>
+
+    @GetMapping("/_/agreements/{agreementId}")
+    fun getAgreementFromAgreementId(
+        @PathVariable agreementId: UUID
+    ): ResponseEntity<Agreement>
 }

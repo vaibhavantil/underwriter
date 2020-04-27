@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.AddAgreementRequest
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
@@ -20,6 +21,7 @@ import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 @EnableFeignClients
@@ -66,4 +68,7 @@ class ProductPricingServiceImpl @Autowired constructor(
 
     override fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse> =
         productPricingClient.createContract(CreateContractsRequest.fromQuotesNoMandate(quotes))
+
+    override fun getAgreementFromAgreementId(agreementId: UUID): Agreement =
+        productPricingClient.getAgreementFromAgreementId(agreementId).body!!
 }

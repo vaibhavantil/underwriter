@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import arrow.core.Either
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
@@ -50,4 +51,6 @@ interface MemberService {
         successUrl: String,
         failUrl: String
     ): StartNorwegianBankIdSignResponse
+
+    fun getMember(memberId: Long): InternalMember
 }
