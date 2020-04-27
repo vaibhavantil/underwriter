@@ -76,7 +76,7 @@ class QuoteController @Autowired constructor(
     fun createQuoteFromBackOffice(
         @RequestBody quoteRequest: QuoteRequestFromBackOfficeDto
     ): ResponseEntity<out Any> {
-        return quoteService.createQuoteFromBackOffice(
+        return quoteService.createQuoteFromAgreement(
             agreementId = quoteRequest.agreementId,
             memberId = quoteRequest.memberId,
             underwritingGuidelinesBypassedBy = quoteRequest.underwritingGuidelinesBypassedBy

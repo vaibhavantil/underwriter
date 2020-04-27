@@ -69,6 +69,6 @@ class ProductPricingServiceImpl @Autowired constructor(
     override fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse> =
         productPricingClient.createContract(CreateContractsRequest.fromQuotesNoMandate(quotes))
 
-    override fun getAgreementFromAgreementId(agreementId: UUID): Agreement =
-        productPricingClient.getAgreementFromAgreementId(agreementId).body!!
+    override fun getAgreement(agreementId: UUID): Agreement =
+        productPricingClient.getAgreement(agreementId).body!!
 }

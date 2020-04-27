@@ -41,5 +41,5 @@ interface ProductPricingService {
 
     fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse>
 
-    fun getAgreementFromAgreementId(agreementId: UUID): Agreement
+    fun getAgreement(agreementId: UUID): Agreement
 }

@@ -148,14 +148,14 @@ class QuoteServiceImpl(
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
-    override fun createQuoteFromBackOffice(
+    override fun createQuoteFromAgreement(
         agreementId: UUID,
         memberId: String,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quoteId = UUID.randomUUID()
 
-        val agreementData = productPricingService.getAgreementFromAgreementId(agreementId)
+        val agreementData = productPricingService.getAgreement(agreementId)
 
         val member = memberService.getMember(memberId.toLong())
 

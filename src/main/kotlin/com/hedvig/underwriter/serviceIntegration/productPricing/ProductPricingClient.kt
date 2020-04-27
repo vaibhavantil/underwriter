@@ -84,7 +84,7 @@ interface ProductPricingClient {
     ): ResponseEntity<InsuranceCost>
 
     @GetMapping("/_/agreements/{agreementId}")
-    fun getAgreementFromAgreementId(
+    fun getAgreement(
         @PathVariable agreementId: UUID
     ): ResponseEntity<Agreement>
 }
