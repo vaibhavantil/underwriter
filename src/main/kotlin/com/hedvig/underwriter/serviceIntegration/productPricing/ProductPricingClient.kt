@@ -17,6 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Ad
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import feign.Headers
+import java.util.UUID
 import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
-import java.util.*
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(

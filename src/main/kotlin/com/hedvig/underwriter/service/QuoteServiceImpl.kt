@@ -2,18 +2,10 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.NorwegianTravelData
-import com.hedvig.underwriter.model.Partner
-import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
@@ -24,15 +16,10 @@ import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -43,8 +30,6 @@ import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.time.ZoneId
 
 @Service
 class QuoteServiceImpl(

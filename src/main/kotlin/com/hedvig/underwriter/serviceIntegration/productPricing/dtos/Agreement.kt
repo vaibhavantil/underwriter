@@ -1,19 +1,17 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import arrow.syntax.function.pipeLazy
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.ProductType
-import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.ExtraBuildingDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.SwedishApartmentLineOfBusiness
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 import javax.money.MonetaryAmount
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -113,7 +111,7 @@ sealed class Agreement {
             city = null,
             coInsured = this.numberCoInsured,
             type = NorwegianHomeContentsType.valueOf(this.lineOfBusiness.name),
-            isYouth = when(this.lineOfBusiness) {
+            isYouth = when (this.lineOfBusiness) {
                 NorwegianHomeContentLineOfBusiness.OWN,
                 NorwegianHomeContentLineOfBusiness.RENT -> {
                     false
@@ -140,7 +138,7 @@ sealed class Agreement {
     ) : Agreement() {
         override fun toQuoteRequestData() = QuoteRequestData.NorwegianTravel(
             coInsured = this.numberCoInsured,
-            isYouth = when(this.lineOfBusiness) {
+            isYouth = when (this.lineOfBusiness) {
                 NorwegianTravelLineOfBusiness.REGULAR -> false
                 NorwegianTravelLineOfBusiness.YOUTH -> true
             }
@@ -148,5 +146,3 @@ sealed class Agreement {
         override fun getOldProductType() = ProductType.TRAVEL
     }
 }
-
-

@@ -17,11 +17,11 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Cr
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
+import java.util.UUID
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 @EnableFeignClients

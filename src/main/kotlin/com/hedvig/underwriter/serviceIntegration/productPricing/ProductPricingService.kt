@@ -16,9 +16,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Ad
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
+import java.util.UUID
 import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
-import java.util.*
 
 interface ProductPricingService {
     fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto
