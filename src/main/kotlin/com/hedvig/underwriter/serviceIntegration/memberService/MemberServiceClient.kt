@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
@@ -66,4 +67,9 @@ interface MemberServiceClient {
         @PathVariable("memberId") memberId: Long,
         @RequestBody request: UnderwriterStartNorwegianBankIdSignSessionRequest
     ): ResponseEntity<StartNorwegianBankIdSignResponse>
+
+    @GetMapping("/_/member/{memberId}")
+    fun getMember(
+        @PathVariable("memberId") memberId: Long
+    ): ResponseEntity<InternalMember>
 }

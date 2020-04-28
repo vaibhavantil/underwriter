@@ -148,6 +148,36 @@ class QuoteServiceImpl(
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
+    override fun createQuoteFromAgreement(
+        agreementId: UUID,
+        memberId: String,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        val quoteId = UUID.randomUUID()
+
+        val agreementData = productPricingService.getAgreement(agreementId)
+
+        val member = memberService.getMember(memberId.toLong())
+
+        val incompleteQuoteData = agreementData.toQuoteRequestData()
+
+        val quoteData = QuoteRequest.from(
+            member = member,
+            agreementData = agreementData,
+            incompleteQuoteData = incompleteQuoteData
+        )
+
+        val breachedGuidelinesOrQuote =
+            underwriter.createQuote(quoteData, quoteId, QuoteInitiatedFrom.HOPE, underwritingGuidelinesBypassedBy)
+        val quote = when (breachedGuidelinesOrQuote) {
+            is Either.Left -> breachedGuidelinesOrQuote.a.first
+            is Either.Right -> breachedGuidelinesOrQuote.b
+        }
+        quoteRepository.insert(quote)
+
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
     private fun transformCompleteQuoteReturn(
         potentiallySavedQuote: Either<Pair<Quote, List<String>>, Quote>,
         quoteId: UUID
