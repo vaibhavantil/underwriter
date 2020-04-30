@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
@@ -32,6 +33,9 @@ class MemberServiceImpl @Autowired constructor(
     override fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse {
         return this.client.checkIsSsnAlreadySignedMemberEntity(ssn)
     }
+
+    override fun isMemberIdAlreadySignedMemberEntity(memberId: Long): IsMemberAlreadySignedResponse  =
+        client.checkIsMemberAlreadySignedMemberEntity(memberId)
 
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
         this.client.updateMemberSsn(memberId, request)
