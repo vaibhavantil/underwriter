@@ -34,7 +34,7 @@ class MemberServiceImpl @Autowired constructor(
         return this.client.checkIsSsnAlreadySignedMemberEntity(ssn)
     }
 
-    override fun isMemberIdAlreadySignedMemberEntity(memberId: Long): IsMemberAlreadySignedResponse  =
+    override fun isMemberIdAlreadySignedMemberEntity(memberId: Long): IsMemberAlreadySignedResponse =
         client.checkIsMemberAlreadySignedMemberEntity(memberId)
 
     override fun updateMemberSsn(memberId: Long, request: UpdateSsnRequest) {
