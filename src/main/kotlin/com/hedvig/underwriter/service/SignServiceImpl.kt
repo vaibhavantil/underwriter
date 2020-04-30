@@ -55,6 +55,10 @@ class SignServiceImpl(
         failUrl: String?
     ): StartSignResponse {
 
+        if (memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()).memberAlreadySigned) {
+            return StartSignResponse.FailedToStartSign(MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE)
+        }
+
         val quotes = quoteService.getQuotes(quoteIds)
         quotes.forEach { quote ->
             quote.memberId?.let { quoteMemberId ->
@@ -328,5 +332,6 @@ class SignServiceImpl(
         const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
         const val VARIOUS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
         const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE = "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
+        const val MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE = "Member has already signed"
     }
 }
