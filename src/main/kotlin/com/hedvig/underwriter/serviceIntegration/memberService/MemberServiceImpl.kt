@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
@@ -111,5 +112,9 @@ class MemberServiceImpl @Autowired constructor(
                 failUrl
             )
         ).body!!
+    }
+
+    override fun getMember(memberId: Long): InternalMember {
+        return client.getMember(memberId).body!!
     }
 }
