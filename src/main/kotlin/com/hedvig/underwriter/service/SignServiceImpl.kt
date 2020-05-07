@@ -23,6 +23,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
@@ -263,6 +264,56 @@ class SignServiceImpl(
         )
     }
 
+    override fun signQuoteFromHope(
+        completeQuoteId: UUID,
+        body: SignQuoteFromHopeRequest
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
+        val quote = quoteRepository.find(completeQuoteId)
+            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+
+        if (quote.signedProductId != null) {
+            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        }
+
+        if (quote.memberId == null) {
+            Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED,
+                    "no member id connected to quote"
+                )
+            )
+        }
+
+        val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+        if (quoteNotSignableErrorDto != null) {
+            return Either.left(quoteNotSignableErrorDto)
+        }
+
+        val memberAlreadySigned = when (quote.data) {
+            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+            else -> throw RuntimeException("Unsupported quote data class")
+        }
+
+        // QUESTION-MARK
+        if (!memberAlreadySigned.ssnAlreadySignedMember) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_HAS_NOT_EXISTING_SIGNED_INSURANCE,
+                    "member needs to sign at least once before"
+                )
+            )
+        }
+
+        return Right(
+            signQuoteWithMemberId(
+                quote,
+                false,
+                SignRequest("", "", ""),
+                (quote.data as PersonPolicyHolder<*>).email!!
+            )
+        )
+    }
+
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, true, signedRequest, null)
@@ -331,7 +382,8 @@ class SignServiceImpl(
         val logger = LoggerFactory.getLogger(this.javaClass)!!
         const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
         const val VARIOUS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
-        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE = "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
+        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE =
+            "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
         const val MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE = "Member has already signed"
     }
 }
