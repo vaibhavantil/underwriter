@@ -31,7 +31,7 @@ interface SignService {
 
     fun signQuoteFromHope(
         completeQuoteId: UUID,
-        body: SignQuoteFromHopeRequest
+        request: SignQuoteFromHopeRequest
     ): Either<ErrorResponseDto, SignedQuoteResponseDto>
 
     fun memberSigned(memberId: String, signedRequest: SignRequest)

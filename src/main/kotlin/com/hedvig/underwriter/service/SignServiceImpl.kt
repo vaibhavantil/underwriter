@@ -266,7 +266,7 @@ class SignServiceImpl(
 
     override fun signQuoteFromHope(
         completeQuoteId: UUID,
-        body: SignQuoteFromHopeRequest
+        request: SignQuoteFromHopeRequest
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
@@ -294,7 +294,6 @@ class SignServiceImpl(
             else -> throw RuntimeException("Unsupported quote data class")
         }
 
-        // QUESTION-MARK
         if (!memberAlreadySigned.ssnAlreadySignedMember) {
             return Either.Left(
                 ErrorResponseDto(
@@ -304,9 +303,11 @@ class SignServiceImpl(
             )
         }
 
+        val updatedQuote = quote.copy(startDate = request.activationDate)
+
         return Right(
             signQuoteWithMemberId(
-                quote,
+                updatedQuote,
                 false,
                 SignRequest("", "", ""),
                 (quote.data as PersonPolicyHolder<*>).email!!
