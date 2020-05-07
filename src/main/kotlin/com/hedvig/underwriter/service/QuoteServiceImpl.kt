@@ -24,7 +24,6 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.util.UUID
 import org.javamoney.moneta.Money
@@ -146,6 +145,41 @@ class QuoteServiceImpl(
         }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    override fun createQuoteForNewContractFromHope(
+        quoteRequest: QuoteRequest,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        val quoteId = UUID.randomUUID()
+
+        val updatedQuoteRequest = updateIncompleteQuoteWithMember(quoteRequest)
+
+        val breachedGuidelinesOrQuote =
+            underwriter.createQuote(
+                updatedQuoteRequest,
+                quoteId,
+                QuoteInitiatedFrom.HOPE,
+                underwritingGuidelinesBypassedBy
+            )
+        val quote = when (breachedGuidelinesOrQuote) {
+            is Either.Left -> breachedGuidelinesOrQuote.a.first
+            is Either.Right -> breachedGuidelinesOrQuote.b
+        }
+        quoteRepository.insert(quote)
+
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    private fun updateIncompleteQuoteWithMember(input: QuoteRequest): QuoteRequest {
+        val member = memberService.getMember(input.memberId!!.toLong())
+        return input.copy(
+            firstName = member.firstName,
+            lastName = member.lastName,
+            email = member.email,
+            birthDate = member.birthDate,
+            ssn = member.ssn
+        )
     }
 
     override fun createQuoteFromAgreement(
