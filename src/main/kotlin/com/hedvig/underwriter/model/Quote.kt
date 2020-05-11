@@ -346,6 +346,7 @@ data class Quote(
             is NorwegianTravel -> {
                 val newQuoteData: NorwegianTravelData = when (newQuote.data) {
                     is NorwegianHomeContentsData -> newQuote.data as NorwegianTravelData
+                    is NorwegianTravelData -> newQuote.data as NorwegianTravelData
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
