@@ -143,14 +143,14 @@ class SignServiceImpl(
         }
         quotes.forEach { quote ->
             val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
-            finishingUpSignedQuote(quote, signedContractId, false)
+            finishingUpSignedQuote(quote, signedContractId, true)
         }
     }
 
     private fun finishingUpSignedQuote(
         quote: Quote,
         signedContractId: UUID,
-        signStartedInMemberService: Boolean
+        shouldCompleteSignInMemberService: Boolean
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
             quote.copy(signedProductId = signedContractId)
@@ -171,7 +171,7 @@ class SignServiceImpl(
             }
         }
 
-        if (!signStartedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
+        if (shouldCompleteSignInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
             memberService.signQuote(
                 quoteWithProductId.memberId.toLong(),
                 UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
@@ -183,16 +183,12 @@ class SignServiceImpl(
 
         quoteRepository.update(signedQuote, signedAt)
 
-        val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
         try {
-            if (activeProfiles.isNotEmpty()) {
-                logger.error("customerIOClient is null even thou $activeProfiles is set")
-            }
             customerIO.postSignUpdate(quoteWithProductId)
         } catch (ex: Exception) {
             logger.error(
                 "Something went wrong while posting a signing update to customerIO " +
-                    "[ActiveProfile: $activeProfiles] [SignQuote: $signedQuote]"
+                    "[SignQuote: $signedQuote]"
             )
         }
 
@@ -257,7 +253,7 @@ class SignServiceImpl(
         return Right(
             signQuoteWithMemberId(
                 quoteWithMember,
-                false,
+                true,
                 SignRequest("", "", ""),
                 body.email
             )
@@ -317,13 +313,13 @@ class SignServiceImpl(
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, true, signedRequest, null)
+            signQuoteWithMemberId(quote, false, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
     private fun signQuoteWithMemberId(
         quote: Quote,
-        signStartedInMemberService: Boolean,
+        shouldCompleteSignInMemberService: Boolean,
         signedRequest: SignRequest,
         email: String?
     ): SignedQuoteResponseDto {
@@ -340,7 +336,7 @@ class SignServiceImpl(
         val createdAgreementId =
             productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
 
-        return finishingUpSignedQuote(quote, createdAgreementId, signStartedInMemberService)
+        return finishingUpSignedQuote(quote, createdAgreementId, shouldCompleteSignInMemberService)
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
