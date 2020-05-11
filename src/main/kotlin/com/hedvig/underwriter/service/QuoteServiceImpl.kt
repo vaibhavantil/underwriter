@@ -132,12 +132,13 @@ class QuoteServiceImpl(
         updateMemberService: Boolean
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quoteId = id ?: UUID.randomUUID()
-        val breachedGuidelinesOrQuote =
-            underwriter.createQuote(incompleteQuoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
-        val quote = when (breachedGuidelinesOrQuote) {
-            is Either.Left -> breachedGuidelinesOrQuote.a.first
-            is Either.Right -> breachedGuidelinesOrQuote.b
-        }
+
+        val (breachedGuidelinesOrQuote, quote) = createBreachedGuidelinesOrQuote(
+            quoteData = incompleteQuoteData,
+            quoteId = quoteId,
+            initiatedFrom = initiatedFrom,
+            underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
+        )
         quoteRepository.insert(quote)
 
         if (updateMemberService && quote.memberId != null) {
@@ -155,17 +156,12 @@ class QuoteServiceImpl(
 
         val updatedQuoteRequest = updateIncompleteQuoteWithMember(quoteRequest)
 
-        val breachedGuidelinesOrQuote =
-            underwriter.createQuote(
-                updatedQuoteRequest,
-                quoteId,
-                QuoteInitiatedFrom.HOPE,
-                underwritingGuidelinesBypassedBy
-            )
-        val quote = when (breachedGuidelinesOrQuote) {
-            is Either.Left -> breachedGuidelinesOrQuote.a.first
-            is Either.Right -> breachedGuidelinesOrQuote.b
-        }
+        val (breachedGuidelinesOrQuote, quote) = createBreachedGuidelinesOrQuote(
+            quoteData = updatedQuoteRequest,
+            quoteId = quoteId,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
+        )
         quoteRepository.insert(quote)
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
@@ -201,15 +197,30 @@ class QuoteServiceImpl(
             incompleteQuoteData = incompleteQuoteData
         )
 
+        val (breachedGuidelinesOrQuote, quote) = createBreachedGuidelinesOrQuote(
+            quoteData,
+            quoteId,
+            QuoteInitiatedFrom.HOPE,
+            underwritingGuidelinesBypassedBy
+        )
+        quoteRepository.insert(quote)
+
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    private fun createBreachedGuidelinesOrQuote(
+        quoteData: QuoteRequest,
+        quoteId: UUID,
+        initiatedFrom: QuoteInitiatedFrom,
+        underwritingGuidelinesBypassedBy: String?
+    ): Pair<Either<Pair<Quote, List<String>>, Quote>, Quote> {
         val breachedGuidelinesOrQuote =
-            underwriter.createQuote(quoteData, quoteId, QuoteInitiatedFrom.HOPE, underwritingGuidelinesBypassedBy)
+            underwriter.createQuote(quoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
         val quote = when (breachedGuidelinesOrQuote) {
             is Either.Left -> breachedGuidelinesOrQuote.a.first
             is Either.Right -> breachedGuidelinesOrQuote.b
         }
-        quoteRepository.insert(quote)
-
-        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+        return Pair(breachedGuidelinesOrQuote, quote)
     }
 
     private fun transformCompleteQuoteReturn(
