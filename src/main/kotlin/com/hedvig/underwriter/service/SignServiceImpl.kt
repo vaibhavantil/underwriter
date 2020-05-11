@@ -279,7 +279,7 @@ class SignServiceImpl(
             Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED,
-                    "no member id connected to quote"
+                    "No member id connected to quote ${quote.id}"
                 )
             )
         }
@@ -298,7 +298,7 @@ class SignServiceImpl(
             return Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.MEMBER_DOES_NOT_HAVE_EXISTING_SIGNED_INSURANCE,
-                    "member needs to sign at least once before"
+                    "Member does not have an existing signed insurance [QuoteId: ${quote.id}]"
                 )
             )
         }
