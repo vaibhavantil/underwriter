@@ -145,7 +145,7 @@ class Mutation @Autowired constructor(
             throw IllegalStateException("Invalid state [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.UNKNOWN_ERROR_CODE ->
             throw IllegalStateException("Unknown error code [Error Message: ${errorResponse.errorMessage}]")
-        ErrorCodes.MEMBER_HAS_NOT_EXISTING_SIGNED_INSURANCE ->
+        ErrorCodes.MEMBER_DOES_NOT_HAVE_EXISTING_SIGNED_INSURANCE ->
             throw IllegalStateException("Member has not existing signed insurance [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED ->
             throw IllegalStateException("MemberId is not provided [Error Message: ${errorResponse.errorMessage}]")

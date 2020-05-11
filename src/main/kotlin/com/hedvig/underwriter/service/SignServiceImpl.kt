@@ -297,7 +297,7 @@ class SignServiceImpl(
         if (!memberAlreadySigned.ssnAlreadySignedMember) {
             return Either.Left(
                 ErrorResponseDto(
-                    ErrorCodes.MEMBER_HAS_NOT_EXISTING_SIGNED_INSURANCE,
+                    ErrorCodes.MEMBER_DOES_NOT_HAVE_EXISTING_SIGNED_INSURANCE,
                     "member needs to sign at least once before"
                 )
             )
