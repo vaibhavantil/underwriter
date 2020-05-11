@@ -154,7 +154,7 @@ class QuoteServiceImpl(
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quoteId = UUID.randomUUID()
 
-        val updatedQuoteRequest = updateIncompleteQuoteWithMember(quoteRequest)
+        val updatedQuoteRequest = updateQuoteRequestWithMember(quoteRequest)
 
         val breachedGuidelinesOrQuote = createAndSaveQuote(
             quoteData = updatedQuoteRequest,
@@ -164,17 +164,6 @@ class QuoteServiceImpl(
         )
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
-    }
-
-    private fun updateIncompleteQuoteWithMember(input: QuoteRequest): QuoteRequest {
-        val member = memberService.getMember(input.memberId!!.toLong())
-        return input.copy(
-            firstName = member.firstName,
-            lastName = member.lastName,
-            email = member.email,
-            birthDate = member.birthDate,
-            ssn = member.ssn
-        )
     }
 
     override fun createQuoteFromAgreement(
@@ -204,6 +193,17 @@ class QuoteServiceImpl(
         )
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    private fun updateQuoteRequestWithMember(input: QuoteRequest): QuoteRequest {
+        val member = memberService.getMember(input.memberId!!.toLong())
+        return input.copy(
+            firstName = member.firstName,
+            lastName = member.lastName,
+            email = member.email,
+            birthDate = member.birthDate,
+            ssn = member.ssn
+        )
     }
 
     private fun createAndSaveQuote(
