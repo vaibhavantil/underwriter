@@ -8,7 +8,7 @@ import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.graphql.commons.extensions.getTokenOrNull
 import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
-import com.hedvig.localization.service.TextKeysLocaleResolver
+import com.hedvig.resolver.LocaleResolver
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
     private val signService: SignService,
-    private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLMutationResolver {
 
@@ -74,7 +73,7 @@ class Mutation @Autowired constructor(
                 typeMapper.mapToCompleteQuoteResult(
                     quote,
                     quoteService.calculateInsuranceCost(quote),
-                    textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+                    LocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
             }
         }
@@ -122,7 +121,7 @@ class Mutation @Autowired constructor(
                 typeMapper.mapToCompleteQuoteResult(
                     quote,
                     quoteService.calculateInsuranceCost(quote),
-                    textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+                    LocaleResolver.resolveLocale(env.getAcceptLanguage())
                 )
             }
         }

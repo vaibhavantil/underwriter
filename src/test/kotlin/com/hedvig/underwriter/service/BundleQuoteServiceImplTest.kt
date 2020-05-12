@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.service
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
-import com.hedvig.localization.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -80,7 +80,7 @@ class BundleQuoteServiceImplTest {
         )
 
         every {
-            localizationService.getText(any(), any())
+            localizationService.getTranslation(any(), any())
         } returns ""
 
         cut.bundleQuotes("1337", ids, Locale("sv", "SE"))
@@ -135,7 +135,7 @@ class BundleQuoteServiceImplTest {
         )
 
         every {
-            localizationService.getText(any(), any())
+            localizationService.getTranslation(any(), any())
         } returns ""
 
         cut.bundleQuotes("1337", ids, Locale("sv", "SE"))
@@ -185,7 +185,7 @@ class BundleQuoteServiceImplTest {
         )
 
         every {
-            localizationService.getText(any(), any())
+            localizationService.getTranslation(any(), any())
         } returns ""
 
         cut.bundleQuotes("1337", listOf(id), Locale("sv", "SE"))
@@ -231,7 +231,7 @@ class BundleQuoteServiceImplTest {
         )
 
         every {
-            localizationService.getText(any(), any())
+            localizationService.getTranslation(any(), any())
         } returns ""
 
         cut.bundleQuotes("1337", listOf(id), Locale("sv", "SE"))
