@@ -1,10 +1,9 @@
 package com.hedvig.underwriter.localization
 
 import com.hedvig.lokalise.client.LokaliseClient
-import com.hedvig.underwriter.localization.LocalizationService
+import java.util.Locale
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.Locale
 
 @Component
 class LocalizationServiceImpl(
