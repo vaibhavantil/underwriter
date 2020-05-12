@@ -2,8 +2,8 @@ package com.hedvig.underwriter.service
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.graphql.type.TypeMapper
+import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
