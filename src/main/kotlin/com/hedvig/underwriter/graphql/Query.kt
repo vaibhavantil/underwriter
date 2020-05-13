@@ -31,12 +31,18 @@ class Query @Autowired constructor(
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
             ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
 
-    fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle =
-        bundleQuotesService.bundleQuotes(
+    fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
+
+        if (input.ids.isEmpty()) {
+            throw EmptyBundleQueryException()
+        }
+
+        return bundleQuotesService.bundleQuotes(
             env.getToken(),
             input.ids,
             textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
         )
+    }
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
