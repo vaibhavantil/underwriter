@@ -11,9 +11,9 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import graphql.schema.DataFetchingEnvironment
+import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 @Component
 class Query @Autowired constructor(

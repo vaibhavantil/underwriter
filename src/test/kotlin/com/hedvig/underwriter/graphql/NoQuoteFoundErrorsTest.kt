@@ -10,11 +10,11 @@ import graphql.schema.DataFetchingEnvironment
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import java.util.UUID
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
-import java.util.UUID
 
 class NoQuoteFoundErrorsTest {
     @MockK
