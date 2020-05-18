@@ -2,7 +2,6 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -25,8 +24,6 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.lang.RuntimeException
-import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 import org.javamoney.moneta.Money
@@ -135,19 +132,99 @@ class QuoteServiceImpl(
         updateMemberService: Boolean
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         val quoteId = id ?: UUID.randomUUID()
-        val breachedGuidelinesOrQuote =
-            underwriter.createQuote(incompleteQuoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
-        val quote = when (breachedGuidelinesOrQuote) {
-            is Either.Left -> breachedGuidelinesOrQuote.a.first
-            is Either.Right -> breachedGuidelinesOrQuote.b
-        }
-        quoteRepository.insert(quote)
 
+        val breachedGuidelinesOrQuote = createAndSaveQuote(
+            quoteData = incompleteQuoteData,
+            quoteId = quoteId,
+            initiatedFrom = initiatedFrom,
+            underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
+        )
+
+        val quote = breachedGuidelinesOrQuote.getQuote()
         if (updateMemberService && quote.memberId != null) {
             memberService.finalizeOnboarding(quote, quote.email ?: "")
         }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    override fun createQuoteForNewContractFromHope(
+        quoteRequest: QuoteRequest,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        val quoteId = UUID.randomUUID()
+
+        val updatedQuoteRequest = updateQuoteRequestWithMember(quoteRequest)
+
+        val breachedGuidelinesOrQuote = createAndSaveQuote(
+            quoteData = updatedQuoteRequest,
+            quoteId = quoteId,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
+        )
+
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    override fun createQuoteFromAgreement(
+        agreementId: UUID,
+        memberId: String,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
+        val quoteId = UUID.randomUUID()
+
+        val agreementData = productPricingService.getAgreement(agreementId)
+
+        val member = memberService.getMember(memberId.toLong())
+
+        val incompleteQuoteData = agreementData.toQuoteRequestData()
+
+        val quoteData = QuoteRequest.from(
+            member = member,
+            agreementData = agreementData,
+            incompleteQuoteData = incompleteQuoteData
+        )
+
+        val breachedGuidelinesOrQuote = createAndSaveQuote(
+            quoteData,
+            quoteId,
+            QuoteInitiatedFrom.HOPE,
+            underwritingGuidelinesBypassedBy
+        )
+
+        return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
+    }
+
+    private fun updateQuoteRequestWithMember(input: QuoteRequest): QuoteRequest {
+        val member = memberService.getMember(input.memberId!!.toLong())
+        return input.copy(
+            firstName = member.firstName,
+            lastName = member.lastName,
+            email = member.email,
+            birthDate = member.birthDate,
+            ssn = member.ssn
+        )
+    }
+
+    private fun createAndSaveQuote(
+        quoteData: QuoteRequest,
+        quoteId: UUID,
+        initiatedFrom: QuoteInitiatedFrom,
+        underwritingGuidelinesBypassedBy: String?
+    ): Either<Pair<Quote, List<String>>, Quote> {
+        val breachedGuidelinesOrQuote =
+            underwriter.createQuote(quoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
+        val quote = breachedGuidelinesOrQuote.getQuote()
+
+        quoteRepository.insert(quote)
+        return breachedGuidelinesOrQuote
+    }
+
+    private fun Either<Pair<Quote, List<String>>, Quote>.getQuote(): Quote {
+        return when (this) {
+            is Either.Left -> a.first
+            is Either.Right -> b
+        }
     }
 
     private fun transformCompleteQuoteReturn(
@@ -156,7 +233,7 @@ class QuoteServiceImpl(
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         return potentiallySavedQuote.bimap(
             { breachedUnderwritingGuidelines ->
-                logger.error(
+                logger.info(
                     "Underwriting guidelines breached for incomplete quote $quoteId: {}",
                     breachedUnderwritingGuidelines
                 )
@@ -240,30 +317,20 @@ class QuoteServiceImpl(
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
 
-        // TODO once campaign service is up to speed lets remove this when
         return when (quote.data) {
             is SwedishHouseData,
             is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
                 Money.of(quote.price, "SEK"), memberId
             )
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> InsuranceCost(
-                monthlyGross = MonetaryAmountV2.of(quote.price!!, "NOK"),
-                monthlyDiscount = MonetaryAmountV2.of(BigDecimal.ZERO, "NOK"),
-                monthlyNet = MonetaryAmountV2.of(quote.price, "NOK"),
-                freeUntil = null
+            is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
+                Money.of(quote.price, "NOK"), memberId
             )
         }
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {
-        val quotes = quoteRepository.findQuotes(quoteIds)
-
-        return if (quotes.all { it != null }) {
-            quotes.filterNotNull()
-        } else {
-            throw RuntimeException("Could not find all quotes in list: $quoteIds")
-        }
+        return quoteRepository.findQuotes(quoteIds)
     }
 
     override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote> {

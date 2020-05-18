@@ -23,6 +23,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
@@ -47,14 +48,24 @@ class SignServiceImpl(
     val env: Environment
 ) : SignService {
 
-    override fun startSigningQuotes(quoteIds: List<UUID>, memberId: String, ipAddress: String?): StartSignResponse {
+    override fun startSigningQuotes(
+        quoteIds: List<UUID>,
+        memberId: String,
+        ipAddress: String?,
+        successUrl: String?,
+        failUrl: String?
+    ): StartSignResponse {
+
+        if (memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()).memberAlreadySigned) {
+            return StartSignResponse.FailedToStartSign(MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE)
+        }
 
         val quotes = quoteService.getQuotes(quoteIds)
         quotes.forEach { quote ->
             quote.memberId?.let { quoteMemberId ->
                 if (memberId != quoteMemberId) {
                     logger.info("Member [id: $memberId] tried to sign quote with member id: $quoteMemberId. [Quotes: $quotes]")
-                    return StartSignResponse.FailedToStartSign(VARIOS_MEMBER_ID_ERROR_MESSAGE)
+                    return StartSignResponse.FailedToStartSign(VARIOUS_MEMBER_ID_ERROR_MESSAGE)
                 }
             } ?: run {
                 logger.info("Member [id: $memberId] tried to sign quote without member id. [Quotes: $quotes]")
@@ -89,10 +100,20 @@ class SignServiceImpl(
                 } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
+                if (successUrl == null || failUrl == null) {
+                    return StartSignResponse.FailedToStartSign(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
+                }
+
                 val signSessionId = signSessionRepository.insert(quoteIds)
 
                 val response =
-                    memberService.startNorwegianBankIdSignQuotes(data.memberId.toLong(), signSessionId, data.ssn)
+                    memberService.startNorwegianBankIdSignQuotes(
+                        data.memberId.toLong(),
+                        signSessionId,
+                        data.ssn,
+                        successUrl,
+                        failUrl
+                    )
 
                 return response.redirectUrl?.let { redirectUrl ->
                     StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
@@ -122,14 +143,14 @@ class SignServiceImpl(
         }
         quotes.forEach { quote ->
             val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
-            finishingUpSignedQuote(quote, signedContractId, false)
+            finishingUpSignedQuote(quote, signedContractId, true)
         }
     }
 
     private fun finishingUpSignedQuote(
         quote: Quote,
         signedContractId: UUID,
-        signStartedInMemberService: Boolean
+        shouldCompleteSignInMemberService: Boolean
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
             quote.copy(signedProductId = signedContractId)
@@ -150,7 +171,7 @@ class SignServiceImpl(
             }
         }
 
-        if (!signStartedInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
+        if (shouldCompleteSignInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
             memberService.signQuote(
                 quoteWithProductId.memberId.toLong(),
                 UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
@@ -162,16 +183,12 @@ class SignServiceImpl(
 
         quoteRepository.update(signedQuote, signedAt)
 
-        val activeProfiles = env.activeProfiles.intersect(listOf("staging", "production"))
         try {
-            if (activeProfiles.isNotEmpty()) {
-                logger.error("customerIOClient is null even thou $activeProfiles is set")
-            }
             customerIO.postSignUpdate(quoteWithProductId)
         } catch (ex: Exception) {
             logger.error(
                 "Something went wrong while posting a signing update to customerIO " +
-                    "[ActiveProfile: $activeProfiles] [SignQuote: $signedQuote]"
+                    "[SignQuote: $signedQuote]"
             )
         }
 
@@ -236,22 +253,73 @@ class SignServiceImpl(
         return Right(
             signQuoteWithMemberId(
                 quoteWithMember,
-                false,
+                true,
                 SignRequest("", "", ""),
                 body.email
             )
         )
     }
 
+    override fun signQuoteFromHope(
+        completeQuoteId: UUID,
+        request: SignQuoteFromHopeRequest
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
+        val quote = quoteRepository.find(completeQuoteId)
+            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+
+        if (quote.signedProductId != null) {
+            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        }
+
+        if (quote.memberId == null) {
+            Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED,
+                    "No member id connected to quote ${quote.id}"
+                )
+            )
+        }
+
+        val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+        if (quoteNotSignableErrorDto != null) {
+            return Either.left(quoteNotSignableErrorDto)
+        }
+
+        val memberAlreadySigned = when (quote.data) {
+            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+            else -> throw RuntimeException("Unsupported quote data class")
+        }
+
+        if (!memberAlreadySigned.ssnAlreadySignedMember) {
+            return Either.Left(
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_DOES_NOT_HAVE_EXISTING_SIGNED_INSURANCE,
+                    "Member does not have an existing signed insurance [QuoteId: ${quote.id}]"
+                )
+            )
+        }
+
+        val updatedQuote = quote.copy(startDate = request.activationDate)
+
+        return Right(
+            signQuoteWithMemberId(
+                updatedQuote,
+                false,
+                SignRequest("", "", ""),
+                (quote.data as PersonPolicyHolder<*>).email!!
+            )
+        )
+    }
+
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, true, signedRequest, null)
+            signQuoteWithMemberId(quote, false, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
     private fun signQuoteWithMemberId(
         quote: Quote,
-        signStartedInMemberService: Boolean,
+        shouldCompleteSignInMemberService: Boolean,
         signedRequest: SignRequest,
         email: String?
     ): SignedQuoteResponseDto {
@@ -268,7 +336,7 @@ class SignServiceImpl(
         val createdAgreementId =
             productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
 
-        return finishingUpSignedQuote(quote, createdAgreementId, signStartedInMemberService)
+        return finishingUpSignedQuote(quote, createdAgreementId, shouldCompleteSignInMemberService)
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
@@ -310,6 +378,9 @@ class SignServiceImpl(
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
         const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
-        const val VARIOS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
+        const val VARIOUS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
+        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE =
+            "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
+        const val MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE = "Member has already signed"
     }
 }
