@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import java.util.UUID
 
 class NoQuoteFoundErrorsTest {
     @MockK
@@ -31,22 +32,35 @@ class NoQuoteFoundErrorsTest {
     @get:Rule
     val thrown = ExpectedException.none()
 
+    lateinit var sut: Query
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
+        sut =
+            Query(quoteService, bundleQuoteService, TextKeysLocaleResolverImpl(), TypeMapper(localizationService))
     }
 
     @Test
     fun `lastest quote finds no quote`() {
-
-        val query =
-            Query(quoteService, bundleQuoteService, TextKeysLocaleResolverImpl(), TypeMapper(localizationService))
 
         every { dataFetchingEnvironment.getTokenOrNull() } returns "1337"
         every { quoteService.getLatestQuoteForMemberId(any()) } returns null
 
         thrown.expect(QuoteNotFoundQueryException::class.java)
         thrown.expectMessage("No quote found for memberId: 1337")
-        query.lastQuoteOfMember(dataFetchingEnvironment)
+        sut.lastQuoteOfMember(dataFetchingEnvironment)
+    }
+
+    @Test
+    fun `get quote finds no quote`() {
+
+        every { quoteService.getQuote(any()) } returns null
+
+        val quoteId = UUID.fromString("4ad0494c-9906-11ea-a02e-3af9d3902f96")
+
+        thrown.expect(QuoteNotFoundQueryException::class.java)
+        thrown.expectMessage("No quote with id '$quoteId' was found!")
+        sut.quote(quoteId, dataFetchingEnvironment)
     }
 }
