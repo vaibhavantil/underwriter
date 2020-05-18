@@ -10,6 +10,7 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 data class CreateContractsRequest(
     val memberId: String,
     val mandate: CreateMandateRequest?,
+    @Deprecated("Use AgreementQuote.currentInsurer instead remove once not used in product pricing")
     val currentInsurer: String?,
     val signSource: QuoteInitiatedFrom,
     val quotes: List<AgreementQuote>
