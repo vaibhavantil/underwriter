@@ -46,6 +46,7 @@ class NoQuoteFoundErrorsTest {
         every { quoteService.getLatestQuoteForMemberId(any()) } returns null
 
         thrown.expect(QuoteNotFoundQueryException::class.java)
+        thrown.expectMessage("No quote found for memberId: 1337")
         query.lastQuoteOfMember(dataFetchingEnvironment)
     }
 }
