@@ -93,6 +93,7 @@ class SignServiceImplTest {
         every {
             productPricingService.createContractsFromQuotes(
                 any(),
+                any(),
                 any()
             )
         } returns listOf(
@@ -123,6 +124,7 @@ class SignServiceImplTest {
         every { memberService.createMember() } returns "1234"
         every {
             productPricingService.createContractsFromQuotes(
+                any(),
                 any(),
                 any()
             )
@@ -407,6 +409,7 @@ class SignServiceImplTest {
         every {
             productPricingService.createContractsFromQuotes(
                 any(),
+                any(),
                 any()
             )
         } returns listOf(
@@ -418,7 +421,10 @@ class SignServiceImplTest {
         )
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
 
-        cut.signQuoteFromHope(quoteId, SignQuoteFromHopeRequest(activationDate = LocalDate.parse("2020-05-11"), token = null))
+        cut.signQuoteFromHope(
+            quoteId,
+            SignQuoteFromHopeRequest(activationDate = LocalDate.parse("2020-05-11"), token = null)
+        )
 
         verify(inverse = true) {
             memberService.signQuote(

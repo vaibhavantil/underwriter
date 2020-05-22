@@ -136,7 +136,8 @@ class SignServiceImpl(
                         referenceToken = completeSignSessionData.referenceToken,
                         signature = completeSignSessionData.signature,
                         oscpResponse = completeSignSessionData.oscpResponse
-                    )
+                    ),
+                    token = null
                 )
             is CompleteSignSessionData.NoMandate ->
                 productPricingService.createContractsFromQuotesNoMandate(quotes)
@@ -334,7 +335,8 @@ class SignServiceImpl(
         }
 
         val createdAgreementId =
-            productPricingService.createContractsFromQuotes(listOf(quote), signedRequest).first().agreementId
+            productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
+                .first().agreementId
 
         return finishingUpSignedQuote(quote, createdAgreementId, shouldCompleteSignInMemberService)
     }
