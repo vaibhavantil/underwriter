@@ -32,7 +32,7 @@ interface QuoteDao {
                 originating_product_id,
                 signed_product_id,
                 data_collection_id,
-                signFromHopeTriggeredBy
+                sign_from_hope_triggered_by
             )
             VALUES (
                 :masterQuoteId,
