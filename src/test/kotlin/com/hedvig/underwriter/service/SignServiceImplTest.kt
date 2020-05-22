@@ -418,7 +418,7 @@ class SignServiceImplTest {
         )
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
 
-        cut.signQuoteFromHope(quoteId, SignQuoteFromHopeRequest(activationDate = LocalDate.parse("2020-05-11")))
+        cut.signQuoteFromHope(quoteId, SignQuoteFromHopeRequest(activationDate = LocalDate.parse("2020-05-11"), token = null))
 
         verify(inverse = true) {
             memberService.signQuote(
