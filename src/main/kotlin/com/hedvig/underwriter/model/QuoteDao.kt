@@ -31,7 +31,8 @@ interface QuoteDao {
                 underwriting_guidelines_bypassed_by,
                 originating_product_id,
                 signed_product_id,
-                data_collection_id
+                data_collection_id,
+                signFromHopeTriggeredBy
             )
             VALUES (
                 :masterQuoteId,
@@ -52,7 +53,8 @@ interface QuoteDao {
                 :underwritingGuidelinesBypassedBy,
                 :originatingProductId,
                 :signedProductId,
-                :dataCollectionId
+                :dataCollectionId,
+                :signFromHopeTriggeredBy
             )
             RETURNING *
     """

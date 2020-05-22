@@ -299,7 +299,7 @@ class SignServiceImpl(
             )
         }
 
-        val updatedQuote = quote.copy(startDate = request.activationDate)
+        val updatedQuote = quote.copy(startDate = request.activationDate, signFromHopeTriggeredBy = request.token)
 
         return Right(
             signQuoteWithMemberId(
