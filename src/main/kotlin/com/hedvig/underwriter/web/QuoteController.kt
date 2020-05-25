@@ -21,10 +21,6 @@ import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -37,6 +33,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -145,7 +145,10 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/sign")
-    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
+    fun signCompleteQuote(
+        @Valid @PathVariable completeQuoteId: UUID,
+        @RequestBody body: SignQuoteRequest
+    ): ResponseEntity<Any> {
         return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -153,7 +156,10 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/signFromHope")
-    fun signQuoteFromHope(@Valid @PathVariable completeQuoteId: UUID, @RequestBody request: SignQuoteFromHopeRequest): ResponseEntity<Any> {
+    fun signQuoteFromHope(
+        @Valid @PathVariable completeQuoteId: UUID,
+        @RequestBody request: SignQuoteFromHopeRequest
+    ): ResponseEntity<Any> {
         return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -204,6 +210,12 @@ class QuoteController @Autowired constructor(
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         signService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/{id}/expire")
+    fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote?> {
+        val maybeQuote = quoteService.expireQuote(id)
+        return ResponseEntity.ok(maybeQuote)
     }
 
     companion object {

@@ -10,6 +10,7 @@ interface QuoteRepository {
     fun findByMemberId(memberId: String): List<Quote>
     fun findOneByMemberId(memberId: String): Quote?
     fun findLatestOneByMemberId(memberId: String): Quote?
+    fun expireQuote(id: UUID): Quote?
     fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?): Quote?
     fun update(updatedQuote: Quote, timestamp: Instant = Instant.now()): Quote
 }
