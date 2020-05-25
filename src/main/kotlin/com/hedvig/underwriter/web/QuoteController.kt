@@ -213,9 +213,9 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{id}/expire")
-    fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote?> {
-        val maybeQuote = quoteService.expireQuote(id)
-        return ResponseEntity.ok(maybeQuote)
+    fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote> {
+        val quote = quoteService.expireQuote(id) ?: return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(quote)
     }
 
     companion object {
