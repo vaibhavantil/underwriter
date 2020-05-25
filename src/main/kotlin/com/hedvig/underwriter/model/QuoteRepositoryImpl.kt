@@ -72,11 +72,25 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return latestQuote?.let { quote -> findQuote(quote, dao) }
     }
 
+    override fun expireQuote(id: UUID): Quote? {
+        return jdbi.inTransaction<Quote?, RuntimeException> { h -> expireQuote(id, h) }
+    }
+
+    fun expireQuote(id: UUID, h: Handle): Quote? {
+        val dao = h.attach<QuoteDao>()
+        val databaseQuotes = dao.find(id) ?: return null
+        val expiredQuote = databaseQuotes.copy(validity = 0)
+        update(expiredQuote, Instant.now(), h)
+        return findQuote(expiredQuote, dao)
+    }
+
     fun findQuote(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
         val quoteData: QuoteData = when {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
             databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
-            databaseQuote.quoteNorwegianHomeContentsDataId != null -> dao.findNorwegianHomeContentsQuoteData(databaseQuote.quoteNorwegianHomeContentsDataId)
+            databaseQuote.quoteNorwegianHomeContentsDataId != null -> dao.findNorwegianHomeContentsQuoteData(
+                databaseQuote.quoteNorwegianHomeContentsDataId
+            )
             databaseQuote.quoteNorwegianTravelDataId != null -> dao.findNorwegianTravelQuoteData(databaseQuote.quoteNorwegianTravelDataId)
             else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
@@ -125,5 +139,10 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is NorwegianTravelData -> dao.insert(updatedQuote.data)
         }
         dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
+    }
+
+    private fun update(updatedQuote: DatabaseQuoteRevision, timestamp: Instant, h: Handle) {
+        val dao = h.attach<QuoteDao>()
+        dao.insert(updatedQuote, timestamp)
     }
 }

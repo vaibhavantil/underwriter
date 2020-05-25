@@ -166,6 +166,10 @@ class QuoteServiceImpl(
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
+    override fun expireQuote(id: UUID): Quote? {
+        return quoteRepository.expireQuote(id)
+    }
+
     override fun createQuoteFromAgreement(
         agreementId: UUID,
         memberId: String,
