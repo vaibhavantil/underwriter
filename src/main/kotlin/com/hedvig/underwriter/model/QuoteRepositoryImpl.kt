@@ -1,11 +1,11 @@
 package com.hedvig.underwriter.model
 
+import java.time.Instant
+import java.util.UUID
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.stereotype.Component
-import java.time.Instant
-import java.util.UUID
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
@@ -76,7 +76,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return jdbi.inTransaction<Quote?, RuntimeException> { h -> expireQuote(id, h) }
     }
 
-    fun expireQuote(id: UUID, h: Handle) : Quote? {
+    fun expireQuote(id: UUID, h: Handle): Quote? {
         val dao = h.attach<QuoteDao>()
         val databaseQuotes = dao.find(id) ?: return null
         val expiredQuote = databaseQuotes.copy(validity = 0)
