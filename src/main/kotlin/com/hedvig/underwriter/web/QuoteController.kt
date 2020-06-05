@@ -229,7 +229,7 @@ class QuoteController @Autowired constructor(
                 )
             )
 
-        return ResponseEntity.ok(quote)
+        return ResponseEntity.ok(QuoteDto.fromQuote(quote))
     }
 
     companion object {
