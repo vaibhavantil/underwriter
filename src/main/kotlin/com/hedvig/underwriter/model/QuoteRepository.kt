@@ -13,4 +13,5 @@ interface QuoteRepository {
     fun expireQuote(id: UUID): Quote?
     fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?): Quote?
     fun update(updatedQuote: Quote, timestamp: Instant = Instant.now()): Quote
+    fun findByContractId(contractId: UUID): Quote?
 }

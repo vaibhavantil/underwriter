@@ -1,0 +1,56 @@
+package com.hedvig.underwriter.service
+
+import assertk.all
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.hedvig.underwriter.model.QuoteRepositoryImpl
+import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.testhelp.JdbiRule
+import com.hedvig.underwriter.testhelp.databuilder.a
+import io.mockk.mockk
+import org.jdbi.v3.jackson2.Jackson2Config
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import java.util.UUID
+
+class FindQuoteByContractIdTest {
+
+    @get:Rule
+    val jdbiRule = JdbiRule.create()
+
+    @Before
+    fun setUp() {
+        jdbiRule.jdbi.getConfig(Jackson2Config::class.java).mapper =
+            ObjectMapper().registerModule(KotlinModule())
+    }
+
+    @Test
+    fun `find quote by contract id`() {
+
+        val quoteRepository = QuoteRepositoryImpl(jdbiRule.jdbi)
+        val sut = QuoteServiceImpl(
+            mockk(),
+            mockk(),
+            mockk(),
+            quoteRepository
+        )
+
+        val contractId = UUID.randomUUID()
+        quoteRepository.insert(a.QuoteBuilder(state = QuoteState.SIGNED, signedProductId = contractId).build())
+
+        val result = sut.getQuoteByContractId(contractId)
+        assertThat(result).isNotNull().all {
+            transform { it.signedProductId }.isEqualTo(contractId)
+        }
+    }
+
+    /**
+     * Find one contract
+     * Find zero contracts
+     * Error
+     */
+}

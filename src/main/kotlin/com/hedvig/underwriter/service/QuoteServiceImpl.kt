@@ -171,7 +171,7 @@ class QuoteServiceImpl(
     }
 
     override fun getQuoteByContractId(contractId: UUID): Quote? {
-        TODO("Not yet implemented")
+        return quoteRepository.findByContractId(contractId)
     }
 
     override fun createQuoteFromAgreement(

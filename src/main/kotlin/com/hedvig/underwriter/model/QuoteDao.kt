@@ -1,13 +1,13 @@
 package com.hedvig.underwriter.model
 
-import java.time.Instant
-import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
+import java.time.Instant
+import java.util.UUID
 
 interface QuoteDao {
     @SqlUpdate(
@@ -96,7 +96,12 @@ interface QuoteDao {
             ORDER BY qr.master_quote_id ASC, qr.id DESC
         """
     )
-    fun find(@BindList("quoteIds", onEmpty = BindList.EmptyHandling.NULL_STRING) quoteIds: List<UUID>): List<DatabaseQuoteRevision>
+    fun find(
+        @BindList(
+            "quoteIds",
+            onEmpty = BindList.EmptyHandling.NULL_STRING
+        ) quoteIds: List<UUID>
+    ): List<DatabaseQuoteRevision>
 
     @SqlUpdate(
         """
@@ -301,4 +306,23 @@ interface QuoteDao {
         @Bind initiatedFrom: QuoteInitiatedFrom,
         @Bind createdAt: Instant = Instant.now()
     )
+
+    @SqlQuery(
+        """
+        SELECT
+            DISTINCT ON (qr.master_quote_id)
+
+            qr.*, 
+            mq.created_at, 
+            mq.initiated_from 
+            
+            FROM master_quotes mq
+            JOIN quote_revisions qr
+            ON qr.master_quote_id = mq.id 
+            
+            WHERE qr.signed_product_id = :contractId
+            ORDER BY qr.master_quote_id ASC, qr.id DESC
+    """
+    )
+    fun findByContractId(@Bind contractId: UUID): DatabaseQuoteRevision?
 }
