@@ -14,6 +14,9 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.UUID
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,9 +30,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.math.BigDecimal
-import java.time.Instant
-import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)

@@ -1,13 +1,13 @@
 package com.hedvig.underwriter.model
 
+import java.time.Instant
+import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
-import java.time.Instant
-import java.util.UUID
 
 interface QuoteDao {
     @SqlUpdate(

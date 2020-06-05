@@ -12,11 +12,11 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.testhelp.JdbiRule
 import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.mockk
+import java.util.UUID
 import org.jdbi.v3.jackson2.Jackson2Config
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.UUID
 
 class FindQuoteByContractIdTest {
 

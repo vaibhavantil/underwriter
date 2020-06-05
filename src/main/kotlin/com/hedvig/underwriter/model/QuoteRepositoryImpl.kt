@@ -1,12 +1,12 @@
 package com.hedvig.underwriter.model
 
+import java.time.Instant
+import java.util.UUID
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.stereotype.Component
-import java.time.Instant
-import java.util.UUID
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
