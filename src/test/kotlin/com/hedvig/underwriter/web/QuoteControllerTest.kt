@@ -14,9 +14,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import java.math.BigDecimal
-import java.time.Instant
-import java.util.UUID
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +27,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)
@@ -119,6 +119,46 @@ internal class QuoteControllerTest {
         mockMvc
             .perform(
                 get("/_/v1/quote/$uuid")
+            )
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("productType").value("APARTMENT"))
+    }
+
+    @Test
+    fun getQuoteByContractId() {
+
+        val contractId: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
+
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            productType = ProductType.APARTMENT,
+            state = QuoteState.SIGNED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.COMPRICER,
+            data = SwedishApartmentData(
+                id = UUID.randomUUID(),
+                street = "123 Baker street",
+                city = "Stockholm",
+                // numberOfRooms = 3,
+                zipCode = "11216",
+                householdSize = 1,
+                livingSpace = 33,
+                subType = ApartmentProductSubType.RENT,
+                firstName = "Simeone",
+                lastName = "null",
+                ssn = "189003042342"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null,
+            signedProductId = contractId
+        )
+
+        every { quoteService.getQuoteByContractId(contractId) } returns quote
+
+        mockMvc
+            .perform(
+                get("/_/v1/quotes/contracts/$contractId")
             )
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("productType").value("APARTMENT"))

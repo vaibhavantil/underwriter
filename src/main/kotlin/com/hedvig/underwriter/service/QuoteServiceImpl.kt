@@ -24,11 +24,11 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.time.LocalDate
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class QuoteServiceImpl(
@@ -168,6 +168,10 @@ class QuoteServiceImpl(
 
     override fun expireQuote(id: UUID): Quote? {
         return quoteRepository.expireQuote(id)
+    }
+
+    override fun getQuoteByContractId(contractId: UUID): Quote? {
+        TODO("Not yet implemented")
     }
 
     override fun createQuoteFromAgreement(

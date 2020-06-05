@@ -65,4 +65,5 @@ interface QuoteService {
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
 
     fun expireQuote(id: UUID): Quote?
+    fun getQuoteByContractId(contractId: UUID): Quote?
 }

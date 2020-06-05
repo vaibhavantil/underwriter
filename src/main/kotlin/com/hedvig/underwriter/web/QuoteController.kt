@@ -21,10 +21,6 @@ import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -37,6 +33,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -216,6 +216,12 @@ class QuoteController @Autowired constructor(
     fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote> {
         val quote = quoteService.expireQuote(id) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(quote)
+    }
+
+    @GetMapping("/contracts/{contractId}")
+    fun getContractById(@PathVariable contractId: UUID): ResponseEntity<Quote> {
+        val quote = quoteService.getQuoteByContractId(contractId = contractId)
+        return ResponseEntity.ok(quote!!)
     }
 
     companion object {
