@@ -14,6 +14,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
+import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteForNewContractRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
@@ -219,9 +220,16 @@ class QuoteController @Autowired constructor(
     }
 
     @GetMapping("/contracts/{contractId}")
-    fun getContractById(@PathVariable contractId: UUID): ResponseEntity<Quote> {
+    fun getContractById(@PathVariable contractId: UUID): ResponseEntity<Any> {
         val quote = quoteService.getQuoteByContractId(contractId = contractId)
-        return ResponseEntity.ok(quote!!)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ErrorQuoteResponseDto(
+                    errorCode = ErrorCodes.NO_SUCH_QUOTE,
+                    errorMessage = "QuoteNotFound"
+                )
+            )
+
+        return ResponseEntity.ok(quote)
     }
 
     companion object {

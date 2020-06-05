@@ -164,6 +164,20 @@ internal class QuoteControllerTest {
             .andExpect(jsonPath("productType").value("APARTMENT"))
     }
 
+    @Test
+    fun `contract not found returns with 404`() {
+
+        val contractId: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
+
+        every { quoteService.getQuoteByContractId(contractId) } returns null
+
+        mockMvc
+            .perform(
+                get("/_/v1/quotes/contracts/$contractId")
+            )
+            .andExpect(status().is4xxClientError)
+    }
+
     @Ignore
     @Test
     fun completeQuote() {
