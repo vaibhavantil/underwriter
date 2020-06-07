@@ -144,11 +144,11 @@ class SignServiceImpl(
         }
         quotes.forEach { quote ->
             val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
-            finishingUpSignedQuote(quote, signedContractId, true)
+            redeemAndSignQuoteAndPostToCustomerio(quote, signedContractId, true)
         }
     }
 
-    private fun finishingUpSignedQuote(
+    private fun redeemAndSignQuoteAndPostToCustomerio(
         quote: Quote,
         signedContractId: UUID,
         shouldCompleteSignInMemberService: Boolean
@@ -338,7 +338,7 @@ class SignServiceImpl(
             productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
                 .first().agreementId
 
-        return finishingUpSignedQuote(quote, createdAgreementId, shouldCompleteSignInMemberService)
+        return redeemAndSignQuoteAndPostToCustomerio(quote, createdAgreementId, shouldCompleteSignInMemberService)
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
