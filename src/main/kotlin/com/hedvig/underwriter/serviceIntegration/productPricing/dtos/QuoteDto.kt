@@ -34,6 +34,8 @@ data class QuoteDto(
     val isComplete: Boolean,
     val originatingProductId: UUID?,
     val signedProductId: UUID?,
+    val contractId: UUID?,
+    val agreementId: UUID?,
     val dataCollectionId: UUID? = null
 ) {
 
@@ -61,6 +63,8 @@ data class QuoteDto(
                 isComplete = quote.isComplete,
                 originatingProductId = quote.originatingProductId,
                 signedProductId = quote.agreementId,
+                contractId = quote.contractId,
+                agreementId = quote.agreementId,
                 dataCollectionId = quote.dataCollectionId
             )
         }
