@@ -166,6 +166,10 @@ class QuoteServiceImpl(
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
     }
 
+    override fun expireQuote(id: UUID): Quote? {
+        return quoteRepository.expireQuote(id)
+    }
+
     override fun createQuoteFromAgreement(
         agreementId: UUID,
         memberId: String,
@@ -233,7 +237,7 @@ class QuoteServiceImpl(
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         return potentiallySavedQuote.bimap(
             { breachedUnderwritingGuidelines ->
-                logger.error(
+                logger.info(
                     "Underwriting guidelines breached for incomplete quote $quoteId: {}",
                     breachedUnderwritingGuidelines
                 )
@@ -330,13 +334,7 @@ class QuoteServiceImpl(
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {
-        val quotes = quoteRepository.findQuotes(quoteIds)
-
-        return if (quotes.all { it != null }) {
-            quotes.filterNotNull()
-        } else {
-            throw RuntimeException("Could not find all quotes in list: $quoteIds")
-        }
+        return quoteRepository.findQuotes(quoteIds)
     }
 
     override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote> {

@@ -145,7 +145,10 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/sign")
-    fun signCompleteQuote(@Valid @PathVariable completeQuoteId: UUID, @RequestBody body: SignQuoteRequest): ResponseEntity<Any> {
+    fun signCompleteQuote(
+        @Valid @PathVariable completeQuoteId: UUID,
+        @RequestBody body: SignQuoteRequest
+    ): ResponseEntity<Any> {
         return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -153,7 +156,10 @@ class QuoteController @Autowired constructor(
     }
 
     @PostMapping("/{completeQuoteId}/signFromHope")
-    fun signQuoteFromHope(@Valid @PathVariable completeQuoteId: UUID, @RequestBody request: SignQuoteFromHopeRequest): ResponseEntity<Any> {
+    fun signQuoteFromHope(
+        @Valid @PathVariable completeQuoteId: UUID,
+        @RequestBody request: SignQuoteFromHopeRequest
+    ): ResponseEntity<Any> {
         return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -204,6 +210,12 @@ class QuoteController @Autowired constructor(
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
         signService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
+    }
+
+    @PostMapping("/{id}/expire")
+    fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote> {
+        val quote = quoteService.expireQuote(id) ?: return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(quote)
     }
 
     companion object {

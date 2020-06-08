@@ -57,17 +57,21 @@ class ProductPricingServiceImpl @Autowired constructor(
     override fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost =
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
 
-    override fun calculateBundleInsuranceCost(request: CalculateBundleInsuranceCostRequest, memberId: String): InsuranceCost =
+    override fun calculateBundleInsuranceCost(
+        request: CalculateBundleInsuranceCostRequest,
+        memberId: String
+    ): InsuranceCost =
         productPricingClient.calculateBundleInsuranceCost(request, memberId).body!!
 
     override fun createContractsFromQuotes(
         quotes: List<Quote>,
-        signedRequest: SignRequest
+        signedRequest: SignRequest,
+        token: String?
     ): List<CreateContractResponse> =
-        productPricingClient.createContract(CreateContractsRequest.from(quotes, signedRequest))
+        productPricingClient.createContract(CreateContractsRequest.from(quotes, signedRequest), token)
 
     override fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse> =
-        productPricingClient.createContract(CreateContractsRequest.fromQuotesNoMandate(quotes))
+        productPricingClient.createContract(request = CreateContractsRequest.fromQuotesNoMandate(quotes), token = null)
 
     override fun getAgreement(agreementId: UUID): Agreement =
         productPricingClient.getAgreement(agreementId).body!!

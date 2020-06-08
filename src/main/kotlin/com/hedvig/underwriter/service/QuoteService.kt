@@ -63,4 +63,6 @@ interface QuoteService {
         quoteRequest: QuoteRequest,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
+
+    fun expireQuote(id: UUID): Quote?
 }

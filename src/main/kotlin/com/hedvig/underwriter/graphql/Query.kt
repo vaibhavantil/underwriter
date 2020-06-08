@@ -24,11 +24,11 @@ class Query @Autowired constructor(
 
     fun quote(id: UUID, env: DataFetchingEnvironment) = quoteService.getQuote(id)?.let { quote ->
         quote.toResult(env)
-    } ?: throw IllegalStateException("No quote with id '$id' was found!")
+    } ?: throw QuoteNotFoundQueryException("No quote with id '$id' was found!")
 
     fun lastQuoteOfMember(env: DataFetchingEnvironment) =
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
-            ?: throw IllegalStateException("No quote found for memberId ${env.getToken()}!")
+            ?: throw QuoteNotFoundQueryException("No quote found for memberId: ${env.getToken()}")
 
     fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
 

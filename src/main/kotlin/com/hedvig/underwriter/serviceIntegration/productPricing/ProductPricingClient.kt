@@ -69,7 +69,8 @@ interface ProductPricingClient {
 
     @PostMapping("/_/contracts/create")
     fun createContract(
-        @Valid @RequestBody request: CreateContractsRequest
+        @Valid @RequestBody request: CreateContractsRequest,
+        @RequestHeader("Authorization") token: String?
     ): List<CreateContractResponse>
 
     @PostMapping("/_/agreements/add")

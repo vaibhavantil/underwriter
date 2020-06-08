@@ -133,7 +133,8 @@ data class DatabaseQuoteRevision(
     val createdAt: Instant?,
     val originatingProductId: UUID?,
     val signedProductId: UUID?,
-    val dataCollectionId: UUID?
+    val dataCollectionId: UUID?,
+    val signFromHopeTriggeredBy: String?
 ) {
 
     companion object {
@@ -172,7 +173,8 @@ data class DatabaseQuoteRevision(
                 initiatedFrom = quote.initiatedFrom,
                 originatingProductId = quote.originatingProductId,
                 signedProductId = quote.signedProductId,
-                dataCollectionId = quote.dataCollectionId
+                dataCollectionId = quote.dataCollectionId,
+                signFromHopeTriggeredBy = quote.signFromHopeTriggeredBy
             )
     }
 }
@@ -199,7 +201,8 @@ data class Quote(
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val signedProductId: UUID? = null,
-    val dataCollectionId: UUID? = null
+    val dataCollectionId: UUID? = null,
+    val signFromHopeTriggeredBy: String? = null
 ) {
     val isComplete: Boolean
         get() = when {
