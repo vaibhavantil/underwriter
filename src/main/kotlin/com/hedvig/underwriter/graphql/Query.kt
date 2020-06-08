@@ -3,7 +3,7 @@ package com.hedvig.underwriter.graphql
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
-import com.hedvig.localization.service.TextKeysLocaleResolver
+import com.hedvig.resolver.LocaleResolver
 import com.hedvig.underwriter.graphql.type.QuoteBundle
 import com.hedvig.underwriter.graphql.type.QuoteBundleInputInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component
 class Query @Autowired constructor(
     private val quoteService: QuoteService,
     private val bundleQuotesService: BundleQuotesService,
-    private val textKeysLocaleResolver: TextKeysLocaleResolver,
     private val typeMapper: TypeMapper
 ) : GraphQLQueryResolver {
 
@@ -40,13 +39,13 @@ class Query @Autowired constructor(
         return bundleQuotesService.bundleQuotes(
             env.getToken(),
             input.ids,
-            textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+            LocaleResolver.resolveLocale(env.getAcceptLanguage())
         )
     }
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = typeMapper.mapToQuoteResult(
         this,
         quoteService.calculateInsuranceCost(this),
-        textKeysLocaleResolver.resolveLocale(env.getAcceptLanguage())
+        LocaleResolver.resolveLocale(env.getAcceptLanguage())
     )
 }
