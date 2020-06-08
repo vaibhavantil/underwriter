@@ -5,7 +5,9 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteRepositoryImpl
+import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.SignSessionRepositoryImpl
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -27,22 +29,24 @@ class CompletedSignSessionTest {
     @get:Rule
     val jdbiRule = JdbiRule.create()
 
+    lateinit var signSessionRepository: SignSessionRepository
+    lateinit var quoteService: QuoteService
+    lateinit var productPricingService: ProductPricingService
+    lateinit var quoteRepository: QuoteRepository
+    lateinit var memberService: MemberService
+    lateinit var sut: SignServiceImpl
+
     @Before
     fun setUp() {
         jdbiRule.jdbi.getConfig(Jackson2Config::class.java).mapper =
             ObjectMapper().registerModule(KotlinModule())
-    }
 
-    @Test
-    fun `store agreementId in signedProductId column`() {
-
-        val signSessionRepository = SignSessionRepositoryImpl(jdbiRule.jdbi)
-        val quoteService = mockk<QuoteService>()
-        val productPricingService = mockk<ProductPricingService>()
-        val quoteRepository = QuoteRepositoryImpl(jdbi = jdbiRule.jdbi)
-
-        val memberService = mockk<MemberService>()
-        val sut = SignServiceImpl(
+        signSessionRepository = SignSessionRepositoryImpl(jdbiRule.jdbi)
+        quoteRepository = QuoteRepositoryImpl(jdbi = jdbiRule.jdbi)
+        quoteService = mockk()
+        productPricingService = mockk()
+        memberService = mockk()
+        sut = SignServiceImpl(
             quoteService,
             quoteRepository,
             memberService,
@@ -51,6 +55,10 @@ class CompletedSignSessionTest {
             mockk(),
             mockk()
         )
+    }
+
+    @Test
+    fun `store agreementId in signedProductId column`() {
 
         val quoteId = UUID.randomUUID()
 
@@ -80,5 +88,38 @@ class CompletedSignSessionTest {
         )
 
         assertThat(quoteRepository.find(quote.id)!!.signedProductId).isEqualTo(agreementId)
+    }
+
+    @Test
+    fun `store contractId`() {
+
+        val quoteId = UUID.randomUUID()
+
+        val quote = a.QuoteBuilder(
+            id = quoteId,
+            memberId = "1339"
+        ).build()
+        quoteRepository.insert(quote)
+
+        val signSessionId = signSessionRepository.insert(listOf(quoteId))
+
+        val agreementId = UUID.randomUUID()
+        val contractId = UUID.randomUUID()
+        every { productPricingService.createContractsFromQuotes(any(), any(), any()) } returns listOf(
+            CreateContractResponse(quote.id, agreementId, contractId)
+        )
+
+        every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(123L, true))
+
+        sut.completedSignSession(
+            signSessionId,
+            CompleteSignSessionData.SwedishBankIdDataComplete(
+                "referenceToken",
+                "signature",
+                "oscpResponse"
+            )
+        )
+
+        assertThat(quoteRepository.find(quote.id)!!.contractId).isEqualTo(contractId)
     }
 }

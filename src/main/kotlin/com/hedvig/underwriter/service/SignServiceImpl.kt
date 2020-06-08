@@ -144,18 +144,19 @@ class SignServiceImpl(
                 productPricingService.createContractsFromQuotesNoMandate(quotes)
         }
         quotes.forEach { quote ->
-            val signedContractId = createContractResponse.first { quote.id == it.quoteId }.agreementId
-            redeemAndSignQuoteAndPostToCustomerio(quote, signedContractId, true)
+            val response = createContractResponse.first { quote.id == it.quoteId }
+            redeemAndSignQuoteAndPostToCustomerio(quote, response.agreementId, true, response.contractId)
         }
     }
 
     private fun redeemAndSignQuoteAndPostToCustomerio(
         quote: Quote,
-        signedContractId: UUID,
-        shouldCompleteSignInMemberService: Boolean
+        agreementId: UUID,
+        shouldCompleteSignInMemberService: Boolean,
+        contractId: UUID? = null
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
-            quote.copy(signedProductId = signedContractId)
+            quote.copy(signedProductId = agreementId, contractId = contractId)
         )
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
@@ -194,7 +195,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(signedContractId, signedAt)
+        return SignedQuoteResponseDto(agreementId, signedAt)
     }
 
     override fun signQuote(

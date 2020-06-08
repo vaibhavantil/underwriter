@@ -31,6 +31,7 @@ interface QuoteDao {
                 underwriting_guidelines_bypassed_by,
                 originating_product_id,
                 signed_product_id,
+                contract_id,
                 data_collection_id,
                 sign_from_hope_triggered_by
             )
@@ -53,6 +54,7 @@ interface QuoteDao {
                 :underwritingGuidelinesBypassedBy,
                 :originatingProductId,
                 :signedProductId,
+                :contractId,
                 :dataCollectionId,
                 :signFromHopeTriggeredBy
             )

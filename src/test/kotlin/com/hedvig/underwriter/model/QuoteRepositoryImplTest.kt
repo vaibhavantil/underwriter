@@ -52,7 +52,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            signedProductId = UUID.randomUUID(),
+            contractId = UUID.randomUUID()
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -94,7 +95,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             state = QuoteState.SIGNED,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            signedProductId = UUID.randomUUID(),
+            contractId = UUID.randomUUID()
         )
         quoteDao.update(updatedQuote)
 
@@ -693,14 +695,19 @@ class QuoteRepositoryImplTest {
         val updatedQuote = quote1.copy(memberId = "1234567", currentInsurer = "ICA")
         quoteDao.update(updatedQuote)
 
-        val updatedQuote3 = quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
+        val updatedQuote3 =
+            quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
         quoteDao.update(updatedQuote3)
 
         val quotes = quoteDao.findQuotes(listOf(quote1Id, quote2Id, quote3Id))
 
         assertThat(quotes.size).isEqualTo(3)
-        assertQuotesDeepEqualExceptInternalId(updatedQuote, quotes.first { quote -> quote?.id?.equals(quote1Id) ?: false })
-        assertQuotesDeepEqualExceptInternalId(updatedQuote3, quotes.first { quote -> quote?.id?.equals(quote3Id) ?: false })
+        assertQuotesDeepEqualExceptInternalId(
+            updatedQuote,
+            quotes.first { quote -> quote?.id?.equals(quote1Id) ?: false })
+        assertQuotesDeepEqualExceptInternalId(
+            updatedQuote3,
+            quotes.first { quote -> quote?.id?.equals(quote3Id) ?: false })
     }
 
     private fun assertQuotesDeepEqualExceptInternalId(
