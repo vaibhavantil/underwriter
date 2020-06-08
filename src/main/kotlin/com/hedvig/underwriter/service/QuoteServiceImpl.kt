@@ -313,6 +313,7 @@ class QuoteServiceImpl(
         val updatedQuote = quoteRepository.update(
             quote.copy(
                 agreementId = response.agreementId,
+                contractId = response.contractId,
                 state = QuoteState.SIGNED
             )
         )
