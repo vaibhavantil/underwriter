@@ -2,7 +2,6 @@ package com.hedvig.underwriter.localization
 
 import com.hedvig.lokalise.client.LokaliseClient
 import java.util.Locale
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
