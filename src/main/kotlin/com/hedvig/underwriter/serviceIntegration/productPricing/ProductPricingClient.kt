@@ -7,8 +7,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
@@ -17,8 +15,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Ad
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import feign.Headers
-import java.util.UUID
-import javax.validation.Valid
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,6 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import java.util.UUID
+import javax.validation.Valid
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -55,12 +53,6 @@ interface ProductPricingClient {
         @Valid @RequestBody req: CalculateInsuranceCostRequest,
         @PathVariable memberId: String
     ): ResponseEntity<InsuranceCost>
-
-    @PostMapping("/_/insurance/quotes/createModifiedProduct")
-    fun createModifiedProductFromQuote(
-        @Valid @RequestBody quoteRequestDto: ModifyProductRequestDto,
-        @RequestHeader("hedvig.token") memberId: String
-    ): ModifiedProductCreatedDto
 
     @PostMapping("/i/campaign/member/redeemCampaign")
     fun redeemCampaign(

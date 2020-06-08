@@ -8,8 +8,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQu
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedQuoteRequest
@@ -17,11 +15,11 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Cr
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 @EnableFeignClients
@@ -44,9 +42,6 @@ class ProductPricingServiceImpl @Autowired constructor(
         memberId: String
     ) = productPricingClient.signedQuote(signedQuoteRequest, memberId).body
         ?: throw RuntimeException("Create product returned with empty body")
-
-    override fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto =
-        productPricingClient.createModifiedProductFromQuote(quoteRequestDto, quoteRequestDto.memberId)
 
     override fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest) =
         productPricingClient.addAgreement(AddAgreementRequest.from(quote, request))

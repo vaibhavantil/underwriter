@@ -11,7 +11,6 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
-import com.hedvig.underwriter.web.dtos.ActivateQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -22,10 +21,6 @@ import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
-import javax.servlet.http.HttpServletRequest
-import javax.validation.Valid
-import javax.validation.constraints.Email
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -38,6 +33,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
+import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
+import javax.validation.constraints.Email
 
 @RestController
 @RequestMapping(
@@ -164,21 +163,6 @@ class QuoteController @Autowired constructor(
         return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
-        }
-    }
-
-    @PostMapping("/{completeQuoteId}/activate")
-    fun activateCompleteQuote(
-        @PathVariable completeQuoteId: UUID,
-        @Valid @RequestBody requestBody: ActivateQuoteRequestDto
-    ): ResponseEntity<Any> {
-        val result =
-            quoteService.activateQuote(completeQuoteId, requestBody.activationDate, requestBody.terminationDate)
-
-        return when (result) {
-            is Either.Left -> ResponseEntity.status(422).body(result.a)
-            is Either.Right -> ResponseEntity.ok(result.b)
-            else -> throw IllegalStateException("Result should be either left or right but was ${result::class.java}")
         }
     }
 
