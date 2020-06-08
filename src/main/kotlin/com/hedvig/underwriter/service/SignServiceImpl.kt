@@ -127,7 +127,8 @@ class SignServiceImpl(
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
-        val quotes = quoteService.getQuotes(signSessionRepository.find(signSessionId))
+        val quoteIds = signSessionRepository.find(signSessionId)
+        val quotes = quoteRepository.findQuotes(quoteIds)
 
         val createContractResponse = when (completeSignSessionData) {
             is CompleteSignSessionData.SwedishBankIdDataComplete ->
@@ -143,7 +144,7 @@ class SignServiceImpl(
                 productPricingService.createContractsFromQuotesNoMandate(quotes)
         }
         quotes.forEach { quote ->
-            val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
+            val signedContractId = createContractResponse.first { quote.id == it.quoteId }.agreementId
             redeemAndSignQuoteAndPostToCustomerio(quote, signedContractId, true)
         }
     }
