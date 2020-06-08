@@ -2,9 +2,7 @@ package com.hedvig.underwriter.graphql
 
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
-import com.hedvig.localization.service.LocalizationService
-import com.hedvig.localization.service.TextKeysLocaleResolver
-import com.hedvig.localization.service.TextKeysLocaleResolverImpl
+import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.graphql.type.QuoteBundleInputInput
 import com.hedvig.underwriter.graphql.type.TypeMapper
 import com.hedvig.underwriter.service.BundleQuotesService
@@ -19,8 +17,6 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 
 class BundleQueryIsolationTest {
-
-    val textKeysLocaleResolver: TextKeysLocaleResolver = TextKeysLocaleResolverImpl()
 
     @MockK
     lateinit var quoteService: QuoteService
@@ -48,7 +44,6 @@ class BundleQueryIsolationTest {
         val query = Query(
             quoteService,
             bundleQuoteService,
-            textKeysLocaleResolver,
             TypeMapper(localizationService)
             )
 
