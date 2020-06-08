@@ -259,23 +259,6 @@ class QuoteServiceImpl(
         )
     }
 
-    override fun getQuoteStateNotSignableErrorOrNull(quote: Quote): ErrorResponseDto? {
-        if (quote.state == QuoteState.EXPIRED) {
-            return ErrorResponseDto(
-                ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
-                "cannot sign quote it has expired [Quote: $quote]"
-            )
-        }
-
-        if (quote.state == QuoteState.SIGNED) {
-            return ErrorResponseDto(
-                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                "quote is already signed [Quote: $quote]"
-            )
-        }
-        return null
-    }
-
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
@@ -300,7 +283,7 @@ class QuoteServiceImpl(
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
 
-        val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
+        val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
         if (quoteNotSignableErrorDto != null) {
             Either.left(quoteNotSignableErrorDto)
         }
@@ -320,4 +303,21 @@ class QuoteServiceImpl(
 
         return Either.right(updatedQuote)
     }
+}
+
+fun assertQuoteIsNotSignedOrExpired(quote: Quote): ErrorResponseDto? {
+    if (quote.state == QuoteState.EXPIRED) {
+        return ErrorResponseDto(
+            ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
+            "cannot sign quote it has expired [Quote: $quote]"
+        )
+    }
+
+    if (quote.state == QuoteState.SIGNED) {
+        return ErrorResponseDto(
+            ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+            "quote is already signed [Quote: $quote]"
+        )
+    }
+    return null
 }

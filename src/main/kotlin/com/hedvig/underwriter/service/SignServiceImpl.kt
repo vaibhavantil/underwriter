@@ -29,12 +29,12 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.time.Instant
-import java.time.LocalDate
-import java.util.UUID
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class SignServiceImpl(
@@ -72,7 +72,7 @@ class SignServiceImpl(
                 return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
             }
 
-            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
             }
@@ -225,7 +225,7 @@ class SignServiceImpl(
         }
 
         val quoteWithMember = if (quote.memberId == null) {
-            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return Either.left(quoteNotSignableErrorDto)
             }
@@ -283,7 +283,7 @@ class SignServiceImpl(
             )
         }
 
-        val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+        val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
         if (quoteNotSignableErrorDto != null) {
             return Either.left(quoteNotSignableErrorDto)
         }
@@ -336,11 +336,16 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        val createdAgreementId =
+        val result =
             productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
-                .first().agreementId
+                .first()
 
-        return redeemAndSignQuoteAndPostToCustomerio(quote, createdAgreementId, shouldCompleteSignInMemberService)
+        return redeemAndSignQuoteAndPostToCustomerio(
+            quote,
+            result.agreementId,
+            shouldCompleteSignInMemberService,
+            result.contractId
+        )
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
