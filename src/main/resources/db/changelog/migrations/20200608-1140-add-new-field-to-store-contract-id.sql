@@ -6,4 +6,8 @@ ALTER TABLE quote_revisions
     ADD COLUMN contract_id uuid NULL
 ;
 
---rollback ALTER TABLE quote_revisions DROP COLUMN contract_id;
+ALTER TABLE quote_revisions
+    RENAME COLUMN signed_product_id TO agreement_id
+;
+
+--rollback ALTER TABLE quote_revisions DROP COLUMN contract_id; ALTER TABLE quote_revisions RENAME COLUMN agreement_id TO signed_product_id;

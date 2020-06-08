@@ -87,7 +87,7 @@ class CompletedSignSessionTest {
             )
         )
 
-        assertThat(quoteRepository.find(quote.id)!!.signedProductId).isEqualTo(agreementId)
+        assertThat(quoteRepository.find(quote.id)!!.agreementId).isEqualTo(agreementId)
     }
 
     @Test

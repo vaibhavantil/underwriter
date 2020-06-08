@@ -56,7 +56,7 @@ class QuoteServiceImplTest {
 
         every { quoteRepository.find(quote.id) } returns quote
         val signedQuote = quote.copy(
-            signedProductId = createdProductResponse.id,
+            agreementId = createdProductResponse.id,
             state = QuoteState.SIGNED
         )
         every {

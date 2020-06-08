@@ -41,11 +41,11 @@ class FindQuoteByContractIdTest {
         )
 
         val contractId = UUID.randomUUID()
-        quoteRepository.insert(a.QuoteBuilder(state = QuoteState.SIGNED, signedProductId = contractId).build())
+        quoteRepository.insert(a.QuoteBuilder(state = QuoteState.SIGNED, contractId = contractId).build())
 
         val result = sut.getQuoteByContractId(contractId)
         assertThat(result).isNotNull().all {
-            transform { it.signedProductId }.isEqualTo(contractId)
+            transform { it.contractId }.isEqualTo(contractId)
         }
     }
 

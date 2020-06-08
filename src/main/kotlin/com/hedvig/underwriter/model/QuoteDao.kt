@@ -30,7 +30,7 @@ interface QuoteDao {
                 breached_underwriting_guidelines,
                 underwriting_guidelines_bypassed_by,
                 originating_product_id,
-                signed_product_id,
+                agreement_id,
                 contract_id,
                 data_collection_id,
                 sign_from_hope_triggered_by
@@ -53,7 +53,7 @@ interface QuoteDao {
                 :breachedUnderwritingGuidelines,
                 :underwritingGuidelinesBypassedBy,
                 :originatingProductId,
-                :signedProductId,
+                :agreementId,
                 :contractId,
                 :dataCollectionId,
                 :signFromHopeTriggeredBy
@@ -322,7 +322,7 @@ interface QuoteDao {
             JOIN quote_revisions qr
             ON qr.master_quote_id = mq.id 
             
-            WHERE qr.signed_product_id = :contractId
+            WHERE qr.contract_id = :contractId
             ORDER BY qr.master_quote_id ASC, qr.id DESC
     """
     )

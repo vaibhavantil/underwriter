@@ -111,7 +111,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             breachedUnderwritingGuidelines = databaseQuote.breachedUnderwritingGuidelines,
             underwritingGuidelinesBypassedBy = databaseQuote.underwritingGuidelinesBypassedBy,
             originatingProductId = databaseQuote.originatingProductId,
-            signedProductId = databaseQuote.signedProductId,
+            agreementId = databaseQuote.agreementId,
             dataCollectionId = databaseQuote.dataCollectionId,
             contractId = databaseQuote.contractId
         )

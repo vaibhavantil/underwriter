@@ -60,7 +60,7 @@ data class QuoteDto(
                 breachedUnderwritingGuidelines = quote.breachedUnderwritingGuidelines,
                 isComplete = quote.isComplete,
                 originatingProductId = quote.originatingProductId,
-                signedProductId = quote.signedProductId,
+                signedProductId = quote.agreementId,
                 dataCollectionId = quote.dataCollectionId
             )
         }

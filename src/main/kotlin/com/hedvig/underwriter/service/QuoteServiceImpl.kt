@@ -296,7 +296,7 @@ class QuoteServiceImpl(
 
         val updatedQuote = quoteRepository.update(
             quote.copy(
-                signedProductId = result.id,
+                agreementId = result.id,
                 state = QuoteState.SIGNED
             )
         )
@@ -357,7 +357,7 @@ class QuoteServiceImpl(
 
         val updatedQuote = quoteRepository.update(
             quote.copy(
-                signedProductId = response.agreementId,
+                agreementId = response.agreementId,
                 state = QuoteState.SIGNED
             )
         )

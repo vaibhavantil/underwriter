@@ -52,7 +52,7 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID(),
+            agreementId = UUID.randomUUID(),
             contractId = UUID.randomUUID()
         )
         quoteDao.insert(quote, timestamp)
@@ -95,7 +95,7 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             state = QuoteState.SIGNED,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID(),
+            agreementId = UUID.randomUUID(),
             contractId = UUID.randomUUID()
         )
         quoteDao.update(updatedQuote)
@@ -593,7 +593,7 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            agreementId = UUID.randomUUID()
         )
         quoteDao.insert(quote, timestamp)
         val breachedUnderwritingGuidelinesQuote = quote.copy(
@@ -633,7 +633,7 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            agreementId = UUID.randomUUID()
         )
         val quote2Id = UUID.randomUUID()
         val quote2 = Quote(
@@ -659,7 +659,7 @@ class QuoteRepositoryImplTest {
             memberId = "1337",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            agreementId = UUID.randomUUID()
         )
 
         val quote3Id = UUID.randomUUID()
@@ -686,7 +686,7 @@ class QuoteRepositoryImplTest {
             memberId = "1337",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            signedProductId = UUID.randomUUID()
+            agreementId = UUID.randomUUID()
         )
         quoteDao.insert(quote1, timestamp)
         quoteDao.insert(quote2, timestamp)

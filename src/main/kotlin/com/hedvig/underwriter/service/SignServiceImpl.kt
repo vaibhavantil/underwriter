@@ -156,7 +156,7 @@ class SignServiceImpl(
         contractId: UUID? = null
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
-            quote.copy(signedProductId = agreementId, contractId = contractId)
+            quote.copy(agreementId = agreementId, contractId = contractId)
         )
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
@@ -205,8 +205,8 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.signedProductId != null) {
-            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        if (quote.agreementId != null) {
+            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
@@ -270,8 +270,8 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.signedProductId != null) {
-            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        if (quote.agreementId != null) {
+            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
         }
 
         if (quote.memberId == null) {

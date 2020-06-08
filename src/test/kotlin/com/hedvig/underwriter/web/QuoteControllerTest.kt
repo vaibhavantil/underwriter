@@ -151,7 +151,7 @@ internal class QuoteControllerTest {
             ),
             breachedUnderwritingGuidelines = null,
             currentInsurer = null,
-            signedProductId = contractId
+            agreementId = contractId
         )
 
         every { quoteService.getQuoteByContractId(contractId) } returns quote
