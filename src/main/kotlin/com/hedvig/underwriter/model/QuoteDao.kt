@@ -1,13 +1,13 @@
 package com.hedvig.underwriter.model
 
-import java.time.Instant
-import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
+import java.time.Instant
+import java.util.UUID
 
 interface QuoteDao {
     @SqlUpdate(
@@ -322,7 +322,7 @@ interface QuoteDao {
             JOIN quote_revisions qr
             ON qr.master_quote_id = mq.id 
             
-            WHERE qr.contract_id = :contractId
+            WHERE qr.contract_id = :contractId AND qr.originating_product_id IS NULL
             ORDER BY qr.master_quote_id ASC, qr.id DESC
     """
     )

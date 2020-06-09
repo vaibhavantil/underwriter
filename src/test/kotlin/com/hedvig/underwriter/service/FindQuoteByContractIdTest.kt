@@ -12,11 +12,11 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.testhelp.JdbiRule
 import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.mockk
-import java.util.UUID
 import org.jdbi.v3.jackson2.Jackson2Config
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class FindQuoteByContractIdTest {
 
@@ -64,5 +64,41 @@ class FindQuoteByContractIdTest {
 
         val result = sut.getQuoteByContractId(contractId)
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun `find quote by contract returns origial quote`() {
+
+        val quoteRepository = QuoteRepositoryImpl(jdbiRule.jdbi)
+        val sut = QuoteServiceImpl(
+            mockk(),
+            mockk(),
+            mockk(),
+            quoteRepository
+        )
+
+        val contractId = UUID.randomUUID()
+        val firstQuote = a.QuoteBuilder(
+            state = QuoteState.SIGNED,
+            contractId = contractId,
+            agreementId = UUID.randomUUID()
+        ).build()
+        quoteRepository.insert(firstQuote)
+
+        val secondQuote = a.QuoteBuilder(
+            id = UUID.randomUUID(),
+            state = QuoteState.SIGNED,
+            contractId = contractId,
+            originatingProductId = firstQuote.agreementId
+        ).build()
+        quoteRepository.insert(
+            secondQuote
+        )
+
+        val result = sut.getQuoteByContractId(contractId)
+        assertThat(result).isNotNull().all {
+            transform { it.contractId }.isEqualTo(contractId)
+            transform { it.id }.isEqualTo(firstQuote.id)
+        }
     }
 }
