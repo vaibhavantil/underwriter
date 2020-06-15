@@ -70,7 +70,7 @@ class a {
             memberId,
             originatingProductId,
             agreementId,
-            contractId = contractId
+            contractId
         )
     }
 
