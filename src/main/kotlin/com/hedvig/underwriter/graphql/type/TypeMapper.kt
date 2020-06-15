@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
-import com.hedvig.localization.service.LocalizationService
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
+import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.Quote
@@ -303,5 +303,5 @@ class TypeMapper(
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
     private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
-        localizationService.getText(locale, "EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}") ?: ebt.getDefaultDisplayName()
+        localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale) ?: ebt.getDefaultDisplayName()
 }

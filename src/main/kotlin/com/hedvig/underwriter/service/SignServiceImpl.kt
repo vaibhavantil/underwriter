@@ -195,7 +195,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(contractId, signedAt)
+        return SignedQuoteResponseDto(contractId, quoteWithProductId.memberId, signedAt)
     }
 
     override fun signQuote(

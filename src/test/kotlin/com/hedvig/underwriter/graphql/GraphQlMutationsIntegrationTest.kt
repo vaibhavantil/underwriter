@@ -6,6 +6,7 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
@@ -55,6 +56,9 @@ internal class GraphQlMutationsIntegrationTest {
 
     @MockkBean
     lateinit var signService: SignService
+
+    @MockkBean
+    lateinit var localizationService: LocalizationService
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
