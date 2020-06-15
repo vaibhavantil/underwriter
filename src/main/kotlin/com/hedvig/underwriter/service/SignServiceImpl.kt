@@ -153,7 +153,7 @@ class SignServiceImpl(
         quote: Quote,
         agreementId: UUID,
         shouldCompleteSignInMemberService: Boolean,
-        contractId: UUID? = null
+        contractId: UUID
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
             quote.copy(agreementId = agreementId, contractId = contractId)
@@ -195,7 +195,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(agreementId, signedAt)
+        return SignedQuoteResponseDto(contractId, signedAt)
     }
 
     override fun signQuote(
