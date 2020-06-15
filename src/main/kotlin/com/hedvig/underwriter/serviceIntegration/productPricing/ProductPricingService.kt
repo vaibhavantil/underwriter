@@ -6,8 +6,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifiedProductCreatedDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.SignedProductResponseDto
@@ -16,9 +14,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Ad
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.springframework.http.ResponseEntity
+import java.util.UUID
 
 interface ProductPricingService {
     fun priceFromProductPricingForApartmentQuote(apartmentQuotePriceDto: ApartmentQuotePriceDto): QuotePriceResponseDto
@@ -26,8 +24,6 @@ interface ProductPricingService {
     fun priceFromProductPricingForHouseQuote(houseQuotePriceDto: HouseQuotePriceDto): QuotePriceResponseDto
 
     fun signedQuote(signedQuoteRequest: SignedQuoteRequest, memberId: String): SignedProductResponseDto
-
-    fun createModifiedProductFromQuote(quoteRequestDto: ModifyProductRequestDto): ModifiedProductCreatedDto
 
     fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest): AddAgreementResponse
 
@@ -37,7 +33,11 @@ interface ProductPricingService {
 
     fun calculateBundleInsuranceCost(request: CalculateBundleInsuranceCostRequest, memberId: String): InsuranceCost
 
-    fun createContractsFromQuotes(quotes: List<Quote>, signedRequest: SignRequest, token: String?): List<CreateContractResponse>
+    fun createContractsFromQuotes(
+        quotes: List<Quote>,
+        signedRequest: SignRequest,
+        token: String?
+    ): List<CreateContractResponse>
 
     fun createContractsFromQuotesNoMandate(quotes: List<Quote>): List<CreateContractResponse>
 

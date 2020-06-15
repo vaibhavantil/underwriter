@@ -4,6 +4,7 @@ import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
+import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.stereotype.Component
 
@@ -32,7 +33,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     fun find(quoteId: UUID, h: Handle): Quote? {
         val dao = h.attach<QuoteDao>()
         val databaseQuote = dao.find(quoteId) ?: return null
-        return findQuote(databaseQuote, dao)
+        return loadQuoteData(databaseQuote, dao)
     }
 
     override fun findQuotes(quoteIds: List<UUID>): List<Quote> =
@@ -41,7 +42,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     private fun findQuotes(quoteIds: List<UUID>, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()
         val databaseQuote = dao.find(quoteIds)
-        return databaseQuote.mapNotNull { findQuote(it, dao) }
+        return databaseQuote.mapNotNull { loadQuoteData(it, dao) }
     }
 
     override fun findByMemberId(memberId: String): List<Quote> =
@@ -50,7 +51,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     fun findByMemberId(memberId: String, h: Handle): List<Quote> {
         val dao = h.attach<QuoteDao>()
         return dao.findByMemberId(memberId)
-            .mapNotNull { databaseQuote -> findQuote(databaseQuote, dao) }
+            .mapNotNull { databaseQuote -> loadQuoteData(databaseQuote, dao) }
     }
 
     override fun findOneByMemberId(memberId: String): Quote? =
@@ -59,7 +60,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
     fun findOneByMemberId(memberId: String, h: Handle): Quote? {
         val dao = h.attach<QuoteDao>()
         val databaseQuote = dao.findOneByMemberId(memberId) ?: return null
-        return findQuote(databaseQuote, dao)
+        return loadQuoteData(databaseQuote, dao)
     }
 
     override fun findLatestOneByMemberId(memberId: String): Quote? =
@@ -69,7 +70,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val dao = h.attach<QuoteDao>()
         val databaseQuotes = dao.findByMemberId(memberId)
         val latestQuote = databaseQuotes.maxBy { it.timestamp }
-        return latestQuote?.let { quote -> findQuote(quote, dao) }
+        return latestQuote?.let { quote -> loadQuoteData(quote, dao) }
     }
 
     override fun expireQuote(id: UUID): Quote? {
@@ -81,10 +82,10 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val databaseQuotes = dao.find(id) ?: return null
         val expiredQuote = databaseQuotes.copy(validity = 0)
         update(expiredQuote, Instant.now(), h)
-        return findQuote(expiredQuote, dao)
+        return loadQuoteData(expiredQuote, dao)
     }
 
-    fun findQuote(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
+    fun loadQuoteData(databaseQuote: DatabaseQuoteRevision, dao: QuoteDao): Quote? {
         val quoteData: QuoteData = when {
             databaseQuote.quoteApartmentDataId != null -> dao.findApartmentQuoteData(databaseQuote.quoteApartmentDataId)
             databaseQuote.quoteHouseDataId != null -> dao.findHouseQuoteData(databaseQuote.quoteHouseDataId)
@@ -110,8 +111,9 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             breachedUnderwritingGuidelines = databaseQuote.breachedUnderwritingGuidelines,
             underwritingGuidelinesBypassedBy = databaseQuote.underwritingGuidelinesBypassedBy,
             originatingProductId = databaseQuote.originatingProductId,
-            signedProductId = databaseQuote.signedProductId,
-            dataCollectionId = databaseQuote.dataCollectionId
+            agreementId = databaseQuote.agreementId,
+            dataCollectionId = databaseQuote.dataCollectionId,
+            contractId = databaseQuote.contractId
         )
     }
 
@@ -129,6 +131,14 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             update(updatedQuote, timestamp, h)
             find(updatedQuote.id, h)!!
         }
+
+    override fun findByContractId(contractId: UUID): Quote? {
+        return jdbi.inTransactionUnchecked { h ->
+            val dao = h.attach<QuoteDao>()
+            val quoteRevision = dao.findByContractId(contractId)
+            quoteRevision?.let { loadQuoteData(it, dao) }
+        }
+    }
 
     private fun update(updatedQuote: Quote, timestamp: Instant, h: Handle) {
         val dao = h.attach<QuoteDao>()

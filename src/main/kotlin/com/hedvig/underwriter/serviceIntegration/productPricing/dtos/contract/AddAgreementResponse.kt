@@ -4,5 +4,6 @@ import java.util.UUID
 
 data class AddAgreementResponse(
     val quoteId: UUID,
-    val agreementId: UUID
+    val agreementId: UUID,
+    val contractId: UUID?
 )

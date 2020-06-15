@@ -18,17 +18,15 @@ import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ModifyProductRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.time.LocalDate
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class QuoteServiceImpl(
@@ -170,6 +168,10 @@ class QuoteServiceImpl(
         return quoteRepository.expireQuote(id)
     }
 
+    override fun getQuoteByContractId(contractId: UUID): Quote? {
+        return quoteRepository.findByContractId(contractId)
+    }
+
     override fun createQuoteFromAgreement(
         agreementId: UUID,
         memberId: String,
@@ -257,66 +259,6 @@ class QuoteServiceImpl(
         )
     }
 
-    override fun activateQuote(
-        completeQuoteId: UUID,
-        activationDate: LocalDate?,
-        previousProductTerminationDate: LocalDate?
-    ): Either<ErrorResponseDto, Quote> {
-        val quote = getQuote(completeQuoteId)
-            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to activate")
-
-        val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
-        if (quoteNotSignableErrorDto != null) {
-            Either.left(quoteNotSignableErrorDto)
-        }
-
-        val finalActivationDate = activationDate ?: quote.startDate
-        val finalTerminationDate = previousProductTerminationDate ?: finalActivationDate
-
-        if (finalActivationDate == null) {
-            return Either.left(
-                ErrorResponseDto(
-                    errorCode = ErrorCodes.UNKNOWN_ERROR_CODE,
-                    errorMessage = "No activation date given [QuoteId : $completeQuoteId]"
-                )
-            )
-        }
-
-        val result = productPricingService.createModifiedProductFromQuote(
-            ModifyProductRequestDto.from(
-                quote,
-                activationDate = finalActivationDate,
-                previousInsuranceTerminationDate = finalTerminationDate!!
-            )
-        )
-
-        val updatedQuote = quoteRepository.update(
-            quote.copy(
-                signedProductId = result.id,
-                state = QuoteState.SIGNED
-            )
-        )
-
-        return Either.right(updatedQuote)
-    }
-
-    override fun getQuoteStateNotSignableErrorOrNull(quote: Quote): ErrorResponseDto? {
-        if (quote.state == QuoteState.EXPIRED) {
-            return ErrorResponseDto(
-                ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
-                "cannot sign quote it has expired [Quote: $quote]"
-            )
-        }
-
-        if (quote.state == QuoteState.SIGNED) {
-            return ErrorResponseDto(
-                ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                "quote is already signed [Quote: $quote]"
-            )
-        }
-        return null
-    }
-
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
@@ -341,7 +283,7 @@ class QuoteServiceImpl(
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
 
-        val quoteNotSignableErrorDto = getQuoteStateNotSignableErrorOrNull(quote)
+        val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
         if (quoteNotSignableErrorDto != null) {
             Either.left(quoteNotSignableErrorDto)
         }
@@ -353,11 +295,29 @@ class QuoteServiceImpl(
 
         val updatedQuote = quoteRepository.update(
             quote.copy(
-                signedProductId = response.agreementId,
+                agreementId = response.agreementId,
+                contractId = response.contractId,
                 state = QuoteState.SIGNED
             )
         )
 
         return Either.right(updatedQuote)
     }
+}
+
+fun assertQuoteIsNotSignedOrExpired(quote: Quote): ErrorResponseDto? {
+    if (quote.state == QuoteState.EXPIRED) {
+        return ErrorResponseDto(
+            ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
+            "cannot sign quote it has expired [Quote: $quote]"
+        )
+    }
+
+    if (quote.state == QuoteState.SIGNED) {
+        return ErrorResponseDto(
+            ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
+            "quote is already signed [Quote: $quote]"
+        )
+    }
+    return null
 }

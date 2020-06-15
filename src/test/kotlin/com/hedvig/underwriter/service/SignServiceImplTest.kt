@@ -5,6 +5,7 @@ import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.SignServiceImpl.Companion.MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE
@@ -22,21 +23,19 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.a
-import com.hedvig.underwriter.web.dtos.ErrorCodes
-import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import java.time.LocalDate
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
+import java.time.LocalDate
+import java.util.UUID
 
 class SignServiceImplTest {
 
@@ -87,7 +86,6 @@ class SignServiceImplTest {
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         every { memberService.createMember() } returns "1234"
         every {
@@ -119,7 +117,6 @@ class SignServiceImplTest {
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         every { memberService.createMember() } returns "1234"
         every {
@@ -152,7 +149,7 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
+
         every {
             memberService.startSwedishBankIdSignQuotes(
                 quote.memberId!!.toLong(),
@@ -179,7 +176,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
             memberService.startSwedishBankIdSignQuotes(
@@ -203,14 +199,14 @@ class SignServiceImplTest {
     @Test
     fun startSigningOfSwedishQuotes_getQuoteStateNotSignableErrorOrNullReturnsError_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
-        val quote = a.QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
+        val quote = a.QuoteBuilder(
+            id = quoteIds[0],
+            memberId = memberId,
+            state = QuoteState.EXPIRED
+        ).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns ErrorResponseDto(
-            ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED,
-            ""
-        )
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -227,7 +223,6 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every {
             memberService.startNorwegianBankIdSignQuotes(
                 quote.memberId!!.toLong(),
@@ -257,7 +252,6 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every {
             memberService.startNorwegianBankIdSignQuotes(
                 quote.memberId!!.toLong(),
@@ -284,7 +278,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -317,7 +310,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -369,7 +361,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
 
@@ -403,7 +394,6 @@ class SignServiceImplTest {
             ssnAlreadySignedMember = true
         )
         every { quoteService.getQuotes(listOf(quoteId)) } returns listOf(quote)
-        every { quoteService.getQuoteStateNotSignableErrorOrNull(any()) } returns null
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
         every {

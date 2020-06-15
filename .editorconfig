@@ -2,3 +2,7 @@
 indent_style = space
 indent_size = 4
 insert_final_newline = true
+
+[*.{kt, kts}]
+#Ktlint and intellij does not agree on import ordering
+disabled_rules = import-ordering

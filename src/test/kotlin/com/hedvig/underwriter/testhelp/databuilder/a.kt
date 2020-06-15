@@ -45,7 +45,8 @@ class a {
         val underwritingGuidelinesBypassedBy: String? = null,
         val memberId: String? = null,
         val originatingProductId: UUID? = null,
-        val signedProductId: UUID? = null
+        val agreementId: UUID? = null,
+        val contractId: UUID? = null
 
     ) {
         fun w(quoteData: DataBuilder<QuoteData>? = null): QuoteBuilder {
@@ -68,7 +69,10 @@ class a {
             underwritingGuidelinesBypassedBy,
             memberId,
             originatingProductId,
-            signedProductId
+            agreementId,
+            null,
+            null,
+            contractId
         )
     }
 

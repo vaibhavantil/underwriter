@@ -132,7 +132,8 @@ data class DatabaseQuoteRevision(
     val initiatedFrom: QuoteInitiatedFrom?,
     val createdAt: Instant?,
     val originatingProductId: UUID?,
-    val signedProductId: UUID?,
+    val agreementId: UUID?,
+    val contractId: UUID?,
     val dataCollectionId: UUID?,
     val signFromHopeTriggeredBy: String?
 ) {
@@ -172,7 +173,8 @@ data class DatabaseQuoteRevision(
                 createdAt = quote.createdAt,
                 initiatedFrom = quote.initiatedFrom,
                 originatingProductId = quote.originatingProductId,
-                signedProductId = quote.signedProductId,
+                agreementId = quote.agreementId,
+                contractId = quote.contractId,
                 dataCollectionId = quote.dataCollectionId,
                 signFromHopeTriggeredBy = quote.signFromHopeTriggeredBy
             )
@@ -200,9 +202,10 @@ data class Quote(
     val underwritingGuidelinesBypassedBy: String? = null,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
-    val signedProductId: UUID? = null,
+    val agreementId: UUID? = null,
     val dataCollectionId: UUID? = null,
-    val signFromHopeTriggeredBy: String? = null
+    val signFromHopeTriggeredBy: String? = null,
+    val contractId: UUID? = null
 ) {
     val isComplete: Boolean
         get() = when {

@@ -9,15 +9,9 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import java.time.LocalDate
 import java.util.UUID
 
 interface QuoteService {
-    fun activateQuote(
-        completeQuoteId: UUID,
-        activationDate: LocalDate? = null,
-        previousProductTerminationDate: LocalDate? = null
-    ): Either<ErrorResponseDto, Quote>
 
     fun getQuote(completeQuoteId: UUID): Quote?
     fun getSingleQuoteForMemberId(memberId: String): QuoteDto?
@@ -51,8 +45,6 @@ interface QuoteService {
         id: UUID
     ): Either<ErrorResponseDto, Quote>
 
-    fun getQuoteStateNotSignableErrorOrNull(quote: Quote): ErrorResponseDto?
-
     fun calculateInsuranceCost(quote: Quote): InsuranceCost
 
     fun getQuotes(quoteIds: List<UUID>): List<Quote>
@@ -65,4 +57,5 @@ interface QuoteService {
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
 
     fun expireQuote(id: UUID): Quote?
+    fun getQuoteByContractId(contractId: UUID): Quote?
 }

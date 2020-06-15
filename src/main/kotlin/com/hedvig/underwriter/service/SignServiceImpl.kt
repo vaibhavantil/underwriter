@@ -29,12 +29,12 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.time.Instant
-import java.time.LocalDate
-import java.util.UUID
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class SignServiceImpl(
@@ -72,7 +72,7 @@ class SignServiceImpl(
                 return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
             }
 
-            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
             }
@@ -127,7 +127,8 @@ class SignServiceImpl(
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
-        val quotes = quoteService.getQuotes(signSessionRepository.find(signSessionId))
+        val quoteIds = signSessionRepository.find(signSessionId)
+        val quotes = quoteRepository.findQuotes(quoteIds)
 
         val createContractResponse = when (completeSignSessionData) {
             is CompleteSignSessionData.SwedishBankIdDataComplete ->
@@ -143,18 +144,19 @@ class SignServiceImpl(
                 productPricingService.createContractsFromQuotesNoMandate(quotes)
         }
         quotes.forEach { quote ->
-            val signedContractId = createContractResponse.first { quote.id == it.quoteId }.contractId
-            finishingUpSignedQuote(quote, signedContractId, true)
+            val response = createContractResponse.first { quote.id == it.quoteId }
+            redeemAndSignQuoteAndPostToCustomerio(quote, response.agreementId, true, response.contractId)
         }
     }
 
-    private fun finishingUpSignedQuote(
+    private fun redeemAndSignQuoteAndPostToCustomerio(
         quote: Quote,
-        signedContractId: UUID,
-        shouldCompleteSignInMemberService: Boolean
+        agreementId: UUID,
+        shouldCompleteSignInMemberService: Boolean,
+        contractId: UUID
     ): SignedQuoteResponseDto {
         val quoteWithProductId = quoteRepository.update(
-            quote.copy(signedProductId = signedContractId)
+            quote.copy(agreementId = agreementId, contractId = contractId)
         )
         checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
@@ -193,7 +195,7 @@ class SignServiceImpl(
             )
         }
 
-        return SignedQuoteResponseDto(signedContractId, quoteWithProductId.memberId, signedAt)
+        return SignedQuoteResponseDto(contractId, quoteWithProductId.memberId, signedAt)
     }
 
     override fun signQuote(
@@ -203,8 +205,8 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.signedProductId != null) {
-            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        if (quote.agreementId != null) {
+            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
         }
 
         val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
@@ -223,7 +225,7 @@ class SignServiceImpl(
         }
 
         val quoteWithMember = if (quote.memberId == null) {
-            val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+            val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return Either.left(quoteNotSignableErrorDto)
             }
@@ -268,8 +270,8 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.signedProductId != null) {
-            throw RuntimeException("There is a signed product id ${quote.signedProductId} already")
+        if (quote.agreementId != null) {
+            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
         }
 
         if (quote.memberId == null) {
@@ -281,7 +283,7 @@ class SignServiceImpl(
             )
         }
 
-        val quoteNotSignableErrorDto = quoteService.getQuoteStateNotSignableErrorOrNull(quote)
+        val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
         if (quoteNotSignableErrorDto != null) {
             return Either.left(quoteNotSignableErrorDto)
         }
@@ -334,11 +336,16 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
 
-        val createdAgreementId =
+        val result =
             productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
-                .first().agreementId
+                .first()
 
-        return finishingUpSignedQuote(quote, createdAgreementId, shouldCompleteSignInMemberService)
+        return redeemAndSignQuoteAndPostToCustomerio(
+            quote,
+            result.agreementId,
+            shouldCompleteSignInMemberService,
+            result.contractId
+        )
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {

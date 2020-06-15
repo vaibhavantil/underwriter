@@ -124,6 +124,60 @@ internal class QuoteControllerTest {
             .andExpect(jsonPath("productType").value("APARTMENT"))
     }
 
+    @Test
+    fun getQuoteByContractId() {
+
+        val contractId: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
+
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            productType = ProductType.APARTMENT,
+            state = QuoteState.SIGNED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.COMPRICER,
+            data = SwedishApartmentData(
+                id = UUID.randomUUID(),
+                street = "123 Baker street",
+                city = "Stockholm",
+                // numberOfRooms = 3,
+                zipCode = "11216",
+                householdSize = 1,
+                livingSpace = 33,
+                subType = ApartmentProductSubType.RENT,
+                firstName = "Simeone",
+                lastName = "null",
+                ssn = "189003042342"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null,
+            agreementId = contractId
+        )
+
+        every { quoteService.getQuoteByContractId(contractId) } returns quote
+
+        mockMvc
+            .perform(
+                get("/_/v1/quotes/contracts/$contractId")
+            )
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(jsonPath("productType").value("APARTMENT"))
+    }
+
+    @Test
+    fun `contract not found returns with 404`() {
+
+        val contractId: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
+
+        every { quoteService.getQuoteByContractId(contractId) } returns null
+
+        mockMvc
+            .perform(
+                get("/_/v1/quotes/contracts/$contractId")
+            )
+            .andExpect(status().is4xxClientError)
+    }
+
     @Ignore
     @Test
     fun completeQuote() {
