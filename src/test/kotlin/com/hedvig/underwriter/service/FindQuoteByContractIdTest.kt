@@ -41,7 +41,8 @@ class FindQuoteByContractIdTest {
         )
 
         val contractId = UUID.randomUUID()
-        quoteRepository.insert(a.QuoteBuilder(state = QuoteState.SIGNED, contractId = contractId).build())
+        val quote = a.QuoteBuilder(state = QuoteState.SIGNED, contractId = contractId).build()
+        quoteRepository.insert(quote)
 
         val result = sut.getQuoteByContractId(contractId)
         assertThat(result).isNotNull().all {

@@ -70,6 +70,8 @@ class a {
             memberId,
             originatingProductId,
             agreementId,
+            null,
+            null,
             contractId
         )
     }
