@@ -322,7 +322,9 @@ interface QuoteDao {
             JOIN quote_revisions qr
             ON qr.master_quote_id = mq.id 
             
-            WHERE qr.contract_id = :contractId AND qr.originating_product_id IS NULL
+            --For some quotes the contract_id is saved in the agreement_ud field
+            --remove the _agreement_id check_ below once this is fixed.
+            WHERE (qr.contract_id = :contractId OR qr.agreement_id = :contractId) AND qr.originating_product_id IS NULL
             ORDER BY qr.master_quote_id ASC, qr.id DESC
     """
     )
