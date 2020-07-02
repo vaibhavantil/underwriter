@@ -51,8 +51,8 @@ class Mutation @Autowired constructor(
         }
 
         val completeQuote = quoteService.createQuote(
-            input.toQuoteRequest(memberId = env.getTokenOrNull()),
-            input.id,
+            incompleteQuoteData = input.toQuoteRequest(memberId = env.getTokenOrNull()),
+            id = input.id,
             initiatedFrom = when {
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID
                 env.isIOS() -> QuoteInitiatedFrom.IOS
