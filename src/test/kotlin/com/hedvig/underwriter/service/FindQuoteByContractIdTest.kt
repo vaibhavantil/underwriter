@@ -37,7 +37,8 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             mockk(),
-            quoteRepository
+            quoteRepository,
+            mockk()
         )
 
         val contractId = UUID.randomUUID()
@@ -58,7 +59,8 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             mockk(),
-            quoteRepository
+            quoteRepository,
+            mockk()
         )
 
         val contractId = UUID.randomUUID()
@@ -75,7 +77,8 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             mockk(),
-            quoteRepository
+            quoteRepository,
+            mockk()
         )
 
         val contractId = UUID.randomUUID()

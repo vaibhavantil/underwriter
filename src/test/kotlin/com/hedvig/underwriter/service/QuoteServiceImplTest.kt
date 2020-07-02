@@ -9,6 +9,7 @@ import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
 import org.javamoney.moneta.Money
 import org.junit.Before
@@ -37,7 +38,7 @@ class QuoteServiceImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository)
+        cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository, mockk())
     }
 
     @Test
@@ -46,7 +47,8 @@ class QuoteServiceImplTest {
             underwriter = underwriter,
             memberService = memberService,
             productPricingService = productPricingService,
-            quoteRepository = quoteRepository
+            quoteRepository = quoteRepository,
+            notificationService = mockk()
         )
 
         every { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") } returns
