@@ -35,7 +35,7 @@ class AddAgreementToContractTest {
     fun `saves contractId to quote`() {
         val quoteRepository = QuoteRepositoryImpl(jdbiRule.jdbi)
         val productPricingService = mockk<ProductPricingService>()
-        val sut = QuoteServiceImpl(mockk(), mockk(), productPricingService, quoteRepository)
+        val sut = QuoteServiceImpl(mockk(), mockk(), productPricingService, quoteRepository, mockk())
 
         val quoteId = UUID.randomUUID()
 

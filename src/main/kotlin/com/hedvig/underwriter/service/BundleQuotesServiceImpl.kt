@@ -11,10 +11,10 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.InsuranceType
-import java.util.Locale
-import java.util.UUID
 import org.javamoney.moneta.Money
 import org.springframework.stereotype.Component
+import java.util.Locale
+import java.util.UUID
 
 @Component
 class BundleQuotesServiceImpl(
@@ -26,25 +26,24 @@ class BundleQuotesServiceImpl(
     override fun bundleQuotes(memberId: String, ids: List<UUID>, locale: Locale): QuoteBundle {
         val quotes = quotesService.getQuotes(ids)
 
-        val request =
-            CalculateBundleInsuranceCostRequest(
-                toBeBundled = quotes.map { quote ->
-                    CalculateBundledPriceDto(
-                        Money.of(quote.price, quote.currency),
-                        when (val data = quote.data) {
-                            is SwedishHouseData -> InsuranceType.SWEDISH_HOUSE
-                            is SwedishApartmentData -> when (data.subType!!) {
-                                ApartmentProductSubType.BRF,
-                                ApartmentProductSubType.STUDENT_BRF -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_BRF else InsuranceType.SWEDISH_BRF
-                                ApartmentProductSubType.RENT,
-                                ApartmentProductSubType.STUDENT_RENT -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_RENT else InsuranceType.SWEDISH_RENT
-                            }
-                            is NorwegianHomeContentsData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS else InsuranceType.NORWEGIAN_HOME_CONTENTS
-                            is NorwegianTravelData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_TRAVEL else InsuranceType.NORWEGIAN_TRAVEL
+        val request = CalculateBundleInsuranceCostRequest(
+            toBeBundled = quotes.map { quote ->
+                CalculateBundledPriceDto(
+                    grossPrice = Money.of(quote.price, quote.currency),
+                    insuranceType = when (val data = quote.data) {
+                        is SwedishHouseData -> InsuranceType.SWEDISH_HOUSE
+                        is SwedishApartmentData -> when (data.subType!!) {
+                            ApartmentProductSubType.BRF,
+                            ApartmentProductSubType.STUDENT_BRF -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_BRF else InsuranceType.SWEDISH_BRF
+                            ApartmentProductSubType.RENT,
+                            ApartmentProductSubType.STUDENT_RENT -> if (data.isStudent) InsuranceType.SWEDISH_STUDENT_RENT else InsuranceType.SWEDISH_RENT
                         }
-                    )
-                }
-            )
+                        is NorwegianHomeContentsData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS else InsuranceType.NORWEGIAN_HOME_CONTENTS
+                        is NorwegianTravelData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_TRAVEL else InsuranceType.NORWEGIAN_TRAVEL
+                    }
+                )
+            }
+        )
 
         val insuranceCost = productPricingService.calculateBundleInsuranceCost(request, memberId)
 

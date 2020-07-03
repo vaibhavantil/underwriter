@@ -17,6 +17,7 @@ import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
@@ -33,7 +34,8 @@ class QuoteServiceImpl(
     val underwriter: Underwriter,
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
-    val quoteRepository: QuoteRepository
+    val quoteRepository: QuoteRepository,
+    val notificationService: NotificationService
 ) : QuoteService {
 
     val logger = getLogger(QuoteServiceImpl::class.java)!!
@@ -141,6 +143,10 @@ class QuoteServiceImpl(
         val quote = breachedGuidelinesOrQuote.getQuote()
         if (updateMemberService && quote.memberId != null) {
             memberService.finalizeOnboarding(quote, quote.email ?: "")
+        }
+
+        if (quote.memberId != null && quote.email != null) {
+            notificationService.sendQuoteCreatedEvent(quote)
         }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
