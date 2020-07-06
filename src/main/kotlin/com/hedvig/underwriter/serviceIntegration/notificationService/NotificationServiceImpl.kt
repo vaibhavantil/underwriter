@@ -9,6 +9,7 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.notificationService.dtos.QuoteCreatedEvent
 import org.springframework.stereotype.Service
 
@@ -30,7 +31,7 @@ class NotificationServiceImpl(
                     is NorwegianTravelData -> null
                 },
                 email = quote.email!!,
-                ssn = quote.ssn,
+                ssn = quote.ssnMaybe,
                 initiatedFrom = quote.initiatedFrom.name,
                 attributedTo = quote.attributedTo.name,
                 productType = quote.productType.name,
