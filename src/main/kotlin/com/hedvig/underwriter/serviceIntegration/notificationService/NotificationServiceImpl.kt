@@ -8,7 +8,6 @@ import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
-import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.notificationService.dtos.QuoteCreatedEvent
 import org.springframework.stereotype.Service
