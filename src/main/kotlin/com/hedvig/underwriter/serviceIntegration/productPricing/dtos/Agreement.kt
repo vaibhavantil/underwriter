@@ -55,6 +55,7 @@ sealed class Agreement {
                 city = null,
                 floor = null
             )
+
         override fun getOldProductType() = ProductType.APARTMENT
     }
 
@@ -84,11 +85,15 @@ sealed class Agreement {
                 ancillaryArea = this.ancillaryArea.toInt(),
                 yearOfConstruction = this.yearOfConstruction,
                 numberOfBathrooms = this.numberOfBathrooms,
-                extraBuildings = this.extraBuildings.map {
-                        extraBuildingDto -> ExtraBuildingRequestDto.from(extraBuildingDto) },
+                extraBuildings = this.extraBuildings.map { extraBuildingDto ->
+                    ExtraBuildingRequestDto.from(
+                        extraBuildingDto
+                    )
+                },
                 isSubleted = this.isSubleted,
                 floor = 0
             )
+
         override fun getOldProductType() = ProductType.HOUSE
     }
 
@@ -110,7 +115,16 @@ sealed class Agreement {
             livingSpace = this.squareMeters.toInt(),
             city = null,
             coInsured = this.numberCoInsured,
-            subType = NorwegianHomeContentsType.valueOf(this.lineOfBusiness.name),
+            subType = when (this.lineOfBusiness) {
+                NorwegianHomeContentLineOfBusiness.OWN,
+                NorwegianHomeContentLineOfBusiness.YOUTH_OWN -> {
+                    NorwegianHomeContentsType.OWN
+                }
+                NorwegianHomeContentLineOfBusiness.RENT,
+                NorwegianHomeContentLineOfBusiness.YOUTH_RENT -> {
+                    NorwegianHomeContentsType.RENT
+                }
+            },
             isYouth = when (this.lineOfBusiness) {
                 NorwegianHomeContentLineOfBusiness.OWN,
                 NorwegianHomeContentLineOfBusiness.RENT -> {
@@ -122,6 +136,7 @@ sealed class Agreement {
                 }
             }
         )
+
         override fun getOldProductType() = ProductType.HOME_CONTENT
     }
 
@@ -143,6 +158,7 @@ sealed class Agreement {
                 NorwegianTravelLineOfBusiness.YOUTH -> true
             }
         )
+
         override fun getOldProductType() = ProductType.TRAVEL
     }
 }
