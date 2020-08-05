@@ -24,14 +24,12 @@ import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
 import com.hedvig.underwriter.util.toStockholmLocalDate
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 
 @Service
 class UnderwriterImpl(
@@ -185,12 +183,12 @@ class UnderwriterImpl(
 
     private fun getPriceRetrievedFromProductPricing(quote: Quote): BigDecimal {
         return when (quote.data) {
-            is SwedishApartmentData -> productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto.from(quote)
-            ).price
-            is SwedishHouseData -> productPricingService.priceFromProductPricingForHouseQuote(
-                HouseQuotePriceDto.from(quote)
-            ).price
+            is SwedishApartmentData -> priceEngineService.querySwedishApartmentPrice(
+                PriceQueryRequest.SwedishApartment.from(quote.id, quote.memberId, quote.data)
+            ).priceBigDecimal
+            is SwedishHouseData -> priceEngineService.querySwedishHousePrice(
+                PriceQueryRequest.SwedishHouse.from(quote.id, quote.memberId, quote.data)
+            ).priceBigDecimal
             is NorwegianHomeContentsData -> priceEngineService.queryNorwegianHomeContentPrice(
                 PriceQueryRequest.NorwegianHomeContent.from(quote.id, quote.memberId, quote.data)
             ).priceBigDecimal
