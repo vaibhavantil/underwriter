@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.ExtraBuildingDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness

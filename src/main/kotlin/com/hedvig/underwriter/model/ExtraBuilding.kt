@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 
 data class ExtraBuilding(
     val type: ExtraBuildingType,
