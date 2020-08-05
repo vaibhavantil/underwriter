@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.extensions
 
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 
 fun List<ExtraBuildingInput>.toExtraBuilding(): List<ExtraBuildingRequestDto> = this.map { extraBuildingInput ->
     ExtraBuildingRequestDto(

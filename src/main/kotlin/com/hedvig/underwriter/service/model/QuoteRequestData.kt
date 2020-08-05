@@ -3,7 +3,7 @@ package com.hedvig.underwriter.service.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 
 sealed class QuoteRequestData {
     data class SwedishHouse(
