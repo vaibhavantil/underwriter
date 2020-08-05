@@ -6,4 +6,6 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResp
 interface PriceEngineService {
     fun queryNorwegianHomeContentPrice(query: PriceQueryRequest.NorwegianHomeContent): PriceQueryResponse
     fun queryNorwegianTravelPrice(query: PriceQueryRequest.NorwegianTravel): PriceQueryResponse
+    fun querySwedishApartmentPrice(query: PriceQueryRequest.SwedishApartment): PriceQueryResponse
+    fun querySwedishHousePrice(query: PriceQueryRequest.SwedishHouse): PriceQueryResponse
 }
