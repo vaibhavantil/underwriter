@@ -32,35 +32,61 @@ import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSp
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.testhelp.databuilder.a
+import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.mockk
+import org.assertj.core.api.Assertions.assertThat
+import org.javamoney.moneta.Money
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.test.context.junit4.SpringRunner
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
-import org.assertj.core.api.Assertions.assertThat
-import org.javamoney.moneta.Money
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(SpringRunner::class)
 class UnderwriterImplTest {
+
+    @MockkBean
+    lateinit var debtChecker: DebtChecker
+
+    @MockkBean
+    lateinit var productPricingService: ProductPricingService
+
+    @MockkBean
+    lateinit var priceEngineService: PriceEngineService
+
+    @Before
+    fun setup() {
+        every {
+            priceEngineService.querySwedishApartmentPrice(
+                any()
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "SEK")
+            )
+
+        every {
+            priceEngineService.querySwedishHousePrice(
+                any()
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "SEK")
+            )
+    }
 
     @Test
     fun successfullyCreatesSwedishApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
 
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder().build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -68,10 +94,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreatesSwedishStudentApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(
             ssn = "200112031356",
@@ -83,9 +105,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -93,17 +112,10 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreatesSwedishHouseQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishHouseQuoteRequestBuilder().build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
@@ -111,10 +123,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreatesNorwegianHomeContentsQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder().build()
         val quoteId = UUID.randomUUID()
@@ -131,10 +139,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreatesNorwegianTravelQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianTravelQuoteRequestBuilder().build()
         val quoteId = UUID.randomUUID()
@@ -151,17 +155,10 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAgeOnCreatesSwedishApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(ssn = "202001010000").build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -170,10 +167,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllLowerApartmentRulesOnCreatesSwedishApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(
             data = a.SwedishApartmentQuoteRequestDataBuilder(
@@ -183,9 +176,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -199,10 +189,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperApartmentRulesOnCreatesSwedishApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(
             data = a.SwedishApartmentQuoteRequestDataBuilder(
@@ -212,9 +198,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -228,10 +211,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllLowerStudentApartmentRulesOnCreatesSwedishStudentApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(
             ssn = "200112031356",
@@ -243,9 +222,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -259,10 +235,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperStudentApartmentRulesOnCreatesSwedishStudentApartmentQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishApartmentQuoteRequestBuilder(
             ssn = "198812031356",
@@ -274,9 +246,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForApartmentQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -291,10 +260,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllLowerHouseRulesOnCreatesSwedishHouseQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishHouseQuoteRequestBuilder(
             data = a.SwedishHouseQuoteRequestDataBuilder(
@@ -305,9 +270,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -323,10 +285,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperHouseRulesOnCreatesSwedishHouseQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.SwedishHouseQuoteRequestBuilder(
             data = a.SwedishHouseQuoteRequestDataBuilder(
@@ -341,9 +299,6 @@ class UnderwriterImplTest {
         ).build()
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every { productPricingService.priceFromProductPricingForHouseQuote(any()) } returns QuotePriceResponseDto(
-            BigDecimal.ONE
-        )
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
@@ -360,10 +315,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreateNorwegianHomeContentsQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder().build()
 
@@ -378,10 +329,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitWhenNorwegianSsnNotMatch() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
             ssn = "24057408215"
@@ -403,10 +350,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreateNorwegianHomeContentsQuoteWhenSsnIsNull() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
             ssn = null
@@ -423,10 +366,6 @@ class UnderwriterImplTest {
 
     @Test
     fun successfullyCreateNorwegianHomeTravelQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianTravelQuoteRequestBuilder().build()
 
@@ -441,10 +380,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperApartmentRulesOnCreatesNorwegianHomeContentsQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
             data = a.NorwegianHomeContentsQuoteRequestDataBuilder(
@@ -465,10 +400,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperApartmentRulesOnCreatesNorwegianHomeContentsYouthQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianHomeContentsQuoteRequestBuilder(
             ssn = "28026400734",
@@ -493,10 +424,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperApartmentRulesOnCreatesNorwegianTravelQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianTravelQuoteRequestBuilder(
             data = a.NorwegianTravelQuoteRequestDataBuilder(
@@ -515,10 +442,6 @@ class UnderwriterImplTest {
 
     @Test
     fun underwritingGuidelineHitAllUpperApartmentRulesOnCreatesNorwegianTravelYouthQuote() {
-        val debtChecker = mockk<DebtChecker>()
-        val productPricingService = mockk<ProductPricingService>()
-        val priceEngineService = mockk<PriceEngineService>()
-
         val cut = UnderwriterImpl(debtChecker, productPricingService, priceEngineService)
         val quoteRequest = a.NorwegianTravelQuoteRequestBuilder(
             birthDate = LocalDate.now().minusYears(31).minusDays(1),

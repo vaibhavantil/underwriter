@@ -18,7 +18,7 @@ import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ExtraBuildingRequestDto
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -308,12 +308,13 @@ class a {
         val area: Int? = 5,
         val hasWaterConnected: Boolean? = true
     ) : DataBuilder<ExtraBuildingRequestDto> {
-        override fun build() = ExtraBuildingRequestDto(
-            id = id,
-            type = type!!,
-            area = area!!,
-            hasWaterConnected = hasWaterConnected!!
-        )
+        override fun build() =
+            ExtraBuildingRequestDto(
+                id = id,
+                type = type!!,
+                area = area!!,
+                hasWaterConnected = hasWaterConnected!!
+            )
     }
 
     data class SwedishHouseQuoteRequestBuilder(

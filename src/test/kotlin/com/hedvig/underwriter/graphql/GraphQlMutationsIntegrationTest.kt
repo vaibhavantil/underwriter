@@ -7,7 +7,6 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
-import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.SignService
@@ -16,24 +15,20 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.ApartmentQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.HouseQuotePriceDto
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuotePriceResponseDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.Year
-import java.util.UUID
 import org.javamoney.moneta.Money
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
+import java.math.BigDecimal
+import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -63,22 +58,32 @@ internal class GraphQlMutationsIntegrationTest {
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
+    @Before
+    fun setup() {
+        every {
+            priceEngineService.querySwedishApartmentPrice(
+                any()
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "SEK")
+            )
+
+        every {
+            priceEngineService.querySwedishHousePrice(
+                any()
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "SEK")
+            )
+    }
+
     @Test
     fun createSuccessfulOldApartmentQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every {
-            productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    houseHoldSize = 2,
-                    houseType = ApartmentProductSubType.BRF,
-                    isStudent = false
-                )
-            )
-        } returns
-            QuotePriceResponseDto(BigDecimal.ONE)
 
         every {
             productPricingService.calculateInsuranceCost(
@@ -111,24 +116,6 @@ internal class GraphQlMutationsIntegrationTest {
     @Test
     fun createSuccessfulOldHouseQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every {
-            productPricingService.priceFromProductPricingForHouseQuote(
-                HouseQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    houseHoldSize = 2,
-                    ancillaryArea = 100,
-                    yearOfConstruction = Year.of(1925),
-                    numberOfBathrooms = 1,
-                    extraBuildings = emptyList(),
-                    isSubleted = false
-                )
-            )
-        } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
-            )
 
         every {
             productPricingService.calculateInsuranceCost(
@@ -160,21 +147,6 @@ internal class GraphQlMutationsIntegrationTest {
     @Test
     fun createSuccessfulSwedishApartmentQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every {
-            productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    houseHoldSize = 2,
-                    houseType = ApartmentProductSubType.BRF,
-                    isStudent = false
-                )
-            )
-        } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
-            )
 
         every {
             productPricingService.calculateInsuranceCost(
@@ -206,27 +178,7 @@ internal class GraphQlMutationsIntegrationTest {
 
     @Test
     fun createSuccessfulSwedishHouseQuote() {
-
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-
-        every {
-            productPricingService.priceFromProductPricingForHouseQuote(
-                HouseQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 30,
-                    zipCode = "12345",
-                    houseHoldSize = 2,
-                    ancillaryArea = 100,
-                    yearOfConstruction = Year.of(1925),
-                    numberOfBathrooms = 1,
-                    extraBuildings = emptyList(),
-                    isSubleted = false
-                )
-            )
-        } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
-            )
 
         every {
             productPricingService.calculateInsuranceCost(
@@ -429,23 +381,7 @@ internal class GraphQlMutationsIntegrationTest {
 
     @Test
     fun createUnderwritingLimitsHitQuote() {
-
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        every {
-            productPricingService.priceFromProductPricingForApartmentQuote(
-                ApartmentQuotePriceDto(
-                    birthDate = LocalDate.of(1912, 12, 12),
-                    livingSpace = 999,
-                    zipCode = "12345",
-                    houseHoldSize = 2,
-                    houseType = ApartmentProductSubType.BRF,
-                    isStudent = false
-                )
-            )
-        } returns
-            QuotePriceResponseDto(
-                BigDecimal.ONE
-            )
 
         val response = graphQLTestTemplate.perform("/mutations/createUnderwritingLimitHitQuote.graphql", null)
         val createQuote = response.readTree()["data"]["createQuote"]
