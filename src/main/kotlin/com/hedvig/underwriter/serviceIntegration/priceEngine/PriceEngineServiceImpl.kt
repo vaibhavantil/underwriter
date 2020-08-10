@@ -17,11 +17,15 @@ class PriceEngineServiceImpl(
         return priceEngineClient.queryPrice(query)
     }
 
-    override fun querySwedishApartmentPrice(query: PriceQueryRequest.SwedishApartment): PriceQueryResponse {
+    override fun querySwedishApartmentPrice(
+        query: PriceQueryRequest.SwedishApartment
+    ): PriceQueryResponse {
         return priceEngineClient.queryPrice(query)
     }
 
-    override fun querySwedishHousePrice(query: PriceQueryRequest.SwedishHouse): PriceQueryResponse {
+    override fun querySwedishHousePrice(
+        query: PriceQueryRequest.SwedishHouse
+    ): PriceQueryResponse {
         return priceEngineClient.queryPrice(query)
     }
 }

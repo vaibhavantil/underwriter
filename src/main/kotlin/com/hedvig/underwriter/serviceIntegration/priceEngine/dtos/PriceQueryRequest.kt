@@ -74,18 +74,21 @@ sealed class PriceQueryRequest {
         override val numberCoInsured: Int,
         val lineOfBusiness: SwedishApartmentLineOfBusiness,
         val squareMeters: Int,
-        val postalCode: String
+        val postalCode: String,
+        val dataCollectionId: UUID?
     ) : PriceQueryRequest() {
         companion object {
-            fun from(quoteId: UUID, memberId: String?, data: SwedishApartmentData) = SwedishApartment(
-                holderMemberId = memberId,
-                quoteId = quoteId,
-                holderBirthDate = data.birthDate ?: data.ssn!!.birthDateFromSwedishSsn(),
-                numberCoInsured = data.householdSize!! - 1,
-                lineOfBusiness = SwedishApartmentLineOfBusiness.from(data.subType!!),
-                squareMeters = data.livingSpace!!,
-                postalCode = data.zipCode!!
-            )
+            fun from(quoteId: UUID, memberId: String?, data: SwedishApartmentData, dataCollectionId: UUID?) =
+                SwedishApartment(
+                    holderMemberId = memberId,
+                    quoteId = quoteId,
+                    holderBirthDate = data.birthDate ?: data.ssn!!.birthDateFromSwedishSsn(),
+                    numberCoInsured = data.householdSize!! - 1,
+                    lineOfBusiness = SwedishApartmentLineOfBusiness.from(data.subType!!),
+                    squareMeters = data.livingSpace!!,
+                    postalCode = data.zipCode!!,
+                    dataCollectionId = dataCollectionId
+                )
         }
     }
 
@@ -100,10 +103,11 @@ sealed class PriceQueryRequest {
         val yearOfConstruction: Year,
         val numberOfBathrooms: Int,
         val extraBuildings: List<ExtraBuildingRequestDto>,
-        val isSubleted: Boolean
+        val isSubleted: Boolean,
+        val dataCollectionId: UUID?
     ) : PriceQueryRequest() {
         companion object {
-            fun from(quoteId: UUID, memberId: String?, data: SwedishHouseData) = SwedishHouse(
+            fun from(quoteId: UUID, memberId: String?, data: SwedishHouseData, dataCollectionId: UUID?) = SwedishHouse(
                 holderMemberId = memberId,
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate ?: data.ssn!!.birthDateFromSwedishSsn(),
@@ -121,7 +125,8 @@ sealed class PriceQueryRequest {
                         type = extraBuilding.type
                     )
                 },
-                isSubleted = data.isSubleted!!
+                isSubleted = data.isSubleted!!,
+                dataCollectionId = dataCollectionId
             )
         }
     }
