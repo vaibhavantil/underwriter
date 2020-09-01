@@ -22,6 +22,6 @@ addons:
     token:
       secure: "OqGBL0tVX1Zrct+R7EVID70fpFk8EKcG5QwEygWFQDXC/tTaiBTda5I5ZSjA06Evcnw8UYC8BV3AhHnMEU8l7hu3nzHcpjVt3mUYDkUp8M/UYnYcshRcB0GXED7zOhdP8nLmdGePzYmwzgCRCD2RkB8yx8Bswm5nuyWyijOkSBWUsVB1RVw7k011bFJu7ELwYFdiU4waczK5OgkRET1nQxBDAbKgUJsn4gf9/82I1qEmi5RPXrzPkE6GqSnSdi35xLgdCpUf3VkWnJSrULewvC+xJkHSeXU3rE/xdxDjY8yKe6Vo5Kr8IqQ7GNFyfbZEOP97XXywPnMzCb94j34mC24DGHgaRND7Q3y/mTEFMkpx1rX6YoQDkXYLjU3JLUfiu7UasxFGBJSDzDzAAlEtGdTJcJ/pf5mfFoq6J7jtPsaQu9uIr2/NQ2Kp/4d3F7rHgf+/4q7jzvd4pa8+TGaBzzRuP6e9sTOYKVkHmVoQjWpVJQrPzSOWet0o1u+TBm3mEhl+8hh5D1V9VeeTbkE9Wb8QwGNTySjm7ArvPtl9vHNcGkpUNnS8fRUHLr7yHrwoeMdAd+BgFgLpzRDS53B8OmvpRptFFSHKse8Olvgc4LtxvMMS8iJLQVOMxQQgtX8H4cdLg7kydBTzcY1WOLyETvDFildkRKjIDYIQn2OTI+8="
 script:
-  - ./mvnw test verify sonar:sonar -Pcoverage -B
+  - mvn test verify sonar:sonar -Pcoverage -B
 git:
   depth: false
