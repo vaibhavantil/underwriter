@@ -51,7 +51,7 @@ sealed class Agreement {
                 street = this.address.street,
                 zipCode = this.address.postalCode,
                 livingSpace = this.squareMeters.toInt(),
-                householdSize = this.numberCoInsured,
+                householdSize = this.numberCoInsured + 1,
                 subType = ApartmentProductSubType.valueOf(this.lineOfBusiness.name),
                 city = null,
                 floor = null
@@ -82,7 +82,7 @@ sealed class Agreement {
                 zipCode = this.address.postalCode,
                 city = this.address.city,
                 livingSpace = this.squareMeters.toInt(),
-                householdSize = this.numberCoInsured,
+                householdSize = this.numberCoInsured + 1,
                 ancillaryArea = this.ancillaryArea.toInt(),
                 yearOfConstruction = this.yearOfConstruction,
                 numberOfBathrooms = this.numberOfBathrooms,
