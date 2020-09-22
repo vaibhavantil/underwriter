@@ -38,7 +38,7 @@ class QuoteSchemaTest {
      */
 
     @Test
-    internal fun swedishQuote() {
+    internal fun swedishHouseQuote() {
 
         every {
             quoteService.getQuote(any())
