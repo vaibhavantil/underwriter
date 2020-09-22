@@ -177,7 +177,14 @@ class QuoteSchemaTest {
             MockMvcRequestBuilders.get("/_/v2/quotes/{quoteId}/schema", UUID.randomUUID())
         )
 
-        response.andExpect(status().is4xxClientError)
+        response.andExpect(status().`is`(404))
+            .andExpect(
+                MockMvcResultMatchers.content().json(
+                    """
+                {"errorCode":"NO_SUCH_QUOTE","errorMessage":"QuoteNotFound","breachedUnderwritingGuidelines":null}
+            """.trimIndent()
+                )
+            )
     }
 
     @Test
