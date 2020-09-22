@@ -242,4 +242,72 @@ class QuoteSchemaTest {
                 )
             )
     }
+
+    @Test
+    internal fun norwegianHomeContentQuote() {
+
+        every {
+            quoteService.getQuote(any())
+        } returns a.QuoteBuilder().w(a.NorwegianHomeContentDataBuilder()).build()
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/_/v2/quotes/{quoteId}/schema", UUID.randomUUID())
+        )
+
+        response
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(
+                MockMvcResultMatchers.content().json(
+                    """
+            {
+                "${'$'}schema": "http://json-schema.org/draft-07/schema#",
+                "title": "Norwegian Home Contents",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "street": {
+                        "propertyOrder": 1,
+                        "type": "string",
+                        "title": "Street"
+                    },
+                    "zipCode": {
+                        "propertyOrder": 2,
+                        "type": "string",
+                        "title": "Zip Code"
+                    },
+                    "city": {
+                        "propertyOrder": 3,
+                        "type": "string",
+                        "title": "City"
+                    },
+                    "coInsured": {
+                        "propertyOrder": 4,
+                        "type": "integer",
+                        "title": "Co Insured"
+                    },
+                    "livingSpace": {
+                        "propertyOrder": 5,
+                        "type": "integer",
+                        "title": "Living Space"
+                    },
+                    "youth": {
+                        "propertyOrder": 6,
+                        "type": "boolean",
+                        "title": "Youth"
+                    },
+                    "subType": {
+                        "propertyOrder": 7,
+                        "type": "string",
+                        "enum": [
+                            "RENT",
+                            "OWN"
+                        ],
+                        "title": "Sub Type"
+                    }
+                }
+            }
+            """.trimIndent()
+                )
+            )
+    }
 }
