@@ -27,12 +27,6 @@ class QuoteSchemaTest {
 
     /**
      *
-     * Get schema quote
-     * - SwedishHouse
-     * - SwedishApartment
-     * - NorwegianTravel
-     * - NorwegianHomeContent
-     *
      * Quote does not exits
      *
      */
@@ -171,6 +165,19 @@ class QuoteSchemaTest {
             """.trimIndent()
                 )
             )
+    }
+
+    @Test
+    internal fun `quote does not exist`() {
+        every {
+            quoteService.getQuote(any())
+        } returns null
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/_/v2/quotes/{quoteId}/schema", UUID.randomUUID())
+        )
+
+        response.andExpect(status().is4xxClientError)
     }
 
     @Test
