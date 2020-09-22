@@ -310,4 +310,43 @@ class QuoteSchemaTest {
                 )
             )
     }
+
+    @Test
+    internal fun norwegianTravelQuote() {
+
+        every {
+            quoteService.getQuote(any())
+        } returns a.QuoteBuilder().w(a.NorwegianTravelDataBuilder()).build()
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/_/v2/quotes/{quoteId}/schema", UUID.randomUUID())
+        )
+
+        response
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(
+                MockMvcResultMatchers.content().json(
+                    """
+            {
+                "${'$'}schema": "http://json-schema.org/draft-07/schema#",
+                "title": "Norwegian Travel",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "coInsured": {
+                        "propertyOrder": 1,
+                        "type": "integer",
+                        "title": "Co Insured"
+                    },
+                    "youth": {
+                        "propertyOrder": 2,
+                        "type": "boolean",
+                        "title": "Youth"
+                    }
+                }
+            }
+            """.trimIndent()
+                )
+            )
+    }
 }
