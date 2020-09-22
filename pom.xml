@@ -275,19 +275,6 @@
             <version>1.27</version>
         </dependency>
 
-        <!--
-        These were explored during our POC but were decided against
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-generator</artifactId>
-            <version>4.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-jackson</artifactId>
-            <version>4.14.0</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>com.kjetland</groupId>
             <artifactId>mbknor-jackson-jsonschema_2.13</artifactId>
