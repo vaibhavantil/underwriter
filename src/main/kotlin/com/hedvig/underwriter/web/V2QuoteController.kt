@@ -3,6 +3,7 @@ package com.hedvig.underwriter.web
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.model.QuoteRequestData
@@ -46,11 +47,12 @@ class V2QuoteController(
             quoteService.getQuote(quoteName) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found")
 
         val dataClass = when (quote.data) {
-            is SwedishHouseData -> QuoteRequestData.SwedishHouse::class
+            is SwedishHouseData -> QuoteRequestData.SwedishHouse::class.java
+            is SwedishApartmentData -> QuoteRequestData.SwedishApartment::class.java
             else -> TODO()
         }
 
-        return jsonSchemaGenerator.generateJsonSchema(dataClass.java)
+        return jsonSchemaGenerator.generateJsonSchema(dataClass)
     }
 }
 

@@ -172,4 +172,74 @@ class QuoteSchemaTest {
                 )
             )
     }
+
+    @Test
+    internal fun swedishApartmentQuote() {
+
+        every {
+            quoteService.getQuote(any())
+        } returns a.QuoteBuilder().w(a.SwedishApartmentDataBuilder()).build()
+
+        val response = mockMvc.perform(
+            MockMvcRequestBuilders.get("/_/v2/quotes/{quoteId}/schema", UUID.randomUUID())
+        )
+
+        response
+            .andExpect(status().is2xxSuccessful)
+            .andExpect(
+                MockMvcResultMatchers.content().json(
+                    """
+            {
+              "${'$'}schema": "http://json-schema.org/draft-07/schema#",
+              "title": "Swedish Apartment",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "street": {
+                  "propertyOrder": 1,
+                  "type": "string",
+                  "title": "Street"
+                },
+                "zipCode": {
+                  "propertyOrder": 2,
+                  "type": "string",
+                  "title": "Zip Code"
+                },
+                "city": {
+                  "propertyOrder": 3,
+                  "type": "string",
+                  "title": "City"
+                },
+                "livingSpace": {
+                  "propertyOrder": 4,
+                  "type": "integer",
+                  "title": "Living Space"
+                },
+                "householdSize": {
+                  "propertyOrder": 5,
+                  "type": "integer",
+                  "title": "Household Size"
+                },
+                "floor": {
+                  "propertyOrder": 6,
+                  "type": "integer",
+                  "title": "Floor"
+                },
+                "subType": {
+                  "propertyOrder": 7,
+                  "type": "string",
+                  "enum": [
+                    "BRF",
+                    "RENT",
+                    "STUDENT_BRF",
+                    "STUDENT_RENT"
+                  ],
+                  "title": "Sub Type"
+                }
+              }
+            }
+            """.trimIndent()
+                )
+            )
+    }
 }
