@@ -25,12 +25,6 @@ class QuoteSchemaTest {
     @MockkBean
     lateinit var quoteService: QuoteService
 
-    /**
-     *
-     * Quote does not exits
-     *
-     */
-
     @Test
     internal fun swedishHouseQuote() {
 
