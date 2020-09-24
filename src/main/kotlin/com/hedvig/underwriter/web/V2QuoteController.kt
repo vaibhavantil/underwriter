@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.web
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -15,6 +17,8 @@ import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -50,4 +54,32 @@ class V2QuoteController(
 
         return jsonSchemaGenerator.generateJsonSchema(dataClass)
     }
+
+    @PostMapping("{quoteId}/update")
+    fun updateSchema(@PathVariable("quoteId") quoteId: UUID, @RequestBody data: QuoteDataSchemas) {
+
+        // quoteService.updateQuote(QuoteRequest())
+    }
+}
+
+sealed class QuoteDataSchemas
+
+data class SwedishHouse(
+    val street: String,
+    val zipCode: String,
+    val city: String?,
+    val livingSpace: Int,
+    val numberCoInsured: Int,
+    val ancillaryArea: Int,
+    val yearOfConstruction: Int,
+    val numberOfBathrooms: Int,
+    val extraBuildings: List<ExtraBuilding>,
+    @field:JsonProperty("subleted")
+    val isSubleted: Boolean
+) : QuoteDataSchemas() {
+    data class ExtraBuilding(
+        val type: ExtraBuildingType,
+        val area: Int,
+        val hasWaterConnected: Boolean
+    )
 }
