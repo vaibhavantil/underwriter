@@ -1,24 +1,13 @@
 package com.hedvig.underwriter.web
 
-import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.testhelp.databuilder.a
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(controllers = [V2QuoteController::class])
+@WebMvcTest(controllers = [QuoteSchemaController::class])
 class QuoteSchemaTest {
-
+    /*
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -356,5 +345,5 @@ class QuoteSchemaTest {
             """.trimIndent()
                 )
             )
-    }
+    }*/
 }
