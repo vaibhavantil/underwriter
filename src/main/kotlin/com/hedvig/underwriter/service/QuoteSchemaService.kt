@@ -13,4 +13,3 @@ interface QuoteSchemaService {
     fun getSchemaByQuoteId(quoteId: UUID): JsonNode?
     fun getSchemaWithDataByQuoteId(quoteId: UUID): QuoteSchema?
 }
-
