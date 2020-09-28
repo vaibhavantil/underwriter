@@ -138,6 +138,14 @@ class QuoteMapper(
     fun mapToQuoteSchemaWithData(
         quote: Quote
     ): QuoteSchema = when (quote.data) {
+        is SwedishApartmentData -> QuoteSchema.SwedishApartment(
+            lineOfBusiness = quote.data.subType!!,
+            street = quote.data.street!!,
+            zipCode = quote.data.zipCode!!,
+            city = quote.data.city,
+            livingSpace = quote.data.livingSpace!!,
+            numberCoInsured = quote.data.householdSize!! - 1
+        )
         is SwedishHouseData -> QuoteSchema.SwedishHouse(
             street = quote.data.street!!,
             zipCode = quote.data.zipCode!!,
@@ -156,9 +164,19 @@ class QuoteMapper(
                 )
             }
         )
-        is SwedishApartmentData -> TODO()
-        is NorwegianHomeContentsData -> TODO()
-        is NorwegianTravelData -> TODO()
+        is NorwegianHomeContentsData -> QuoteSchema.NorwegianHomeContent(
+            lineOfBusiness = quote.data.type,
+            isYouth = quote.data.isYouth,
+            street = quote.data.street,
+            zipCode = quote.data.zipCode,
+            city = quote.data.city,
+            livingSpace = quote.data.livingSpace,
+            numberCoInsured = quote.data.coInsured
+        )
+        is NorwegianTravelData -> QuoteSchema.NorwegianTravel(
+            isYouth = quote.data.isYouth,
+            numberCoInsured = quote.data.coInsured
+        )
     }
 
     private fun mapToExtraBuildingCore(

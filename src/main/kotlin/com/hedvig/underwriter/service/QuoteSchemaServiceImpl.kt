@@ -22,9 +22,9 @@ class QuoteSchemaServiceImpl(
 
         val dataClass = when (quote.data) {
             is SwedishHouseData -> QuoteSchema.SwedishHouse::class.java
-            is SwedishApartmentData -> TODO()
-            is NorwegianHomeContentsData -> TODO()
-            is NorwegianTravelData -> TODO()
+            is SwedishApartmentData -> QuoteSchema.SwedishApartment::class.java
+            is NorwegianHomeContentsData -> QuoteSchema.NorwegianHomeContent::class.java
+            is NorwegianTravelData -> QuoteSchema.NorwegianTravel::class.java
         }
 
         return schemaGenerator.generateSchema(dataClass)

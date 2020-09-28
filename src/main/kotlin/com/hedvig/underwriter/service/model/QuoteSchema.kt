@@ -4,13 +4,30 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.github.imifou.jsonschema.module.addon.annotation.JsonSchema
+import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.ExtraBuildingType
+import com.hedvig.underwriter.model.NorwegianHomeContentsType
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "id")
 @JsonSubTypes(
     JsonSubTypes.Type(value = QuoteSchema.SwedishHouse::class, name = "SwedishHouse")
 )
 sealed class QuoteSchema {
+    data class SwedishApartment(
+        @JsonSchema(title = "Line Of Business", required = true)
+        val lineOfBusiness: ApartmentProductSubType,
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 5, maxLength = 5)
+        val zipCode: String,
+        @JsonSchema(title = "City", required = false)
+        val city: String?,
+        @JsonSchema(title = "Living Space", required = true, min = 0.0)
+        val livingSpace: Int,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int
+    ) : QuoteSchema()
+
     data class SwedishHouse(
         @JsonSchema(title = "Street", required = true)
         val street: String,
@@ -43,4 +60,28 @@ sealed class QuoteSchema {
             val hasWaterConnected: Boolean
         )
     }
+
+    data class NorwegianHomeContent(
+        @JsonSchema(title = "Line Of Business", required = true)
+        val lineOfBusiness: NorwegianHomeContentsType,
+        @JsonSchema(title = "Is Youth", required = true)
+        val isYouth: Boolean,
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 5, maxLength = 5)
+        val zipCode: String,
+        @JsonSchema(title = "City", required = false)
+        val city: String?,
+        @JsonSchema(title = "Living Space", required = true, min = 0.0)
+        val livingSpace: Int,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int
+    ) : QuoteSchema()
+
+    data class NorwegianTravel(
+        @JsonSchema(title = "Is Youth", required = true)
+        val isYouth: Boolean,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int
+    ) : QuoteSchema()
 }
