@@ -1,6 +1,5 @@
 package com.hedvig.underwriter.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.imifou.jsonschema.module.addon.AddonModule
 import com.github.victools.jsonschema.generator.OptionPreset
 import com.github.victools.jsonschema.generator.SchemaGenerator
@@ -12,9 +11,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class JsonSchemaConfig {
     @Bean
-    fun jsonSchemaGenerator(
-        objectMapper: ObjectMapper
-    ): SchemaGenerator {
+    fun jsonSchemaGenerator(): SchemaGenerator {
         val configBuilder =
             SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7, OptionPreset.PLAIN_JSON)
                 .with(AddonModule())
