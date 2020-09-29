@@ -10,7 +10,10 @@ import com.hedvig.underwriter.model.NorwegianHomeContentsType
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "id")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = QuoteSchema.SwedishHouse::class, name = "SwedishHouse")
+    JsonSubTypes.Type(value = QuoteSchema.SwedishApartment::class, name = "SwedishApartment"),
+    JsonSubTypes.Type(value = QuoteSchema.SwedishHouse::class, name = "SwedishHouse"),
+    JsonSubTypes.Type(value = QuoteSchema.NorwegianHomeContent::class, name = "NorwegianHomeContent"),
+    JsonSubTypes.Type(value = QuoteSchema.NorwegianTravel::class, name = "NorwegianTravel")
 )
 sealed class QuoteSchema {
     data class SwedishApartment(
@@ -68,7 +71,7 @@ sealed class QuoteSchema {
         val isYouth: Boolean,
         @JsonSchema(title = "Street", required = true)
         val street: String,
-        @JsonSchema(title = "Zip Code", required = true, minLength = 5, maxLength = 5)
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
         @JsonSchema(title = "City", required = false)
         val city: String?,
