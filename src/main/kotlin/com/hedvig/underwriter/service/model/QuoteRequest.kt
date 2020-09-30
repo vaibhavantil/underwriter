@@ -13,7 +13,6 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
-import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant

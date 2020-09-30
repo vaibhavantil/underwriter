@@ -50,8 +50,8 @@ sealed class QuoteSchema {
         val numberOfBathrooms: Int,
         @field:JsonProperty("subleted")
         @JsonSchema(title = "Is Subleted", required = true)
-        val isSubleted: Boolean,
-        @JsonSchema(title = "Extra Buildings", required = true)
+        val isSubleted: Boolean = false,
+        @JsonSchema(required = true)
         val extraBuildings: List<ExtraBuildingSchema>
     ) : QuoteSchema() {
         data class ExtraBuildingSchema(
@@ -60,15 +60,13 @@ sealed class QuoteSchema {
             @JsonSchema(title = "Area", required = true, min = 0.0)
             val area: Int,
             @JsonSchema(title = "Has Water Connected", required = true)
-            val hasWaterConnected: Boolean
+            val hasWaterConnected: Boolean = false
         )
     }
 
     data class NorwegianHomeContent(
         @JsonSchema(title = "Line Of Business", required = true)
         val lineOfBusiness: NorwegianHomeContentsType,
-        @JsonSchema(title = "Is Youth", required = true)
-        val isYouth: Boolean,
         @JsonSchema(title = "Street", required = true)
         val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
@@ -78,13 +76,15 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Living Space", required = true, min = 0.0)
         val livingSpace: Int,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
-        val numberCoInsured: Int
+        val numberCoInsured: Int,
+        @JsonSchema(title = "Is Youth", required = true)
+        val isYouth: Boolean
     ) : QuoteSchema()
 
     data class NorwegianTravel(
-        @JsonSchema(title = "Is Youth", required = true)
-        val isYouth: Boolean,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
-        val numberCoInsured: Int
+        val numberCoInsured: Int,
+        @JsonSchema(title = "Is Youth", required = true)
+        val isYouth: Boolean
     ) : QuoteSchema()
 }

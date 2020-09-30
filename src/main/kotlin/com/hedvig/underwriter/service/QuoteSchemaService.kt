@@ -11,5 +11,6 @@ interface QuoteSchemaService {
         get() = LoggerFactory.getLogger(QuoteSchemaService::class.simpleName)
 
     fun getSchemaByQuoteId(quoteId: UUID): JsonNode?
+    fun getSchemaForContract(contractType: String): JsonNode?
     fun getSchemaWithDataByQuoteId(quoteId: UUID): QuoteSchema?
 }

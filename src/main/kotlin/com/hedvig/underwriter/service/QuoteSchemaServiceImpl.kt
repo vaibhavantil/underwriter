@@ -20,13 +20,25 @@ class QuoteSchemaServiceImpl(
     override fun getSchemaByQuoteId(quoteId: UUID): JsonNode? {
         val quote = quoteService.getQuote(quoteId) ?: return null
 
-        val dataClass = when (quote.data) {
-            is SwedishHouseData -> QuoteSchema.SwedishHouse::class.java
-            is SwedishApartmentData -> QuoteSchema.SwedishApartment::class.java
-            is NorwegianHomeContentsData -> QuoteSchema.NorwegianHomeContent::class.java
-            is NorwegianTravelData -> QuoteSchema.NorwegianTravel::class.java
+        return when (quote.data) {
+            is SwedishApartmentData -> getSchemaForContract("SWEDISH_APARTMENT")
+            is SwedishHouseData -> getSchemaForContract("SWEDISH_HOUSE")
+            is NorwegianHomeContentsData -> getSchemaForContract("NORWEGIAN_HOME_CONTENT")
+            is NorwegianTravelData -> getSchemaForContract("NORWEGIAN_TRAVEL")
         }
+    }
 
+    override fun getSchemaForContract(contractType: String): JsonNode? {
+        val dataClass = when (contractType) {
+            "SWEDISH_APARTMENT" -> QuoteSchema.SwedishApartment::class.java
+            "SWEDISH_HOUSE" -> QuoteSchema.SwedishHouse::class.java
+            "NORWEGIAN_HOME_CONTENT" -> QuoteSchema.NorwegianHomeContent::class.java
+            "NORWEGIAN_TRAVEL" -> QuoteSchema.NorwegianTravel::class.java
+            else -> {
+                logger.error("Unable to get schema for contract of type=$contractType")
+                return null
+            }
+        }
         return schemaGenerator.generateSchema(dataClass)
     }
 

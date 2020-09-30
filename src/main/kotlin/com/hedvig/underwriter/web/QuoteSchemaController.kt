@@ -43,6 +43,16 @@ class QuoteSchemaController(
         )
     }
 
+    @GetMapping("contract/{contractType}")
+    fun getSchemaByContractType(@PathVariable contractType: String): Any {
+        return quoteSchemaService.getSchemaForContract(contractType) ?: return ResponseEntity.status(404).body(
+            ErrorResponseDto(
+                ErrorCodes.NO_SUCH_QUOTE,
+                errorMessage = "Unable to get schema for contractType=$contractType"
+            )
+        )
+    }
+
     @PostMapping("{quoteId}/update")
     fun updateQuoteBySchemaWithData(
         @PathVariable quoteId: UUID,

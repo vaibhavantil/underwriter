@@ -17,8 +17,13 @@ class JsonSchemaConfig {
                 .with(AddonModule())
         disableSorting(configBuilder)
         setClassNameAsId(configBuilder)
+        setupDefaults(configBuilder)
         val config = configBuilder.build()
         return SchemaGenerator(config)
+    }
+
+    private fun disableSorting(configBuilder: SchemaGeneratorConfigBuilder) {
+        configBuilder.forTypesInGeneral().withPropertySorter { _, _ -> 0 }
     }
 
     private fun setClassNameAsId(configBuilder: SchemaGeneratorConfigBuilder) {
@@ -32,7 +37,14 @@ class JsonSchemaConfig {
         }
     }
 
-    private fun disableSorting(configBuilder: SchemaGeneratorConfigBuilder) {
-        configBuilder.forTypesInGeneral().withPropertySorter { _, _ -> 0 }
+    private fun setupDefaults(configBuilder: SchemaGeneratorConfigBuilder) {
+        configBuilder.forTypesInGeneral().withDefaultResolver { typeScope ->
+            return@withDefaultResolver when {
+                typeScope.type.typeName.contains("java.util.List") -> emptyList<Any>()
+                typeScope.type.typeName == "boolean" -> false
+                typeScope.type.typeName == "java.lang.String" -> ""
+                else -> null
+            }
+        }
     }
 }
