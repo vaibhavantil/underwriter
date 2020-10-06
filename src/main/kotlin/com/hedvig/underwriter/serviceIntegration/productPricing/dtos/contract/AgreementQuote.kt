@@ -134,7 +134,7 @@ sealed class AgreementQuote {
                 lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
             )
             is Danish_PLACEHOLDER_Data -> {
-                //TODO: fix when replacing _PLACEHOLDER_
+                // TODO: fix when replacing _PLACEHOLDER_
                 TODO()
             }
         }

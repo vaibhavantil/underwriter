@@ -13,7 +13,6 @@ sealed class QuotesSignData {
         val ssn: String
     ) : QuotesSignData()
 
-
     data class DanishBankId(
         val memberId: String,
         val ssn: String

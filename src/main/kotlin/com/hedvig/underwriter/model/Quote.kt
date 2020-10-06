@@ -260,7 +260,7 @@ data class Quote(
                     email = quoteRequest.email ?: data.email
                 )
                 is Danish_PLACEHOLDER_Data -> {
-                    //TODO: fix when replacing _PLACEHOLDER_
+                    // TODO: fix when replacing _PLACEHOLDER_
                     TODO()
                 }
             }

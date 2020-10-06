@@ -195,7 +195,7 @@ class UnderwriterImpl(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
             ).priceBigDecimal
             is Danish_PLACEHOLDER_Data -> {
-                //TODO: fix when replacing _PLACEHOLDER_
+                // TODO: fix when replacing _PLACEHOLDER_
                 BigDecimal(9999)
             }
         }
@@ -224,7 +224,7 @@ class UnderwriterImpl(
                 data, NorwegianPersonGuidelines.setOfRules
             )
             is Danish_PLACEHOLDER_Data -> {
-                //TODO: fix when replacing _PLACEHOLDER_
+                // TODO: fix when replacing _PLACEHOLDER_
                 mutableListOf()
             }
         }
@@ -252,7 +252,7 @@ class UnderwriterImpl(
                     NorwegianTravelGuidelines.setOfRules
                 )
             is Danish_PLACEHOLDER_Data -> {
-                //TODO: fix when replacing _PLACEHOLDER_
+                // TODO: fix when replacing _PLACEHOLDER_
                 mutableListOf()
             }
         }

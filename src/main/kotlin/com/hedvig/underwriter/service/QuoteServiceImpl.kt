@@ -281,8 +281,8 @@ class QuoteServiceImpl(
                 Money.of(quote.price, "NOK"), memberId
             )
             is Danish_PLACEHOLDER_Data -> {
-                //TODO: fix when replacing _PLACEHOLDER_
-                //TODO: Implement actual request
+                // TODO: fix when replacing _PLACEHOLDER_
+                // TODO: Implement actual request
                 InsuranceCost(
                         MonetaryAmountV2("9999", "DKK"),
                         MonetaryAmountV2("0", "DKK"),
