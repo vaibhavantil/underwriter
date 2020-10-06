@@ -31,7 +31,7 @@ input CreateQuoteInput {
     swedishHouse: CreateSwedishHouseInput
     norwegianHomeContents: CreateNorwegianHomeContentsInput
     norwegianTravel: CreateNorwegianTravelInput
-    dansih_PLACEHOLDER_: CreateDansih_PLACEHOLDER_Input
+    danish_PLACEHOLDER_: CreateDanish_PLACEHOLDER_Input
     email: String
     dataCollectionId: ID
 }
@@ -55,7 +55,7 @@ input CreateNorwegianTravelInput {
     isYouth: Boolean!
 }
 
-input CreateDansih_PLACEHOLDER_Input {
+input CreateDanish_PLACEHOLDER_Input {
     wip: Boolean
 }
 
@@ -443,7 +443,7 @@ type NorwegianTravelDetails {
 }
 
 type Danish_PLACEHOLDER_Details {
-    test: Boolean
+    wip: Boolean
 }
 
 type IncompleteQuote {

@@ -304,6 +304,7 @@ internal class GraphQlMutationsIntegrationTest {
             null,
             null,
             CreateNorwegianTravelInput(0, false),
+            null,
             null
         )
 
@@ -368,6 +369,7 @@ internal class GraphQlMutationsIntegrationTest {
             null,
             null,
             CreateNorwegianTravelInput(0, false),
+            null,
             null
         )
         val response = graphQLTestTemplate.perform(

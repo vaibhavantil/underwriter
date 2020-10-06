@@ -29,6 +29,7 @@ data class CreateQuoteInput(
     val swedishHouse: CreateSwedishHouseInput?,
     val norwegianHomeContents: CreateNorwegianHomeContentsInput?,
     val norwegianTravel: CreateNorwegianTravelInput?,
+    val danish_PLACEHOLDER_: CreateDanish_PLACEHOLDER_Input?,
     val dataCollectionId: UUID?
 ) {
     fun toQuoteRequest(
