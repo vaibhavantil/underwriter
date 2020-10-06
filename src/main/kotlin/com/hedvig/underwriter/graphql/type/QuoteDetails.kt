@@ -72,6 +72,6 @@ sealed class QuoteDetails {
     }
 
     data class Danish_PLACEHOLDER_Details(
-        val test: Boolean = true
+        val wip: Boolean = true
     )
 }

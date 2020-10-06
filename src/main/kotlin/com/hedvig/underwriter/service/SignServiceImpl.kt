@@ -383,7 +383,7 @@ class SignServiceImpl(
                     )
                     is NorwegianHomeContentsData,
                     is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
-                    is Danish_PLACEHOLDER_Data -> QuotesSignData.CanNotBeBundled
+                    is Danish_PLACEHOLDER_Data -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
                 }
             2 -> if (
                 quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&

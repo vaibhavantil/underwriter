@@ -133,7 +133,10 @@ sealed class AgreementQuote {
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
             )
-            is Danish_PLACEHOLDER_Data -> TODO()
+            is Danish_PLACEHOLDER_Data -> {
+                //TODO: fix when replacing _PLACEHOLDER_
+                TODO()
+            }
         }
     }
 }
