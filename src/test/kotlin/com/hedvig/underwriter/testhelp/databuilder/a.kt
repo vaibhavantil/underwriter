@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -221,6 +222,15 @@ class a {
             coInsured,
             isYouth,
             internalId
+        )
+    }
+
+    data class Danish_PLACEHOLDER_DataBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be5")
+    ) : DataBuilder<QuoteData> {
+
+        override fun build() = Danish_PLACEHOLDER_Data(
+            id
         )
     }
 

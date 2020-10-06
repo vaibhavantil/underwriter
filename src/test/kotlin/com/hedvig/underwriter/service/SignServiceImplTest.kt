@@ -424,6 +424,33 @@ class SignServiceImplTest {
         }
     }
 
+    @Test
+    fun startSigningOfDanishQuote_startDanishSign() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.Danish_PLACEHOLDER_DataBuilder(), memberId = memberId).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every {
+            memberService.startDanishBankIdSignQuotes(
+                memberId.toLong(),
+                signSessionReference,
+                "1212121212",
+                successUrl,
+                failUrl
+            )
+        } returns StartRedirectBankIdSignResponse(
+            "redirect url"
+        )
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+    }
+
     companion object {
         private val memberId = "1337"
         private val ipAddress = "127.0.0.1"

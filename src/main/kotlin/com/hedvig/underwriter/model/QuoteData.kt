@@ -162,7 +162,9 @@ data class Danish_PLACEHOLDER_Data(
     override val id: UUID
 ) : QuoteData(), PersonPolicyHolder<Danish_PLACEHOLDER_Data> {
 
-    override val ssn: String? = null
+    // TODO: fix when replacing _PLACEHOLDER_
+    // TODO: remove default
+    override val ssn: String? = "1212121212"
     override val birthDate: LocalDate = LocalDate.MIN
     override val firstName: String = "firstname"
     override val lastName: String = "lastname"
