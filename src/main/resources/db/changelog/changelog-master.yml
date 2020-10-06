@@ -50,3 +50,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20200608-1140-add-new-field-to-store-contract-id.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20201006-1030-add-danish-data-table.sql
+      relativeToChangelogFile: true

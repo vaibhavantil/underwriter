@@ -6,10 +6,10 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMemb
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartNorwegianBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
@@ -69,8 +69,14 @@ interface MemberServiceClient {
     @PostMapping("_/member/start/sign/norwegian/bankid/{memberId}")
     fun startNorwegianSing(
         @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartNorwegianBankIdSignSessionRequest
-    ): ResponseEntity<StartNorwegianBankIdSignResponse>
+        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
+    ): ResponseEntity<StartRedirectBankIdSignResponse>
+
+    @PostMapping("_/member/start/sign/danish/bankid/{memberId}")
+    fun startDanishSing(
+        @PathVariable("memberId") memberId: Long,
+        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
+    ): ResponseEntity<StartRedirectBankIdSignResponse>
 
     @GetMapping("/_/member/{memberId}")
     fun getMember(

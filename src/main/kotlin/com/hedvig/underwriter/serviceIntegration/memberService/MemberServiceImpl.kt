@@ -9,10 +9,10 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMemb
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartNorwegianBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -102,10 +102,28 @@ class MemberServiceImpl @Autowired constructor(
         ssn: String,
         successUrl: String,
         failUrl: String
-    ): StartNorwegianBankIdSignResponse {
+    ): StartRedirectBankIdSignResponse {
         return client.startNorwegianSing(
             memberId,
-            UnderwriterStartNorwegianBankIdSignSessionRequest(
+            UnderwriterStartRedirectBankIdSignSessionRequest(
+                underwriterSessionReference,
+                ssn,
+                successUrl,
+                failUrl
+            )
+        ).body!!
+    }
+
+    override fun startDanishBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        successUrl: String,
+        failUrl: String
+    ): StartRedirectBankIdSignResponse {
+        return client.startDanishSing(
+            memberId,
+            UnderwriterStartRedirectBankIdSignSessionRequest(
                 underwriterSessionReference,
                 ssn,
                 successUrl,

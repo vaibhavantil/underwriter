@@ -13,3 +13,4 @@ data class CreateNorwegianTravelInput(
             isYouth = this.isYouth
         )
 }
+

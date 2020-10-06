@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
 import com.hedvig.underwriter.model.AddressData
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -64,6 +65,18 @@ class FinalizeOnBoardingRequest(
                         address = null,
                         birthDate = quote.birthDate
                     )
+                is Danish_PLACEHOLDER_Data -> {
+                    FinalizeOnBoardingRequest(
+                        memberId = quote.memberId!!,
+                        ssn = quote.data.ssn,
+                        firstName = quote.firstName,
+                        lastName = quote.lastName,
+                        email = email,
+                        phoneNumber = phoneNumber,
+                        address = null,
+                        birthDate = quote.birthDate
+                    )
+                }
             }
     }
 }

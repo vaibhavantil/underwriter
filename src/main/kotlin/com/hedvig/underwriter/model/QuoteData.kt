@@ -26,6 +26,7 @@ sealed class QuoteData {
             is SwedishApartmentData -> ProductType.APARTMENT
             is NorwegianHomeContentsData -> ProductType.HOME_CONTENT
             is NorwegianTravelData -> ProductType.TRAVEL
+            is Danish_PLACEHOLDER_Data -> ProductType.UNKNOWN
         }
     }
 }
@@ -155,4 +156,22 @@ data class NorwegianTravelData(
             firstName, lastName, coInsured -> false
             else -> true
         }
+}
+
+data class Danish_PLACEHOLDER_Data(
+    override val id: UUID
+) : QuoteData(), PersonPolicyHolder<Danish_PLACEHOLDER_Data> {
+
+    override val ssn: String? = null
+    override val birthDate: LocalDate = LocalDate.MIN
+    override val firstName: String = "firstname"
+    override val lastName: String = "lastname"
+    override val email: String? = null
+
+    override fun updateName(firstName: String, lastName: String): Danish_PLACEHOLDER_Data {
+        TODO("implement")
+    }
+
+    // TODO: implement
+    override val isComplete = true
 }

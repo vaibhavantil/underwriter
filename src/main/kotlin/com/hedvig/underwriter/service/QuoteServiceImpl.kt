@@ -2,7 +2,9 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -278,6 +280,14 @@ class QuoteServiceImpl(
             is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
                 Money.of(quote.price, "NOK"), memberId
             )
+            is Danish_PLACEHOLDER_Data -> {
+                InsuranceCost(
+                        MonetaryAmountV2("9999", "DKK"),
+                        MonetaryAmountV2("0", "DKK"),
+                        MonetaryAmountV2("9999", "DKK"),
+                    null
+                )
+            }
         }
     }
 

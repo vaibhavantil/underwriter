@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -18,6 +19,7 @@ import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
@@ -100,13 +102,7 @@ class SignServiceImpl(
                 } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
-                if (successUrl == null || failUrl == null) {
-                    return StartSignResponse.FailedToStartSign(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
-                }
-
-                val signSessionId = signSessionRepository.insert(quoteIds)
-
-                val response =
+                return genericStartRedirectSign(successUrl, failUrl, quoteIds) { signSessionId, successUrl, failUrl ->
                     memberService.startNorwegianBankIdSignQuotes(
                         data.memberId.toLong(),
                         signSessionId,
@@ -114,16 +110,43 @@ class SignServiceImpl(
                         successUrl,
                         failUrl
                     )
-
-                return response.redirectUrl?.let { redirectUrl ->
-                    StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
-                } ?: response.internalErrorMessage?.let {
-                    StartSignResponse.FailedToStartSign(it)
-                } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
+                }
+            }
+            is QuotesSignData.DanishBankId -> {
+                return genericStartRedirectSign(successUrl, failUrl, quoteIds) { signSessionId, successUrl, failUrl ->
+                    memberService.startDanishBankIdSignQuotes(
+                        data.memberId.toLong(),
+                        signSessionId,
+                        data.ssn,
+                        successUrl,
+                        failUrl
+                    )
+                }
             }
             is QuotesSignData.CanNotBeBundled ->
                 return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
         }
+    }
+
+    private fun genericStartRedirectSign(
+        successUrl: String?,
+        failUrl: String?,
+        quoteIds: List<UUID>,
+        memberServiceStartMethod: (signSessionId: UUID, successUrl: String, failUrl: String) -> StartRedirectBankIdSignResponse
+    ): StartSignResponse {
+        if (successUrl == null || failUrl == null) {
+            return StartSignResponse.FailedToStartSign(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
+        }
+
+        val signSessionId = signSessionRepository.insert(quoteIds)
+
+        val response = memberServiceStartMethod(signSessionId, successUrl, failUrl)
+
+        return response.redirectUrl?.let { redirectUrl ->
+            StartSignResponse.NorwegianBankIdSession(signSessionId, redirectUrl)
+        } ?: response.internalErrorMessage?.let {
+            StartSignResponse.FailedToStartSign(it)
+        } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
@@ -360,6 +383,7 @@ class SignServiceImpl(
                     )
                     is NorwegianHomeContentsData,
                     is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
+                    is Danish_PLACEHOLDER_Data -> QuotesSignData.CanNotBeBundled
                 }
             2 -> if (
                 quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&

@@ -2,6 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -132,6 +133,7 @@ sealed class AgreementQuote {
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
             )
+            is Danish_PLACEHOLDER_Data -> TODO()
         }
     }
 }

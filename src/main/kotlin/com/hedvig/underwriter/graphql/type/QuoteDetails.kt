@@ -70,4 +70,8 @@ sealed class QuoteDetails {
                 false -> TypeOfContract.NO_TRAVEL
             }
     }
+
+    data class Danish_PLACEHOLDER_Details(
+        val test: Boolean = true
+    )
 }

@@ -31,6 +31,7 @@ input CreateQuoteInput {
     swedishHouse: CreateSwedishHouseInput
     norwegianHomeContents: CreateNorwegianHomeContentsInput
     norwegianTravel: CreateNorwegianTravelInput
+    dansih_PLACEHOLDER_: CreateDansih_PLACEHOLDER_Input
     email: String
     dataCollectionId: ID
 }
@@ -52,6 +53,10 @@ enum NorwegianHomeContentsType {
 input CreateNorwegianTravelInput {
     coInsured: Int!
     isYouth: Boolean!
+}
+
+input CreateDansih_PLACEHOLDER_Input {
+    wip: Boolean
 }
 
 input CreateApartmentInput {
@@ -381,6 +386,7 @@ union QuoteDetails =
     | SwedishHouseQuoteDetails
     | NorwegianHomeContentsDetails
     | NorwegianTravelDetails
+    | Danish_PLACEHOLDER_Details
 
 type CompleteApartmentQuoteDetails {
     street: String!
@@ -436,6 +442,10 @@ type NorwegianTravelDetails {
     isYouth: Boolean!
 }
 
+type Danish_PLACEHOLDER_Details {
+    test: Boolean
+}
+
 type IncompleteQuote {
     id: ID!
     currentInsurer: CurrentInsurer
@@ -477,6 +487,7 @@ type InsuranceCost {
 union StartSignResponse =
     SwedishBankIdSession
     | NorwegianBankIdSession
+    | DanishBankIdSession
     | FailedToStartSign
 
 type SwedishBankIdSession {
@@ -484,6 +495,10 @@ type SwedishBankIdSession {
 }
 
 type NorwegianBankIdSession {
+    redirectUrl: String
+}
+
+type DanishBankIdSession {
     redirectUrl: String
 }
 

@@ -291,6 +291,22 @@ interface QuoteDao {
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: NorwegianTravelData): NorwegianTravelData
 
+    @SqlUpdate(
+        """
+            INSERT INTO quote_revision_danish_home_contents_data
+            (
+                id
+            )
+            VALUES
+            (
+                :id
+            )
+            RETURNING *
+    """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: Danish_PLACEHOLDER_Data): Danish_PLACEHOLDER_Data
+
     @SqlQuery(
         """
         SELECT * FROM quote_revision_norwegian_travel_data WHERE internal_id = :id

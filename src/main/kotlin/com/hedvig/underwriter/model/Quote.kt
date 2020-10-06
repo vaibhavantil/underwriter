@@ -217,10 +217,9 @@ data class Quote(
 
     val currency: String
         get() = when (this.data) {
-            is SwedishApartmentData -> SEK
-            is SwedishHouseData -> SEK
-            is NorwegianTravelData -> NOK
-            is NorwegianHomeContentsData -> NOK
+            is SwedishApartmentData, is SwedishHouseData -> SEK
+            is NorwegianTravelData, is NorwegianHomeContentsData -> NOK
+            is Danish_PLACEHOLDER_Data -> DKK
         }
 
     fun update(quoteRequest: QuoteRequest): Quote {
@@ -260,6 +259,7 @@ data class Quote(
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email
                 )
+                is Danish_PLACEHOLDER_Data -> TODO()
             }
         )
 
@@ -378,11 +378,13 @@ data class Quote(
         is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
         is NorwegianHomeContentsData,
         is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
+        is Danish_PLACEHOLDER_Data -> ZoneId.of("Europe/Copenhagen")
     }
 
     companion object {
         private const val SEK = "SEK"
         private const val NOK = "NOK"
+        private const val DKK = "DKK"
     }
 }
 

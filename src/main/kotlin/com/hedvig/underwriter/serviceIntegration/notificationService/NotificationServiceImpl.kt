@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.notificationService
 
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -28,6 +29,7 @@ class NotificationServiceImpl(
                     is SwedishApartmentData -> quote.data.zipCode
                     is NorwegianHomeContentsData -> quote.data.zipCode
                     is NorwegianTravelData -> null
+                    is Danish_PLACEHOLDER_Data -> null
                 },
                 email = quote.email!!,
                 ssn = quote.ssnMaybe,

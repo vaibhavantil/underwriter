@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -193,6 +194,10 @@ class UnderwriterImpl(
             is NorwegianTravelData -> priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
             ).priceBigDecimal
+            is Danish_PLACEHOLDER_Data -> {
+                //TODO
+                BigDecimal(9999)
+            }
         }
     }
 
@@ -218,6 +223,10 @@ class UnderwriterImpl(
             is NorwegianTravelData -> runRules(
                 data, NorwegianPersonGuidelines.setOfRules
             )
+            is Danish_PLACEHOLDER_Data -> {
+                //TODO
+                mutableListOf()
+            }
         }
 
     private fun validateProductGuidelines(data: QuoteData): List<String> =
@@ -242,6 +251,9 @@ class UnderwriterImpl(
                     data,
                     NorwegianTravelGuidelines.setOfRules
                 )
+            is Danish_PLACEHOLDER_Data -> {
+                mutableListOf()
+            }
         }
 
     fun <T> runRules(
