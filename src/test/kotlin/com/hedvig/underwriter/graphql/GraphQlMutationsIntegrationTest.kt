@@ -361,7 +361,7 @@ internal class GraphQlMutationsIntegrationTest {
 
         assert(response.isOk)
         assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
-        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
         assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")

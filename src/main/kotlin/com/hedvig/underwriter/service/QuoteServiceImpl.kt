@@ -30,6 +30,7 @@ import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import java.util.UUID
+import kotlin.random.Random
 
 @Service
 class QuoteServiceImpl(
@@ -283,9 +284,9 @@ class QuoteServiceImpl(
             is DanishHomeContentsData -> {
                 // TODO: Implement actual request
                 InsuranceCost(
-                        MonetaryAmountV2("9999", "DKK"),
+                        MonetaryAmountV2("9999.00", "DKK"),
                         MonetaryAmountV2("0", "DKK"),
-                        MonetaryAmountV2("9999", "DKK"),
+                        MonetaryAmountV2("9999.00", "DKK"),
                     null
                 )
             }
