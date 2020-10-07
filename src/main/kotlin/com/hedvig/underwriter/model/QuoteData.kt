@@ -173,7 +173,7 @@ data class DanishHomeContentsData(
     val internalId: Int? = null
 ) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
-    //Should probably be removed from AddressData
+    // Should probably be removed from AddressData
     override val city: String? = null
 
     override fun updateName(firstName: String, lastName: String): DanishHomeContentsData {

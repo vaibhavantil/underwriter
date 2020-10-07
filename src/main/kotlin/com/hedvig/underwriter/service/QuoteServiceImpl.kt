@@ -30,7 +30,6 @@ import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import java.util.UUID
-import kotlin.random.Random
 
 @Service
 class QuoteServiceImpl(

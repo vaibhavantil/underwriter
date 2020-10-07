@@ -334,14 +334,12 @@ interface QuoteDao {
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
 
-
     @SqlQuery(
         """
         SELECT * FROM quote_revision_danish_home_contents_data WHERE internal_id = :id
     """
     )
     fun findDanishHomeContentsQuoteData(@Bind id: Int): DanishHomeContentsData?
-
 
     @SqlUpdate(
         """
