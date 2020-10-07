@@ -200,14 +200,8 @@ class a {
         val firstName: String = "",
         val lastName: String = "",
         val email: String? = "em@i.l",
-
-        val street: String = "",
-        val city: String? = "",
-        val zipCode: String = "",
         val coInsured: Int = 3,
-        val livingSpace: Int = 2,
         val isYouth: Boolean = false,
-        val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val internalId: Int? = null
     ) : DataBuilder<QuoteData> {
 

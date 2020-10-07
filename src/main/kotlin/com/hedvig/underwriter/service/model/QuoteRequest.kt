@@ -105,7 +105,7 @@ data class QuoteRequest(
             )
         }
 
-        fun from(memberId: String, schemaWithData: QuoteSchema): QuoteRequest {
+        fun from(memberId: String, schemaData: QuoteSchema): QuoteRequest {
             return QuoteRequest(
                 firstName = null,
                 lastName = null,
@@ -114,13 +114,13 @@ data class QuoteRequest(
                 email = null,
                 quotingPartner = null,
                 ssn = null,
-                productType = when (schemaWithData) {
+                productType = when (schemaData) {
                     is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
                     is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
                     is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
                 },
-                incompleteQuoteData = QuoteRequestData.from(schemaWithData),
+                incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
                 memberId = memberId,
                 originatingProductId = null,
@@ -128,7 +128,7 @@ data class QuoteRequest(
             )
         }
 
-        fun from(quote: Quote, schemaWithData: QuoteSchema): QuoteRequest {
+        fun from(quote: Quote, schemaData: QuoteSchema): QuoteRequest {
             return QuoteRequest(
                 firstName = quote.firstName,
                 lastName = quote.lastName,
@@ -137,13 +137,13 @@ data class QuoteRequest(
                 email = quote.email,
                 quotingPartner = quote.attributedTo,
                 ssn = quote.ssnMaybe,
-                productType = when (schemaWithData) {
+                productType = when (schemaData) {
                     is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
                     is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
                     is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
                 },
-                incompleteQuoteData = QuoteRequestData.from(schemaWithData),
+                incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
                 memberId = quote.memberId,
                 originatingProductId = quote.originatingProductId,

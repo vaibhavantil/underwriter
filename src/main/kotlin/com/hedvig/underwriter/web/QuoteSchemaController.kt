@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.getOrHandle
+import com.fasterxml.jackson.databind.JsonNode
+import com.hedvig.underwriter.model.ContractType
 import com.hedvig.underwriter.service.QuoteSchemaService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -34,27 +36,22 @@ class QuoteSchemaController(
     }
 
     @GetMapping("{quoteId}/data")
-    fun getSchemaWithDataByQuoteId(@PathVariable quoteId: UUID): Any {
-        return quoteSchemaService.getSchemaWithDataByQuoteId(quoteId) ?: return ResponseEntity.status(404).body(
+    fun getSchemaDataByQuoteId(@PathVariable quoteId: UUID): Any {
+        return quoteSchemaService.getSchemaDataByQuoteId(quoteId) ?: return ResponseEntity.status(404).body(
             ErrorResponseDto(
                 ErrorCodes.NO_SUCH_QUOTE,
-                errorMessage = "Quote $quoteId not found when getting schema with data"
+                errorMessage = "Quote $quoteId not found when getting schema data"
             )
         )
     }
 
     @GetMapping("contract/{contractType}")
-    fun getSchemaByContractType(@PathVariable contractType: String): Any {
-        return quoteSchemaService.getSchemaForContract(contractType) ?: return ResponseEntity.status(404).body(
-            ErrorResponseDto(
-                ErrorCodes.NO_SUCH_QUOTE,
-                errorMessage = "Unable to get schema for contractType=$contractType"
-            )
-        )
+    fun getSchemaByContractType(@PathVariable contractType: ContractType): JsonNode {
+        return quoteSchemaService.getSchemaByContractType(contractType)
     }
 
     @PostMapping("{quoteId}/update")
-    fun updateQuoteBySchemaWithData(
+    fun updateQuoteBySchemaData(
         @PathVariable quoteId: UUID,
         @RequestBody body: QuoteSchema,
         @RequestParam underwritingGuidelinesBypassedBy: String?
@@ -62,7 +59,7 @@ class QuoteSchemaController(
         val quote = quoteService.getQuote(quoteId) ?: return ResponseEntity.status(404).body(
             ErrorResponseDto(
                 ErrorCodes.NO_SUCH_QUOTE,
-                errorMessage = "QuoteNotFound"
+                errorMessage = "Quote $quoteId not found when updating quote via schema data"
             )
         )
 
@@ -77,7 +74,7 @@ class QuoteSchemaController(
     }
 
     @PostMapping("/{memberId}/create")
-    fun createQuoteForMemberBySchemaWithData(
+    fun createQuoteForMemberBySchemaData(
         @PathVariable memberId: String,
         @RequestBody body: QuoteSchema,
         @RequestParam underwritingGuidelinesBypassedBy: String?

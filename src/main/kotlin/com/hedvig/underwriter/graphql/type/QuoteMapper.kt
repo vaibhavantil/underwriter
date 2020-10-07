@@ -135,7 +135,7 @@ class QuoteMapper(
         )
     }
 
-    fun mapToQuoteSchemaWithData(
+    fun mapToQuoteSchemaData(
         quote: Quote
     ): QuoteSchema = when (quote.data) {
         is SwedishApartmentData -> QuoteSchema.SwedishApartment(

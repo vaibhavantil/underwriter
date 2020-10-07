@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.hedvig.underwriter.model.ContractType
 import com.hedvig.underwriter.service.model.QuoteSchema
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,6 +12,6 @@ interface QuoteSchemaService {
         get() = LoggerFactory.getLogger(QuoteSchemaService::class.simpleName)
 
     fun getSchemaByQuoteId(quoteId: UUID): JsonNode?
-    fun getSchemaForContract(contractType: String): JsonNode?
-    fun getSchemaWithDataByQuoteId(quoteId: UUID): QuoteSchema?
+    fun getSchemaByContractType(contractType: ContractType): JsonNode
+    fun getSchemaDataByQuoteId(quoteId: UUID): QuoteSchema?
 }
