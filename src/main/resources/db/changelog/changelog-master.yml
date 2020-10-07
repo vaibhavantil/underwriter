@@ -53,3 +53,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20201006-1030-add-danish-data-table.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20201007-1100-add-columns-to-danish-home-contents
+      relativeToChangelogFile: true
