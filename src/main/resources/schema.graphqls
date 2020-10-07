@@ -31,7 +31,7 @@ input CreateQuoteInput {
     swedishHouse: CreateSwedishHouseInput
     norwegianHomeContents: CreateNorwegianHomeContentsInput
     norwegianTravel: CreateNorwegianTravelInput
-    danish_PLACEHOLDER_: CreateDanish_PLACEHOLDER_Input
+    danishHomeContents: CreateDanishHomeContentsInput
     email: String
     dataCollectionId: ID
 }
@@ -55,8 +55,11 @@ input CreateNorwegianTravelInput {
     isYouth: Boolean!
 }
 
-input CreateDanish_PLACEHOLDER_Input {
-    wip: Boolean
+input CreateDanishHomeContentsInput {
+    street: String!
+    zipCode: String!
+    livingSpace: Int!
+    coInsured: Int!
 }
 
 input CreateApartmentInput {
@@ -386,7 +389,7 @@ union QuoteDetails =
     | SwedishHouseQuoteDetails
     | NorwegianHomeContentsDetails
     | NorwegianTravelDetails
-    | Danish_PLACEHOLDER_Details
+    | DanishHomeContentsDetails
 
 type CompleteApartmentQuoteDetails {
     street: String!
@@ -442,8 +445,11 @@ type NorwegianTravelDetails {
     isYouth: Boolean!
 }
 
-type Danish_PLACEHOLDER_Details {
-    wip: Boolean
+type DanishHomeContentsDetails {
+    street: String!
+    zipCode: String!
+    livingSpace: Int!
+    coInsured: Int!
 }
 
 type IncompleteQuote {

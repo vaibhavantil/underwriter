@@ -1,6 +1,6 @@
 --liquibase formatted.sql
 
---changeset fredrikareschoug:20201007-1100-add-danish-data-table.sql
+--changeset fredrikareschoug:20201007-1100-add-columns-to-danish-home-contents.sql
 
 ALTER TABLE quote_revision_danish_home_contents_data
     ADD COLUMN ssn varchar(10) NULL,

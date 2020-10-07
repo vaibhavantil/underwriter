@@ -428,7 +428,7 @@ class SignServiceImplTest {
     fun startSigningOfDanishQuote_startDanishSign() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.Danish_PLACEHOLDER_DataBuilder(), memberId = memberId).build()
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -438,7 +438,7 @@ class SignServiceImplTest {
             memberService.startDanishBankIdSignQuotes(
                 memberId.toLong(),
                 signSessionReference,
-                "1212121212",
+                "1212120000",
                 successUrl,
                 failUrl
             )

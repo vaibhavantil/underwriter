@@ -21,7 +21,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is SwedishHouseData -> dao.insert(quote.data)
             is NorwegianHomeContentsData -> dao.insert(quote.data)
             is NorwegianTravelData -> dao.insert(quote.data)
-            is Danish_PLACEHOLDER_Data -> dao.insert(quote.data)
+            is DanishHomeContentsData -> dao.insert(quote.data)
         }
         dao.insertMasterQuote(quote.id, quote.initiatedFrom, timestamp)
         val databaseQuote = DatabaseQuoteRevision.from(quote.copy(data = quoteData))
@@ -94,7 +94,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
                 databaseQuote.quoteNorwegianHomeContentsDataId
             )
             databaseQuote.quoteNorwegianTravelDataId != null -> dao.findNorwegianTravelQuoteData(databaseQuote.quoteNorwegianTravelDataId)
-            else -> throw IllegalStateException("Quote data must be apartment or house (but was neither) quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
+            databaseQuote.quoteDanishHomeContentsDataId != null -> dao.findDanishHomeContentsQuoteData(databaseQuote.quoteDanishHomeContentsDataId)
+            else -> throw IllegalStateException("Quote must have details set (but was not). Quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
         return Quote(
             id = databaseQuote.masterQuoteId,
@@ -148,7 +149,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is SwedishHouseData -> dao.insert(updatedQuote.data)
             is NorwegianHomeContentsData -> dao.insert(updatedQuote.data)
             is NorwegianTravelData -> dao.insert(updatedQuote.data)
-            is Danish_PLACEHOLDER_Data -> dao.insert(updatedQuote.data)
+            is DanishHomeContentsData -> dao.insert(updatedQuote.data)
         }
         dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
     }

@@ -2,7 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -81,6 +81,18 @@ sealed class AgreementQuote {
         val lineOfBusiness: NorwegianTravelLineOfBusiness
     ) : AgreementQuote()
 
+    data class DanishHomeContentQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
+        override val currentInsurer: String?,
+        val address: AddressDto,
+        val coInsured: List<CoInsuredDto>,
+        val squareMeters: Long
+    ) : AgreementQuote()
+
     companion object {
         fun from(quote: Quote, fromDate: LocalDate? = null, toDate: LocalDate? = null) = when (quote.data) {
             is SwedishApartmentData -> SwedishApartmentQuote(
@@ -133,10 +145,17 @@ sealed class AgreementQuote {
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
             )
-            is Danish_PLACEHOLDER_Data -> {
-                // TODO: fix when replacing _PLACEHOLDER_
-                TODO()
-            }
+            is DanishHomeContentsData -> DanishHomeContentQuote(
+                quoteId = quote.id,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
+                premium = quote.price!!,
+                currency = quote.currency,
+                currentInsurer = quote.currentInsurer,
+                address = AddressDto.from(quote.data),
+                squareMeters = quote.data.livingSpace.toLong(),
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
+            )
         }
     }
 }

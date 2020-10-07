@@ -71,7 +71,13 @@ sealed class QuoteDetails {
             }
     }
 
-    data class Danish_PLACEHOLDER_Details(
-        val wip: Boolean = true
-    )
+    data class DanishHomeContentsDetails(
+        val street: String,
+        val zipCode: String,
+        val coInsured: Int,
+        val livingSpace: Int
+    ) : QuoteDetails() {
+        override val typeOfContract: TypeOfContract
+            get() = TypeOfContract.DK_HOME_CONTENT
+    }
 }

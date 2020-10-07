@@ -26,7 +26,7 @@ sealed class QuoteData {
             is SwedishApartmentData -> ProductType.APARTMENT
             is NorwegianHomeContentsData -> ProductType.HOME_CONTENT
             is NorwegianTravelData -> ProductType.TRAVEL
-            is Danish_PLACEHOLDER_Data -> ProductType.UNKNOWN
+            is DanishHomeContentsData -> ProductType.HOME_CONTENT
         }
     }
 }
@@ -158,24 +158,31 @@ data class NorwegianTravelData(
         }
 }
 
-data class Danish_PLACEHOLDER_Data(
-    override val id: UUID
-) : QuoteData(), PersonPolicyHolder<Danish_PLACEHOLDER_Data> {
+data class DanishHomeContentsData(
+    override val id: UUID,
+    override val ssn: String?,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
+    override val email: String?,
+    override val street: String,
+    override val zipCode: String,
+    override val livingSpace: Int,
+    val coInsured: Int,
+    @JsonIgnore
+    val internalId: Int? = null
+) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
-    // TODO: fix when replacing _PLACEHOLDER_
-    // TODO: remove default
-    override val ssn: String? = "1212121212"
-    override val birthDate: LocalDate = LocalDate.MIN
-    override val firstName: String = "firstname"
-    override val lastName: String = "lastname"
-    override val email: String? = null
+    //Should probably be removed from AddressData
+    override val city: String? = null
 
-    override fun updateName(firstName: String, lastName: String): Danish_PLACEHOLDER_Data {
-        // TODO: fix when replacing _PLACEHOLDER_
-        TODO("implement")
+    override fun updateName(firstName: String, lastName: String): DanishHomeContentsData {
+        return this.copy(firstName = firstName, lastName = lastName)
     }
 
-    // TODO: fix when replacing _PLACEHOLDER_
-    // TODO: implement
-    override val isComplete = true
+    override val isComplete: Boolean
+        get() = when (null) {
+            firstName, lastName, coInsured -> false
+            else -> true
+        }
 }

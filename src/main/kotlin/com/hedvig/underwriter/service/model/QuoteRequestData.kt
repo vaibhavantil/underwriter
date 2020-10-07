@@ -47,4 +47,11 @@ sealed class QuoteRequestData {
         @field:JsonProperty("youth")
         val isYouth: Boolean?
     ) : QuoteRequestData()
+
+    data class DanishHomeContents(
+        val street: String?,
+        val zipCode: String?,
+        val coInsured: Int?,
+        val livingSpace: Int?
+    ) : QuoteRequestData()
 }

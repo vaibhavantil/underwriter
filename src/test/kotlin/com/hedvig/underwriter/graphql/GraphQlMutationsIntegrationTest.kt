@@ -322,6 +322,54 @@ internal class GraphQlMutationsIntegrationTest {
     }
 
     @Test
+    fun createSuccessfulDanishHomeContentsQuote() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        /* TODO: Should be verified when price engine is in plce
+        every {
+            priceEngineService.queryDanishHomeContentPrice(
+                PriceQueryRequest.DanishHomeContent(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("00000000-0000-0000-0000-000000000007"),
+                    holderBirthDate = "2112611416".birthDateFromDanishSsn(),
+                    numberCoInsured = 0,
+                    postalCode = "12345",
+                    squareMeters = 30
+                )
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "NOK")
+            )
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal(9999), "DKK"), "123"
+            )
+        } returns
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                null
+            )*/
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform("/mutations/createDanishHomeContentsQuote.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
+        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
+        assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
+        assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
+    }
+
+    @Test
     fun createQuoteFinalizeOnbaordingInMemberServiceQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
         every {

@@ -29,7 +29,7 @@ data class CreateQuoteInput(
     val swedishHouse: CreateSwedishHouseInput?,
     val norwegianHomeContents: CreateNorwegianHomeContentsInput?,
     val norwegianTravel: CreateNorwegianTravelInput?,
-    val danish_PLACEHOLDER_: CreateDanish_PLACEHOLDER_Input?,
+    val danishHomeContents: CreateDanishHomeContentsInput?,
     val dataCollectionId: UUID?
 ) {
     fun toQuoteRequest(
@@ -53,6 +53,7 @@ data class CreateQuoteInput(
         this.swedishHouse != null -> this.swedishHouse.toQuoteRequestData()
         this.norwegianHomeContents != null -> this.norwegianHomeContents.toQuoteRequestData()
         this.norwegianTravel != null -> this.norwegianTravel.toQuoteRequestData()
+        this.danishHomeContents != null -> this.danishHomeContents.toQuoteRequestData()
         this.house != null -> this.house.toQuoteRequestData()
         else -> this.apartment!!.toQuoteRequestData()
     },
@@ -68,7 +69,7 @@ data class CreateQuoteInput(
         when {
             this.apartment != null || this.swedishApartment != null -> ProductType.APARTMENT
             this.house != null || this.swedishHouse != null -> ProductType.HOUSE
-            this.norwegianHomeContents != null -> ProductType.HOME_CONTENT
+            this.norwegianHomeContents != null || this.danishHomeContents != null -> ProductType.HOME_CONTENT
             this.norwegianTravel != null -> ProductType.TRAVEL
             // There is an `UNKNOWN` but we don't want to use it because then we can't complete the quote
             else -> throw RuntimeException("Could not map `ProductType` on [CreateQuoteInput: $this]")

@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.model.Danish_PLACEHOLDER_Data
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -86,7 +86,7 @@ data class ModifyProductRequestDto(
                 )
                 is NorwegianHomeContentsData -> TODO()
                 is NorwegianTravelData -> TODO()
-                is Danish_PLACEHOLDER_Data -> TODO()
+                is DanishHomeContentsData -> TODO()
             }
     }
 }

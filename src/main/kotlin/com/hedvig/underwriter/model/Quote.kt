@@ -52,6 +52,9 @@ val Quote.norwegianHomeContents
 val Quote.norwegianTravel
     get() = (data as? NorwegianTravelData)
 
+val Quote.danishHomeContents
+    get() = (data as? DanishHomeContentsData)
+
 val Quote.validTo
     get() = this.createdAt.plusSeconds(this.validity)!!
 
@@ -126,6 +129,7 @@ data class DatabaseQuoteRevision(
     val quoteHouseDataId: Int?,
     val quoteNorwegianHomeContentsDataId: Int?,
     val quoteNorwegianTravelDataId: Int?,
+    val quoteDanishHomeContentsDataId: Int?,
     val memberId: String?,
     val breachedUnderwritingGuidelines: List<String>?,
     val underwritingGuidelinesBypassedBy: String?,
@@ -165,6 +169,10 @@ data class DatabaseQuoteRevision(
                 },
                 quoteNorwegianTravelDataId = when (quote.data) {
                     is NorwegianTravelData -> quote.data.internalId
+                    else -> null
+                },
+                quoteDanishHomeContentsDataId = when (quote.data) {
+                    is DanishHomeContentsData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,
@@ -219,7 +227,7 @@ data class Quote(
         get() = when (this.data) {
             is SwedishApartmentData, is SwedishHouseData -> SEK
             is NorwegianTravelData, is NorwegianHomeContentsData -> NOK
-            is Danish_PLACEHOLDER_Data -> DKK
+            is DanishHomeContentsData -> DKK
         }
 
     fun update(quoteRequest: QuoteRequest): Quote {
@@ -259,10 +267,13 @@ data class Quote(
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email
                 )
-                is Danish_PLACEHOLDER_Data -> {
-                    // TODO: fix when replacing _PLACEHOLDER_
-                    TODO()
-                }
+                is DanishHomeContentsData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
+                )
             }
         )
 
@@ -381,7 +392,7 @@ data class Quote(
         is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
         is NorwegianHomeContentsData,
         is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
-        is Danish_PLACEHOLDER_Data -> ZoneId.of("Europe/Copenhagen")
+        is DanishHomeContentsData -> ZoneId.of("Europe/Copenhagen")
     }
 
     companion object {

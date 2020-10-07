@@ -39,7 +39,7 @@ class GraphQLConfiguration {
                     QuoteDetails.SwedishHouseQuoteDetails::class.java,
                     QuoteDetails.NorwegianHomeContentsDetails::class.java,
                     QuoteDetails.NorwegianTravelDetails::class.java,
-                    QuoteDetails.Danish_PLACEHOLDER_Details::class.java,
+                    QuoteDetails.DanishHomeContentsDetails::class.java,
                     IncompleteQuoteDetails.IncompleteApartmentQuoteDetails::class.java,
                     IncompleteQuoteDetails.IncompleteHouseQuoteDetails::class.java,
                     StartSignResponse.SwedishBankIdSession::class.java,
