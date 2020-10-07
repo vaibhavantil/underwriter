@@ -205,7 +205,7 @@ internal class QuoteSchemaControllerTest {
         } returns null
         val response = mockMvc.perform(
             MockMvcRequestBuilders.post(
-                "/_/v1/quotes/schema/{quoteId}/update?underwritingGuidelinesBypassedBy=${null}",
+                "/_/v1/quotes/schema/{quoteId}/update?underwritingGuidelinesBypassedBy=null",
                 QUOTE_ID,
                 null
             )
@@ -241,7 +241,7 @@ internal class QuoteSchemaControllerTest {
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.post(
-                "/_/v1/quotes/schema/{quoteId}/update?underwritingGuidelinesBypassedBy=${null}",
+                "/_/v1/quotes/schema/{quoteId}/update?underwritingGuidelinesBypassedBy=null",
                 QUOTE_ID,
                 null
             )
@@ -276,7 +276,7 @@ internal class QuoteSchemaControllerTest {
 
         val response = mockMvc.perform(
             MockMvcRequestBuilders.post(
-                "/_/v1/quotes/schema/{memberId}/create?underwritingGuidelinesBypassedBy=${null}",
+                "/_/v1/quotes/schema/{memberId}/create?underwritingGuidelinesBypassedBy=null",
                 MEMBER_ID,
                 null
             )
