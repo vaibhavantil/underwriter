@@ -99,7 +99,7 @@ sealed class QuoteRequestData {
                 isYouth = quoteSchema.isYouth,
                 coInsured = quoteSchema.numberCoInsured
             )
-            is QuoteSchema.DanishHomeContents -> DanishHomeContents(
+            is QuoteSchema.DanishHomeContent -> DanishHomeContents(
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
                 livingSpace = quoteSchema.livingSpace,

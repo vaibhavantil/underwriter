@@ -67,13 +67,13 @@ interface MemberServiceClient {
     ): ResponseEntity<StartSwedishBankIdSignResponse>
 
     @PostMapping("_/member/start/sign/norwegian/bankid/{memberId}")
-    fun startNorwegianSing(
+    fun startNorwegianSign(
         @PathVariable("memberId") memberId: Long,
         @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
     ): ResponseEntity<StartRedirectBankIdSignResponse>
 
     @PostMapping("_/member/start/sign/danish/bankid/{memberId}")
-    fun startDanishSing(
+    fun startDanishSign(
         @PathVariable("memberId") memberId: Long,
         @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
     ): ResponseEntity<StartRedirectBankIdSignResponse>

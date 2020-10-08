@@ -37,7 +37,7 @@ class QuoteSchemaServiceImpl(
             ContractType.SWEDISH_HOUSE -> QuoteSchema.SwedishHouse::class.java
             ContractType.NORWEGIAN_HOME_CONTENT -> QuoteSchema.NorwegianHomeContent::class.java
             ContractType.NORWEGIAN_TRAVEL -> QuoteSchema.NorwegianTravel::class.java
-            ContractType.DANISH_HOME_CONTENT -> QuoteSchema.DanishHomeContents::class.java
+            ContractType.DANISH_HOME_CONTENT -> QuoteSchema.DanishHomeContent::class.java
         }
         return schemaGenerator.generateSchema(dataClass)
     }

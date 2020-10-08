@@ -90,7 +90,7 @@ sealed class QuoteSchema {
         val isYouth: Boolean
     ) : QuoteSchema()
 
-    data class DanishHomeContents(
+    data class DanishHomeContent(
         @JsonSchema(title = "Street", required = true)
         val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)

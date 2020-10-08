@@ -103,7 +103,7 @@ class MemberServiceImpl @Autowired constructor(
         successUrl: String,
         failUrl: String
     ): StartRedirectBankIdSignResponse {
-        return client.startNorwegianSing(
+        return client.startNorwegianSign(
             memberId,
             UnderwriterStartRedirectBankIdSignSessionRequest(
                 underwriterSessionReference,
@@ -121,7 +121,7 @@ class MemberServiceImpl @Autowired constructor(
         successUrl: String,
         failUrl: String
     ): StartRedirectBankIdSignResponse {
-        return client.startDanishSing(
+        return client.startDanishSign(
             memberId,
             UnderwriterStartRedirectBankIdSignSessionRequest(
                 underwriterSessionReference,

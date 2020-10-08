@@ -33,7 +33,8 @@ class FinalizeOnBoardingRequest(
             when (quote.data) {
                 is SwedishHouseData,
                 is SwedishApartmentData,
-                is NorwegianHomeContentsData -> {
+                is NorwegianHomeContentsData,
+                is DanishHomeContentsData -> {
                     val addressInsurance = quote.data as AddressData
                     val personPolicyHolder = quote.data as PersonPolicyHolder<*>
 
@@ -65,18 +66,6 @@ class FinalizeOnBoardingRequest(
                         address = null,
                         birthDate = quote.birthDate
                     )
-                is DanishHomeContentsData -> {
-                    FinalizeOnBoardingRequest(
-                        memberId = quote.memberId!!,
-                        ssn = quote.data.ssn,
-                        firstName = quote.firstName,
-                        lastName = quote.lastName,
-                        email = email,
-                        phoneNumber = phoneNumber,
-                        address = null,
-                        birthDate = quote.birthDate
-                    )
-                }
             }
     }
 }

@@ -179,7 +179,7 @@ class QuoteMapper(
             isYouth = quote.data.isYouth,
             numberCoInsured = quote.data.coInsured
         )
-        is DanishHomeContentsData -> QuoteSchema.DanishHomeContents(
+        is DanishHomeContentsData -> QuoteSchema.DanishHomeContent(
             street = quote.data.street,
             zipCode = quote.data.zipCode,
             livingSpace = quote.data.livingSpace,

@@ -41,7 +41,7 @@ class BundleQuotesServiceImpl(
                         }
                         is NorwegianHomeContentsData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS else InsuranceType.NORWEGIAN_HOME_CONTENTS
                         is NorwegianTravelData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_TRAVEL else InsuranceType.NORWEGIAN_TRAVEL
-                        is DanishHomeContentsData -> InsuranceType.DANISH_PLACEHOLDER
+                        is DanishHomeContentsData -> InsuranceType.DANISH_HOME_CONTENTS
                     }
                 )
             }

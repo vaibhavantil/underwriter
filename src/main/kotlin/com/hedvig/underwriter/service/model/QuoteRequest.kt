@@ -119,7 +119,7 @@ data class QuoteRequest(
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
                     is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
                     is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
-                    is QuoteSchema.DanishHomeContents -> ProductType.HOME_CONTENT
+                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
                 },
                 incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
@@ -143,7 +143,7 @@ data class QuoteRequest(
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
                     is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
                     is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
-                    is QuoteSchema.DanishHomeContents -> ProductType.HOME_CONTENT
+                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
                 },
                 incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
