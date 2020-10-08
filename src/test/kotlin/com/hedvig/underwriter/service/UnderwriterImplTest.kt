@@ -457,4 +457,21 @@ class UnderwriterImplTest {
             )
         )
     }
+
+    @Test
+    fun successfullyCreatesDanishHomeContentsQuote() {
+        val cut = UnderwriterImpl(debtChecker, priceEngineService)
+        val quoteRequest = a.DanishHomeContentsQuoteRequestBuilder().build()
+        val quoteId = UUID.randomUUID()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        /* TODO: This should be verifide once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            quoteId,
+            Money.of(BigDecimal.ONE, "NOK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, quoteId, QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Right)
+    }
 }

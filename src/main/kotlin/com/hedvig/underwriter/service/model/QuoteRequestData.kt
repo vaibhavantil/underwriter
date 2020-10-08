@@ -48,6 +48,13 @@ sealed class QuoteRequestData {
         val isYouth: Boolean?
     ) : QuoteRequestData()
 
+    data class DanishHomeContents(
+        val street: String?,
+        val zipCode: String?,
+        val coInsured: Int?,
+        val livingSpace: Int?
+    ) : QuoteRequestData()
+
     companion object {
         fun from(quoteSchema: QuoteSchema) = when (quoteSchema) {
             is QuoteSchema.SwedishApartment -> SwedishApartment(
@@ -90,6 +97,12 @@ sealed class QuoteRequestData {
             )
             is QuoteSchema.NorwegianTravel -> NorwegianTravel(
                 isYouth = quoteSchema.isYouth,
+                coInsured = quoteSchema.numberCoInsured
+            )
+            is QuoteSchema.DanishHomeContent -> DanishHomeContents(
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                livingSpace = quoteSchema.livingSpace,
                 coInsured = quoteSchema.numberCoInsured
             )
         }

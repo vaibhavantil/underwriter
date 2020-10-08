@@ -92,4 +92,15 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Is Youth", required = true)
         val isYouth: Boolean
     ) : QuoteSchema()
+
+    data class DanishHomeContent(
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
+        val zipCode: String,
+        @JsonSchema(title = "Living Space", required = true, min = 0.0)
+        val livingSpace: Int,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int
+    ) : QuoteSchema()
 }

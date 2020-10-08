@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
 import com.hedvig.underwriter.model.AddressData
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -32,7 +33,8 @@ class FinalizeOnBoardingRequest(
             when (quote.data) {
                 is SwedishHouseData,
                 is SwedishApartmentData,
-                is NorwegianHomeContentsData -> {
+                is NorwegianHomeContentsData,
+                is DanishHomeContentsData -> {
                     val addressInsurance = quote.data as AddressData
                     val personPolicyHolder = quote.data as PersonPolicyHolder<*>
 

@@ -3,6 +3,7 @@ package com.hedvig.underwriter.graphql.type
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -11,6 +12,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDate
+import com.hedvig.underwriter.model.danishHomeContents
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
@@ -177,6 +179,12 @@ class QuoteMapper(
             isYouth = quote.data.isYouth,
             numberCoInsured = quote.data.coInsured
         )
+        is DanishHomeContentsData -> QuoteSchema.DanishHomeContent(
+            street = quote.data.street,
+            zipCode = quote.data.zipCode,
+            livingSpace = quote.data.livingSpace,
+            numberCoInsured = quote.data.coInsured
+        )
     }
 
     private fun mapToExtraBuildingCore(
@@ -315,8 +323,15 @@ class QuoteMapper(
                 coInsured = it.coInsured,
                 isYouth = it.isYouth
             )
+        } ?: quote.danishHomeContents?.let {
+            QuoteDetails.DanishHomeContentsDetails(
+                street = it.street,
+                zipCode = it.zipCode,
+                coInsured = it.coInsured,
+                livingSpace = it.livingSpace
+            )
         }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
+        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents`, `norwegianTravel` or `danishHomeContents` data")
 
     private fun mapCompleteQuoteResult(
         quote: Quote,
@@ -348,8 +363,10 @@ class QuoteMapper(
             CompleteQuoteDetails.UnknownQuoteDetails()
         } ?: quote.norwegianTravel?.let {
             CompleteQuoteDetails.UnknownQuoteDetails()
+        } ?: quote.danishHomeContents?.let {
+            CompleteQuoteDetails.UnknownQuoteDetails()
         }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
+        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents`, `norwegianTravel` or `danishHomeContents` data")
 
     private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
         localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale)

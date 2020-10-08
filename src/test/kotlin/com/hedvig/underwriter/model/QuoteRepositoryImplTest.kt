@@ -605,6 +605,80 @@ class QuoteRepositoryImplTest {
     }
 
     @Test
+    fun updatesDanishHomContentsQuotes() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.APARTMENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = DanishHomeContentsData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                zipCode = "1121",
+                livingSpace = 33,
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null
+        )
+        quoteDao.insert(quote, timestamp)
+
+        val updatedQuote = quote.copy(
+            state = QuoteState.SIGNED,
+            data = (quote.data as DanishHomeContentsData).copy(
+                firstName = "John",
+                lastName = "Watson"
+            ),
+            memberId = "123456"
+        )
+        quoteDao.update(updatedQuote)
+
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun insertsAndFindsOneDanishHomeQuoteByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            productType = ProductType.HOME_CONTENT,
+            data = DanishHomeContentsData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                zipCode = "1121",
+                livingSpace = 33,
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l"
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            id = UUID.randomUUID(),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+        )
+        quoteDao.insert(quote, timestamp)
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
+    }
+
+    @Test
     fun insertMultipleQuotes_updateQuotes_getLatestRevision_inList() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 
@@ -620,7 +694,7 @@ class QuoteRepositoryImplTest {
             data = SwedishApartmentData(
                 firstName = "Sherlock",
                 lastName = "Holmes",
-                ssn = "199003041234",
+                ssn = "9003041234",
                 street = "221 Baker street",
                 zipCode = "11216",
                 livingSpace = 33,
