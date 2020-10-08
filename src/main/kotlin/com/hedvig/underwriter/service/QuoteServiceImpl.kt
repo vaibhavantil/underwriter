@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.orNull
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -176,6 +177,15 @@ class QuoteServiceImpl(
 
     override fun getQuoteByContractId(contractId: UUID): Quote? {
         return quoteRepository.findByContractId(contractId)
+    }
+
+    override fun getMarketInfoFromLatestQuote(memberId: String): MarketInfo {
+        val quote = getLatestQuoteForMemberId(memberId)
+
+        return when (quote!!.data) {
+            is SwedishHouseData, is SwedishApartmentData -> MarketInfo.SWEDEN
+            is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo.NORWAY
+        }
     }
 
     override fun createQuoteFromAgreement(

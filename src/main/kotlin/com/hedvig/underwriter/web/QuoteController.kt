@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
+import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
@@ -214,6 +215,12 @@ class QuoteController @Autowired constructor(
             )
 
         return ResponseEntity.ok(QuoteDto.fromQuote(quote))
+    }
+
+    @GetMapping("/members/{memberId}/latestQuote/marketInfo")
+    fun getMarketInfoFromLatestQuote(@PathVariable memberId: String): ResponseEntity<MarketInfo> {
+        val marketInfo = quoteService.getMarketInfoFromLatestQuote(memberId)
+        return ResponseEntity.ok(marketInfo)
     }
 
     companion object {
