@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.orNull
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -183,8 +184,8 @@ class QuoteServiceImpl(
         val quote = getLatestQuoteForMemberId(memberId)
 
         return when (quote!!.data) {
-            is SwedishHouseData, is SwedishApartmentData -> MarketInfo.SWEDEN
-            is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo.NORWAY
+            is SwedishHouseData, is SwedishApartmentData -> MarketInfo(Market.SWEDEN)
+            is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo(Market.NORWAY)
         }
     }
 

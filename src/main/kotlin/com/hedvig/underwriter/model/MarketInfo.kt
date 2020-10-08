@@ -1,6 +1,10 @@
 package com.hedvig.underwriter.model
 
-enum class MarketInfo {
+class MarketInfo(
+    val market: Market
+)
+
+enum class Market {
     SWEDEN,
     NORWAY,
     DENMARK
