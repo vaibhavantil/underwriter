@@ -1,7 +1,10 @@
 package com.hedvig.underwriter.service
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -39,18 +42,6 @@ class QuoteServiceImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
         cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository, mockk())
-    }
-
-    @Test
-    fun calculateInsuranceCost() {
-        val service = QuoteServiceImpl(
-            underwriter = underwriter,
-            memberService = memberService,
-            productPricingService = productPricingService,
-            quoteRepository = quoteRepository,
-            notificationService = mockk()
-        )
-
         every { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") } returns
             InsuranceCost(
                 MonetaryAmountV2.of(BigDecimal.TEN, "SEK"),
@@ -58,11 +49,55 @@ class QuoteServiceImplTest {
                 MonetaryAmountV2.of(BigDecimal.TEN, "SEK"),
                 null
             )
+    }
 
+    @Test
+    fun calculateInsuranceCost() {
         val quote = a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
 
-        val result = service.calculateInsuranceCost(quote)
+        val result = cut.calculateInsuranceCost(quote)
 
         verify(exactly = 1) { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") }
     }
+
+
+    @Test
+    fun returnTheCorrectMarketForApartmentQuote() {
+        val quote = a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
+        every { cut.getLatestQuoteForMemberId(any()) } returns quote
+        val result = cut.getMarketInfoFromLatestQuote("12345")
+
+        assertThat(result.market).isEqualTo(Market.SWEDEN)
+    }
+
+    @Test
+    fun returnTheCorrectMarketForHouseQuote() {
+        val quote =
+            a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.SwedishHouseDataBuilder()).build()
+        every { cut.getLatestQuoteForMemberId(any()) } returns quote
+        val result = cut.getMarketInfoFromLatestQuote("12345")
+
+        assertThat(result.market).isEqualTo(Market.SWEDEN)
+    }
+
+    @Test
+    fun returnTheCorrectMarketForNorwegianHomeContent() {
+        val quote =
+            a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianHomeContentDataBuilder()).build()
+        every { cut.getLatestQuoteForMemberId(any()) } returns quote
+        val result = cut.getMarketInfoFromLatestQuote("12345")
+
+        assertThat(result.market).isEqualTo(Market.NORWAY)
+    }
+
+    @Test
+    fun returnTheCorrectMarketForNorwegianTravel() {
+        val quote =
+            a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianTravelDataBuilder()).build()
+        every { cut.getLatestQuoteForMemberId(any()) } returns quote
+        val result = cut.getMarketInfoFromLatestQuote("12345")
+
+        assertThat(result.market).isEqualTo(Market.NORWAY)
+    }
+
 }
