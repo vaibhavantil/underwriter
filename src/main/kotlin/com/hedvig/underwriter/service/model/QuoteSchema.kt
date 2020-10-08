@@ -48,7 +48,8 @@ sealed class QuoteSchema {
         val yearOfConstruction: Int,
         @JsonSchema(title = "Number Of Bathrooms", required = true, min = 0.0)
         val numberOfBathrooms: Int,
-        @field:JsonProperty("isSubleted")
+        @get:JsonProperty("isSubleted")
+        @param:JsonProperty("isSubleted")
         @JsonSchema(title = "Is Subleted", required = true)
         val isSubleted: Boolean = false,
         @JsonSchema(required = true)
@@ -77,7 +78,8 @@ sealed class QuoteSchema {
         val livingSpace: Int,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
         val numberCoInsured: Int,
-        @field:JsonProperty("isYouth")
+        @get:JsonProperty("isYouth")
+        @param:JsonProperty("isYouth")
         @JsonSchema(title = "Is Youth", required = true)
         val isYouth: Boolean
     ) : QuoteSchema()
@@ -85,7 +87,8 @@ sealed class QuoteSchema {
     data class NorwegianTravel(
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
         val numberCoInsured: Int,
-        @field:JsonProperty("isYouth")
+        @get:JsonProperty("isYouth")
+        @param:JsonProperty("isYouth")
         @JsonSchema(title = "Is Youth", required = true)
         val isYouth: Boolean
     ) : QuoteSchema()
