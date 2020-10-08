@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.QuoteData
@@ -34,6 +35,7 @@ data class AddressDto(
                 country = CountryCode.NO
             )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
+            is DanishHomeContentsData -> throw RuntimeException("This is a placeholder data class")
         }
     }
 }

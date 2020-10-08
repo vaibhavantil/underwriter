@@ -70,4 +70,14 @@ sealed class QuoteDetails {
                 false -> ContractAgreementType.NO_TRAVEL
             }
     }
+
+    data class DanishHomeContentsDetails(
+        val street: String,
+        val zipCode: String,
+        val coInsured: Int,
+        val livingSpace: Int
+    ) : QuoteDetails() {
+        override val typeOfContract: ContractAgreementType
+            get() = ContractAgreementType.DK_HOME_CONTENT
+    }
 }
