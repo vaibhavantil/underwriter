@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-enum class TypeOfContract {
+enum class ContractAgreementType {
     SE_HOUSE,
     SE_APARTMENT_BRF,
     SE_APARTMENT_RENT,

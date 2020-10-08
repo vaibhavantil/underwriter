@@ -5,7 +5,11 @@ import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
@@ -16,13 +20,14 @@ import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.model.swedishApartment
 import com.hedvig.underwriter.model.swedishHouse
 import com.hedvig.underwriter.model.validTo
+import com.hedvig.underwriter.service.model.QuoteSchema
 import com.hedvig.underwriter.util.toStockholmLocalDate
+import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.util.Locale
-import org.springframework.stereotype.Component
 
 @Component
-class TypeMapper(
+class QuoteMapper(
     private val localizationService: LocalizationService
 ) {
     fun mapToBundleQuote(
@@ -127,6 +132,50 @@ class TypeMapper(
             expiresAt = quote.validTo.toStockholmLocalDate(),
             startDate = quote.startDate?.coerceAtLeast(LocalDate.now()),
             dataCollectionId = quote.dataCollectionId
+        )
+    }
+
+    fun mapToQuoteSchemaData(
+        quote: Quote
+    ): QuoteSchema = when (quote.data) {
+        is SwedishApartmentData -> QuoteSchema.SwedishApartment(
+            lineOfBusiness = quote.data.subType!!,
+            street = quote.data.street!!,
+            zipCode = quote.data.zipCode!!,
+            city = quote.data.city,
+            livingSpace = quote.data.livingSpace!!,
+            numberCoInsured = quote.data.householdSize!! - 1
+        )
+        is SwedishHouseData -> QuoteSchema.SwedishHouse(
+            street = quote.data.street!!,
+            zipCode = quote.data.zipCode!!,
+            city = quote.data.city,
+            livingSpace = quote.data.livingSpace!!,
+            numberCoInsured = quote.data.householdSize!! - 1,
+            ancillaryArea = quote.data.ancillaryArea!!,
+            yearOfConstruction = quote.data.yearOfConstruction!!,
+            numberOfBathrooms = quote.data.numberOfBathrooms!!,
+            isSubleted = quote.data.isSubleted!!,
+            extraBuildings = quote.data.extraBuildings!!.map { extraBuilding ->
+                QuoteSchema.SwedishHouse.ExtraBuildingSchema(
+                    type = extraBuilding.type,
+                    area = extraBuilding.area,
+                    hasWaterConnected = extraBuilding.hasWaterConnected
+                )
+            }
+        )
+        is NorwegianHomeContentsData -> QuoteSchema.NorwegianHomeContent(
+            lineOfBusiness = quote.data.type,
+            isYouth = quote.data.isYouth,
+            street = quote.data.street,
+            zipCode = quote.data.zipCode,
+            city = quote.data.city,
+            livingSpace = quote.data.livingSpace,
+            numberCoInsured = quote.data.coInsured
+        )
+        is NorwegianTravelData -> QuoteSchema.NorwegianTravel(
+            isYouth = quote.data.isYouth,
+            numberCoInsured = quote.data.coInsured
         )
     }
 
@@ -303,5 +352,6 @@ class TypeMapper(
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents` or `norwegianTravel` data")
 
     private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
-        localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale) ?: ebt.getDefaultDisplayName()
+        localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale)
+            ?: ebt.getDefaultDisplayName()
 }

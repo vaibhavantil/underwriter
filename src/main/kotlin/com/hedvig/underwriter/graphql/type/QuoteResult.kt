@@ -24,7 +24,7 @@ sealed class QuoteResult {
         val email: String?,
         val dataCollectionId: UUID?
     ) : QuoteResult(), CreateQuoteResult {
-        val typeOfContract: TypeOfContract
+        val typeOfContract: ContractAgreementType
             get() = quoteDetails.typeOfContract
     }
 
