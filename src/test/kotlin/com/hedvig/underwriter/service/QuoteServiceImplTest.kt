@@ -60,7 +60,6 @@ class QuoteServiceImplTest {
         verify(exactly = 1) { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") }
     }
 
-
     @Test
     fun returnTheCorrectMarketForApartmentQuote() {
         val quote = a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
@@ -99,5 +98,4 @@ class QuoteServiceImplTest {
 
         assertThat(result.market).isEqualTo(Market.NORWAY)
     }
-
 }
