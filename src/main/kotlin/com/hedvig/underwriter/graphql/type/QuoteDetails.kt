@@ -2,7 +2,7 @@ package com.hedvig.underwriter.graphql.type
 
 sealed class QuoteDetails {
 
-    abstract val typeOfContract: TypeOfContract
+    abstract val typeOfContract: ContractAgreementType
 
     data class SwedishApartmentQuoteDetails(
         val street: String,
@@ -11,12 +11,12 @@ sealed class QuoteDetails {
         val livingSpace: Int,
         val type: ApartmentType
     ) : QuoteDetails() {
-        override val typeOfContract: TypeOfContract
+        override val typeOfContract: ContractAgreementType
             get() = when (type) {
-                ApartmentType.BRF -> TypeOfContract.SE_APARTMENT_BRF
-                ApartmentType.RENT -> TypeOfContract.SE_APARTMENT_RENT
-                ApartmentType.STUDENT_BRF -> TypeOfContract.SE_APARTMENT_STUDENT_BRF
-                ApartmentType.STUDENT_RENT -> TypeOfContract.SE_APARTMENT_STUDENT_RENT
+                ApartmentType.BRF -> ContractAgreementType.SE_APARTMENT_BRF
+                ApartmentType.RENT -> ContractAgreementType.SE_APARTMENT_RENT
+                ApartmentType.STUDENT_BRF -> ContractAgreementType.SE_APARTMENT_STUDENT_BRF
+                ApartmentType.STUDENT_RENT -> ContractAgreementType.SE_APARTMENT_STUDENT_RENT
             }
     }
 
@@ -31,8 +31,8 @@ sealed class QuoteDetails {
         val yearOfConstruction: Int,
         val isSubleted: Boolean
     ) : QuoteDetails() {
-        override val typeOfContract: TypeOfContract
-            get() = TypeOfContract.SE_HOUSE
+        override val typeOfContract: ContractAgreementType
+            get() = ContractAgreementType.SE_HOUSE
     }
 
     data class NorwegianHomeContentsDetails(
@@ -43,18 +43,18 @@ sealed class QuoteDetails {
         val isYouth: Boolean,
         val type: NorwegianHomeContentsType
     ) : QuoteDetails() {
-        override val typeOfContract: TypeOfContract
+        override val typeOfContract: ContractAgreementType
             get() = when (type) {
                 NorwegianHomeContentsType.OWN -> {
                     when (isYouth) {
-                        true -> TypeOfContract.NO_HOME_CONTENT_YOUTH_OWN
-                        false -> TypeOfContract.NO_HOME_CONTENT_OWN
+                        true -> ContractAgreementType.NO_HOME_CONTENT_YOUTH_OWN
+                        false -> ContractAgreementType.NO_HOME_CONTENT_OWN
                     }
                 }
                 NorwegianHomeContentsType.RENT -> {
                     when (isYouth) {
-                        true -> TypeOfContract.NO_HOME_CONTENT_YOUTH_RENT
-                        false -> TypeOfContract.NO_HOME_CONTENT_RENT
+                        true -> ContractAgreementType.NO_HOME_CONTENT_YOUTH_RENT
+                        false -> ContractAgreementType.NO_HOME_CONTENT_RENT
                     }
                 }
             }
@@ -64,10 +64,10 @@ sealed class QuoteDetails {
         val coInsured: Int,
         val isYouth: Boolean
     ) : QuoteDetails() {
-        override val typeOfContract: TypeOfContract
+        override val typeOfContract: ContractAgreementType
             get() = when (isYouth) {
-                true -> TypeOfContract.NO_TRAVEL_YOUTH
-                false -> TypeOfContract.NO_TRAVEL
+                true -> ContractAgreementType.NO_TRAVEL_YOUTH
+                false -> ContractAgreementType.NO_TRAVEL
             }
     }
 
@@ -77,7 +77,7 @@ sealed class QuoteDetails {
         val coInsured: Int,
         val livingSpace: Int
     ) : QuoteDetails() {
-        override val typeOfContract: TypeOfContract
-            get() = TypeOfContract.DK_HOME_CONTENT
+        override val typeOfContract: ContractAgreementType
+            get() = ContractAgreementType.DK_HOME_CONTENT
     }
 }

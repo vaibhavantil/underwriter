@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class GraphQLConfiguration {
+class GraphQLConfig {
     @Bean
     fun dataLoaderRegistry(loaderList: List<DataLoader<*, *>>): DataLoaderRegistry {
         val registry = DataLoaderRegistry()

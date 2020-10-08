@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.service
 
 import com.hedvig.underwriter.graphql.type.QuoteBundle
-import com.hedvig.underwriter.graphql.type.TypeMapper
+import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -21,7 +21,7 @@ import java.util.UUID
 class BundleQuotesServiceImpl(
     private val quotesService: QuoteService,
     private val productPricingService: ProductPricingService,
-    private val typeMapper: TypeMapper
+    private val quoteMapper: QuoteMapper
 ) : BundleQuotesService {
 
     override fun bundleQuotes(memberId: String, ids: List<UUID>, locale: Locale): QuoteBundle {
@@ -50,7 +50,7 @@ class BundleQuotesServiceImpl(
         val insuranceCost = productPricingService.calculateBundleInsuranceCost(request, memberId)
 
         return QuoteBundle(quotes.map {
-            typeMapper.mapToBundleQuote(
+            quoteMapper.mapToBundleQuote(
                 it,
                 locale
             )

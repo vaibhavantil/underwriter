@@ -15,7 +15,7 @@ import com.hedvig.underwriter.graphql.type.EditQuoteInput
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
 import com.hedvig.underwriter.graphql.type.SignQuotesInput
-import com.hedvig.underwriter.graphql.type.TypeMapper
+import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.model.Quote
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component
 class Mutation @Autowired constructor(
     private val quoteService: QuoteService,
     private val signService: SignService,
-    private val typeMapper: TypeMapper
+    private val quoteMapper: QuoteMapper
 ) : GraphQLMutationResolver {
 
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
@@ -70,7 +70,7 @@ class Mutation @Autowired constructor(
                 val quote = quoteService.getQuote(completeQuoteResponseDto.id)
                     ?: throw RuntimeException("Quote must not be null!")
 
-                typeMapper.mapToCompleteQuoteResult(
+                quoteMapper.mapToCompleteQuoteResult(
                     quote,
                     quoteService.calculateInsuranceCost(quote),
                     LocaleResolver.resolveLocale(env.getAcceptLanguage())
@@ -118,7 +118,7 @@ class Mutation @Autowired constructor(
             is Either.Right -> {
                 val quote = errorOrQuote.b
 
-                typeMapper.mapToCompleteQuoteResult(
+                quoteMapper.mapToCompleteQuoteResult(
                     quote,
                     quoteService.calculateInsuranceCost(quote),
                     LocaleResolver.resolveLocale(env.getAcceptLanguage())

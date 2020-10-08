@@ -18,6 +18,6 @@ data class BundledQuote(
     val email: String?,
     val dataCollectionId: UUID?
 ) {
-    val typeOfContract: TypeOfContract
+    val typeOfContract: ContractAgreementType
         get() = quoteDetails.typeOfContract
 }

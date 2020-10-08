@@ -201,14 +201,8 @@ class a {
         val firstName: String = "",
         val lastName: String = "",
         val email: String? = "em@i.l",
-
-        val street: String = "",
-        val city: String? = "",
-        val zipCode: String = "",
         val coInsured: Int = 3,
-        val livingSpace: Int = 2,
         val isYouth: Boolean = false,
-        val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val internalId: Int? = null
     ) : DataBuilder<QuoteData> {
 
@@ -302,6 +296,29 @@ class a {
             originatingProductId = originatingProductId,
             startDate = startDate,
             dataCollectionId = dataCollectionId
+        )
+    }
+
+    data class SwedishApartmentDataBuilder(
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
+        val zipCode: String = "12345"
+    ) : DataBuilder<QuoteData> {
+        override fun build(): QuoteData = SwedishApartmentData(
+            id = UUID.randomUUID(),
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            birthDate = ssn?.birthDateFromSwedishSsn(),
+            ssn = ssn,
+            city = "",
+            householdSize = 1,
+            livingSpace = 1,
+            street = "",
+            subType = ApartmentProductSubType.BRF,
+            zipCode = zipCode
         )
     }
 
