@@ -42,7 +42,6 @@ class JsonSchemaConfig {
             return@withDefaultResolver when {
                 typeScope.type.typeName.contains("java.util.List") -> emptyList<Any>()
                 typeScope.type.typeName == "boolean" -> false
-                typeScope.type.typeName == "java.lang.String" -> ""
                 else -> null
             }
         }

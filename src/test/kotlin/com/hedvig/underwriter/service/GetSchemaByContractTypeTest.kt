@@ -36,20 +36,17 @@ internal class GetSchemaByContractTypeTest {
                 },
                 "street": {
                   "type": "string",
-                  "title": "Street",
-                  "default": ""
+                  "title": "Street"
                 },
                 "zipCode": {
                   "type": "string",
                   "title": "Zip Code",
                   "minLength": 5,
-                  "maxLength": 5,
-                  "default": ""
+                  "maxLength": 5
                 },
                 "city": {
                   "type": "string",
-                  "title": "City",
-                  "default": ""
+                  "title": "City"
                 },
                 "livingSpace": {
                   "type": "integer",
@@ -86,20 +83,17 @@ internal class GetSchemaByContractTypeTest {
               "properties": {
                 "street": {
                   "type": "string",
-                  "title": "Street",
-                  "default": ""
+                  "title": "Street"
                 },
                 "zipCode": {
                   "type": "string",
                   "title": "Zip Code",
                   "minLength": 5,
-                  "maxLength": 5,
-                  "default": ""
+                  "maxLength": 5
                 },
                 "city": {
                   "type": "string",
-                  "title": "City",
-                  "default": ""
+                  "title": "City"
                 },
                 "livingSpace": {
                   "type": "integer",
@@ -213,20 +207,17 @@ internal class GetSchemaByContractTypeTest {
                 },
                 "street": {
                   "type": "string",
-                  "title": "Street",
-                  "default": ""
+                  "title": "Street"
                 },
                 "zipCode": {
                   "type": "string",
                   "title": "Zip Code",
                   "minLength": 4,
-                  "maxLength": 4,
-                  "default": ""
+                  "maxLength": 4
                 },
                 "city": {
                   "type": "string",
-                  "title": "City",
-                  "default": ""
+                  "title": "City"
                 },
                 "livingSpace": {
                   "type": "integer",
