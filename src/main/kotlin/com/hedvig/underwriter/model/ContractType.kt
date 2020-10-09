@@ -5,4 +5,5 @@ enum class ContractType {
     SWEDISH_HOUSE,
     NORWEGIAN_HOME_CONTENT,
     NORWEGIAN_TRAVEL,
+    DANISH_HOME_CONTENT
 }

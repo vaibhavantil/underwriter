@@ -26,6 +26,7 @@ sealed class QuoteData {
             is SwedishApartmentData -> ProductType.APARTMENT
             is NorwegianHomeContentsData -> ProductType.HOME_CONTENT
             is NorwegianTravelData -> ProductType.TRAVEL
+            is DanishHomeContentsData -> ProductType.HOME_CONTENT
         }
     }
 }
@@ -150,6 +151,35 @@ data class NorwegianTravelData(
     }
 
     // TODO: Let's remove the concept of complete
+    override val isComplete: Boolean
+        get() = when (null) {
+            firstName, lastName, coInsured -> false
+            else -> true
+        }
+}
+
+data class DanishHomeContentsData(
+    override val id: UUID,
+    override val ssn: String?,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
+    override val email: String?,
+    override val street: String,
+    override val zipCode: String,
+    override val livingSpace: Int,
+    val coInsured: Int,
+    @JsonIgnore
+    val internalId: Int? = null
+) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
+
+    // Should probably be removed from AddressData
+    override val city: String? = null
+
+    override fun updateName(firstName: String, lastName: String): DanishHomeContentsData {
+        return this.copy(firstName = firstName, lastName = lastName)
+    }
+
     override val isComplete: Boolean
         get() = when (null) {
             firstName, lastName, coInsured -> false
