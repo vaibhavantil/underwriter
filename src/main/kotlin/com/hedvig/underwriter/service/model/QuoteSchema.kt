@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.service.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -8,6 +9,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 
+@JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "id")
 @JsonSubTypes(
     JsonSubTypes.Type(value = QuoteSchema.SwedishApartment::class, name = "SwedishApartment"),
