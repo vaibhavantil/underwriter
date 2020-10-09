@@ -17,7 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -231,7 +231,7 @@ class SignServiceImplTest {
                 successUrl,
                 failUrl
             )
-        } returns StartNorwegianBankIdSignResponse(
+        } returns StartRedirectBankIdSignResponse(
             "redirect url"
         )
 
@@ -260,7 +260,7 @@ class SignServiceImplTest {
                 successUrl,
                 failUrl
             )
-        } returns StartNorwegianBankIdSignResponse(
+        } returns StartRedirectBankIdSignResponse(
             "redirect url"
         )
 
@@ -422,6 +422,33 @@ class SignServiceImplTest {
                 underwriterQuoteSignRequest = any()
             )
         }
+    }
+
+    @Test
+    fun startSigningOfDanishQuote_startDanishSign() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every {
+            memberService.startDanishBankIdSignQuotes(
+                memberId.toLong(),
+                signSessionReference,
+                "1212120000",
+                successUrl,
+                failUrl
+            )
+        } returns StartRedirectBankIdSignResponse(
+            "redirect url"
+        )
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
     }
 
     companion object {
