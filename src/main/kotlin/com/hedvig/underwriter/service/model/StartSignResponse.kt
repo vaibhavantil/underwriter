@@ -14,6 +14,11 @@ sealed class StartSignResponse {
         val redirectUrl: String
     ) : StartSignResponse()
 
+    data class DanishBankIdSession(
+        val session: UUID,
+        val redirectUrl: String
+    ) : StartSignResponse()
+
     data class FailedToStartSign(
         val errorMessage: String
     ) : StartSignResponse()

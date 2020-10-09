@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.github.victools.jsonschema.generator.SchemaGenerator
 import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.model.ContractType
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -26,6 +27,7 @@ class QuoteSchemaServiceImpl(
             is SwedishHouseData -> getSchemaByContractType(ContractType.SWEDISH_HOUSE)
             is NorwegianHomeContentsData -> getSchemaByContractType(ContractType.NORWEGIAN_HOME_CONTENT)
             is NorwegianTravelData -> getSchemaByContractType(ContractType.NORWEGIAN_TRAVEL)
+            is DanishHomeContentsData -> getSchemaByContractType(ContractType.DANISH_HOME_CONTENT)
         }
     }
 
@@ -35,6 +37,7 @@ class QuoteSchemaServiceImpl(
             ContractType.SWEDISH_HOUSE -> QuoteSchema.SwedishHouse::class.java
             ContractType.NORWEGIAN_HOME_CONTENT -> QuoteSchema.NorwegianHomeContent::class.java
             ContractType.NORWEGIAN_TRAVEL -> QuoteSchema.NorwegianTravel::class.java
+            ContractType.DANISH_HOME_CONTENT -> QuoteSchema.DanishHomeContent::class.java
         }
         return schemaGenerator.generateSchema(dataClass)
     }
