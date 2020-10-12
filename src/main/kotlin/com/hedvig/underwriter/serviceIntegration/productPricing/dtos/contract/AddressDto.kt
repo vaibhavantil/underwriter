@@ -34,8 +34,13 @@ data class AddressDto(
                 city = data.city,
                 country = CountryCode.NO
             )
+            is DanishHomeContentsData -> AddressDto(
+                street = data.street,
+                postalCode = data.zipCode,
+                city = data.city,
+                country = CountryCode.NO
+            )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
-            is DanishHomeContentsData -> throw RuntimeException("This is a placeholder data class")
         }
     }
 }
