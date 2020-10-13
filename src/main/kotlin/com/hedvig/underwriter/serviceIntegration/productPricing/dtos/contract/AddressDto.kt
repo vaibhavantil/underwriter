@@ -38,7 +38,7 @@ data class AddressDto(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
-                country = CountryCode.NO
+                country = CountryCode.DK
             )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
         }
