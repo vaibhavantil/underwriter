@@ -55,7 +55,8 @@ sealed class AgreementQuote {
         val yearOfConstruction: Int,
         val numberOfBathrooms: Int,
         val extraBuildings: List<ExtraBuildingDto>,
-        @field:JsonProperty("isSubleted")
+        @param:JsonProperty("isSubleted")
+        @get:JsonProperty("isSubleted")
         val isSubleted: Boolean
     ) : AgreementQuote()
 
