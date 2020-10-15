@@ -18,7 +18,8 @@ import java.util.UUID
     JsonSubTypes.Type(value = AgreementQuote.SwedishApartmentQuote::class, name = "SwedishApartment"),
     JsonSubTypes.Type(value = AgreementQuote.SwedishHouseQuote::class, name = "SwedishHouse"),
     JsonSubTypes.Type(value = AgreementQuote.NorwegianHomeContentQuote::class, name = "NorwegianHomeContent"),
-    JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel")
+    JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel"),
+    JsonSubTypes.Type(value = AgreementQuote.DanishHomeContentQuote::class, name = "DanishHomeContent")
 )
 sealed class AgreementQuote {
     abstract val quoteId: UUID
