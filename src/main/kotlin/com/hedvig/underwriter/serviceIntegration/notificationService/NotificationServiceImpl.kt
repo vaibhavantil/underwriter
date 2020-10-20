@@ -46,7 +46,7 @@ class NotificationServiceImpl(
                 productType = quote.productType.name,
                 insuranceType = when (quote.data) {
                     is SwedishHouseData -> "HOUSE"
-                    is SwedishApartmentData -> quote.data.subType?.name
+                    is SwedishApartmentData -> quote.data.subType!!.name
                     is NorwegianHomeContentsData -> when (quote.data.isYouth) {
                         true -> when (quote.data.type) {
                             NorwegianHomeContentsType.RENT -> "YOUTH_RENT"
@@ -58,7 +58,7 @@ class NotificationServiceImpl(
                         true -> "YOUTH"
                         false -> "REGULAR"
                     }
-                    is DanishHomeContentsData -> null
+                    is DanishHomeContentsData -> "REGULAR"
                 },
                 currentInsurer = quote.currentInsurer,
                 price = quote.price,
@@ -68,4 +68,3 @@ class NotificationServiceImpl(
         )
     }
 }
-
