@@ -148,7 +148,11 @@ class QuoteServiceImpl(
         }
 
         if (quote.memberId != null && quote.email != null) {
-            notificationService.sendQuoteCreatedEvent(quote)
+            try {
+                notificationService.sendQuoteCreatedEvent(quote)
+            } catch (exception: Exception) {
+                logger.error("Unable to send quote created event (quoteId=${quote.id})", exception)
+            }
         }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
