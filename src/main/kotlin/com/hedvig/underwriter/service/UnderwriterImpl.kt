@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -113,6 +114,19 @@ class UnderwriterImpl(
                         coInsured = quoteData.coInsured!!,
                         isYouth = quoteData.isYouth!!
                     )
+                is QuoteRequestData.DanishHomeContents ->
+                    DanishHomeContentsData(
+                        id = UUID.randomUUID(),
+                        ssn = quoteRequest.ssn,
+                        birthDate = quoteRequest.birthDate!!,
+                        firstName = quoteRequest.firstName!!,
+                        lastName = quoteRequest.lastName!!,
+                        email = quoteRequest.email,
+                        street = quoteData.street!!,
+                        zipCode = quoteData.zipCode!!,
+                        coInsured = quoteData.coInsured!!,
+                        livingSpace = quoteData.livingSpace!!
+                    )
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
             },
             state = QuoteState.INCOMPLETE,
@@ -193,6 +207,10 @@ class UnderwriterImpl(
             is NorwegianTravelData -> priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
             ).priceBigDecimal
+            is DanishHomeContentsData -> {
+                // TODO: fix when pricing is in place
+                BigDecimal(9999)
+            }
         }
     }
 
@@ -218,6 +236,10 @@ class UnderwriterImpl(
             is NorwegianTravelData -> runRules(
                 data, NorwegianPersonGuidelines.setOfRules
             )
+            is DanishHomeContentsData -> {
+                // TODO: fix when we have guidlines
+                mutableListOf()
+            }
         }
 
     private fun validateProductGuidelines(data: QuoteData): List<String> =
@@ -242,6 +264,10 @@ class UnderwriterImpl(
                     data,
                     NorwegianTravelGuidelines.setOfRules
                 )
+            is DanishHomeContentsData -> {
+                // TODO: fix when we have guidelines
+                mutableListOf()
+            }
         }
 
     fun <T> runRules(

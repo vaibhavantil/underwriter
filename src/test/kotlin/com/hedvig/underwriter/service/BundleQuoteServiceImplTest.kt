@@ -2,7 +2,7 @@ package com.hedvig.underwriter.service
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.graphql.type.TypeMapper
+import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -35,15 +35,15 @@ class BundleQuoteServiceImplTest {
     @MockK
     lateinit var localizationService: LocalizationService
 
-    lateinit var typeMapper: TypeMapper
+    lateinit var quoteMapper: QuoteMapper
 
     lateinit var cut: BundleQuotesServiceImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        typeMapper = TypeMapper(localizationService)
-        cut = BundleQuotesServiceImpl(quoteService, productPricingService, typeMapper)
+        quoteMapper = QuoteMapper(localizationService)
+        cut = BundleQuotesServiceImpl(quoteService, productPricingService, quoteMapper)
     }
 
     @Test

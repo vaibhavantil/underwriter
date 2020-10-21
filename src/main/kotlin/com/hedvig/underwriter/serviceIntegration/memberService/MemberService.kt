@@ -6,7 +6,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMemb
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartNorwegianBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -52,7 +52,15 @@ interface MemberService {
         ssn: String,
         successUrl: String,
         failUrl: String
-    ): StartNorwegianBankIdSignResponse
+    ): StartRedirectBankIdSignResponse
+
+    fun startDanishBankIdSignQuotes(
+        memberId: Long,
+        underwriterSessionReference: UUID,
+        ssn: String,
+        successUrl: String,
+        failUrl: String
+    ): StartRedirectBankIdSignResponse
 
     fun getMember(memberId: Long): InternalMember
 }

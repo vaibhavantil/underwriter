@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -16,7 +18,8 @@ import java.util.UUID
     JsonSubTypes.Type(value = AgreementQuote.SwedishApartmentQuote::class, name = "SwedishApartment"),
     JsonSubTypes.Type(value = AgreementQuote.SwedishHouseQuote::class, name = "SwedishHouse"),
     JsonSubTypes.Type(value = AgreementQuote.NorwegianHomeContentQuote::class, name = "NorwegianHomeContent"),
-    JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel")
+    JsonSubTypes.Type(value = AgreementQuote.NorwegianTravelQuote::class, name = "NorwegianTravel"),
+    JsonSubTypes.Type(value = AgreementQuote.DanishHomeContentQuote::class, name = "DanishHomeContent")
 )
 sealed class AgreementQuote {
     abstract val quoteId: UUID
@@ -53,6 +56,8 @@ sealed class AgreementQuote {
         val yearOfConstruction: Int,
         val numberOfBathrooms: Int,
         val extraBuildings: List<ExtraBuildingDto>,
+        @param:JsonProperty("isSubleted")
+        @get:JsonProperty("isSubleted")
         val isSubleted: Boolean
     ) : AgreementQuote()
 
@@ -78,6 +83,18 @@ sealed class AgreementQuote {
         override val currentInsurer: String?,
         val coInsured: List<CoInsuredDto>,
         val lineOfBusiness: NorwegianTravelLineOfBusiness
+    ) : AgreementQuote()
+
+    data class DanishHomeContentQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
+        override val currentInsurer: String?,
+        val address: AddressDto,
+        val coInsured: List<CoInsuredDto>,
+        val squareMeters: Long
     ) : AgreementQuote()
 
     companion object {
@@ -131,6 +148,17 @@ sealed class AgreementQuote {
                 currentInsurer = quote.currentInsurer,
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
+            )
+            is DanishHomeContentsData -> DanishHomeContentQuote(
+                quoteId = quote.id,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
+                premium = quote.price!!,
+                currency = quote.currency,
+                currentInsurer = quote.currentInsurer,
+                address = AddressDto.from(quote.data),
+                squareMeters = quote.data.livingSpace.toLong(),
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
             )
         }
     }

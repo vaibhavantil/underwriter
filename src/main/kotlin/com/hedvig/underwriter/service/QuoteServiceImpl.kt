@@ -2,7 +2,9 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -148,7 +150,11 @@ class QuoteServiceImpl(
         }
 
         if (quote.memberId != null && quote.email != null) {
-            notificationService.sendQuoteCreatedEvent(quote)
+            try {
+                notificationService.sendQuoteCreatedEvent(quote)
+            } catch (exception: Exception) {
+                logger.error("Unable to send quote created event (quoteId=${quote.id})", exception)
+            }
         }
 
         return transformCompleteQuoteReturn(breachedGuidelinesOrQuote, quoteId)
@@ -186,6 +192,7 @@ class QuoteServiceImpl(
         return when (quote!!.data) {
             is SwedishHouseData, is SwedishApartmentData -> MarketInfo(Market.SWEDEN)
             is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo(Market.NORWAY)
+            is DanishHomeContentsData ->  MarketInfo(Market.DENMARK)
         }
     }
 
@@ -289,6 +296,15 @@ class QuoteServiceImpl(
             is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
                 Money.of(quote.price, "NOK"), memberId
             )
+            is DanishHomeContentsData -> {
+                // TODO: Implement actual request
+                InsuranceCost(
+                        MonetaryAmountV2("9999.00", "DKK"),
+                        MonetaryAmountV2("0", "DKK"),
+                        MonetaryAmountV2("9999.00", "DKK"),
+                    null
+                )
+            }
         }
     }
 

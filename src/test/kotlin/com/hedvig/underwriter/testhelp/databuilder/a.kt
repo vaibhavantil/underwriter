@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.testhelp.databuilder
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -200,14 +201,8 @@ class a {
         val firstName: String = "",
         val lastName: String = "",
         val email: String? = "em@i.l",
-
-        val street: String = "",
-        val city: String? = "",
-        val zipCode: String = "",
         val coInsured: Int = 3,
-        val livingSpace: Int = 2,
         val isYouth: Boolean = false,
-        val type: NorwegianHomeContentsType = NorwegianHomeContentsType.OWN,
         val internalId: Int? = null
     ) : DataBuilder<QuoteData> {
 
@@ -221,6 +216,34 @@ class a {
             coInsured,
             isYouth,
             internalId
+        )
+    }
+
+    data class DanishHomeContentsDataBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be5"),
+        val ssn: String? = "1212120000",
+        val birthDate: LocalDate = LocalDate.of(1912, 12, 12),
+        val firstName: String = "",
+        val lastName: String = "",
+        val email: String? = "em@i.l",
+
+        val street: String = "",
+        val zipCode: String = "",
+        val coInsured: Int = 3,
+        val livingSpace: Int = 25
+    ) : DataBuilder<QuoteData> {
+
+        override fun build() = DanishHomeContentsData(
+            id,
+            ssn,
+            birthDate,
+            firstName,
+            lastName,
+            email,
+            street,
+            zipCode,
+            coInsured,
+            livingSpace
         )
     }
 
@@ -273,6 +296,29 @@ class a {
             originatingProductId = originatingProductId,
             startDate = startDate,
             dataCollectionId = dataCollectionId
+        )
+    }
+
+    data class SwedishApartmentDataBuilder(
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String = "191212121212",
+        val email: String = "em@i.l",
+        val zipCode: String = "12345"
+    ) : DataBuilder<QuoteData> {
+        override fun build(): QuoteData = SwedishApartmentData(
+            id = UUID.randomUUID(),
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            birthDate = ssn?.birthDateFromSwedishSsn(),
+            ssn = ssn,
+            city = "",
+            householdSize = 1,
+            livingSpace = 1,
+            street = "",
+            subType = ApartmentProductSubType.BRF,
+            zipCode = zipCode
         )
     }
 
@@ -410,6 +456,53 @@ class a {
         override fun build() = QuoteRequestData.NorwegianTravel(
             coInsured = coInsured,
             isYouth = isYouth
+        )
+    }
+
+    data class DanishHomeContentsQuoteRequestDataBuilder(
+        val street: String = "",
+        val zipCode: String = "",
+        val coInsured: Int = 3,
+        val livingSpace: Int = 2
+    ) : DataBuilder<QuoteRequestData.DanishHomeContents> {
+        override fun build() = QuoteRequestData.DanishHomeContents(
+            street = street,
+            zipCode = zipCode,
+            livingSpace = livingSpace,
+            coInsured = coInsured
+        )
+    }
+
+    data class DanishHomeContentsQuoteRequestBuilder(
+        val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
+        val firstName: String = "",
+        val lastName: String = "",
+        val ssn: String? = "28026400734",
+        val birthDate: LocalDate = LocalDate.of(1964, 2, 28),
+        val email: String = "em@i.l",
+        val quotingPartner: Partner = Partner.HEDVIG,
+        val memberId: String? = null,
+        val originatingProductId: UUID? = null,
+        val startDate: Instant? = Instant.now(),
+        val dataCollectionId: UUID? = null,
+        val currentInsurer: String? = null,
+        val data: DataBuilder<QuoteRequestData.DanishHomeContents> = DanishHomeContentsQuoteRequestDataBuilder(),
+        val productType: ProductType? = ProductType.APARTMENT
+    ) : DataBuilder<QuoteRequest> {
+        override fun build(): QuoteRequest = QuoteRequest(
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            currentInsurer = currentInsurer,
+            birthDate = birthDate,
+            ssn = ssn,
+            quotingPartner = quotingPartner,
+            productType = productType,
+            incompleteQuoteData = data.build(),
+            memberId = memberId,
+            originatingProductId = originatingProductId,
+            startDate = startDate,
+            dataCollectionId = dataCollectionId
         )
     }
 

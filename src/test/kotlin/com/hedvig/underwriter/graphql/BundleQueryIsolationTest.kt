@@ -3,7 +3,7 @@ package com.hedvig.underwriter.graphql
 import com.hedvig.graphql.commons.extensions.getAcceptLanguage
 import com.hedvig.graphql.commons.extensions.getToken
 import com.hedvig.underwriter.graphql.type.QuoteBundleInputInput
-import com.hedvig.underwriter.graphql.type.TypeMapper
+import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
@@ -44,7 +44,7 @@ class BundleQueryIsolationTest {
         val query = Query(
             quoteService,
             bundleQuoteService,
-            TypeMapper(localizationService)
+            QuoteMapper(localizationService)
             )
 
         every { bundleQuoteService.bundleQuotes(any(), any(), any()) } throws RuntimeException("Should not get here")

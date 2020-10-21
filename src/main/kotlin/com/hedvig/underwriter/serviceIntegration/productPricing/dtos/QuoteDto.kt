@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
@@ -20,6 +21,7 @@ data class QuoteDto(
     val id: UUID,
     val createdAt: Instant,
     val price: BigDecimal? = null,
+    val currency: String,
     val productType: ProductType,
     val state: QuoteState,
     val initiatedFrom: QuoteInitiatedFrom,
@@ -42,6 +44,7 @@ data class QuoteDto(
     val signMethod = when (this.data) {
         is SwedishApartmentData, is SwedishHouseData -> SignMethod.SWEDISH_BANK_ID
         is NorwegianHomeContentsData, is NorwegianTravelData -> SignMethod.NORWEGIAN_BANK_ID
+        is DanishHomeContentsData -> SignMethod.DANISH_BANK_ID
     }
 
     companion object {
@@ -50,6 +53,7 @@ data class QuoteDto(
                 id = quote.id,
                 createdAt = quote.createdAt,
                 price = quote.price,
+                currency = quote.currency,
                 productType = quote.productType,
                 state = quote.state,
                 initiatedFrom = quote.initiatedFrom,

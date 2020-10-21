@@ -47,4 +47,64 @@ sealed class QuoteRequestData {
         @field:JsonProperty("youth")
         val isYouth: Boolean?
     ) : QuoteRequestData()
+
+    data class DanishHomeContents(
+        val street: String?,
+        val zipCode: String?,
+        val coInsured: Int?,
+        val livingSpace: Int?
+    ) : QuoteRequestData()
+
+    companion object {
+        fun from(quoteSchema: QuoteSchema) = when (quoteSchema) {
+            is QuoteSchema.SwedishApartment -> SwedishApartment(
+                subType = quoteSchema.lineOfBusiness,
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                livingSpace = quoteSchema.livingSpace,
+                householdSize = quoteSchema.numberCoInsured + 1,
+                floor = null
+            )
+            is QuoteSchema.SwedishHouse -> SwedishHouse(
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                livingSpace = quoteSchema.livingSpace,
+                householdSize = quoteSchema.numberCoInsured + 1,
+                ancillaryArea = quoteSchema.ancillaryArea,
+                yearOfConstruction = quoteSchema.yearOfConstruction,
+                numberOfBathrooms = quoteSchema.numberOfBathrooms,
+                extraBuildings = quoteSchema.extraBuildings.map { extraBuildingSchema ->
+                    ExtraBuildingRequestDto(
+                        id = null,
+                        type = extraBuildingSchema.type,
+                        area = extraBuildingSchema.area,
+                        hasWaterConnected = extraBuildingSchema.hasWaterConnected
+                    )
+                },
+                isSubleted = quoteSchema.isSubleted,
+                floor = null
+            )
+            is QuoteSchema.NorwegianHomeContent -> NorwegianHomeContents(
+                subType = quoteSchema.lineOfBusiness,
+                isYouth = quoteSchema.isYouth,
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                livingSpace = quoteSchema.livingSpace,
+                coInsured = quoteSchema.numberCoInsured
+            )
+            is QuoteSchema.NorwegianTravel -> NorwegianTravel(
+                isYouth = quoteSchema.isYouth,
+                coInsured = quoteSchema.numberCoInsured
+            )
+            is QuoteSchema.DanishHomeContent -> DanishHomeContents(
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                livingSpace = quoteSchema.livingSpace,
+                coInsured = quoteSchema.numberCoInsured
+            )
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.ApartmentProductSubType
@@ -74,6 +75,8 @@ sealed class Agreement {
         val yearOfConstruction: Int,
         val numberOfBathrooms: Int,
         val extraBuildings: List<ExtraBuildingDto>,
+        @param:JsonProperty("isSubleted")
+        @get:JsonProperty("isSubleted")
         val isSubleted: Boolean
     ) : Agreement() {
         override fun toQuoteRequestData() =

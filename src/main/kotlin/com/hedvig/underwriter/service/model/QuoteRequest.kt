@@ -4,8 +4,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
+import com.hedvig.underwriter.model.email
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
+import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
@@ -77,7 +83,11 @@ data class QuoteRequest(
             )
         }
 
-        fun from(member: InternalMember, agreementData: Agreement, incompleteQuoteData: QuoteRequestData?): QuoteRequest {
+        fun from(
+            member: InternalMember,
+            agreementData: Agreement,
+            incompleteQuoteData: QuoteRequestData?
+        ): QuoteRequest {
             return QuoteRequest(
                 firstName = member.firstName,
                 lastName = member.lastName,
@@ -92,6 +102,54 @@ data class QuoteRequest(
                 memberId = member.memberId.toString(),
                 originatingProductId = agreementData.id,
                 startDate = agreementData.fromDate?.atStartOfDay(ZoneId.of("Europe/Stockholm"))?.toInstant()
+            )
+        }
+
+        fun from(memberId: String, schemaData: QuoteSchema): QuoteRequest {
+            return QuoteRequest(
+                firstName = null,
+                lastName = null,
+                birthDate = null,
+                currentInsurer = null,
+                email = null,
+                quotingPartner = null,
+                ssn = null,
+                productType = when (schemaData) {
+                    is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
+                    is QuoteSchema.SwedishHouse -> ProductType.HOUSE
+                    is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
+                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                },
+                incompleteQuoteData = QuoteRequestData.from(schemaData),
+                dataCollectionId = null,
+                memberId = memberId,
+                originatingProductId = null,
+                startDate = null
+            )
+        }
+
+        fun from(quote: Quote, schemaData: QuoteSchema): QuoteRequest {
+            return QuoteRequest(
+                firstName = quote.firstName,
+                lastName = quote.lastName,
+                birthDate = quote.birthDate,
+                currentInsurer = quote.currentInsurer,
+                email = quote.email,
+                quotingPartner = quote.attributedTo,
+                ssn = quote.ssnMaybe,
+                productType = when (schemaData) {
+                    is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
+                    is QuoteSchema.SwedishHouse -> ProductType.HOUSE
+                    is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
+                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                },
+                incompleteQuoteData = QuoteRequestData.from(schemaData),
+                dataCollectionId = null,
+                memberId = quote.memberId,
+                originatingProductId = quote.originatingProductId,
+                startDate = null
             )
         }
     }

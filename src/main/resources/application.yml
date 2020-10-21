@@ -30,6 +30,14 @@ graphcms.url: https://api-euwest.graphcms.com/v1/cjmawd9hw036a01cuzmjhplka/maste
 
 ---
 spring:
+  profiles: staging
+
+graphql:
+  servlet:
+    exception-handlers-enabled: true
+
+---
+spring:
   profiles: test, development
 
 lokalise:
