@@ -5,7 +5,6 @@ import arrow.core.orNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -187,13 +186,7 @@ class QuoteServiceImpl(
     }
 
     override fun getMarketInfoFromLatestQuote(memberId: String): MarketInfo {
-        val quote = getLatestQuoteForMemberId(memberId)
-
-        return when (quote!!.data) {
-            is SwedishHouseData, is SwedishApartmentData -> MarketInfo(Market.SWEDEN)
-            is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo(Market.NORWAY)
-            is DanishHomeContentsData -> MarketInfo(Market.DENMARK)
-        }
+        return getLatestQuoteForMemberId(memberId)!!.marketInfo
     }
 
     override fun createQuoteFromAgreement(
@@ -299,9 +292,9 @@ class QuoteServiceImpl(
             is DanishHomeContentsData -> {
                 // TODO: Implement actual request
                 InsuranceCost(
-                        MonetaryAmountV2("9999.00", "DKK"),
-                        MonetaryAmountV2("0", "DKK"),
-                        MonetaryAmountV2("9999.00", "DKK"),
+                    MonetaryAmountV2("9999.00", "DKK"),
+                    MonetaryAmountV2("0", "DKK"),
+                    MonetaryAmountV2("9999.00", "DKK"),
                     null
                 )
             }
