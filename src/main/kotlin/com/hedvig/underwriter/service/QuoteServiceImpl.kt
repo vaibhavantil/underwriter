@@ -192,7 +192,7 @@ class QuoteServiceImpl(
         return when (quote!!.data) {
             is SwedishHouseData, is SwedishApartmentData -> MarketInfo(Market.SWEDEN)
             is NorwegianHomeContentsData, is NorwegianTravelData -> MarketInfo(Market.NORWAY)
-            is DanishHomeContentsData ->  MarketInfo(Market.DENMARK)
+            is DanishHomeContentsData -> MarketInfo(Market.DENMARK)
         }
     }
 
