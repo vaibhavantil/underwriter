@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
-import com.hedvig.underwriter.model.MarketInfo
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
@@ -16,6 +15,7 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.MarketInfo
 import com.hedvig.underwriter.web.dtos.QuoteForNewContractRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
@@ -219,8 +219,8 @@ class QuoteController @Autowired constructor(
 
     @GetMapping("/members/{memberId}/latestQuote/marketInfo")
     fun getMarketInfoFromLatestQuote(@PathVariable memberId: String): ResponseEntity<MarketInfo> {
-        val marketInfo = quoteService.getMarketInfoFromLatestQuote(memberId)
-        return ResponseEntity.ok(marketInfo)
+        val market = quoteService.getMarketFromLatestQuote(memberId)
+        return ResponseEntity.ok(MarketInfo(market = market))
     }
 
     companion object {

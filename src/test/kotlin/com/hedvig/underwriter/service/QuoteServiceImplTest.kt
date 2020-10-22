@@ -64,9 +64,9 @@ class QuoteServiceImplTest {
     fun returnTheCorrectMarketForApartmentQuote() {
         val quote = a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
-        val result = cut.getMarketInfoFromLatestQuote("12345")
+        val result = cut.getMarketFromLatestQuote("12345")
 
-        assertThat(result.market).isEqualTo(Market.SWEDEN)
+        assertThat(result).isEqualTo(Market.SWEDEN)
     }
 
     @Test
@@ -74,9 +74,9 @@ class QuoteServiceImplTest {
         val quote =
             a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.SwedishHouseDataBuilder()).build()
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
-        val result = cut.getMarketInfoFromLatestQuote("12345")
+        val result = cut.getMarketFromLatestQuote("12345")
 
-        assertThat(result.market).isEqualTo(Market.SWEDEN)
+        assertThat(result).isEqualTo(Market.SWEDEN)
     }
 
     @Test
@@ -84,9 +84,9 @@ class QuoteServiceImplTest {
         val quote =
             a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianHomeContentDataBuilder()).build()
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
-        val result = cut.getMarketInfoFromLatestQuote("12345")
+        val result = cut.getMarketFromLatestQuote("12345")
 
-        assertThat(result.market).isEqualTo(Market.NORWAY)
+        assertThat(result).isEqualTo(Market.NORWAY)
     }
 
     @Test
@@ -94,8 +94,8 @@ class QuoteServiceImplTest {
         val quote =
             a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianTravelDataBuilder()).build()
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
-        val result = cut.getMarketInfoFromLatestQuote("12345")
+        val result = cut.getMarketFromLatestQuote("12345")
 
-        assertThat(result.market).isEqualTo(Market.NORWAY)
+        assertThat(result).isEqualTo(Market.NORWAY)
     }
 }

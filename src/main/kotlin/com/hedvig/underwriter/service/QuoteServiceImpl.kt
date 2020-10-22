@@ -5,7 +5,7 @@ import arrow.core.orNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.MarketInfo
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -185,8 +185,8 @@ class QuoteServiceImpl(
         return quoteRepository.findByContractId(contractId)
     }
 
-    override fun getMarketInfoFromLatestQuote(memberId: String): MarketInfo {
-        return getLatestQuoteForMemberId(memberId)!!.marketInfo
+    override fun getMarketFromLatestQuote(memberId: String): Market {
+        return getLatestQuoteForMemberId(memberId)!!.market
     }
 
     override fun createQuoteFromAgreement(
