@@ -15,6 +15,7 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import com.hedvig.underwriter.web.dtos.MarketInfo
 import com.hedvig.underwriter.web.dtos.QuoteForNewContractRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
@@ -214,6 +215,12 @@ class QuoteController @Autowired constructor(
             )
 
         return ResponseEntity.ok(QuoteDto.fromQuote(quote))
+    }
+
+    @GetMapping("/members/{memberId}/latestQuote/marketInfo")
+    fun getMarketInfoFromLatestQuote(@PathVariable memberId: String): ResponseEntity<MarketInfo> {
+        val market = quoteService.getMarketFromLatestQuote(memberId)
+        return ResponseEntity.ok(MarketInfo(market = market))
     }
 
     companion object {

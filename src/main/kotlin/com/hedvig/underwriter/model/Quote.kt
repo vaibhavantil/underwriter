@@ -230,6 +230,13 @@ data class Quote(
             is DanishHomeContentsData -> DKK
         }
 
+    val market: Market
+        get() = when (this.data) {
+            is SwedishHouseData, is SwedishApartmentData -> Market.SWEDEN
+            is NorwegianHomeContentsData, is NorwegianTravelData -> Market.NORWAY
+            is DanishHomeContentsData -> Market.DENMARK
+        }
+
     fun update(quoteRequest: QuoteRequest): Quote {
         var newQuote = copy(
             productType = quoteRequest.productType ?: productType,

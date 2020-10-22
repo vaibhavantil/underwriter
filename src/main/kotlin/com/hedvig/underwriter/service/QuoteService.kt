@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -58,4 +59,5 @@ interface QuoteService {
 
     fun expireQuote(id: UUID): Quote?
     fun getQuoteByContractId(contractId: UUID): Quote?
+    fun getMarketFromLatestQuote(memberId: String): Market
 }
