@@ -60,6 +60,13 @@ input CreateDanishHomeContentsInput {
     zipCode: String!
     livingSpace: Int!
     coInsured: Int!
+    isStudent: Boolean!
+    type: DanishHomeContentsType!
+}
+
+enum DanishHomeContentsType {
+    RENT
+    OWN
 }
 
 input CreateApartmentInput {
@@ -231,7 +238,10 @@ enum TypeOfContract {
     NO_HOME_CONTENT_YOUTH_RENT
     NO_TRAVEL
     NO_TRAVEL_YOUTH
-    DK_HOME_CONTENT
+    DK_HOME_CONTENT_OWN
+    DK_HOME_CONTENT_RENT
+    DK_HOME_CONTENT_STUDENT_OWN
+    DK_HOME_CONTENT_STUDENT_RENT
 }
 
 type CompleteQuote {
@@ -451,6 +461,8 @@ type DanishHomeContentsDetails {
     zipCode: String!
     livingSpace: Int!
     coInsured: Int!
+    isStudent: Boolean!
+    type: DanishHomeContentsType!
 }
 
 type IncompleteQuote {

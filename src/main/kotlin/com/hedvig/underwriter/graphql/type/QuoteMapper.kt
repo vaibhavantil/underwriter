@@ -183,7 +183,9 @@ class QuoteMapper(
             street = quote.data.street,
             zipCode = quote.data.zipCode,
             livingSpace = quote.data.livingSpace,
-            numberCoInsured = quote.data.coInsured
+            numberCoInsured = quote.data.coInsured,
+            isStudent = quote.data.isStudent,
+            lineOfBusiness = quote.data.type
         )
     }
 
@@ -328,7 +330,9 @@ class QuoteMapper(
                 street = it.street,
                 zipCode = it.zipCode,
                 coInsured = it.coInsured,
-                livingSpace = it.livingSpace
+                livingSpace = it.livingSpace,
+                isStudent = it.isStudent,
+                type = it.type
             )
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents`, `norwegianTravel` or `danishHomeContents` data")

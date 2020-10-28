@@ -2,6 +2,7 @@ package com.hedvig.underwriter.testhelp.databuilder
 
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -230,20 +231,24 @@ class a {
         val street: String = "",
         val zipCode: String = "",
         val coInsured: Int = 3,
-        val livingSpace: Int = 25
+        val livingSpace: Int = 25,
+        val isStudent: Boolean = false,
+        val type: DanishHomeContentsType = DanishHomeContentsType.RENT
     ) : DataBuilder<QuoteData> {
 
         override fun build() = DanishHomeContentsData(
-            id,
-            ssn,
-            birthDate,
-            firstName,
-            lastName,
-            email,
-            street,
-            zipCode,
-            coInsured,
-            livingSpace
+            id = id,
+            ssn = ssn,
+            birthDate = birthDate,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            street = street,
+            zipCode = zipCode,
+            livingSpace = coInsured,
+            coInsured = livingSpace,
+            isStudent = isStudent,
+            type = type
         )
     }
 
@@ -287,7 +292,7 @@ class a {
             lastName = lastName,
             email = email,
             currentInsurer = currentInsurer,
-            birthDate = ssn?.birthDateFromSwedishSsn(),
+            birthDate = ssn.birthDateFromSwedishSsn(),
             ssn = ssn,
             quotingPartner = quotingPartner,
             productType = productType,
@@ -463,13 +468,17 @@ class a {
         val street: String = "",
         val zipCode: String = "",
         val coInsured: Int = 3,
-        val livingSpace: Int = 2
+        val livingSpace: Int = 2,
+        val isStudent: Boolean = false,
+        val subType: DanishHomeContentsType = DanishHomeContentsType.RENT
     ) : DataBuilder<QuoteRequestData.DanishHomeContents> {
         override fun build() = QuoteRequestData.DanishHomeContents(
             street = street,
             zipCode = zipCode,
             livingSpace = livingSpace,
-            coInsured = coInsured
+            coInsured = coInsured,
+            isStudent = isStudent,
+            subType = subType
         )
     }
 

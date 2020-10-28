@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.github.imifou.jsonschema.module.addon.annotation.JsonSchema
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 
@@ -52,7 +53,7 @@ sealed class QuoteSchema {
         val numberOfBathrooms: Int,
         @get:JsonProperty("isSubleted")
         @param:JsonProperty("isSubleted")
-        @JsonSchema(title = "Is Subleted", required = true)
+        @JsonSchema(title = "Is Subleted")
         val isSubleted: Boolean = false,
         @JsonSchema(required = true)
         val extraBuildings: List<ExtraBuildingSchema>
@@ -62,7 +63,7 @@ sealed class QuoteSchema {
             val type: ExtraBuildingType,
             @JsonSchema(title = "Area", required = true, min = 0.0)
             val area: Int,
-            @JsonSchema(title = "Has Water Connected", required = true)
+            @JsonSchema(title = "Has Water Connected")
             val hasWaterConnected: Boolean = false
         )
     }
@@ -82,7 +83,7 @@ sealed class QuoteSchema {
         val numberCoInsured: Int,
         @get:JsonProperty("isYouth")
         @param:JsonProperty("isYouth")
-        @JsonSchema(title = "Is Youth", required = true)
+        @JsonSchema(title = "Is Youth")
         val isYouth: Boolean
     ) : QuoteSchema()
 
@@ -91,11 +92,13 @@ sealed class QuoteSchema {
         val numberCoInsured: Int,
         @get:JsonProperty("isYouth")
         @param:JsonProperty("isYouth")
-        @JsonSchema(title = "Is Youth", required = true)
+        @JsonSchema(title = "Is Youth")
         val isYouth: Boolean
     ) : QuoteSchema()
 
     data class DanishHomeContent(
+        @JsonSchema(title = "Line Of Business", required = true)
+        val lineOfBusiness: DanishHomeContentsType,
         @JsonSchema(title = "Street", required = true)
         val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
@@ -103,6 +106,10 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Living Space", required = true, min = 0.0)
         val livingSpace: Int,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
-        val numberCoInsured: Int
+        val numberCoInsured: Int,
+        @get:JsonProperty("isStudent")
+        @param:JsonProperty("isStudent")
+        @JsonSchema(title = "Is Student")
+        val isStudent: Boolean
     ) : QuoteSchema()
 }

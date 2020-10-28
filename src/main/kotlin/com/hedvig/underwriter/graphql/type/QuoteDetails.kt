@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
+import com.hedvig.underwriter.model.DanishHomeContentsType
+
 sealed class QuoteDetails {
 
     abstract val typeOfContract: ContractAgreementType
@@ -75,9 +77,24 @@ sealed class QuoteDetails {
         val street: String,
         val zipCode: String,
         val coInsured: Int,
-        val livingSpace: Int
+        val livingSpace: Int,
+        val isStudent: Boolean,
+        val type: DanishHomeContentsType
     ) : QuoteDetails() {
         override val typeOfContract: ContractAgreementType
-            get() = ContractAgreementType.DK_HOME_CONTENT
+            get() = when (type) {
+                DanishHomeContentsType.OWN -> {
+                    when (isStudent) {
+                        true -> ContractAgreementType.DK_HOME_CONTENT_STUDENT_OWN
+                        false -> ContractAgreementType.DK_HOME_CONTENT_OWN
+                    }
+                }
+                DanishHomeContentsType.RENT -> {
+                    when (isStudent) {
+                        true -> ContractAgreementType.DK_HOME_CONTENT_STUDENT_RENT
+                        false -> ContractAgreementType.DK_HOME_CONTENT_RENT
+                    }
+                }
+            }
     }
 }
