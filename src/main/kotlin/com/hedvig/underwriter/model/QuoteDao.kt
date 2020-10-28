@@ -313,8 +313,8 @@ interface QuoteDao {
                 street,
                 zip_code,
                 living_space,
-                co_insured                
-                is_student                
+                co_insured,                
+                is_student,                
                 type                
             )
             VALUES

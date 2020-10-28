@@ -785,7 +785,7 @@ class QuoteRepositoryImplTest {
             quotes.first { quote -> quote.id == quote1Id })
         assertQuotesDeepEqualExceptInternalId(
             updatedQuote3,
-            quotes.first { quote -> quote.id == quote3Id })
+            quotes.first { quote -> quote.id.equals(quote3Id) })
     }
 
     private fun assertQuotesDeepEqualExceptInternalId(
