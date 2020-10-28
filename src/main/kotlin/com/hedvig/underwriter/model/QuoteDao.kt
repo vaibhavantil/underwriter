@@ -314,6 +314,8 @@ interface QuoteDao {
                 zip_code,
                 living_space,
                 co_insured                
+                is_student                
+                type                
             )
             VALUES
             (
@@ -327,12 +329,14 @@ interface QuoteDao {
                 :zipCode,
                 :livingSpace,
                 :coInsured
+                :isStudent
+                :type
             )
             RETURNING *
     """
     )
     @GetGeneratedKeys("internal_id")
-    fun insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
+    fun  insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
 
     @SqlQuery(
         """
