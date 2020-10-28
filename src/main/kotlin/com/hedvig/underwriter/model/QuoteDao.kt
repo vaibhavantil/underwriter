@@ -336,7 +336,7 @@ interface QuoteDao {
     """
     )
     @GetGeneratedKeys("internal_id")
-    fun  insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
+    fun insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
 
     @SqlQuery(
         """
