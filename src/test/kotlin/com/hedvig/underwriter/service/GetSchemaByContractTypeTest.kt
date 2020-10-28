@@ -164,8 +164,7 @@ internal class GetSchemaByContractTypeTest {
                     },
                     "required": [
                       "type",
-                      "area",
-                      "hasWaterConnected"
+                      "area"
                     ]
                   },
                   "default": []
@@ -179,7 +178,6 @@ internal class GetSchemaByContractTypeTest {
                 "ancillaryArea",
                 "yearOfConstruction",
                 "numberOfBathrooms",
-                "isSubleted",
                 "extraBuildings"
               ],
               "${'$'}id": "SwedishHouse"
@@ -240,8 +238,7 @@ internal class GetSchemaByContractTypeTest {
                 "street",
                 "zipCode",
                 "livingSpace",
-                "numberCoInsured",
-                "isYouth"
+                "numberCoInsured"
               ],
               "${'$'}id": "NorwegianHomeContent"
             }
@@ -270,8 +267,7 @@ internal class GetSchemaByContractTypeTest {
                 }
               },
               "required": [
-                "numberCoInsured",
-                "isYouth"
+                "numberCoInsured"
               ],
               "${'$'}id": "NorwegianTravel"
             }
