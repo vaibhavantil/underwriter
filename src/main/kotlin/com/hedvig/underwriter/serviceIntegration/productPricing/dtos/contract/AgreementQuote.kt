@@ -85,7 +85,6 @@ sealed class AgreementQuote {
         val lineOfBusiness: NorwegianTravelLineOfBusiness
     ) : AgreementQuote()
 
-    // TODO: Use product-pricing-objects lib instead so I don't have to change this code here
     data class DanishHomeContentQuote(
         override val quoteId: UUID,
         override val fromDate: LocalDate?,
