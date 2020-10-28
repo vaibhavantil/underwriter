@@ -328,8 +328,8 @@ interface QuoteDao {
                 :street,
                 :zipCode,
                 :livingSpace,
-                :coInsured
-                :isStudent
+                :coInsured,
+                :isStudent,
                 :type
             )
             RETURNING *
