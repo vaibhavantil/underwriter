@@ -56,3 +56,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20201007-1100-add-columns-to-danish-home-contents.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20201028-1015-support-student-and-type-denmark.sql
+      relativeToChangelogFile: true
