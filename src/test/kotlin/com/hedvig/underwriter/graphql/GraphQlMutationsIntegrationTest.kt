@@ -361,34 +361,9 @@ internal class GraphQlMutationsIntegrationTest {
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
-        val createQuoteInput = CreateQuoteInput(
-            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
-            firstName = "",
-            lastName = "",
-            email = null,
-            currentInsurer = null,
-            ssn = "1212121212",
-            birthDate = null,
-            startDate = null,
-            apartment = null,
-            house = null,
-            swedishApartment = null,
-            swedishHouse = null,
-            norwegianHomeContents = null,
-            norwegianTravel = null,
-            danishHomeContents = CreateDanishHomeContentsInput(
-                street = "Kungsgatan 2",
-                zipCode = "1234",
-                coInsured = 0,
-                livingSpace = 30,
-                isStudent = false,
-                type = DanishHomeContentsType.RENT
-            ),
-            dataCollectionId = null
-        )
         val response = graphQLTestTemplate.perform(
             "/mutations/createDanishHomeContentsQuote.graphql",
-            ObjectMapper().valueToTree(mapOf("input" to createQuoteInput))
+            null
         )
         val createQuote = response.readTree()["data"]["createQuote"]
 

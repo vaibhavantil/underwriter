@@ -22,43 +22,6 @@ mutation {
             id
             insuranceCost {
                 monthlyGross {
-                    ... on SwedishApartmentQuoteDetails {
-                        street
-                        zipCode
-                        livingSpace
-                        householdSize
-                        apartmentType: type
-                    }
-                    ... on SwedishHouseQuoteDetails {
-                        street
-                        zipCode
-                        livingSpace
-                        householdSize
-                        ancillarySpace
-                        extraBuildings {
-                            __typename
-                        }
-                    }
-                    ... on NorwegianHomeContentsDetails {
-                        street
-                        zipCode
-                        livingSpace
-                        coInsured
-                        isYouth
-                        norwegianType: type
-                    }
-                    ... on NorwegianTravelDetails {
-                        coInsured
-                        isYouth
-                    }
-                    ... on DanishHomeContentsDetails {
-                        coInsured
-                        zipCode
-                        livingSpace
-                        coInsured
-                        isStudent
-                        danishHomeContentType: type
-                    }
                     amount
                     currency
                 }
@@ -73,6 +36,43 @@ mutation {
                 freeUntil
             }
             quoteDetails {
+                ... on SwedishApartmentQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    apartmentType: type
+                }
+                ... on SwedishHouseQuoteDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    householdSize
+                    ancillarySpace
+                    extraBuildings {
+                        __typename
+                    }
+                }
+                ... on NorwegianHomeContentsDetails {
+                    street
+                    zipCode
+                    livingSpace
+                    coInsured
+                    isYouth
+                    norwegianType: type
+                }
+                ... on NorwegianTravelDetails {
+                    coInsured
+                    isYouth
+                }
+                ... on DanishHomeContentsDetails {
+                    coInsured
+                    zipCode
+                    livingSpace
+                    coInsured
+                    isStudent
+                    danishHomeContentType: type
+                }
             }
         }
     }
