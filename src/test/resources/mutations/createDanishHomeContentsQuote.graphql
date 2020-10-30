@@ -1,6 +1,6 @@
 mutation {
     createQuote(input: {
-        id: "00000000-0000-0000-0000-000000000007"
+        id: "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"
         firstName: "first"
         lastName: "family"
         birthDate: "1961-12-21"
@@ -22,6 +22,43 @@ mutation {
             id
             insuranceCost {
                 monthlyGross {
+                    ... on SwedishApartmentQuoteDetails {
+                        street
+                        zipCode
+                        livingSpace
+                        householdSize
+                        apartmentType: type
+                    }
+                    ... on SwedishHouseQuoteDetails {
+                        street
+                        zipCode
+                        livingSpace
+                        householdSize
+                        ancillarySpace
+                        extraBuildings {
+                            __typename
+                        }
+                    }
+                    ... on NorwegianHomeContentsDetails {
+                        street
+                        zipCode
+                        livingSpace
+                        coInsured
+                        isYouth
+                        norwegianType: type
+                    }
+                    ... on NorwegianTravelDetails {
+                        coInsured
+                        isYouth
+                    }
+                    ... on DanishHomeContentsDetails {
+                        coInsured
+                        zipCode
+                        livingSpace
+                        coInsured
+                        isStudent
+                        danishHomeContentType: type
+                    }
                     amount
                     currency
                 }
@@ -36,43 +73,6 @@ mutation {
                 freeUntil
             }
             quoteDetails {
-                ... on SwedishApartmentQuoteDetails {
-                    street
-                    zipCode
-                    livingSpace
-                    householdSize
-                    apartmentType: type
-                }
-                ... on SwedishHouseQuoteDetails {
-                    street
-                    zipCode
-                    livingSpace
-                    householdSize
-                    ancillarySpace
-                    extraBuildings {
-                        __typename
-                    }
-                }
-                ... on NorwegianHomeContentsDetails {
-                    street
-                    zipCode
-                    livingSpace
-                    coInsured
-                    isYouth
-                    norwegianType: type
-                }
-                ... on NorwegianTravelDetails {
-                    coInsured
-                    isYouth
-                }
-                ... on DanishHomeContentsDetails {
-                    coInsured
-                    zipCode
-                    livingSpace
-                    coInsured
-                    isStudent
-                    danishHomeContentType: type
-                }
             }
         }
     }

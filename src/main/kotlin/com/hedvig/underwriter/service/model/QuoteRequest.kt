@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.birthDate
+import com.hedvig.underwriter.model.birthDateFromDanishSsn
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.model.email
@@ -34,7 +35,8 @@ data class QuoteRequest(
         JsonSubTypes.Type(value = QuoteRequestData.SwedishApartment::class, name = "apartment"),
         JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
         JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
-        JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel")
+        JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel"),
+        JsonSubTypes.Type(value = QuoteRequestData.DanishHomeContents::class, name = "danishHomeContents")
     ) val incompleteQuoteData: QuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
@@ -48,7 +50,8 @@ data class QuoteRequest(
                 quoteRequestDto.incompleteHouseQuoteData == null &&
                 quoteRequestDto.incompleteApartmentQuoteData == null &&
                 quoteRequestDto.norwegianHomeContentsData == null &&
-                quoteRequestDto.norwegianTravelData == null
+                quoteRequestDto.norwegianTravelData == null &&
+                quoteRequestDto.danishHomeContentsData == null
             ) {
                 throw RuntimeException("Cannot create quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData, norwegianHomeContentsData, norwegianTravelData are all null")
             }
@@ -64,6 +67,7 @@ data class QuoteRequest(
                         quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.ssn?.birthDateFromSwedishSsn()
                     quoteRequestDto.norwegianHomeContentsData != null ||
                         quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.ssn?.birthDateFromNorwegianSsn()
+                    quoteRequestDto.danishHomeContentsData != null -> quoteRequestDto.ssn?.birthDateFromDanishSsn()
                     else -> null
                 },
                 ssn = quoteRequestDto.ssn,
@@ -73,6 +77,7 @@ data class QuoteRequest(
                     quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.incompleteHouseQuoteData
                     quoteRequestDto.norwegianHomeContentsData != null -> quoteRequestDto.norwegianHomeContentsData
                     quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.norwegianTravelData
+                    quoteRequestDto.danishHomeContentsData != null -> quoteRequestDto.danishHomeContentsData
                     else -> quoteRequestDto.incompleteQuoteData
                 },
                 productType = quoteRequestDto.productType,

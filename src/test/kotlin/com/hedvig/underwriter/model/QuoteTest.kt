@@ -8,6 +8,7 @@ import java.time.Instant
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.time.LocalDate
 
 class QuoteTest {
     @Test
@@ -142,5 +143,17 @@ class QuoteTest {
         assertThat((updatedQuote.data as SwedishApartmentData).ssn).isEqualTo("201212121213")
         assertThat((updatedQuote.data as SwedishApartmentData).street).isEqualTo("Storgatan 2")
         assertThat((updatedQuote.data as SwedishApartmentData).subType).isEqualTo(ApartmentProductSubType.BRF)
+    }
+
+    @Test
+    fun `gets Danish birth date from Danish SSN`() {
+        val birthDate = "1408300921".birthDateFromDanishSsn()
+        assertThat(birthDate).isEqualTo(LocalDate.of(1930, 8, 14))
+    }
+
+    @Test
+    fun `gets Danish birth date from Norwegian SSN`() {
+        val birthDate = "23077421475".birthDateFromDanishSsn()
+        assertThat(birthDate).isEqualTo(LocalDate.of(1974, 7, 23))
     }
 }
