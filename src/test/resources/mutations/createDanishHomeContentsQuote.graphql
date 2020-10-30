@@ -9,6 +9,8 @@ mutation {
             livingSpace: 30
             zipCode: "1234"
             coInsured: 0
+            isStudent: false
+            type: RENT
         }
     }) {
         ... on UnderwritingLimitsHit {
@@ -64,10 +66,12 @@ mutation {
                     isYouth
                 }
                 ... on DanishHomeContentsDetails {
-                    street
+                    coInsured
                     zipCode
                     livingSpace
                     coInsured
+                    isStudent
+                    danishHomeContentType: type
                 }
             }
         }

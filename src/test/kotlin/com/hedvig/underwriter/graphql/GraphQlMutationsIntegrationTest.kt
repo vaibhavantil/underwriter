@@ -3,10 +3,12 @@ package com.hedvig.underwriter.graphql
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
+import com.hedvig.underwriter.graphql.type.CreateDanishHomeContentsInput
 import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.SignService
@@ -290,22 +292,25 @@ internal class GraphQlMutationsIntegrationTest {
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
         val createQuoteInput = CreateQuoteInput(
-            UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
-            "",
-            "",
-            null,
-            null,
-            "21126114165",
-            "21126114165".birthDateFromNorwegianSsn(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            CreateNorwegianTravelInput(0, false),
-            null,
-            null
+            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
+            firstName = "",
+            lastName = "",
+            email = null,
+            currentInsurer = null,
+            ssn = "21126114165",
+            birthDate = "21126114165".birthDateFromNorwegianSsn(),
+            startDate = null,
+            apartment = null,
+            house = null,
+            swedishApartment = null,
+            swedishHouse = null,
+            norwegianHomeContents = null,
+            norwegianTravel = CreateNorwegianTravelInput(
+                coInsured = 0,
+                isYouth = false
+            ),
+            danishHomeContents = null,
+            dataCollectionId = null
         )
 
         val response = graphQLTestTemplate.perform(
@@ -356,17 +361,47 @@ internal class GraphQlMutationsIntegrationTest {
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
-        val response = graphQLTestTemplate.perform("/mutations/createDanishHomeContentsQuote.graphql", null)
+        val createQuoteInput = CreateQuoteInput(
+            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+            firstName = "",
+            lastName = "",
+            email = null,
+            currentInsurer = null,
+            ssn = "1212121212",
+            birthDate = null,
+            startDate = null,
+            apartment = null,
+            house = null,
+            swedishApartment = null,
+            swedishHouse = null,
+            norwegianHomeContents = null,
+            norwegianTravel = null,
+            danishHomeContents = CreateDanishHomeContentsInput(
+                street = "Kungsgatan 2",
+                zipCode = "1234",
+                coInsured = 0,
+                livingSpace = 30,
+                isStudent = false,
+                type = DanishHomeContentsType.RENT
+            ),
+            dataCollectionId = null
+        )
+        val response = graphQLTestTemplate.perform(
+            "/mutations/createDanishHomeContentsQuote.graphql",
+            ObjectMapper().valueToTree(mapOf("input" to createQuoteInput))
+        )
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
-        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000007")
+        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
         assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["isStudent"].booleanValue() == false)
+        assert(createQuote["quoteDetails"]["danishHomeContentType"].textValue() == "RENT")
     }
 
     @Test
@@ -403,22 +438,25 @@ internal class GraphQlMutationsIntegrationTest {
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
         val createQuoteInput = CreateQuoteInput(
-            UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
-            "",
-            "",
-            null,
-            null,
-            "1212121212",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            CreateNorwegianTravelInput(0, false),
-            null,
-            null
+            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+            firstName = "",
+            lastName = "",
+            email = null,
+            currentInsurer = null,
+            ssn = "1212121212",
+            birthDate = null,
+            startDate = null,
+            apartment = null,
+            house = null,
+            swedishApartment = null,
+            swedishHouse = null,
+            norwegianHomeContents = null,
+            norwegianTravel = CreateNorwegianTravelInput(
+                coInsured = 0,
+                isYouth = false
+            ),
+            danishHomeContents = null,
+            dataCollectionId = null
         )
         val response = graphQLTestTemplate.perform(
             "/mutations/createNorwegianTravelQuote.graphql",

@@ -52,6 +52,14 @@ mutation create($input:CreateQuoteInput!) {
                     coInsured
                     isYouth
                 }
+                ... on DanishHomeContentsDetails {
+                    coInsured
+                    zipCode
+                    livingSpace
+                    coInsured
+                    isStudent
+                    danishHomeContentType: type
+                }
             }
         }
     }
