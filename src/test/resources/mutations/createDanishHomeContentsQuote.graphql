@@ -67,6 +67,7 @@ mutation {
                 }
                 ... on DanishHomeContentsDetails {
                     coInsured
+                    street
                     zipCode
                     livingSpace
                     coInsured
