@@ -152,7 +152,7 @@ class Mutation @Autowired constructor(
 
     private fun addCenturyToSSN(ssn: String): String {
         val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
-        val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+        val breakPoint = LocalDate.now().minusYears(10).year % 100
 
         return if (personalIdentityNumberYear > breakPoint) {
             "19$ssn"

@@ -146,13 +146,13 @@ class QuoteTest {
     }
 
     @Test
-    fun `gets Danish birth date from Danish SSN`() {
+    fun `gets birth date from Danish SSN`() {
         val birthDate = "1408300921".birthDateFromDanishSsn()
         assertThat(birthDate).isEqualTo(LocalDate.of(1930, 8, 14))
     }
 
     @Test
-    fun `gets Danish birth date from Norwegian SSN`() {
+    fun `gets birth date from Norwegian SSN`() {
         val birthDate = "23077421475".birthDateFromDanishSsn()
         assertThat(birthDate).isEqualTo(LocalDate.of(1974, 7, 23))
     }

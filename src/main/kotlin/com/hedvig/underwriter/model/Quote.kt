@@ -89,7 +89,7 @@ fun String.dayMonthAndTwoDigitYearFromDDMMYYSsn(): Triple<String, String, String
 }
 
 fun yearFromTwoDigitYear(year: Int): Int {
-    val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
+    val breakPoint = LocalDate.now().minusYears(10).year % 100
     return if (year > breakPoint) {
         "19$year".toInt()
     } else {
