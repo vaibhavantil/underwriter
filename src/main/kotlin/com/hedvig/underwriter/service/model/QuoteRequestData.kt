@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
 
@@ -52,7 +53,9 @@ sealed class QuoteRequestData {
         val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
-        val livingSpace: Int?
+        val livingSpace: Int?,
+        val isStudent: Boolean?,
+        val subType: DanishHomeContentsType?
     ) : QuoteRequestData()
 
     companion object {
@@ -103,7 +106,9 @@ sealed class QuoteRequestData {
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
                 livingSpace = quoteSchema.livingSpace,
-                coInsured = quoteSchema.numberCoInsured
+                coInsured = quoteSchema.numberCoInsured,
+                isStudent = quoteSchema.isStudent,
+                subType = quoteSchema.lineOfBusiness
             )
         }
     }

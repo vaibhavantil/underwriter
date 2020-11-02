@@ -65,6 +65,14 @@ mutation {
                     coInsured
                     isYouth
                 }
+                ... on DanishHomeContentsDetails {
+                    coInsured
+                    zipCode
+                    livingSpace
+                    coInsured
+                    isStudent
+                    danishHomeContentType: type
+                }
             }
         }
     }

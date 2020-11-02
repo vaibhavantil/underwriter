@@ -68,11 +68,19 @@ fun String.birthDateFromSwedishSsn(): LocalDate {
     )
 }
 
-fun String.birthDateFromNorwegianSsn(): LocalDate {
-    return LocalDate.parse(this.birthDateStringFromNorwegianSsn())
+fun String.birthDateFromNorwegianSsn(): LocalDate = this.birthDateFromDDMMYYSsn()
+
+fun String.birthDateFromDanishSsn(): LocalDate = this.birthDateFromDDMMYYSsn()
+
+private fun String.birthDateFromDDMMYYSsn(): LocalDate {
+    val dayMonthTwoDigitYear = this.dayMonthAndTwoDigitYearFromDDMMYYSsn()
+    val year = yearFromTwoDigitYear(dayMonthTwoDigitYear.third.toInt())
+    val month = dayMonthTwoDigitYear.second.toInt()
+    val day = dayMonthTwoDigitYear.first.toInt()
+    return LocalDate.of(year, month, day)
 }
 
-fun String.dayMonthAndTwoDigitYearFromNorwegianSsn(): Triple<String, String, String> {
+fun String.dayMonthAndTwoDigitYearFromDDMMYYSsn(): Triple<String, String, String> {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     val day = trimmedInput.substring(0, 2)
     val month = trimmedInput.substring(2, 4)
@@ -80,16 +88,13 @@ fun String.dayMonthAndTwoDigitYearFromNorwegianSsn(): Triple<String, String, Str
     return Triple(day, month, twoDigitYear)
 }
 
-fun String.birthDateStringFromNorwegianSsn(): String {
-    val dayMonthYear = this.dayMonthAndTwoDigitYearFromNorwegianSsn()
-    val breakPoint = LocalDate.now().minusYears(10).year.toString().substring(2, 4).toInt()
-
-    val year = if (dayMonthYear.third.toInt() > breakPoint) {
-        "19${dayMonthYear.third}"
+fun yearFromTwoDigitYear(year: Int): Int {
+    val breakPoint = LocalDate.now().minusYears(10).year % 100
+    return if (year > breakPoint) {
+        "19$year".toInt()
     } else {
-        "20${dayMonthYear.third}"
+        "20$year".toInt()
     }
-    return "$year-${dayMonthYear.second}-${dayMonthYear.first}"
 }
 
 fun String.isValidNorwegianSsn(): Boolean {

@@ -626,7 +626,9 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 id = UUID.randomUUID(),
                 coInsured = 1,
-                email = "em@i.l"
+                email = "em@i.l",
+                isStudent = false,
+                type = DanishHomeContentsType.RENT
             ),
             breachedUnderwritingGuidelines = null,
             currentInsurer = null
@@ -663,7 +665,9 @@ class QuoteRepositoryImplTest {
                 livingSpace = 33,
                 id = UUID.randomUUID(),
                 coInsured = 1,
-                email = "em@i.l"
+                email = "em@i.l",
+                isStudent = false,
+                type = DanishHomeContentsType.RENT
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,
@@ -778,10 +782,10 @@ class QuoteRepositoryImplTest {
         assertThat(quotes.size).isEqualTo(3)
         assertQuotesDeepEqualExceptInternalId(
             updatedQuote,
-            quotes.first { quote -> quote?.id?.equals(quote1Id) ?: false })
+            quotes.first { quote -> quote.id == quote1Id })
         assertQuotesDeepEqualExceptInternalId(
             updatedQuote3,
-            quotes.first { quote -> quote?.id?.equals(quote3Id) ?: false })
+            quotes.first { quote -> quote.id.equals(quote3Id) })
     }
 
     private fun assertQuotesDeepEqualExceptInternalId(

@@ -1,6 +1,6 @@
 mutation {
     createQuote(input: {
-        id: "00000000-0000-0000-0000-000000000007"
+        id: "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"
         firstName: "first"
         lastName: "family"
         birthDate: "1961-12-21"
@@ -9,6 +9,8 @@ mutation {
             livingSpace: 30
             zipCode: "1234"
             coInsured: 0
+            isStudent: false
+            type: RENT
         }
     }) {
         ... on UnderwritingLimitsHit {
@@ -64,10 +66,13 @@ mutation {
                     isYouth
                 }
                 ... on DanishHomeContentsDetails {
+                    coInsured
                     street
                     zipCode
                     livingSpace
                     coInsured
+                    isStudent
+                    danishHomeContentType: type
                 }
             }
         }

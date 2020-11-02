@@ -94,7 +94,8 @@ sealed class AgreementQuote {
         override val currentInsurer: String?,
         val address: AddressDto,
         val coInsured: List<CoInsuredDto>,
-        val squareMeters: Long
+        val squareMeters: Long,
+        val lineOfBusiness: DanishHomeContentLineOfBusiness
     ) : AgreementQuote()
 
     companion object {
@@ -158,7 +159,8 @@ sealed class AgreementQuote {
                 currentInsurer = quote.currentInsurer,
                 address = AddressDto.from(quote.data),
                 squareMeters = quote.data.livingSpace.toLong(),
-                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
+                lineOfBusiness = DanishHomeContentLineOfBusiness.from(quote.data.type, quote.data.isStudent)
             )
         }
     }
