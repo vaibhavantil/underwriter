@@ -384,7 +384,7 @@ internal class GraphQlMutationsIntegrationTest {
             priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel(
                     holderMemberId = "123",
-                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae6"),
                     holderBirthDate = "1212121212".birthDateFromNorwegianSsn(),
                     numberCoInsured = 0,
                     lineOfBusiness = NorwegianTravelLineOfBusiness.REGULAR
@@ -411,7 +411,7 @@ internal class GraphQlMutationsIntegrationTest {
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
         val createQuoteInput = CreateQuoteInput(
-            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+            id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae6"),
             firstName = "",
             lastName = "",
             email = null,
