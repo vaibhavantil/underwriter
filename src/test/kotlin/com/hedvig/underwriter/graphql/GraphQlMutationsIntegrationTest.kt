@@ -3,12 +3,10 @@ package com.hedvig.underwriter.graphql
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
-import com.hedvig.underwriter.graphql.type.CreateDanishHomeContentsInput
 import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
-import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.SignService
