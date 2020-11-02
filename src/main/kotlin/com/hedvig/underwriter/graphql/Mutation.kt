@@ -41,7 +41,7 @@ class Mutation @Autowired constructor(
             createQuoteInput.apartment != null || createQuoteInput.house != null ||
                 createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
                 val ssn = if (createQuoteInput.ssn!!.length == 10) {
-                    addCenturyToSSN(createQuoteInput.ssn)
+                    addCenturyToSwedishSSN(createQuoteInput.ssn)
                 } else {
                     createQuoteInput.ssn
                 }
@@ -150,7 +150,7 @@ class Mutation @Autowired constructor(
             throw IllegalStateException("MemberId is not provided [Error Message: ${errorResponse.errorMessage}]")
     }
 
-    private fun addCenturyToSSN(ssn: String): String {
+    private fun addCenturyToSwedishSSN(ssn: String): String {
         val personalIdentityNumberYear = ssn.substring(0, 2).toInt()
         val breakPoint = LocalDate.now().minusYears(10).year % 100
 
