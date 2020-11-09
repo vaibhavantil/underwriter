@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.model.NorwegianHomeContentsType as InternalNorwegianHomeContentsType
 
 data class EditNorwegianHomeContentsInput(
     val street: String?,
@@ -16,7 +17,11 @@ data class EditNorwegianHomeContentsInput(
             zipCode = this.zipCode,
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
-            subType = this.type?.let { com.hedvig.underwriter.model.NorwegianHomeContentsType.valueOf(it.name) },
+            subType = when (this.type) {
+                NorwegianHomeContentsType.OWN -> InternalNorwegianHomeContentsType.OWN
+                NorwegianHomeContentsType.RENT -> InternalNorwegianHomeContentsType.RENT
+                null -> null
+            },
             isYouth = this.isYouth,
             city = null
         )
