@@ -123,6 +123,7 @@ input EditQuoteInput {
     swedishHouse: EditSwedishHouseInput
     norwegianHomeContents: EditNorwegianHomeContentsInput
     norwegianTravel: EditNorwegianTravelInput
+    danishHomeContents: EditDanishHomeContentsInput
     email: String
 }
 
@@ -173,6 +174,15 @@ input EditNorwegianHomeContentsInput {
     livingSpace: Int
     isYouth: Boolean
     type: NorwegianHomeContentsType
+}
+
+input EditDanishHomeContentsInput {
+    street: String
+    zipCode: String
+    coInsured: Int
+    livingSpace: Int
+    isStudent: Boolean
+    type: DanishHomeContentsType
 }
 
 input EditNorwegianTravelInput {

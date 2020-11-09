@@ -4,6 +4,7 @@ import com.hedvig.underwriter.graphql.type.depricated.EditApartmentInput
 import com.hedvig.underwriter.graphql.type.depricated.EditHouseInput
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
+import com.hedvig.underwriter.model.birthDateFromDanishSsn
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -28,6 +29,7 @@ data class EditQuoteInput(
     val swedishHouse: EditSwedishHouseInput?,
     val norwegianHomeContents: EditNorwegianHomeContentsInput?,
     val norwegianTravel: EditNorwegianTravelInput?,
+    val danishHomeContents: EditDanishHomeContentsInput?,
     val dataCollectionId: UUID?
 ) {
     fun toQuoteRequest(
@@ -42,6 +44,7 @@ data class EditQuoteInput(
         birthDate = this.birthDate ?: when {
             this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
             this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
+            this.danishHomeContents != null -> this.ssn?.birthDateFromDanishSsn()
             else -> null
         },
         ssn = this.ssn,
@@ -51,6 +54,7 @@ data class EditQuoteInput(
             this.swedishHouse != null -> this.swedishHouse.toQuoteRequestDataDto()
             this.norwegianHomeContents != null -> this.norwegianHomeContents.toQuoteRequestDataDto()
             this.norwegianTravel != null -> this.norwegianTravel.toQuoteRequestDataDto()
+            this.danishHomeContents != null -> this.danishHomeContents.toQuoteRequestDataDto()
             this.apartment != null -> this.apartment.toQuoteRequestDataDto()
             this.house != null -> this.house.toQuoteRequestDataDto()
             else -> null
