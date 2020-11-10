@@ -1,10 +1,9 @@
 package com.hedvig.underwriter.serviceIntegration.customerio
 
 import com.hedvig.underwriter.model.Quote
-import java.time.LocalDate
-import java.time.ZoneId
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
+import java.time.Instant
 
 private val logger = KotlinLogging.logger {}
 
@@ -18,7 +17,7 @@ class CustomerIO(val customerIOClient: CustomerIOClient) {
                 val map = mapOf(
                     "partner_code" to quote.attributedTo.name,
                     "sign_source" to quote.initiatedFrom.name,
-                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond(),
+                    "sign_date" to Instant.now(),
                     "switcher_company" to quote.currentInsurer,
                     "is_switcher" to isSwitcher
                 )
