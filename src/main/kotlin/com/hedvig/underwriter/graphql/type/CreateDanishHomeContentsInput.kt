@@ -1,13 +1,14 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHomeContentsType
 
 data class CreateDanishHomeContentsInput(
     val street: String,
     val zipCode: String,
     val coInsured: Int,
     val livingSpace: Int,
+    @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     val type: DanishHomeContentsType
 ) {
@@ -18,6 +19,9 @@ data class CreateDanishHomeContentsInput(
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
             isStudent = this.isStudent,
-            subType = this.type
+            subType = when (this.type) {
+                DanishHomeContentsType.OWN -> InternalDanishHomeContentsType.OWN
+                DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
+            }
         )
 }

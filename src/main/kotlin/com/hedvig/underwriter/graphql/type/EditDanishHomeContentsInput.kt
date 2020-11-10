@@ -1,28 +1,27 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.model.NorwegianHomeContentsType as InternalNorwegianHomeContentsType
+import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHomeContentsType
 
-data class EditNorwegianHomeContentsInput(
+data class EditDanishHomeContentsInput(
     val street: String?,
     val zipCode: String?,
     val coInsured: Int?,
     val livingSpace: Int?,
-    val isYouth: Boolean?,
-    val type: NorwegianHomeContentsType?
+    val isStudent: Boolean?,
+    val type: DanishHomeContentsType?
 ) {
     fun toQuoteRequestDataDto() =
-        QuoteRequestData.NorwegianHomeContents(
+        QuoteRequestData.DanishHomeContents(
             street = this.street,
             zipCode = this.zipCode,
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
             subType = when (this.type) {
-                NorwegianHomeContentsType.OWN -> InternalNorwegianHomeContentsType.OWN
-                NorwegianHomeContentsType.RENT -> InternalNorwegianHomeContentsType.RENT
+                DanishHomeContentsType.OWN -> InternalDanishHomeContentsType.OWN
+                DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
                 null -> null
             },
-            isYouth = this.isYouth,
-            city = null
+            isStudent = this.isStudent
         )
 }

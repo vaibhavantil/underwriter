@@ -3,10 +3,13 @@ package com.hedvig.underwriter.graphql.type
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -27,6 +30,8 @@ import com.hedvig.underwriter.util.toStockholmLocalDate
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.util.Locale
+import com.hedvig.underwriter.graphql.type.DanishHomeContentsType as ExternalDanishHomeContentsType
+import com.hedvig.underwriter.graphql.type.NorwegianHomeContentsType as ExternalNorwegianHomeContentsType
 
 @Component
 class QuoteMapper(
@@ -289,27 +294,33 @@ class QuoteMapper(
         quote: Quote,
         locale: Locale
     ): QuoteDetails =
-        quote.swedishApartment?.let { apartment ->
+        quote.swedishApartment?.let {
             QuoteDetails.SwedishApartmentQuoteDetails(
-                street = apartment.street!!,
-                zipCode = apartment.zipCode!!,
-                householdSize = apartment.householdSize!!,
-                livingSpace = apartment.livingSpace!!,
-                type = ApartmentType.valueOf(apartment.subType!!.name)
+                street = it.street!!,
+                zipCode = it.zipCode!!,
+                householdSize = it.householdSize!!,
+                livingSpace = it.livingSpace!!,
+                type = when (it.subType) {
+                    ApartmentProductSubType.BRF -> ApartmentType.BRF
+                    ApartmentProductSubType.RENT -> ApartmentType.RENT
+                    ApartmentProductSubType.STUDENT_BRF -> ApartmentType.STUDENT_BRF
+                    ApartmentProductSubType.STUDENT_RENT -> ApartmentType.STUDENT_RENT
+                    null -> throw IllegalArgumentException("Missing subType when mapping quote to SwedishApartmentQuoteDetails (quoteId=${quote.id})")
+                }
             )
-        } ?: quote.swedishHouse?.let { house ->
+        } ?: quote.swedishHouse?.let {
             QuoteDetails.SwedishHouseQuoteDetails(
-                street = house.street!!,
-                zipCode = house.zipCode!!,
-                householdSize = house.householdSize!!,
-                livingSpace = house.livingSpace!!,
-                ancillarySpace = house.ancillaryArea!!,
-                extraBuildings = house.extraBuildings!!.map { extraBuildingInput ->
+                street = it.street!!,
+                zipCode = it.zipCode!!,
+                householdSize = it.householdSize!!,
+                livingSpace = it.livingSpace!!,
+                ancillarySpace = it.ancillaryArea!!,
+                extraBuildings = it.extraBuildings!!.map { extraBuildingInput ->
                     mapToExtraBuildingCore(extraBuildingInput, locale)
                 },
-                numberOfBathrooms = house.numberOfBathrooms!!,
-                yearOfConstruction = house.yearOfConstruction!!,
-                isSubleted = house.isSubleted!!
+                numberOfBathrooms = it.numberOfBathrooms!!,
+                yearOfConstruction = it.yearOfConstruction!!,
+                isSubleted = it.isSubleted!!
             )
         } ?: quote.norwegianHomeContents?.let {
             QuoteDetails.NorwegianHomeContentsDetails(
@@ -318,7 +329,10 @@ class QuoteMapper(
                 coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
                 isYouth = it.isYouth,
-                type = NorwegianHomeContentsType.valueOf(it.type.name)
+                type = when (it.type) {
+                    NorwegianHomeContentsType.RENT -> ExternalNorwegianHomeContentsType.RENT
+                    NorwegianHomeContentsType.OWN -> ExternalNorwegianHomeContentsType.OWN
+                }
             )
         } ?: quote.norwegianTravel?.let {
             QuoteDetails.NorwegianTravelDetails(
@@ -332,7 +346,10 @@ class QuoteMapper(
                 coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
                 isStudent = it.isStudent,
-                type = it.type
+                type = when (it.type) {
+                    DanishHomeContentsType.RENT -> ExternalDanishHomeContentsType.RENT
+                    DanishHomeContentsType.OWN -> ExternalDanishHomeContentsType.OWN
+                }
             )
         }
         ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`, `norwegianHomeContents`, `norwegianTravel` or `danishHomeContents` data")
