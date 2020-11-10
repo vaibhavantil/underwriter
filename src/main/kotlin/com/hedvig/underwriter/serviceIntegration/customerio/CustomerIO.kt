@@ -18,7 +18,7 @@ class CustomerIO(val customerIOClient: CustomerIOClient) {
                 val map = mapOf(
                     "partner_code" to quote.attributedTo.name,
                     "sign_source" to quote.initiatedFrom.name,
-                    "sign_date" to LocalDate.now().atStartOfDay(ZoneId.of("Europe/Stockholm")).toEpochSecond(),
+                    "sign_date" to LocalDate.now(),
                     "switcher_company" to quote.currentInsurer,
                     "is_switcher" to isSwitcher
                 )
