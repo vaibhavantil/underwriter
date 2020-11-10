@@ -1,7 +1,5 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.underwriter.model.DanishHomeContentsType
-
 sealed class QuoteDetails {
 
     abstract val typeOfContract: ContractAgreementType
