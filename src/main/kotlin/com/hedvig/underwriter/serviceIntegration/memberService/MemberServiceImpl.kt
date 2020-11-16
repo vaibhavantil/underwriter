@@ -3,6 +3,7 @@ package com.hedvig.underwriter.serviceIntegration.memberService
 import arrow.core.Either
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
@@ -15,6 +16,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.util.maskSsn
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
@@ -62,9 +64,9 @@ class MemberServiceImpl @Autowired constructor(
         try {
             this.client.checkPersonDebt(ssn)
         } catch (e: RestClientResponseException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
+            logger.error("Cannot check debt for the following personnummer {}", ssn.maskSsn(Market.SWEDEN), e)
         } catch (e: FeignException) {
-            logger.error("Cannot check debt for the following personnummer {}", ssn, e)
+            logger.error("Cannot check debt for the following personnummer {}", ssn.maskSsn(Market.SWEDEN), e)
         }
     }
 
