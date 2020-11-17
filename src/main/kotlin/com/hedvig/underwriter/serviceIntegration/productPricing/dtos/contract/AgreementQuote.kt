@@ -3,7 +3,9 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -98,6 +100,29 @@ sealed class AgreementQuote {
         val lineOfBusiness: DanishHomeContentLineOfBusiness
     ) : AgreementQuote()
 
+    data class DanishAccidentQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
+        override val currentInsurer: String?,
+        val address: AddressDto,
+        val coInsured: List<CoInsuredDto>
+    ) : AgreementQuote()
+
+    data class DanishTravelQuote(
+        override val quoteId: UUID,
+        override val fromDate: LocalDate?,
+        override val toDate: LocalDate?,
+        override val premium: BigDecimal,
+        override val currency: String,
+        override val currentInsurer: String?,
+        val address: AddressDto,
+        val coInsured: List<CoInsuredDto>
+    ) : AgreementQuote()
+
+
     companion object {
         fun from(quote: Quote, fromDate: LocalDate? = null, toDate: LocalDate? = null) = when (quote.data) {
             is SwedishApartmentData -> SwedishApartmentQuote(
@@ -161,6 +186,26 @@ sealed class AgreementQuote {
                 squareMeters = quote.data.livingSpace.toLong(),
                 coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) },
                 lineOfBusiness = DanishHomeContentLineOfBusiness.from(quote.data.type, quote.data.isStudent)
+            )
+            is DanishAccidentData -> DanishAccidentQuote(
+                quoteId = quote.id,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
+                premium = quote.price!!,
+                currency = quote.currency,
+                currentInsurer = quote.currentInsurer,
+                address = AddressDto.from(quote.data),
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
+            )
+            is DanishTravelData -> DanishTravelQuote(
+                quoteId = quote.id,
+                fromDate = fromDate ?: quote.startDate,
+                toDate = toDate,
+                premium = quote.price!!,
+                currency = quote.currency,
+                currentInsurer = quote.currentInsurer,
+                address = AddressDto.from(quote.data),
+                coInsured = List(quote.data.coInsured) { CoInsuredDto(null, null, null) }
             )
         }
     }

@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.QuoteData
@@ -35,6 +37,18 @@ data class AddressDto(
                 country = CountryCode.NO
             )
             is DanishHomeContentsData -> AddressDto(
+                street = data.street,
+                postalCode = data.zipCode,
+                city = data.city,
+                country = CountryCode.DK
+            )
+            is DanishAccidentData -> AddressDto(
+                street = data.street,
+                postalCode = data.zipCode,
+                city = data.city,
+                country = CountryCode.DK
+            )
+            is DanishTravelData -> AddressDto(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,

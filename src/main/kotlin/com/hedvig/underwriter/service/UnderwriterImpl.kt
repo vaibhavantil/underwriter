@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -129,7 +131,34 @@ class UnderwriterImpl(
                         isStudent = quoteData.isStudent!!,
                         type = quoteData.subType!!
                     )
+                is QuoteRequestData.DanishAccident ->
+                    DanishAccidentData(
+                        id = UUID.randomUUID(),
+                        ssn = quoteRequest.ssn,
+                        birthDate = quoteRequest.birthDate!!,
+                        firstName = quoteRequest.firstName!!,
+                        lastName = quoteRequest.lastName!!,
+                        email = quoteRequest.email,
+                        street = quoteData.street!!,
+                        zipCode = quoteData.zipCode!!,
+                        coInsured = quoteData.coInsured!!,
+                        isStudent = quoteData.isStudent!!
+                    )
+                is QuoteRequestData.DanishTravel ->
+                    DanishTravelData(
+                        id = UUID.randomUUID(),
+                        ssn = quoteRequest.ssn,
+                        birthDate = quoteRequest.birthDate!!,
+                        firstName = quoteRequest.firstName!!,
+                        lastName = quoteRequest.lastName!!,
+                        email = quoteRequest.email,
+                        street = quoteData.street!!,
+                        zipCode = quoteData.zipCode!!,
+                        coInsured = quoteData.coInsured!!,
+                        isStudent = quoteData.isStudent!!
+                    )
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
+
             },
             state = QuoteState.INCOMPLETE,
             memberId = quoteRequest.memberId,
@@ -213,6 +242,14 @@ class UnderwriterImpl(
                 // TODO: fix when pricing is in place
                 BigDecimal(9999)
             }
+            is DanishAccidentData -> {
+                // TODO: fix when pricing is in place
+                BigDecimal(6666)
+            }
+            is DanishTravelData -> {
+                // TODO: fix when pricing is in place
+                BigDecimal(3333)
+            }
         }
     }
 
@@ -242,6 +279,14 @@ class UnderwriterImpl(
                 // TODO: fix when we have guidlines
                 mutableListOf()
             }
+            is DanishAccidentData -> {
+                // TODO: fix when we have guidlines
+                mutableListOf()
+            }
+            is DanishTravelData -> {
+                // TODO: fix when we have guidlines
+                mutableListOf()
+            }
         }
 
     private fun validateProductGuidelines(data: QuoteData): List<String> =
@@ -267,6 +312,14 @@ class UnderwriterImpl(
                     NorwegianTravelGuidelines.setOfRules
                 )
             is DanishHomeContentsData -> {
+                // TODO: fix when we have guidelines
+                mutableListOf()
+            }
+            is DanishAccidentData -> {
+                // TODO: fix when we have guidelines
+                mutableListOf()
+            }
+            is DanishTravelData -> {
                 // TODO: fix when we have guidelines
                 mutableListOf()
             }

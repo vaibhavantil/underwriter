@@ -2,7 +2,9 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -400,7 +402,9 @@ class SignServiceImpl(
                     )
                     is NorwegianHomeContentsData,
                     is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
-                    is DanishHomeContentsData -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
+                    is DanishHomeContentsData,
+                    is DanishAccidentData,
+                    is DanishTravelData -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
                 }
             2 -> if (
                 quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&

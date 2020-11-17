@@ -308,6 +308,8 @@ internal class GraphQlMutationsIntegrationTest {
                 isYouth = false
             ),
             danishHomeContents = null,
+            danishAccident = null,
+            danishTravel = null,
             dataCollectionId = null
         )
 
@@ -429,6 +431,8 @@ internal class GraphQlMutationsIntegrationTest {
                 isYouth = false
             ),
             danishHomeContents = null,
+            danishAccident = null,
+            danishTravel = null,
             dataCollectionId = null
         )
         val response = graphQLTestTemplate.perform(
