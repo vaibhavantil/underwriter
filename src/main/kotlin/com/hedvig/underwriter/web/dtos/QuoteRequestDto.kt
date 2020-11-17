@@ -24,7 +24,9 @@ data class QuoteRequestDto(
         JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
         JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
         JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel"),
-        JsonSubTypes.Type(value = QuoteRequestData.DanishHomeContents::class, name = "danishHomeContents")
+        JsonSubTypes.Type(value = QuoteRequestData.DanishHomeContents::class, name = "danishHomeContents"),
+        JsonSubTypes.Type(value = QuoteRequestData.DanishAccident::class, name = "danishAccident"),
+        JsonSubTypes.Type(value = QuoteRequestData.DanishTravel::class, name = "danishTravel")
     )
     val incompleteQuoteData: QuoteRequestData?,
     val incompleteHouseQuoteData: QuoteRequestData.SwedishHouse?,
@@ -32,6 +34,8 @@ data class QuoteRequestDto(
     val norwegianHomeContentsData: QuoteRequestData.NorwegianHomeContents?,
     val norwegianTravelData: QuoteRequestData.NorwegianTravel?,
     val danishHomeContentsData: QuoteRequestData.DanishHomeContents?,
+    val danishAccidentData: QuoteRequestData.DanishAccident?,
+    val danishTravelData: QuoteRequestData.DanishTravel?,
     val memberId: String? = null,
     val originatingProductId: UUID? = null,
     val startDate: Instant? = null,

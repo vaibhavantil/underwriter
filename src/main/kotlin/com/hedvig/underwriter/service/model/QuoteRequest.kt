@@ -36,7 +36,9 @@ data class QuoteRequest(
         JsonSubTypes.Type(value = QuoteRequestData.SwedishHouse::class, name = "house"),
         JsonSubTypes.Type(value = QuoteRequestData.NorwegianHomeContents::class, name = "norwegianHomeContents"),
         JsonSubTypes.Type(value = QuoteRequestData.NorwegianTravel::class, name = "norwegianTravel"),
-        JsonSubTypes.Type(value = QuoteRequestData.DanishHomeContents::class, name = "danishHomeContents")
+        JsonSubTypes.Type(value = QuoteRequestData.DanishHomeContents::class, name = "danishHomeContents"),
+        JsonSubTypes.Type(value = QuoteRequestData.DanishAccident::class, name = "danishAccident"),
+        JsonSubTypes.Type(value = QuoteRequestData.DanishTravel::class, name = "danishTravel")
     ) val incompleteQuoteData: QuoteRequestData?,
     val memberId: String?,
     val originatingProductId: UUID?,
@@ -51,7 +53,9 @@ data class QuoteRequest(
                 quoteRequestDto.incompleteApartmentQuoteData == null &&
                 quoteRequestDto.norwegianHomeContentsData == null &&
                 quoteRequestDto.norwegianTravelData == null &&
-                quoteRequestDto.danishHomeContentsData == null
+                quoteRequestDto.danishHomeContentsData == null &&
+                quoteRequestDto.danishAccidentData == null &&
+                quoteRequestDto.danishTravelData == null
             ) {
                 throw RuntimeException("Cannot create quote data as incompleteQuoteData, incompleteHouseQuoteData and incompleteApartmentQuoteData, norwegianHomeContentsData, norwegianTravelData are all null")
             }
@@ -67,7 +71,9 @@ data class QuoteRequest(
                         quoteRequestDto.incompleteHouseQuoteData != null -> quoteRequestDto.ssn?.birthDateFromSwedishSsn()
                     quoteRequestDto.norwegianHomeContentsData != null ||
                         quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.ssn?.birthDateFromNorwegianSsn()
-                    quoteRequestDto.danishHomeContentsData != null -> quoteRequestDto.ssn?.birthDateFromDanishSsn()
+                    quoteRequestDto.danishHomeContentsData != null ||
+                        quoteRequestDto.danishAccidentData != null ||
+                        quoteRequestDto.danishTravelData != null -> quoteRequestDto.ssn?.birthDateFromDanishSsn()
                     else -> null
                 },
                 ssn = quoteRequestDto.ssn,
@@ -78,6 +84,8 @@ data class QuoteRequest(
                     quoteRequestDto.norwegianHomeContentsData != null -> quoteRequestDto.norwegianHomeContentsData
                     quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.norwegianTravelData
                     quoteRequestDto.danishHomeContentsData != null -> quoteRequestDto.danishHomeContentsData
+                    quoteRequestDto.danishAccidentData != null -> quoteRequestDto.danishAccidentData
+                    quoteRequestDto.danishTravelData != null -> quoteRequestDto.danishTravelData
                     else -> quoteRequestDto.incompleteQuoteData
                 },
                 productType = quoteRequestDto.productType,
@@ -122,9 +130,9 @@ data class QuoteRequest(
                 productType = when (schemaData) {
                     is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
-                    is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
-                    is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
-                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianHomeContent, is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianTravel, is QuoteSchema.DanishTravel -> ProductType.TRAVEL
+                    is QuoteSchema.DanishAccident -> ProductType.ACCIDENT
                 },
                 incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
@@ -146,9 +154,9 @@ data class QuoteRequest(
                 productType = when (schemaData) {
                     is QuoteSchema.SwedishApartment -> ProductType.APARTMENT
                     is QuoteSchema.SwedishHouse -> ProductType.HOUSE
-                    is QuoteSchema.NorwegianHomeContent -> ProductType.HOME_CONTENT
-                    is QuoteSchema.NorwegianTravel -> ProductType.TRAVEL
-                    is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianHomeContent, is QuoteSchema.DanishHomeContent -> ProductType.HOME_CONTENT
+                    is QuoteSchema.NorwegianTravel, is QuoteSchema.DanishTravel -> ProductType.TRAVEL
+                    is QuoteSchema.DanishAccident -> ProductType.ACCIDENT
                 },
                 incompleteQuoteData = QuoteRequestData.from(schemaData),
                 dataCollectionId = null,
