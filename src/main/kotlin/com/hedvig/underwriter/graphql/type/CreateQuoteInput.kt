@@ -30,6 +30,7 @@ data class CreateQuoteInput(
     val norwegianHomeContents: CreateNorwegianHomeContentsInput?,
     val norwegianTravel: CreateNorwegianTravelInput?,
     val danishHomeContents: CreateDanishHomeContentsInput?,
+    val danishAccident: CreateDanishAccidentInput?,
     val dataCollectionId: UUID?
 ) {
     fun toQuoteRequest(
@@ -37,31 +38,32 @@ data class CreateQuoteInput(
         memberId: String? = null,
         originatingProductId: UUID? = null
     ) = QuoteRequest(
-    firstName = this.firstName,
-    lastName = this.lastName,
-    email = this.email,
-    currentInsurer = this.currentInsurer,
-    birthDate = this.birthDate ?: when {
-        this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
-        this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
-        else -> null
-    },
-    ssn = this.ssn,
-    productType = this.getProductType(),
-    incompleteQuoteData = when {
-        this.swedishApartment != null -> this.swedishApartment.toQuoteRequestData()
-        this.swedishHouse != null -> this.swedishHouse.toQuoteRequestData()
-        this.norwegianHomeContents != null -> this.norwegianHomeContents.toQuoteRequestData()
-        this.norwegianTravel != null -> this.norwegianTravel.toQuoteRequestData()
-        this.danishHomeContents != null -> this.danishHomeContents.toQuoteRequestData()
-        this.house != null -> this.house.toQuoteRequestData()
-        else -> this.apartment!!.toQuoteRequestData()
-    },
-    quotingPartner = quotingPartner,
-    memberId = memberId,
-    originatingProductId = originatingProductId,
-    startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
-    dataCollectionId = this.dataCollectionId
+        firstName = this.firstName,
+        lastName = this.lastName,
+        email = this.email,
+        currentInsurer = this.currentInsurer,
+        birthDate = this.birthDate ?: when {
+            this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
+            this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
+            else -> null
+        },
+        ssn = this.ssn,
+        productType = this.getProductType(),
+        incompleteQuoteData = when {
+            this.swedishApartment != null -> this.swedishApartment.toQuoteRequestData()
+            this.swedishHouse != null -> this.swedishHouse.toQuoteRequestData()
+            this.norwegianHomeContents != null -> this.norwegianHomeContents.toQuoteRequestData()
+            this.norwegianTravel != null -> this.norwegianTravel.toQuoteRequestData()
+            this.danishHomeContents != null -> this.danishHomeContents.toQuoteRequestData()
+            this.danishAccident != null -> this.danishAccident.toQuoteRequestData()
+            this.house != null -> this.house.toQuoteRequestData()
+            else -> this.apartment!!.toQuoteRequestData()
+        },
+        quotingPartner = quotingPartner,
+        memberId = memberId,
+        originatingProductId = originatingProductId,
+        startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
+        dataCollectionId = this.dataCollectionId
     )
 
     @JsonIgnore
@@ -71,6 +73,7 @@ data class CreateQuoteInput(
             this.house != null || this.swedishHouse != null -> ProductType.HOUSE
             this.norwegianHomeContents != null || this.danishHomeContents != null -> ProductType.HOME_CONTENT
             this.norwegianTravel != null -> ProductType.TRAVEL
+            this.danishAccident != null -> ProductType.ACCIDENT
             // There is an `UNKNOWN` but we don't want to use it because then we can't complete the quote
             else -> throw RuntimeException("Could not map `ProductType` on [CreateQuoteInput: $this]")
         }
