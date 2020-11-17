@@ -16,7 +16,10 @@ import com.hedvig.underwriter.model.NorwegianHomeContentsType
     JsonSubTypes.Type(value = QuoteSchema.SwedishApartment::class, name = "SwedishApartment"),
     JsonSubTypes.Type(value = QuoteSchema.SwedishHouse::class, name = "SwedishHouse"),
     JsonSubTypes.Type(value = QuoteSchema.NorwegianHomeContent::class, name = "NorwegianHomeContent"),
-    JsonSubTypes.Type(value = QuoteSchema.NorwegianTravel::class, name = "NorwegianTravel")
+    JsonSubTypes.Type(value = QuoteSchema.NorwegianTravel::class, name = "NorwegianTravel"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishHomeContent::class, name = "DanishHomeContent"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishAccident::class, name = "DanishAccident"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishTravel::class, name = "DanishTravel")
 )
 sealed class QuoteSchema {
     data class SwedishApartment(
