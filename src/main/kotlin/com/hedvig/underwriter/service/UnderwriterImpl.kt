@@ -158,7 +158,6 @@ class UnderwriterImpl(
                         isStudent = quoteData.isStudent!!
                     )
                 null -> throw IllegalArgumentException("Must provide either house or apartment data")
-
             },
             state = QuoteState.INCOMPLETE,
             memberId = quoteRequest.memberId,

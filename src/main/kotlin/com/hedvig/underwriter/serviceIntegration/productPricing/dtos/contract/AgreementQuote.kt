@@ -122,7 +122,6 @@ sealed class AgreementQuote {
         val coInsured: List<CoInsuredDto>
     ) : AgreementQuote()
 
-
     companion object {
         fun from(quote: Quote, fromDate: LocalDate? = null, toDate: LocalDate? = null) = when (quote.data) {
             is SwedishApartmentData -> SwedishApartmentQuote(
