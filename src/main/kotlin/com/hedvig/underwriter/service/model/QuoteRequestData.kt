@@ -124,6 +124,18 @@ sealed class QuoteRequestData {
                 isStudent = quoteSchema.isStudent,
                 subType = quoteSchema.lineOfBusiness
             )
+            is QuoteSchema.DanishAccident -> DanishAccident(
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                coInsured = quoteSchema.numberCoInsured,
+                isStudent = quoteSchema.isStudent
+            )
+            is QuoteSchema.DanishTravel -> DanishTravel(
+                street = quoteSchema.street,
+                zipCode = quoteSchema.zipCode,
+                coInsured = quoteSchema.numberCoInsured,
+                isStudent = quoteSchema.isStudent
+            )
         }
     }
 }

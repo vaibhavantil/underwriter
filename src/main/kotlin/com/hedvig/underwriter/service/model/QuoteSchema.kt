@@ -112,4 +112,30 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Is Student")
         val isStudent: Boolean
     ) : QuoteSchema()
+
+    data class DanishAccident(
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
+        val zipCode: String,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int,
+        @get:JsonProperty("isStudent")
+        @param:JsonProperty("isStudent")
+        @JsonSchema(title = "Is Student")
+        val isStudent: Boolean
+    ) : QuoteSchema()
+
+    data class DanishTravel(
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
+        val zipCode: String,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int,
+        @get:JsonProperty("isStudent")
+        @param:JsonProperty("isStudent")
+        @JsonSchema(title = "Is Student")
+        val isStudent: Boolean
+    ) : QuoteSchema()
 }
