@@ -65,6 +65,13 @@ sealed class QuoteRequestData {
         val isStudent: Boolean?
     ) : QuoteRequestData()
 
+    data class DanishTravel(
+        val street: String?,
+        val zipCode: String?,
+        val coInsured: Int?,
+        val isStudent: Boolean?
+    ) : QuoteRequestData()
+
     companion object {
         fun from(quoteSchema: QuoteSchema) = when (quoteSchema) {
             is QuoteSchema.SwedishApartment -> SwedishApartment(
