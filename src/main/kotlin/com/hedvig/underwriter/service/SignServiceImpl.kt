@@ -410,11 +410,11 @@ class SignServiceImpl(
                     }
                 }
             2 -> when {
-                canTwoNorwegianBundledQuotesBeSigned(quotes) -> {
+                areTwoValidNorwegianQuotes(quotes) -> {
                     val ssn: String = getSSNFromQuotes(quotes)
                     QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn)
                 }
-                canTwoDanishBundledQuotesBeSigned(quotes) -> {
+                areTwoValidDanishQuotes(quotes) -> {
                     val ssn: String = getSSNFromQuotes(quotes)
                     QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
                 }
@@ -423,7 +423,7 @@ class SignServiceImpl(
                 }
             }
             3 -> when {
-                canThreeDanishBundledQuotesBeSigned(quotes) -> {
+                areThreeValidDanishQuotes(quotes) -> {
                     val ssn: String = getSSNFromQuotes(quotes)
                     QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
                 }
@@ -450,18 +450,18 @@ class SignServiceImpl(
         return ssn!!
     }
 
-    private fun canTwoNorwegianBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+    private fun areTwoValidNorwegianQuotes(quotes: List<Quote>): Boolean =
         quotes.size == 2 &&
             quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
             quotes.any { quote -> quote.data is NorwegianTravelData }
 
-    private fun canTwoDanishBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+    private fun areTwoValidDanishQuotes(quotes: List<Quote>): Boolean =
         quotes.size == 2 &&
             (quotes.any { quote -> quote.data is DanishHomeContentsData } &&
                 (quotes.any { quote -> quote.data is DanishAccidentData } ||
                     quotes.any { quote -> quote.data is DanishTravelData }))
 
-    private fun canThreeDanishBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+    private fun areThreeValidDanishQuotes(quotes: List<Quote>): Boolean =
         quotes.size == 3 &&
             quotes.any { quote -> quote.data is DanishHomeContentsData } &&
             quotes.any { quote -> quote.data is DanishAccidentData } &&
