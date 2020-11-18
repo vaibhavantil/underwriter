@@ -404,7 +404,6 @@ class SignServiceImplTest {
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
-
     @Test
     fun startSigningZeroQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
