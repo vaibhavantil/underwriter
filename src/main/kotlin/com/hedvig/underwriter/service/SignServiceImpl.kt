@@ -402,32 +402,70 @@ class SignServiceImpl(
                     )
                     is NorwegianHomeContentsData,
                     is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
-                    is DanishHomeContentsData,
+                    is DanishHomeContentsData -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
                     is DanishAccidentData,
-                    is DanishTravelData -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
-                }
-            2 -> if (
-                quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
-                quotes.any { quote -> quote.data is NorwegianTravelData }
-            ) {
-                var ssn: String? = null
-                quotes.forEach { quote ->
-                    if (quote.data is PersonPolicyHolder<*>) {
-                        quote.data.ssn?.let {
-                            ssn = it
-                            return@forEach
-                        }
-                    } else {
-                        throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
+                    is DanishTravelData -> {
+                        logger.error("${quotes[0].data::class.java.simpleName} cannot be signed as a stand alone quote. MemberId: ${quotes[0].memberId}")
+                        QuotesSignData.CanNotBeBundled
                     }
                 }
-                QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn!!)
-            } else {
-                QuotesSignData.CanNotBeBundled
+            2 -> when {
+                canTwoNorwegianBundledQuotesBeSigned(quotes) -> {
+                    val ssn: String = getSSNFromQuotes(quotes)
+                    QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn)
+                }
+                canTwoDanishBundledQuotesBeSigned(quotes) -> {
+                    val ssn: String = getSSNFromQuotes(quotes)
+                    QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
+                }
+                else -> {
+                    QuotesSignData.CanNotBeBundled
+                }
+            }
+            3 -> when {
+                canThreeDanishBundledQuotesBeSigned(quotes) -> {
+                    val ssn: String = getSSNFromQuotes(quotes)
+                    QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
+                }
+                else -> {
+                    QuotesSignData.CanNotBeBundled
+                }
             }
             else -> QuotesSignData.CanNotBeBundled
         }
     }
+
+    private fun getSSNFromQuotes(quotes: List<Quote>): String {
+        var ssn: String? = null
+        quotes.forEach { quote ->
+            if (quote.data is PersonPolicyHolder<*>) {
+                quote.data.ssn?.let {
+                    ssn = it
+                    return@forEach
+                }
+            } else {
+                throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
+            }
+        }
+        return ssn!!
+    }
+
+    private fun canTwoNorwegianBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+        quotes.size == 2 &&
+            quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
+            quotes.any { quote -> quote.data is NorwegianTravelData }
+
+    private fun canTwoDanishBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+        quotes.size == 2 &&
+            (quotes.any { quote -> quote.data is DanishHomeContentsData } &&
+                (quotes.any { quote -> quote.data is DanishAccidentData } ||
+                    quotes.any { quote -> quote.data is DanishTravelData }))
+
+    private fun canThreeDanishBundledQuotesBeSigned(quotes: List<Quote>): Boolean =
+        quotes.size == 3 &&
+            quotes.any { quote -> quote.data is DanishHomeContentsData } &&
+            quotes.any { quote -> quote.data is DanishAccidentData } &&
+            quotes.any { quote -> quote.data is DanishTravelData }
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
