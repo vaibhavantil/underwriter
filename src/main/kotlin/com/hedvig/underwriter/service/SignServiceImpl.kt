@@ -251,29 +251,18 @@ class SignServiceImpl(
             throw RuntimeException("There is a signed product id ${quote.agreementId} already")
         }
 
-        val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
-            quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
-        } else {
-            quote
-        }
+        val updatedName = updateNameFromRequest(quote, body)
 
-        val updatedStartTime = when {
-            body.startDate != null -> {
-                updatedName.copy(
-                    startDate = body.startDate
-                )
-            }
-            else -> updatedName.copy(startDate = null)
-        }
+        val updatedStartTime = updateStartTimeFromRequest(updatedName, body)
 
-        val quoteWithMember = if (quote.memberId == null) {
+        val quoteWithMember = if (updatedStartTime.memberId == null) {
             val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return Either.left(quoteNotSignableErrorDto)
             }
 
-            val memberAlreadySigned = when (quote.data) {
-                is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
+            val memberAlreadySigned = when (updatedStartTime.data) {
+                is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(updatedStartTime.data.ssn!!)
                 else -> throw RuntimeException("Unsupported quote data class")
             }
 
@@ -288,7 +277,7 @@ class SignServiceImpl(
 
             val memberId = memberService.createMember()
 
-            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
+            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = updatedStartTime.data.ssn!!))
 
             quoteRepository.update(updatedStartTime.copy(memberId = memberId))
         } else {
@@ -303,6 +292,31 @@ class SignServiceImpl(
                 body.email
             )
         )
+    }
+
+    private fun updateStartTimeFromRequest(
+        quote: Quote,
+        body: SignQuoteRequest
+    ): Quote {
+        return when {
+            body.startDate != null -> {
+                quote.copy(
+                    startDate = body.startDate
+                )
+            }
+            else -> quote.copy(startDate = null)
+        }
+    }
+
+    private fun updateNameFromRequest(
+        quote: Quote,
+        body: SignQuoteRequest
+    ): Quote {
+        return if (body.name != null && quote.data is PersonPolicyHolder<*>) {
+            quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+        } else {
+            quote
+        }
     }
 
     override fun signQuoteFromHope(
