@@ -1,5 +1,6 @@
-package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
+package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.mappers
 
+import com.hedvig.productPricingObjects.dtos.Address
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
@@ -10,48 +11,49 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.neovisionaries.i18n.CountryCode
 
-data class AddressDto(
-    val street: String,
-    val postalCode: String,
-    val city: String?,
-    val country: CountryCode
-) {
+class AddressMapper {
     companion object {
-        fun from(data: QuoteData) = when (data) {
-            is SwedishApartmentData -> AddressDto(
+        fun toAddress(data: QuoteData) = when (data) {
+            is SwedishApartmentData -> Address(
                 street = data.street!!,
                 postalCode = data.zipCode!!,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.SE
             )
-            is SwedishHouseData -> AddressDto(
+            is SwedishHouseData -> Address(
                 street = data.street!!,
                 postalCode = data.zipCode!!,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.SE
             )
-            is NorwegianHomeContentsData -> AddressDto(
+            is NorwegianHomeContentsData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.NO
             )
-            is DanishHomeContentsData -> AddressDto(
+            is DanishHomeContentsData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.DK
             )
-            is DanishAccidentData -> AddressDto(
+            is DanishAccidentData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.DK
             )
-            is DanishTravelData -> AddressDto(
+            is DanishTravelData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
+                coLine = null,
                 country = CountryCode.DK
             )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
