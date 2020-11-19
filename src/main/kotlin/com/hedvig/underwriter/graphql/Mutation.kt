@@ -130,7 +130,10 @@ class Mutation @Autowired constructor(
         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
             UnderwritingLimitsHit(
                 errorResponse.breachedUnderwritingGuidelines?.map { breachedGuideline ->
-                    UnderwritingLimit(breachedGuideline.message, breachedGuideline.code)
+                    UnderwritingLimit(
+                        description = breachedGuideline.message,
+                        code = breachedGuideline.code
+                    )
                 } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
             )
         }
