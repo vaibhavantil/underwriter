@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.service.guidelines
 
-data class GuidelineBreached(
+data class BreachedGuideline(
     val message: String,
     val code: String
 ) {

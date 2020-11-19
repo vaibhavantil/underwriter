@@ -1,12 +1,12 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
-import com.hedvig.underwriter.service.guidelines.GuidelineBreached
+import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 
 data class ErrorResponseDto(
     override val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,
     override val errorMessage: String,
-    val breachedUnderwritingGuidelines: List<GuidelineBreached>? = null
+    val breachedUnderwritingGuidelines: List<BreachedGuideline>? = null
 ) : BasicErrorResponseDto
 
 enum class ErrorCodes {

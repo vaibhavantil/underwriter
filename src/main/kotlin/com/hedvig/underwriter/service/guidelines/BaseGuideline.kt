@@ -2,15 +2,15 @@ package com.hedvig.underwriter.service.guidelines
 
 interface BaseGuideline<T> {
 
-    val guidelineBreached: GuidelineBreached
+    val breachedGuideline: BreachedGuideline
     val validate: (T) -> Boolean
 
     val skipAfter: Boolean
         get() = false
 
-    fun invokeValidate(data: T): GuidelineBreached? {
+    fun invokeValidate(data: T): BreachedGuideline? {
         if (validate.invoke(data)) {
-            return guidelineBreached
+            return breachedGuideline
         }
         return null
     }

@@ -16,7 +16,7 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
 }
 
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "SSN Invalid length",
         "INVALID_SSN_LENGTH"
     )
@@ -36,7 +36,7 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "Birth date does not match SSN",
         "SSN_DOES_NOT_MATCH_BIRTH_DATE"
     )
@@ -47,7 +47,7 @@ object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityDate : BaseGuideline<QuoteData> {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "Invalid SSN",
         "INVALID_SSN"
     )
@@ -71,7 +71,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 }
 
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "member is younger than 18",
         "YOUNGER_THAN_18"
     )
@@ -83,7 +83,7 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
 }
 
 class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         ERROR_MESSAGE,
         "DEBT_CHECK"
     )

@@ -158,7 +158,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a.second).isEqualTo(listOf(AgeRestrictionGuideline.guidelineBreached))
+        assertThat(result.a.second).isEqualTo(listOf(AgeRestrictionGuideline.breachedGuideline))
     }
 
     @Test
@@ -177,8 +177,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeAtLeast1.guidelineBreached,
-                SwedishApartmentLivingSpaceAtLeast1Sqm.guidelineBreached
+                SwedishApartmentHouseHoldSizeAtLeast1.breachedGuideline,
+                SwedishApartmentLivingSpaceAtLeast1Sqm.breachedGuideline
             )
         )
     }
@@ -199,8 +199,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeNotMoreThan6.guidelineBreached,
-                SwedishApartmentLivingSpaceNotMoreThan250Sqm.guidelineBreached
+                SwedishApartmentHouseHoldSizeNotMoreThan6.breachedGuideline,
+                SwedishApartmentLivingSpaceNotMoreThan250Sqm.breachedGuideline
             )
         )
     }
@@ -223,8 +223,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeAtLeast1.guidelineBreached,
-                SwedishApartmentLivingSpaceAtLeast1Sqm.guidelineBreached
+                SwedishApartmentHouseHoldSizeAtLeast1.breachedGuideline,
+                SwedishApartmentLivingSpaceAtLeast1Sqm.breachedGuideline
             )
         )
     }
@@ -247,9 +247,9 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishStudentApartmentHouseholdSizeNotMoreThan2.guidelineBreached,
-                SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm.guidelineBreached,
-                SwedishStudentApartmentAgeNotMoreThan30Years.guidelineBreached
+                SwedishStudentApartmentHouseholdSizeNotMoreThan2.breachedGuideline,
+                SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm.breachedGuideline,
+                SwedishStudentApartmentAgeNotMoreThan30Years.breachedGuideline
             )
         )
     }
@@ -271,10 +271,10 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishHouseHouseholdSizeAtLeast1.guidelineBreached,
-                SwedishHouseLivingSpaceAtLeast1Sqm.guidelineBreached,
-                SwedishHouseYearOfConstruction.guidelineBreached,
-                SwedishHouseExtraBuildingsSizeAtLeast1Sqm.guidelineBreached
+                SwedishHouseHouseholdSizeAtLeast1.breachedGuideline,
+                SwedishHouseLivingSpaceAtLeast1Sqm.breachedGuideline,
+                SwedishHouseYearOfConstruction.breachedGuideline,
+                SwedishHouseExtraBuildingsSizeAtLeast1Sqm.breachedGuideline
             )
         )
     }
@@ -300,11 +300,11 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishHouseHouseholdSizeNotMoreThan6.guidelineBreached,
-                SwedishHouseLivingSpaceNotMoreThan250Sqm.guidelineBreached,
-                SwedishHouseNumberOfBathrooms.guidelineBreached,
-                SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm.guidelineBreached,
-                SwedishHouseExtraBuildingsSizeNotOverThan75Sqm.guidelineBreached
+                SwedishHouseHouseholdSizeNotMoreThan6.breachedGuideline,
+                SwedishHouseLivingSpaceNotMoreThan250Sqm.breachedGuideline,
+                SwedishHouseNumberOfBathrooms.breachedGuideline,
+                SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm.breachedGuideline,
+                SwedishHouseExtraBuildingsSizeNotOverThan75Sqm.breachedGuideline
             )
         )
     }
@@ -339,7 +339,7 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianSsnNotMatchesBirthDate.guidelineBreached
+                NorwegianSsnNotMatchesBirthDate.breachedGuideline
             )
         )
     }
@@ -388,8 +388,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianHomeContentscoInsuredNotMoreThan5.guidelineBreached,
-                NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm.guidelineBreached
+                NorwegianHomeContentscoInsuredNotMoreThan5.breachedGuideline,
+                NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm.breachedGuideline
             )
         )
     }
@@ -411,9 +411,9 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm.guidelineBreached,
-                NorwegianYouthHomeContentsAgeNotMoreThan30Years.guidelineBreached,
-                NorwegianYouthHomeContentsCoInsuredNotMoreThan2.guidelineBreached
+                NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm.breachedGuideline,
+                NorwegianYouthHomeContentsAgeNotMoreThan30Years.breachedGuideline,
+                NorwegianYouthHomeContentsCoInsuredNotMoreThan2.breachedGuideline
             )
         )
     }
@@ -431,7 +431,7 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianTravelCoInsuredNotMoreThan5.guidelineBreached
+                NorwegianTravelCoInsuredNotMoreThan5.breachedGuideline
             )
         )
     }
@@ -451,9 +451,9 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianSsnNotMatchesBirthDate.guidelineBreached,
-                NorwegianYouthTravelAgeNotMoreThan30Years.guidelineBreached,
-                NorwegianYouthTravelCoInsuredNotMoreThan0.guidelineBreached
+                NorwegianSsnNotMatchesBirthDate.breachedGuideline,
+                NorwegianYouthTravelAgeNotMoreThan30Years.breachedGuideline,
+                NorwegianYouthTravelCoInsuredNotMoreThan0.breachedGuideline
             )
         )
     }

@@ -19,7 +19,7 @@ object SwedishHouseGuidelines {
 }
 
 object SwedishHouseHouseholdSizeAtLeast1 : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size, must be at least 1",
             "HOUSE_HOLD_SIZE_LESS_THAN_1"
     )
@@ -28,7 +28,7 @@ object SwedishHouseHouseholdSizeAtLeast1 : SwedishHouseGuideline {
 }
 
 object SwedishHouseLivingSpaceAtLeast1Sqm : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space, must be at least 1 sqm",
         "LIVING_SPACE_LESS_THAN_1"
     )
@@ -37,7 +37,7 @@ object SwedishHouseLivingSpaceAtLeast1Sqm : SwedishHouseGuideline {
 }
 
 object SwedishHouseHouseholdSizeNotMoreThan6 : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size, must not be more than 6",
         "HOUSE_HOLD_SIZE_MORE_THAN_6"
     )
@@ -46,7 +46,7 @@ object SwedishHouseHouseholdSizeNotMoreThan6 : SwedishHouseGuideline {
 }
 
 object SwedishHouseLivingSpaceNotMoreThan250Sqm : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space, must not be more than 250 sqm",
             "LIVING_SPACE_MORE_THAN_250"
     )
@@ -55,7 +55,7 @@ object SwedishHouseLivingSpaceNotMoreThan250Sqm : SwedishHouseGuideline {
 }
 
 object SwedishHouseYearOfConstruction : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline year of construction, must not be older than 1925",
         "YEAR_OF_CONSTRUCTION_BEFORE_1925"
     )
@@ -64,7 +64,7 @@ object SwedishHouseYearOfConstruction : SwedishHouseGuideline {
 }
 
 object SwedishHouseNumberOfBathrooms : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline number of bathrooms, must not be more than 2",
         "NUMBER_OF_BATHROOMS_MORE_THAN_2"
     )
@@ -73,7 +73,7 @@ object SwedishHouseNumberOfBathrooms : SwedishHouseGuideline {
 }
 
 object SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline extra building areas, number of extra buildings with an area over 6 sqm must not be more than 4",
         "NUMBER_OF_EXTRA_BUILDINGS_WITH_A_SIZE_OF_6_SQM_MORE_THAN_4"
     )
@@ -83,7 +83,7 @@ object SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm : SwedishHouseGuidel
 }
 
 object SwedishHouseExtraBuildingsSizeNotOverThan75Sqm : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline extra building areas, extra buildings may not be over 75 sqm",
         "EXTRA_BUILDING_SIZE_MORE_THAN_75"
     )
@@ -93,7 +93,7 @@ object SwedishHouseExtraBuildingsSizeNotOverThan75Sqm : SwedishHouseGuideline {
 }
 
 object SwedishHouseExtraBuildingsSizeAtLeast1Sqm : SwedishHouseGuideline {
-    override val guidelineBreached = GuidelineBreached(
+    override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline extra building areas, extra buildings must have an area of at least 1",
         "EXTRA_BUILDING_SIZE_LESS_THAN_1"
     )
