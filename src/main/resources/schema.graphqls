@@ -533,6 +533,7 @@ type DanishBankIdSession {
 
 type FailedToStartSign {
     errorMessage: String
+    errorCode: String
 }
 
 input QuoteBundleInput {
