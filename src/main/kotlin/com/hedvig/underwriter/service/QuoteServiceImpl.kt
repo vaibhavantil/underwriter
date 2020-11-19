@@ -18,6 +18,7 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
+import com.hedvig.underwriter.service.guidelines.GuidelineBreached
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
@@ -234,7 +235,7 @@ class QuoteServiceImpl(
         quoteId: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<String>>, Quote> {
+    ): Either<Pair<Quote, List<GuidelineBreached>>, Quote> {
         val breachedGuidelinesOrQuote =
             underwriter.createQuote(quoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
         val quote = breachedGuidelinesOrQuote.getQuote()
@@ -243,7 +244,7 @@ class QuoteServiceImpl(
         return breachedGuidelinesOrQuote
     }
 
-    private fun Either<Pair<Quote, List<String>>, Quote>.getQuote(): Quote {
+    private fun Either<Pair<Quote, List<GuidelineBreached>>, Quote>.getQuote(): Quote {
         return when (this) {
             is Either.Left -> a.first
             is Either.Right -> b
@@ -251,7 +252,7 @@ class QuoteServiceImpl(
     }
 
     private fun transformCompleteQuoteReturn(
-        potentiallySavedQuote: Either<Pair<Quote, List<String>>, Quote>,
+        potentiallySavedQuote: Either<Pair<Quote, List<GuidelineBreached>>, Quote>,
         quoteId: UUID
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
         return potentiallySavedQuote.bimap(

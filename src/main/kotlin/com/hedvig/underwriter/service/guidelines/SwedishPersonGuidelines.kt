@@ -16,7 +16,10 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
 }
 
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
-    override val errorMessage = "SSN Invalid length"
+    override val guidelineBreached = GuidelineBreached(
+        "SSN Invalid length",
+        "INVALID_SSN_LENGTH"
+    )
 
     override val skipAfter: Boolean
         get() = true
@@ -33,7 +36,10 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val errorMessage = "Birth date does not match SSN"
+    override val guidelineBreached = GuidelineBreached(
+        "Birth date does not match SSN",
+        "SSN_DOES_NOT_MATCH_BIRTH_DATE"
+    )
 
     override val validate = { data: QuoteData ->
         !LocalDate.parse(getPossibleDateFromSSN(data)).isEqual((data as PersonPolicyHolder<*>).birthDate)
@@ -41,9 +47,13 @@ object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityDate : BaseGuideline<QuoteData> {
-    override val errorMessage = "Invalid SSN"
+    override val guidelineBreached = GuidelineBreached(
+        "Invalid SSN",
+        "INVALID_SSN"
+    )
 
-    override val skipAfter: Boolean
+    override
+    val skipAfter: Boolean
         get() = true
 
     private fun tryParse(input: String): Boolean {
@@ -54,13 +64,17 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
         }
     }
 
-    override val validate = { data: QuoteData ->
+    override
+    val validate = { data: QuoteData ->
         !tryParse(getPossibleDateFromSSN(data))
     }
 }
 
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
-    override val errorMessage = "member is younger than 18"
+    override val guidelineBreached = GuidelineBreached(
+        "member is younger than 18",
+        "YOUNGER_THAN_18"
+    )
 
     override val skipAfter: Boolean
         get() = true
@@ -69,12 +83,16 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
 }
 
 class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val errorMessage = ERROR_MESSAGE
+    override val guidelineBreached = GuidelineBreached(
+        ERROR_MESSAGE,
+        "DEBT_CHECK"
+    )
 
     override val skipAfter: Boolean
         get() = true
 
-    private fun debtCheck(data: QuoteData): List<String> = debtChecker.passesDebtCheck(data as PersonPolicyHolder<*>)
+    private fun debtCheck(data: QuoteData): List<String> =
+        debtChecker.passesDebtCheck(data as PersonPolicyHolder<*>)
 
     override val validate = { data: QuoteData -> debtCheck(data).isNotEmpty() }
 

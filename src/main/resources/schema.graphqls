@@ -390,6 +390,7 @@ type UnderwritingLimitsHit {
 
 type UnderwritingLimit {
     description: String!
+    code: String!
 }
 
 type MonetaryAmountV2 {
