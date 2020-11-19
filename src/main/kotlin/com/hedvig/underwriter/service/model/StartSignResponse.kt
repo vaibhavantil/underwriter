@@ -24,4 +24,3 @@ sealed class StartSignResponse {
         val errorCode: String
     ) : StartSignResponse()
 }
-
