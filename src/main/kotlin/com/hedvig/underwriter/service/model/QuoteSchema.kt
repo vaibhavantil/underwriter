@@ -16,7 +16,10 @@ import com.hedvig.underwriter.model.NorwegianHomeContentsType
     JsonSubTypes.Type(value = QuoteSchema.SwedishApartment::class, name = "SwedishApartment"),
     JsonSubTypes.Type(value = QuoteSchema.SwedishHouse::class, name = "SwedishHouse"),
     JsonSubTypes.Type(value = QuoteSchema.NorwegianHomeContent::class, name = "NorwegianHomeContent"),
-    JsonSubTypes.Type(value = QuoteSchema.NorwegianTravel::class, name = "NorwegianTravel")
+    JsonSubTypes.Type(value = QuoteSchema.NorwegianTravel::class, name = "NorwegianTravel"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishHomeContent::class, name = "DanishHomeContent"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishAccident::class, name = "DanishAccident"),
+    JsonSubTypes.Type(value = QuoteSchema.DanishTravel::class, name = "DanishTravel")
 )
 sealed class QuoteSchema {
     data class SwedishApartment(
@@ -105,6 +108,32 @@ sealed class QuoteSchema {
         val zipCode: String,
         @JsonSchema(title = "Living Space", required = true, min = 0.0)
         val livingSpace: Int,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int,
+        @get:JsonProperty("isStudent")
+        @param:JsonProperty("isStudent")
+        @JsonSchema(title = "Is Student")
+        val isStudent: Boolean
+    ) : QuoteSchema()
+
+    data class DanishAccident(
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
+        val zipCode: String,
+        @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
+        val numberCoInsured: Int,
+        @get:JsonProperty("isStudent")
+        @param:JsonProperty("isStudent")
+        @JsonSchema(title = "Is Student")
+        val isStudent: Boolean
+    ) : QuoteSchema()
+
+    data class DanishTravel(
+        @JsonSchema(title = "Street", required = true)
+        val street: String,
+        @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
+        val zipCode: String,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
         val numberCoInsured: Int,
         @get:JsonProperty("isStudent")

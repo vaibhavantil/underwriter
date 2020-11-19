@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.notificationService
 
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -31,6 +33,8 @@ class NotificationServiceImpl(
                     is NorwegianHomeContentsData -> quote.data.street
                     is NorwegianTravelData -> null
                     is DanishHomeContentsData -> quote.data.street
+                    is DanishAccidentData -> quote.data.street
+                    is DanishTravelData -> quote.data.street
                 },
                 postalCode = when (quote.data) {
                     is SwedishHouseData -> quote.data.zipCode
@@ -38,6 +42,8 @@ class NotificationServiceImpl(
                     is NorwegianHomeContentsData -> quote.data.zipCode
                     is NorwegianTravelData -> null
                     is DanishHomeContentsData -> quote.data.zipCode
+                    is DanishAccidentData -> quote.data.zipCode
+                    is DanishTravelData -> quote.data.zipCode
                 },
                 email = quote.email!!,
                 ssn = quote.ssnMaybe,
@@ -58,7 +64,18 @@ class NotificationServiceImpl(
                         true -> "YOUTH"
                         false -> "REGULAR"
                     }
-                    is DanishHomeContentsData -> "REGULAR"
+                    is DanishHomeContentsData -> when (quote.data.isStudent) {
+                        true -> "STUDENT"
+                        false -> "REGULAR"
+                    }
+                    is DanishAccidentData -> when (quote.data.isStudent) {
+                        true -> "STUDENT"
+                        false -> "REGULAR"
+                    }
+                    is DanishTravelData -> when (quote.data.isStudent) {
+                        true -> "STUDENT"
+                        false -> "REGULAR"
+                    }
                 },
                 currentInsurer = quote.currentInsurer,
                 price = quote.price,

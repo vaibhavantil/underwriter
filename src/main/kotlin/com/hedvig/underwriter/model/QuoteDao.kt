@@ -27,6 +27,8 @@ interface QuoteDao {
                 quote_norwegian_home_contents_data_id,
                 quote_norwegian_travel_data_id,
                 quote_danish_home_contents_data_id,
+                quote_danish_accident_data_id,
+                quote_danish_travel_data_id,
                 member_id,
                 breached_underwriting_guidelines,
                 underwriting_guidelines_bypassed_by,
@@ -51,6 +53,8 @@ interface QuoteDao {
                 :quoteNorwegianHomeContentsDataId,
                 :quoteNorwegianTravelDataId,
                 :quoteDanishHomeContentsDataId,
+                :quoteDanishAccidentDataId,
+                :quoteDanishTravelDataId,
                 :memberId,
                 :breachedUnderwritingGuidelines,
                 :underwritingGuidelinesBypassedBy,
@@ -344,6 +348,88 @@ interface QuoteDao {
     """
     )
     fun findDanishHomeContentsQuoteData(@Bind id: Int): DanishHomeContentsData?
+
+    @SqlUpdate(
+        """
+            INSERT INTO quote_revision_danish_accident_data
+            (
+                id,
+                ssn,
+                birth_date,
+                first_name,
+                last_name,
+                email,
+                street,
+                zip_code,
+                co_insured,                
+                is_student      
+            )
+            VALUES
+            (
+                :id,
+                :ssn,
+                :birthDate,
+                :firstName,
+                :lastName,
+                :email,
+                :street,
+                :zipCode,
+                :coInsured,
+                :isStudent
+            )
+            RETURNING *
+    """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: DanishAccidentData): DanishAccidentData
+
+    @SqlQuery(
+        """
+        SELECT * FROM quote_revision_danish_accident_data WHERE internal_id = :id
+    """
+    )
+    fun findDanishAccidentQuoteData(@Bind id: Int): DanishAccidentData?
+
+    @SqlUpdate(
+        """
+            INSERT INTO quote_revision_danish_travel_data
+            (
+                id,
+                ssn,
+                birth_date,
+                first_name,
+                last_name,
+                email,
+                street,
+                zip_code,
+                co_insured,                
+                is_student      
+            )
+            VALUES
+            (
+                :id,
+                :ssn,
+                :birthDate,
+                :firstName,
+                :lastName,
+                :email,
+                :street,
+                :zipCode,
+                :coInsured,
+                :isStudent
+            )
+            RETURNING *
+    """
+    )
+    @GetGeneratedKeys("internal_id")
+    fun insert(@BindBean data: DanishTravelData): DanishTravelData
+
+    @SqlQuery(
+        """
+        SELECT * FROM quote_revision_danish_travel_data WHERE internal_id = :id
+    """
+    )
+    fun findDanishTravelQuoteData(@Bind id: Int): DanishTravelData?
 
     @SqlUpdate(
         """

@@ -4,8 +4,10 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishHomeContentsType
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
@@ -191,6 +193,18 @@ class QuoteMapper(
             numberCoInsured = quote.data.coInsured,
             isStudent = quote.data.isStudent,
             lineOfBusiness = quote.data.type
+        )
+        is DanishAccidentData -> QuoteSchema.DanishAccident(
+            street = quote.data.street,
+            zipCode = quote.data.zipCode,
+            numberCoInsured = quote.data.coInsured,
+            isStudent = quote.data.isStudent
+        )
+        is DanishTravelData -> QuoteSchema.DanishTravel(
+            street = quote.data.street,
+            zipCode = quote.data.zipCode,
+            numberCoInsured = quote.data.coInsured,
+            isStudent = quote.data.isStudent
         )
     }
 

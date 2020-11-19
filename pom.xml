@@ -315,6 +315,12 @@
             <version>1.2.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.hedvig.productPricing</groupId>
+            <artifactId>product-pricing-objects</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

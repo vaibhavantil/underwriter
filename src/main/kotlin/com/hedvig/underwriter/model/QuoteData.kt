@@ -14,7 +14,10 @@ import java.util.UUID
     JsonSubTypes.Type(value = SwedishApartmentData::class, name = "apartment"),
     JsonSubTypes.Type(value = SwedishHouseData::class, name = "house"),
     JsonSubTypes.Type(value = NorwegianHomeContentsData::class, name = "norwegianHomeContentsData"),
-    JsonSubTypes.Type(value = NorwegianTravelData::class, name = "norwegianTravelData")
+    JsonSubTypes.Type(value = NorwegianTravelData::class, name = "norwegianTravelData"),
+    JsonSubTypes.Type(value = DanishHomeContentsData::class, name = "danishHomeContentsData"),
+    JsonSubTypes.Type(value = DanishAccidentData::class, name = "danishAccidentData"),
+    JsonSubTypes.Type(value = DanishTravelData::class, name = "danishTravelData")
 )
 sealed class QuoteData {
     abstract val isComplete: Boolean
@@ -24,9 +27,9 @@ sealed class QuoteData {
         return when (this) {
             is SwedishHouseData -> ProductType.HOUSE
             is SwedishApartmentData -> ProductType.APARTMENT
-            is NorwegianHomeContentsData -> ProductType.HOME_CONTENT
-            is NorwegianTravelData -> ProductType.TRAVEL
-            is DanishHomeContentsData -> ProductType.HOME_CONTENT
+            is NorwegianHomeContentsData, is DanishHomeContentsData -> ProductType.HOME_CONTENT
+            is NorwegianTravelData, is DanishTravelData -> ProductType.TRAVEL
+            is DanishAccidentData -> ProductType.ACCIDENT
         }
     }
 }
@@ -42,7 +45,7 @@ data class SwedishHouseData(
     override val street: String? = null,
     override val zipCode: String? = null,
     override val city: String? = null,
-    override var livingSpace: Int? = null,
+    var livingSpace: Int? = null,
     override var householdSize: Int? = null,
     val ancillaryArea: Int? = null,
     val yearOfConstruction: Int? = null,
@@ -78,7 +81,7 @@ data class SwedishApartmentData(
     override val city: String? = null,
     override val zipCode: String? = null,
     override val householdSize: Int? = null,
-    override val livingSpace: Int? = null,
+    val livingSpace: Int? = null,
 
     val subType: ApartmentProductSubType? = null,
     @JsonIgnore
@@ -111,7 +114,7 @@ data class NorwegianHomeContentsData(
     override val street: String,
     override val city: String?,
     override val zipCode: String,
-    override val livingSpace: Int,
+    val livingSpace: Int,
     val coInsured: Int,
     @get:JvmName("getIsYouth")
     val isYouth: Boolean,
@@ -167,7 +170,7 @@ data class DanishHomeContentsData(
     override val email: String?,
     override val street: String,
     override val zipCode: String,
-    override val livingSpace: Int,
+    val livingSpace: Int,
     val coInsured: Int,
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
@@ -180,6 +183,66 @@ data class DanishHomeContentsData(
     override val city: String? = null
 
     override fun updateName(firstName: String, lastName: String): DanishHomeContentsData {
+        return this.copy(firstName = firstName, lastName = lastName)
+    }
+
+    override val isComplete: Boolean
+        get() = when (null) {
+            firstName, lastName, coInsured -> false
+            else -> true
+        }
+}
+
+data class DanishAccidentData(
+    override val id: UUID,
+    override val ssn: String?,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
+    override val email: String?,
+    override val street: String,
+    override val zipCode: String,
+    val coInsured: Int,
+    @get:JvmName("getIsStudent")
+    val isStudent: Boolean,
+    @JsonIgnore
+    val internalId: Int? = null
+) : QuoteData(), AddressData, PersonPolicyHolder<DanishAccidentData> {
+
+    // Should probably be removed from AddressData
+    override val city: String? = null
+
+    override fun updateName(firstName: String, lastName: String): DanishAccidentData {
+        return this.copy(firstName = firstName, lastName = lastName)
+    }
+
+    override val isComplete: Boolean
+        get() = when (null) {
+            firstName, lastName, coInsured -> false
+            else -> true
+        }
+}
+
+data class DanishTravelData(
+    override val id: UUID,
+    override val ssn: String?,
+    override val birthDate: LocalDate,
+    override val firstName: String,
+    override val lastName: String,
+    override val email: String?,
+    override val street: String,
+    override val zipCode: String,
+    val coInsured: Int,
+    @get:JvmName("getIsStudent")
+    val isStudent: Boolean,
+    @JsonIgnore
+    val internalId: Int? = null
+) : QuoteData(), AddressData, PersonPolicyHolder<DanishTravelData> {
+
+    // Should probably be removed from AddressData
+    override val city: String? = null
+
+    override fun updateName(firstName: String, lastName: String): DanishTravelData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
 

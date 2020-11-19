@@ -40,6 +40,8 @@ class GraphQLConfig {
                     QuoteDetails.NorwegianHomeContentsDetails::class.java,
                     QuoteDetails.NorwegianTravelDetails::class.java,
                     QuoteDetails.DanishHomeContentsDetails::class.java,
+                    QuoteDetails.DanishAccidentDetails::class.java,
+                    QuoteDetails.DanishTravelDetails::class.java,
                     IncompleteQuoteDetails.IncompleteApartmentQuoteDetails::class.java,
                     IncompleteQuoteDetails.IncompleteHouseQuoteDetails::class.java,
                     StartSignResponse.SwedishBankIdSession::class.java,
