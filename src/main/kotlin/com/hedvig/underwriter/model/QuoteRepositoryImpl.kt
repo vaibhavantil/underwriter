@@ -1,12 +1,12 @@
 package com.hedvig.underwriter.model
 
-import java.time.Instant
-import java.util.UUID
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.stereotype.Component
+import java.time.Instant
+import java.util.UUID
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
@@ -22,6 +22,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is NorwegianHomeContentsData -> dao.insert(quote.data)
             is NorwegianTravelData -> dao.insert(quote.data)
             is DanishHomeContentsData -> dao.insert(quote.data)
+            is DanishAccidentData -> dao.insert(quote.data)
+            is DanishTravelData -> dao.insert(quote.data)
         }
         dao.insertMasterQuote(quote.id, quote.initiatedFrom, timestamp)
         val databaseQuote = DatabaseQuoteRevision.from(quote.copy(data = quoteData))
@@ -93,8 +95,18 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             databaseQuote.quoteNorwegianHomeContentsDataId != null -> dao.findNorwegianHomeContentsQuoteData(
                 databaseQuote.quoteNorwegianHomeContentsDataId
             )
-            databaseQuote.quoteNorwegianTravelDataId != null -> dao.findNorwegianTravelQuoteData(databaseQuote.quoteNorwegianTravelDataId)
-            databaseQuote.quoteDanishHomeContentsDataId != null -> dao.findDanishHomeContentsQuoteData(databaseQuote.quoteDanishHomeContentsDataId)
+            databaseQuote.quoteNorwegianTravelDataId != null -> dao.findNorwegianTravelQuoteData(
+                databaseQuote.quoteNorwegianTravelDataId
+            )
+            databaseQuote.quoteDanishHomeContentsDataId != null -> dao.findDanishHomeContentsQuoteData(
+                databaseQuote.quoteDanishHomeContentsDataId
+            )
+            databaseQuote.quoteDanishAccidentDataId != null -> dao.findDanishAccidentQuoteData(
+                databaseQuote.quoteDanishAccidentDataId
+            )
+            databaseQuote.quoteDanishTravelDataId != null -> dao.findDanishTravelQuoteData(
+                databaseQuote.quoteDanishTravelDataId
+            )
             else -> throw IllegalStateException("Quote must have details set (but was not). Quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
         return Quote(
@@ -150,6 +162,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is NorwegianHomeContentsData -> dao.insert(updatedQuote.data)
             is NorwegianTravelData -> dao.insert(updatedQuote.data)
             is DanishHomeContentsData -> dao.insert(updatedQuote.data)
+            is DanishAccidentData -> dao.insert(updatedQuote.data)
+            is DanishTravelData -> dao.insert(updatedQuote.data)
         }
         dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
     }

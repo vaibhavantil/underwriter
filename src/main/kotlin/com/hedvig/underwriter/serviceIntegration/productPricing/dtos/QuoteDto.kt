@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
@@ -44,7 +46,7 @@ data class QuoteDto(
     val signMethod = when (this.data) {
         is SwedishApartmentData, is SwedishHouseData -> SignMethod.SWEDISH_BANK_ID
         is NorwegianHomeContentsData, is NorwegianTravelData -> SignMethod.NORWEGIAN_BANK_ID
-        is DanishHomeContentsData -> SignMethod.DANISH_BANK_ID
+        is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> SignMethod.DANISH_BANK_ID
     }
 
     companion object {

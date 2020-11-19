@@ -30,6 +30,8 @@ data class EditQuoteInput(
     val norwegianHomeContents: EditNorwegianHomeContentsInput?,
     val norwegianTravel: EditNorwegianTravelInput?,
     val danishHomeContents: EditDanishHomeContentsInput?,
+    val danishAccident: EditDanishAccidentInput?,
+    val danishTravel: EditDanishTravelInput?,
     val dataCollectionId: UUID?
 ) {
     fun toQuoteRequest(
@@ -44,7 +46,7 @@ data class EditQuoteInput(
         birthDate = this.birthDate ?: when {
             this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()
             this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn?.birthDateFromNorwegianSsn()
-            this.danishHomeContents != null -> this.ssn?.birthDateFromDanishSsn()
+            this.danishHomeContents != null || this.danishAccident != null || this.danishTravel != null -> this.ssn?.birthDateFromDanishSsn()
             else -> null
         },
         ssn = this.ssn,
@@ -55,6 +57,8 @@ data class EditQuoteInput(
             this.norwegianHomeContents != null -> this.norwegianHomeContents.toQuoteRequestDataDto()
             this.norwegianTravel != null -> this.norwegianTravel.toQuoteRequestDataDto()
             this.danishHomeContents != null -> this.danishHomeContents.toQuoteRequestDataDto()
+            this.danishAccident != null -> this.danishAccident.toQuoteRequestDataDto()
+            this.danishTravel != null -> this.danishTravel.toQuoteRequestDataDto()
             this.apartment != null -> this.apartment.toQuoteRequestDataDto()
             this.house != null -> this.house.toQuoteRequestDataDto()
             else -> null

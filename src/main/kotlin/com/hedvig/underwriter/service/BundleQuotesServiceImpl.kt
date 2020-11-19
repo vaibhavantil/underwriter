@@ -3,7 +3,9 @@ package com.hedvig.underwriter.service
 import com.hedvig.underwriter.graphql.type.QuoteBundle
 import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -41,7 +43,9 @@ class BundleQuotesServiceImpl(
                         }
                         is NorwegianHomeContentsData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_HOME_CONTENTS else InsuranceType.NORWEGIAN_HOME_CONTENTS
                         is NorwegianTravelData -> if (data.isYouth) InsuranceType.NORWEGIAN_YOUTH_TRAVEL else InsuranceType.NORWEGIAN_TRAVEL
-                        is DanishHomeContentsData -> InsuranceType.DANISH_HOME_CONTENTS
+                        is DanishHomeContentsData -> if (data.isStudent) InsuranceType.DANISH_STUDENT_HOME_CONTENTS else InsuranceType.DANISH_HOME_CONTENTS
+                        is DanishAccidentData -> if (data.isStudent) InsuranceType.DANISH_STUDENT_ACCIDENT else InsuranceType.DANISH_ACCIDENT
+                        is DanishTravelData -> if (data.isStudent) InsuranceType.DANISH_STUDENT_TRAVEL else InsuranceType.DANISH_TRAVEL
                     }
                 )
             }

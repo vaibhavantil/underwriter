@@ -2,14 +2,15 @@ package com.hedvig.underwriter.serviceIntegration.priceEngine.dtos
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.productPricingObjects.enums.NorwegianHomeContentLineOfBusiness
+import com.hedvig.productPricingObjects.enums.NorwegianTravelLineOfBusiness
+import com.hedvig.productPricingObjects.enums.SwedishApartmentLineOfBusiness
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianHomeContentLineOfBusiness
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.NorwegianTravelLineOfBusiness
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.SwedishApartmentLineOfBusiness
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.mappers.OutgoingMapper
 import java.time.LocalDate
 import java.time.Year
 import java.util.UUID
@@ -42,7 +43,7 @@ sealed class PriceQueryRequest {
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
-                lineOfBusiness = NorwegianHomeContentLineOfBusiness.from(data.type, data.isYouth),
+                lineOfBusiness = OutgoingMapper.toLineOfBusiness(data.type, data.isYouth),
                 postalCode = data.zipCode,
                 squareMeters = data.livingSpace
             )
@@ -62,7 +63,7 @@ sealed class PriceQueryRequest {
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
-                lineOfBusiness = NorwegianTravelLineOfBusiness.from(data.isYouth)
+                lineOfBusiness = OutgoingMapper.toLineOfBusiness(data.isYouth)
             )
         }
     }
@@ -84,7 +85,7 @@ sealed class PriceQueryRequest {
                     quoteId = quoteId,
                     holderBirthDate = data.birthDate ?: data.ssn!!.birthDateFromSwedishSsn(),
                     numberCoInsured = data.householdSize!! - 1,
-                    lineOfBusiness = SwedishApartmentLineOfBusiness.from(data.subType!!),
+                    lineOfBusiness = OutgoingMapper.toLineOfBusiness(data.subType!!),
                     squareMeters = data.livingSpace!!,
                     postalCode = data.zipCode!!,
                     dataCollectionId = dataCollectionId

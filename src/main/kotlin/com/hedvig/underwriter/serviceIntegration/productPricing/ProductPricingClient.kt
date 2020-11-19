@@ -1,8 +1,8 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing
 
+import com.hedvig.productPricingObjects.dtos.Agreement
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.AddAgreementRequest
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto

@@ -59,3 +59,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20201028-1015-support-student-and-type-denmark.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20201117-1030-add-danish-accident-and-travel-table.sql
+      relativeToChangelogFile: true
