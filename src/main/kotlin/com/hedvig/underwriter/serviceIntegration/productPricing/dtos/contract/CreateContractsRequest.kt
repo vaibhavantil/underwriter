@@ -1,10 +1,12 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract
 
+import com.hedvig.productPricingObjects.dtos.AgreementQuote
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.mappers.OutgoingMapper
 import com.hedvig.underwriter.web.dtos.SignRequest
 
 data class CreateContractsRequest(
@@ -30,7 +32,7 @@ data class CreateContractsRequest(
                 ),
                 currentInsurer = firstQuote.currentInsurer,
                 signSource = firstQuote.initiatedFrom,
-                quotes = quotes.map { quote -> AgreementQuote.from(quote) }
+                quotes = quotes.map { quote -> OutgoingMapper.toQuote(quote) }
             )
         }
 
@@ -41,7 +43,7 @@ data class CreateContractsRequest(
                 mandate = null,
                 currentInsurer = firstQuote.currentInsurer,
                 signSource = firstQuote.initiatedFrom,
-                quotes = quotes.map { quote -> AgreementQuote.from(quote) }
+                quotes = quotes.map { quote -> OutgoingMapper.toQuote(quote) }
             )
         }
     }

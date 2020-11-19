@@ -135,6 +135,8 @@ data class DatabaseQuoteRevision(
     val quoteNorwegianHomeContentsDataId: Int?,
     val quoteNorwegianTravelDataId: Int?,
     val quoteDanishHomeContentsDataId: Int?,
+    val quoteDanishAccidentDataId: Int?,
+    val quoteDanishTravelDataId: Int?,
     val memberId: String?,
     val breachedUnderwritingGuidelines: List<String>?,
     val underwritingGuidelinesBypassedBy: String?,
@@ -178,6 +180,14 @@ data class DatabaseQuoteRevision(
                 },
                 quoteDanishHomeContentsDataId = when (quote.data) {
                     is DanishHomeContentsData -> quote.data.internalId
+                    else -> null
+                },
+                quoteDanishAccidentDataId = when (quote.data) {
+                    is DanishAccidentData -> quote.data.internalId
+                    else -> null
+                },
+                quoteDanishTravelDataId = when (quote.data) {
+                    is DanishTravelData -> quote.data.internalId
                     else -> null
                 },
                 memberId = quote.memberId,
@@ -232,14 +242,14 @@ data class Quote(
         get() = when (this.data) {
             is SwedishApartmentData, is SwedishHouseData -> SEK
             is NorwegianTravelData, is NorwegianHomeContentsData -> NOK
-            is DanishHomeContentsData -> DKK
+            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> DKK
         }
 
     val market: Market
         get() = when (this.data) {
             is SwedishHouseData, is SwedishApartmentData -> Market.SWEDEN
             is NorwegianHomeContentsData, is NorwegianTravelData -> Market.NORWAY
-            is DanishHomeContentsData -> Market.DENMARK
+            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> Market.DENMARK
         }
 
     fun update(quoteRequest: QuoteRequest): Quote {
@@ -280,6 +290,20 @@ data class Quote(
                     email = quoteRequest.email ?: data.email
                 )
                 is DanishHomeContentsData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
+                )
+                is DanishAccidentData -> data.copy(
+                    ssn = quoteRequest.ssn ?: data.ssn,
+                    birthDate = quoteRequest.birthDate ?: data.birthDate,
+                    firstName = quoteRequest.firstName ?: data.firstName,
+                    lastName = quoteRequest.lastName ?: data.lastName,
+                    email = quoteRequest.email ?: data.email
+                )
+                is DanishTravelData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
@@ -404,7 +428,7 @@ data class Quote(
         is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
         is NorwegianHomeContentsData,
         is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
-        is DanishHomeContentsData -> ZoneId.of("Europe/Copenhagen")
+        is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> ZoneId.of("Europe/Copenhagen")
     }
 
     companion object {

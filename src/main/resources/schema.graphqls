@@ -32,6 +32,8 @@ input CreateQuoteInput {
     norwegianHomeContents: CreateNorwegianHomeContentsInput
     norwegianTravel: CreateNorwegianTravelInput
     danishHomeContents: CreateDanishHomeContentsInput
+    danishAccident: CreateDanishAccidentInput
+    danishTravel: CreateDanishTravelInput
     email: String
     dataCollectionId: ID
 }
@@ -62,6 +64,20 @@ input CreateDanishHomeContentsInput {
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
+}
+
+input CreateDanishAccidentInput {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    isStudent: Boolean!
+}
+
+input CreateDanishTravelInput {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    isStudent: Boolean!
 }
 
 enum DanishHomeContentsType {
@@ -124,6 +140,8 @@ input EditQuoteInput {
     norwegianHomeContents: EditNorwegianHomeContentsInput
     norwegianTravel: EditNorwegianTravelInput
     danishHomeContents: EditDanishHomeContentsInput
+    danishAccident: EditDanishAccidentInput
+    danishTravel: EditDanishTravelInput
     email: String
 }
 
@@ -183,6 +201,20 @@ input EditDanishHomeContentsInput {
     livingSpace: Int
     isStudent: Boolean
     type: DanishHomeContentsType
+}
+
+input EditDanishAccidentInput {
+    street: String
+    zipCode: String
+    coInsured: Int
+    isStudent: Boolean
+}
+
+input EditDanishTravelInput {
+    street: String
+    zipCode: String
+    coInsured: Int
+    isStudent: Boolean
 }
 
 input EditNorwegianTravelInput {
@@ -252,6 +284,10 @@ enum TypeOfContract {
     DK_HOME_CONTENT_RENT
     DK_HOME_CONTENT_STUDENT_OWN
     DK_HOME_CONTENT_STUDENT_RENT
+    DK_ACCIDENT,
+    DK_ACCIDENT_STUDENT,
+    DK_TRAVEL,
+    DK_TRAVEL_STUDENT
 }
 
 type CompleteQuote {
@@ -279,7 +315,7 @@ type CurrentInsurer {
 }
 
 union ExtraBuilding =
-      ExtraBuildingGarage
+    ExtraBuildingGarage
     | ExtraBuildingCarport
     | ExtraBuildingShed
     | ExtraBuildingStorehouse
@@ -412,6 +448,9 @@ union QuoteDetails =
     | NorwegianHomeContentsDetails
     | NorwegianTravelDetails
     | DanishHomeContentsDetails
+    | DanishAccidentDetails
+    | DanishTravelDetails
+
 
 type CompleteApartmentQuoteDetails {
     street: String!
@@ -474,6 +513,20 @@ type DanishHomeContentsDetails {
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
+}
+
+type DanishAccidentDetails {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    isStudent: Boolean!
+}
+
+type DanishTravelDetails {
+    street: String!
+    zipCode: String!
+    coInsured: Int!
+    isStudent: Boolean!
 }
 
 type IncompleteQuote {

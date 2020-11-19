@@ -286,6 +286,125 @@ class SignServiceImplTest {
     }
 
     @Test
+    fun startSigningOfOnlyDanishAccidentQuote_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
+    fun startSigningOfOnlyDanishTravelQuote_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
+    fun startSigningOfDanishAccidentAndDanishTravelQuotes_returnsFailResponse() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
+    fun startSigningOfDanishHomeContentAndDanishAccidentQuotes_returnsDanishBankIdSession() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every {
+            memberService.startDanishBankIdSignQuotes(
+                quote.memberId!!.toLong(),
+                signSessionReference,
+                quote.ssn,
+                successUrl,
+                failUrl
+            )
+        } returns StartRedirectBankIdSignResponse(
+            "redirect url"
+        )
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+    }
+
+    @Test
+    fun startSigningOfAllDanishTypeOfQuotes_returnsDanishBankIdSession() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+        val quote3 = a.QuoteBuilder(id = quoteIds[2], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+        val signSessionReference = UUID.randomUUID()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
+        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every {
+            memberService.startDanishBankIdSignQuotes(
+                quote.memberId!!.toLong(),
+                signSessionReference,
+                quote.ssn,
+                successUrl,
+                failUrl
+            )
+        } returns StartRedirectBankIdSignResponse(
+            "redirect url"
+        )
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+    }
+
+    @Test
+    fun startSigningOfThreeDanishHomeContentQuotes_returnsFailedToStartSign() {
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
+        val quote =
+            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote3 = a.QuoteBuilder(id = quoteIds[2], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+    }
+
+    @Test
     fun startSigningZeroQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
 
@@ -314,7 +433,6 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
-        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
     @Test

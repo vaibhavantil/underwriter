@@ -95,4 +95,30 @@ sealed class QuoteDetails {
                 }
             }
     }
+
+    data class DanishAccidentDetails(
+        val street: String,
+        val zipCode: String,
+        val coInsured: Int,
+        val isStudent: Boolean
+    ) : QuoteDetails() {
+        override val typeOfContract: ContractAgreementType
+            get() = when (isStudent) {
+                true -> ContractAgreementType.DK_ACCIDENT_STUDENT
+                false -> ContractAgreementType.DK_ACCIDENT
+            }
+    }
+
+    data class DanishTravelDetails(
+        val street: String,
+        val zipCode: String,
+        val coInsured: Int,
+        val isStudent: Boolean
+    ) : QuoteDetails() {
+        override val typeOfContract: ContractAgreementType
+            get() = when (isStudent) {
+                true -> ContractAgreementType.DK_TRAVEL_STUDENT
+                false -> ContractAgreementType.DK_TRAVEL
+            }
+    }
 }

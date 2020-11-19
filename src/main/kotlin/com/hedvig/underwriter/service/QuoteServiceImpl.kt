@@ -4,7 +4,9 @@ import arrow.core.Either
 import arrow.core.orNull
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -24,6 +26,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -290,7 +293,7 @@ class QuoteServiceImpl(
             is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
                 Money.of(quote.price, "NOK"), memberId
             )
-            is DanishHomeContentsData -> {
+            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> {
                 // TODO: Implement actual request
                 InsuranceCost(
                     MonetaryAmountV2("9999.00", "DKK"),
