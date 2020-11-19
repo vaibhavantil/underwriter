@@ -2,7 +2,7 @@ package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
 import com.hedvig.productPricingObjects.dtos.AgreementQuote
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.mappers.AgreementQuoteMapper
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.mappers.OutgoingMapper
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import java.time.LocalDate
 import java.util.UUID
@@ -21,7 +21,7 @@ data class AddAgreementRequest(
             contractId = request.contractId,
             quoteFromAgreementId = quote.originatingProductId,
             previousAgreementToDate = request.previousAgreementActiveTo,
-            quote = AgreementQuoteMapper.toQuote(
+            quote = OutgoingMapper.toQuote(
                 quote = quote,
                 fromDate = request.activeFrom,
                 toDate = request.activeTo
