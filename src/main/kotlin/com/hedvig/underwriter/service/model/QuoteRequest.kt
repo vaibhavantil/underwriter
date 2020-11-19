@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.model
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.productPricingObjects.dtos.Agreement
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.Quote
@@ -14,7 +15,7 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
-import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.Agreement
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.getOldProductType
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate

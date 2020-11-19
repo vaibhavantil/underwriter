@@ -82,7 +82,7 @@ class OutgoingMapper {
                 currency = quote.currency,
                 currentInsurer = quote.currentInsurer,
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
-                lineOfBusiness = if (quote.data.isYouth) NorwegianTravelLineOfBusiness.YOUTH else NorwegianTravelLineOfBusiness.REGULAR
+                lineOfBusiness = this.toLineOfBusiness(quote.data.isYouth)
             )
             is DanishHomeContentsData -> AgreementQuote.DanishHomeContentQuote(
                 quoteId = quote.id,
@@ -174,16 +174,21 @@ class OutgoingMapper {
             displayName = extraBuilding.displayName
         )
 
-        private fun toLineOfBusiness(type: ApartmentProductSubType) = when (type) {
+        fun toLineOfBusiness(type: ApartmentProductSubType) = when (type) {
             ApartmentProductSubType.BRF -> SwedishApartmentLineOfBusiness.BRF
             ApartmentProductSubType.RENT -> SwedishApartmentLineOfBusiness.RENT
             ApartmentProductSubType.STUDENT_BRF -> SwedishApartmentLineOfBusiness.STUDENT_BRF
             ApartmentProductSubType.STUDENT_RENT -> SwedishApartmentLineOfBusiness.STUDENT_RENT
         }
 
-        private fun toLineOfBusiness(type: NorwegianHomeContentsType, isYouth: Boolean) = when (type) {
+        fun toLineOfBusiness(type: NorwegianHomeContentsType, isYouth: Boolean) = when (type) {
             NorwegianHomeContentsType.RENT -> if (isYouth) NorwegianHomeContentLineOfBusiness.YOUTH_RENT else NorwegianHomeContentLineOfBusiness.RENT
             NorwegianHomeContentsType.OWN -> if (isYouth) NorwegianHomeContentLineOfBusiness.YOUTH_OWN else NorwegianHomeContentLineOfBusiness.OWN
+        }
+
+        fun toLineOfBusiness(isYouth: Boolean) = when (isYouth) {
+            true -> NorwegianTravelLineOfBusiness.YOUTH
+            false -> NorwegianTravelLineOfBusiness.REGULAR
         }
 
         private fun toLineOfBusiness(type: DanishHomeContentsType, isStudent: Boolean) = when (type) {
