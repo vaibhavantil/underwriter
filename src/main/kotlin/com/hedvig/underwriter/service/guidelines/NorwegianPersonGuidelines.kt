@@ -22,9 +22,11 @@ object NorwegianSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
     override val validate =
         { data: QuoteData ->
             (data as PersonPolicyHolder<*>).ssn?.dayMonthAndTwoDigitYearFromDDMMYYSsn()?.let { dayMonthYear ->
-                !((data.birthDate!!.dayOfMonth == dayMonthYear.first.toInt()) &&
-                    (data.birthDate!!.monthValue == dayMonthYear.second.toInt()) &&
-                    (data.birthDate!!.year.toString().substring(2, 4) == dayMonthYear.third))
+                !(
+                    (data.birthDate!!.dayOfMonth == dayMonthYear.first.toInt()) &&
+                        (data.birthDate!!.monthValue == dayMonthYear.second.toInt()) &&
+                        (data.birthDate!!.year.toString().substring(2, 4) == dayMonthYear.third)
+                    )
             } ?: false
         }
 }
