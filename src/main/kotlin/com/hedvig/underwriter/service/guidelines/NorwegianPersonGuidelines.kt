@@ -16,7 +16,7 @@ object NorwegianPersonGuidelines {
 object NorwegianSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines ssn does not match birth date",
-        "SSN_DOSE_NOT_MATCH_BIRTH_DATE"
+        "SSN_DOES_NOT_MATCH_BIRTH_DATE"
     )
 
     override val validate =
