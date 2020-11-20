@@ -20,6 +20,7 @@ sealed class StartSignResponse {
     ) : StartSignResponse()
 
     data class FailedToStartSign(
-        val errorMessage: String
+        val errorMessage: String,
+        val errorCode: String
     ) : StartSignResponse()
 }
