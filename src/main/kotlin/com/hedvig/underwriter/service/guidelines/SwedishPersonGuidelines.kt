@@ -2,6 +2,11 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.DEBT_CHECK
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN_LENGTH
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_YOUNG
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
@@ -18,7 +23,7 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "SSN Invalid length",
-        "INVALID_SSN_LENGTH"
+        INVALID_SSN_LENGTH
     )
 
     override val skipAfter: Boolean
@@ -38,7 +43,7 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "Birth date does not match SSN",
-        "SSN_DOES_NOT_MATCH_BIRTH_DATE"
+        SSN_DOES_NOT_MATCH_BIRTH_DATE
     )
 
     override val validate = { data: QuoteData ->
@@ -49,7 +54,7 @@ object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
 object SocialSecurityDate : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "Invalid SSN",
-        "INVALID_SSN"
+        INVALID_SSN
     )
 
     override
@@ -73,7 +78,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "member is younger than 18",
-        "TOO_YOUNG"
+        TOO_YOUNG
     )
 
     override val skipAfter: Boolean
@@ -85,7 +90,7 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
 class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         ERROR_MESSAGE,
-        "DEBT_CHECK"
+        DEBT_CHECK
     )
 
     override val skipAfter: Boolean

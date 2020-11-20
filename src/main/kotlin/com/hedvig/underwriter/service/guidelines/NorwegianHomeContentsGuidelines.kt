@@ -1,6 +1,13 @@
 package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.NEGATIVE_NUMBER_OF_CO_INSURED
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_NUMBER_OF_CO_INSURED
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_MUCH_LIVING_SPACE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_OLD
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -17,19 +24,19 @@ object NorwegianHomeContentsGuidelines {
 }
 
 object NorwegianHomeContentcoInsuredCantBeNegative : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("coInsured cant be negative", "NEGATIVE_NUMBER_OF_CO_INSURED")
+    override val breachedGuideline = BreachedGuideline("coInsured cant be negative", NEGATIVE_NUMBER_OF_CO_INSURED)
 
     override val validate = { data: NorwegianHomeContentsData -> data.coInsured < 0 }
 }
 
 object NorwegianHomeContentLivingSpaceAtLeast1Sqm : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("living space must be at least 1 sqm", "TOO_SMALL_LIVING_SPACE")
+    override val breachedGuideline = BreachedGuideline("living space must be at least 1 sqm", TOO_SMALL_LIVING_SPACE)
 
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace < 1 }
 }
 
 object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", "TOO_MANY_NUMBER_OF_CO_INSURED")
+    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", TOO_MANY_NUMBER_OF_CO_INSURED)
 
     override val validate = { data: NorwegianHomeContentsData -> data.coInsured > 5 }
 }
@@ -37,7 +44,7 @@ object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeC
 object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "living space must be less than or equal to 250 sqm",
-        "TOO_MUCH_LIVING_SPACE"
+        TOO_MUCH_LIVING_SPACE
     )
 
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace > 250 }
@@ -46,7 +53,7 @@ object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<Norwegi
 object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "coInsured size must be less than or equal to 2",
-        "YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED"
+        YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED
     )
 
     override val validate =
@@ -59,7 +66,7 @@ object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<Norwegian
 object NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space must be less than or equal to 50sqm",
-        "YOUTH_TOO_MUCH_LIVING_SPACE"
+        YOUTH_TOO_MUCH_LIVING_SPACE
     )
 
     override val validate =
@@ -72,7 +79,7 @@ object NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm : BaseGuideline<Nor
 object NorwegianYouthHomeContentsAgeNotMoreThan30Years : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines member must be 30 years old or younger",
-        "YOUTH_TOO_OLD"
+        YOUTH_TOO_OLD
     )
 
     override val validate =
