@@ -11,7 +11,7 @@ object StartSignErrors {
 
     val variousMemberId = StartSignResponse.FailedToStartSign(
         "creation and signing must be made by the same member",
-        "DIFFRENT_MEMBER_ID_ON_QUOTE_AND_SIGN_REQUEST"
+        "DIFFERENT_MEMBER_ID_ON_QUOTE_AND_SIGN_REQUEST"
     )
 
     val noMemberIdOnQuote = StartSignResponse.FailedToStartSign(
@@ -22,7 +22,7 @@ object StartSignErrors {
     val targetURLNotProvided =
         StartSignResponse.FailedToStartSign(
             "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign",
-            "TAGET_URL_NOT_PROVIDED"
+            "TARGET_URL_NOT_PROVIDED"
         )
 
     fun fromErrorResponse(error: ErrorResponseDto) =
