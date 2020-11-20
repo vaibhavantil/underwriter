@@ -6,7 +6,7 @@ import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.DEBT_CH
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN_LENGTH
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_YOUNG
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.UNDERAGE
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
@@ -78,7 +78,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "member is younger than 18",
-        TOO_YOUNG
+        UNDERAGE
     )
 
     override val skipAfter: Boolean

@@ -2,14 +2,14 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_BIG_EXTRA_BUILDING_SIZE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_BIG_HOUSE_HOLD_SIZE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_HOUSE_HOLD_SIZE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_BATHROOMS
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_EXTRA_BUILDINGS
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_EXTRA_BUILDING_SIZE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_HOUSE_HOLD_SIZE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YEAR_OF_CONSTRUCTION_TOO_EARLY
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_EARLY_YEAR_OF_CONSTRUCTION
 
 interface SwedishHouseGuideline : BaseGuideline<SwedishHouseData>
 
@@ -30,7 +30,7 @@ object SwedishHouseGuidelines {
 object SwedishHouseHouseholdSizeAtLeast1 : SwedishHouseGuideline {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size, must be at least 1",
-        TOO_SMALL_HOUSE_HOLD_SIZE
+        TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
     )
 
     override val validate = { data: SwedishHouseData -> data.householdSize!! < 1 }
@@ -48,7 +48,7 @@ object SwedishHouseLivingSpaceAtLeast1Sqm : SwedishHouseGuideline {
 object SwedishHouseHouseholdSizeNotMoreThan6 : SwedishHouseGuideline {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size, must not be more than 6",
-        TOO_BIG_HOUSE_HOLD_SIZE
+        TOO_HIGH_NUMBER_OF_HOUSE_HOLD_SIZE
     )
 
     override val validate = { data: SwedishHouseData -> data.householdSize!! > 6 }
@@ -66,7 +66,7 @@ object SwedishHouseLivingSpaceNotMoreThan250Sqm : SwedishHouseGuideline {
 object SwedishHouseYearOfConstruction : SwedishHouseGuideline {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline year of construction, must not be older than 1925",
-        YEAR_OF_CONSTRUCTION_TOO_EARLY
+        TOO_EARLY_YEAR_OF_CONSTRUCTION
     )
 
     override val validate = { data: SwedishHouseData -> data.yearOfConstruction!! < 1925 }

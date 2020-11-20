@@ -2,12 +2,12 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.NEGATIVE_NUMBER_OF_CO_INSURED
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_NUMBER_OF_CO_INSURED
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_HIGH_NUMBER_OF_CO_INSURED
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_MUCH_LIVING_SPACE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_TOO_OLD
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.YOUTH_OVERAGE
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -36,7 +36,7 @@ object NorwegianHomeContentLivingSpaceAtLeast1Sqm : BaseGuideline<NorwegianHomeC
 }
 
 object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", TOO_MANY_NUMBER_OF_CO_INSURED)
+    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", TOO_HIGH_NUMBER_OF_CO_INSURED)
 
     override val validate = { data: NorwegianHomeContentsData -> data.coInsured > 5 }
 }
@@ -53,7 +53,7 @@ object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<Norwegi
 object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "coInsured size must be less than or equal to 2",
-        YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED
+        YOUTH_TOO_HIGH_NUMBER_OF_CO_INSURED
     )
 
     override val validate =
@@ -79,7 +79,7 @@ object NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm : BaseGuideline<Nor
 object NorwegianYouthHomeContentsAgeNotMoreThan30Years : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines member must be 30 years old or younger",
-        YOUTH_TOO_OLD
+        YOUTH_OVERAGE
     )
 
     override val validate =
