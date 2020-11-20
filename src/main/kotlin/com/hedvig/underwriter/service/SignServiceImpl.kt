@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
+import arrow.core.toOption
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
@@ -269,26 +270,23 @@ class SignServiceImpl(
     }
 
     override fun signQuote(
-        completeQuoteId: UUID,
+        quoteId: UUID,
         body: SignQuoteRequest
-    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
-        val quote1 = quoteRepository.find(completeQuoteId)
-            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
-
-        return Either.Right(quote1)
-            .map(::assertAgreementIdIsNotNull)
-            .map { updateNameFromRequest(it, body) }
-            .map { updateStartTimeFromRequest(it, body) }
-            .flatMap { createMemberMaybe(it) }
-            .flatMap {
-                signQuoteWithMemberId(
-                    it,
-                    true,
-                    SignRequest("", "", ""),
-                    body.email
-                )
-            }
-    }
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> = quoteRepository.find(quoteId)
+        .toOption()
+        .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
+        .map(::assertAgreementIdIsNotNull)
+        .map { updateNameFromRequest(it, body) }
+        .map { updateStartTimeFromRequest(it, body) }
+        .flatMap { createMemberMaybe(it) }
+        .flatMap {
+            signQuoteWithMemberId(
+                it,
+                true,
+                SignRequest("", "", ""),
+                body.email
+            )
+        }
 
     private fun createMemberMaybe(
         quote: Quote
