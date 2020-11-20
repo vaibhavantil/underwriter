@@ -25,7 +25,7 @@ object NorwegianTravelCoInsuredCantBeNegative : BaseGuideline<NorwegianTravelDat
 object NorwegianYouthTravelAgeNotMoreThan30Years : BaseGuideline<NorwegianTravelData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines member must be 30 years old or younger",
-        "YOUTH_AGE_MORE_THAN_30"
+        "YOUTH_TOO_OLD"
     )
 
     override val validate =
@@ -51,7 +51,7 @@ object NorwegianYouthTravelCoInsuredNotMoreThan0 : BaseGuideline<NorwegianTravel
 object NorwegianTravelCoInsuredNotMoreThan5 : BaseGuideline<NorwegianTravelData> {
     override val breachedGuideline = BreachedGuideline(
         "coInsured size must be less than or equal to 5",
-        "NUMBER_OF_CO_INSURED_MORE_THAN_5"
+        "TOO_MANY_NUMBER_OF_CO_INSURED"
     )
 
     override val validate = { data: NorwegianTravelData -> data.coInsured > 5 }

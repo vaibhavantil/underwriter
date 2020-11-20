@@ -23,13 +23,13 @@ object NorwegianHomeContentcoInsuredCantBeNegative : BaseGuideline<NorwegianHome
 }
 
 object NorwegianHomeContentLivingSpaceAtLeast1Sqm : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("living space must be at least 1 sqm", "LIVING_SPACE_LESS_THAN_1")
+    override val breachedGuideline = BreachedGuideline("living space must be at least 1 sqm", "TOO_SMALL_LIVING_SPACE")
 
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace < 1 }
 }
 
 object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeContentsData> {
-    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", "NUMBER_OF_CO_INSURED_MORE_THAN_5")
+    override val breachedGuideline = BreachedGuideline("coInsured size must be less than or equal to 5", "TOO_MANY_NUMBER_OF_CO_INSURED")
 
     override val validate = { data: NorwegianHomeContentsData -> data.coInsured > 5 }
 }
@@ -37,7 +37,7 @@ object NorwegianHomeContentscoInsuredNotMoreThan5 : BaseGuideline<NorwegianHomeC
 object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "living space must be less than or equal to 250 sqm",
-        "LIVING_SPACE_MORE_THAN_250"
+        "TOO_MUCH_LIVING_SPACE"
     )
 
     override val validate = { data: NorwegianHomeContentsData -> data.livingSpace > 250 }
@@ -46,7 +46,7 @@ object NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm : BaseGuideline<Norwegi
 object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "coInsured size must be less than or equal to 2",
-        "YOUTH_NUMBER_OF_CO_INSURED_MORE_THAN_2"
+        "YOUTH_TOO_MANY_NUMBER_OF_CO_INSURED"
     )
 
     override val validate =
@@ -59,7 +59,7 @@ object NorwegianYouthHomeContentsCoInsuredNotMoreThan2 : BaseGuideline<Norwegian
 object NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space must be less than or equal to 50sqm",
-        "YOUTH_LIVING_SPACE_MORE_THAN_50"
+        "YOUTH_TOO_MUCH_LIVING_SPACE"
     )
 
     override val validate =
@@ -72,7 +72,7 @@ object NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm : BaseGuideline<Nor
 object NorwegianYouthHomeContentsAgeNotMoreThan30Years : BaseGuideline<NorwegianHomeContentsData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines member must be 30 years old or younger",
-        "YOUTH_AGE_MORE_THAN_30"
+        "YOUTH_TOO_OLD"
     )
 
     override val validate =

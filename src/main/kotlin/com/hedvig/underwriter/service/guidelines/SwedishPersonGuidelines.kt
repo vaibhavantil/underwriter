@@ -73,7 +73,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val breachedGuideline = BreachedGuideline(
         "member is younger than 18",
-        "YOUNGER_THAN_18"
+        "TOO_YOUNG"
     )
 
     override val skipAfter: Boolean

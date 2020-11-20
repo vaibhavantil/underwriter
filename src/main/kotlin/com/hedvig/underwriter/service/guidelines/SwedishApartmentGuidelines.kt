@@ -21,7 +21,7 @@ object SwedishApartmentGuidelines {
 object SwedishApartmentHouseHoldSizeAtLeast1 : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size, must be at least 1",
-        "HOUSE_HOLD_SIZE_LESS_THAN_1"
+        "TOO_SMALL_HOUSE_HOLD_SIZE"
     )
 
     override val validate = { data: SwedishApartmentData -> data.householdSize!! < 1 }
@@ -30,7 +30,7 @@ object SwedishApartmentHouseHoldSizeAtLeast1 : BaseGuideline<SwedishApartmentDat
 object SwedishApartmentLivingSpaceAtLeast1Sqm : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space, must be at least 1 sqm",
-        "LIVING_SPACE_LESS_THAN_1"
+        "TOO_SMALL_LIVING_SPACE"
     )
 
     override val validate = { data: SwedishApartmentData -> data.livingSpace!! < 1 }
@@ -39,7 +39,7 @@ object SwedishApartmentLivingSpaceAtLeast1Sqm : BaseGuideline<SwedishApartmentDa
 object SwedishApartmentHouseHoldSizeNotMoreThan6 : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size must be less than or equal to 6",
-        "HOUSE_HOLD_SIZE_MORE_THAN_6"
+        "TOO_BIG_HOUSE_HOLD_SIZE"
     )
 
     override val validate = { data: SwedishApartmentData -> data.householdSize!! > 6 }
@@ -48,7 +48,7 @@ object SwedishApartmentHouseHoldSizeNotMoreThan6 : BaseGuideline<SwedishApartmen
 object SwedishApartmentLivingSpaceNotMoreThan250Sqm : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space must be less than or equal to 250 sqm",
-        "LIVING_SPACE_MORE_THAN_250"
+        "TOO_MUCH_LIVING_SPACE"
     )
 
     override val validate = { data: SwedishApartmentData -> data.livingSpace!! > 250 }
@@ -57,7 +57,7 @@ object SwedishApartmentLivingSpaceNotMoreThan250Sqm : BaseGuideline<SwedishApart
 object SwedishStudentApartmentHouseholdSizeNotMoreThan2 : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline household size must be less than 2",
-        "STUDENT_HOUSE_HOLD_SIZE_MORE_THAN_2"
+        "STUDENT_TOO_BIG_HOUSE_HOLD_SIZE"
     )
 
     override val validate =
@@ -70,7 +70,7 @@ object SwedishStudentApartmentHouseholdSizeNotMoreThan2 : BaseGuideline<SwedishA
 object SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guideline living space must be less than or equal to 50sqm",
-        "STUDENT_LIVING_SPACE_MORE_THAN_50"
+        "STUDENT_TOO_MUCH_LIVING_SPACE"
     )
 
     override val validate =
@@ -83,7 +83,7 @@ object SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm : BaseGuideline<Swedis
 object SwedishStudentApartmentAgeNotMoreThan30Years : BaseGuideline<SwedishApartmentData> {
     override val breachedGuideline = BreachedGuideline(
         "breaches underwriting guidelines member must be 30 years old or younger",
-        "STUDENT_AGE_MORE_THAN_30"
+        "STUDENT_TOO_OLD"
     )
 
     override val validate =
