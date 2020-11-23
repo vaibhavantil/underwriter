@@ -14,9 +14,9 @@ import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.quoteStrategies.StrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
-import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData

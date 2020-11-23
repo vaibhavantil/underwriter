@@ -19,7 +19,7 @@ import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.StrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.util.toStockholmLocalDate

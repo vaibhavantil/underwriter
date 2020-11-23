@@ -29,7 +29,7 @@ import com.hedvig.underwriter.service.guidelines.SwedishHouseYearOfConstruction
 import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentAgeNotMoreThan30Years
 import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentHouseholdSizeNotMoreThan2
 import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm
-import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.StrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.testhelp.databuilder.a

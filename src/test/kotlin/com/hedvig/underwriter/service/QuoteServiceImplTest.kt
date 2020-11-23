@@ -6,8 +6,8 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.service.quoteStrategies.StrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.MockKAnnotations
