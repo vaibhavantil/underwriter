@@ -473,6 +473,7 @@ data class Quote(
                     )
                 )
             }
+            null -> throw IllegalArgumentException("Unable to update quote when data is null (quoteId=${this.id})")
         }
     }
 
