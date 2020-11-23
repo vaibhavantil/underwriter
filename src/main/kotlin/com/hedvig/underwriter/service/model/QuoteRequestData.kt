@@ -54,6 +54,7 @@ sealed class QuoteRequestData {
         val zipCode: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
+        @field:JsonProperty("student")
         val isStudent: Boolean?,
         val subType: DanishHomeContentsType?
     ) : QuoteRequestData()
@@ -62,6 +63,7 @@ sealed class QuoteRequestData {
         val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
+        @field:JsonProperty("student")
         val isStudent: Boolean?
     ) : QuoteRequestData()
 
@@ -69,6 +71,7 @@ sealed class QuoteRequestData {
         val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
+        @field:JsonProperty("student")
         val isStudent: Boolean?
     ) : QuoteRequestData()
 
