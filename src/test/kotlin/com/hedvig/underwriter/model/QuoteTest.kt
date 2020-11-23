@@ -12,40 +12,6 @@ import java.time.LocalDate
 
 class QuoteTest {
     @Test
-    fun updatesQuote() {
-        val quote = Quote(
-            id = UUID.randomUUID(),
-            createdAt = Instant.now(),
-            data = SwedishApartmentData(id = UUID.randomUUID()),
-            productType = ProductType.APARTMENT,
-            initiatedFrom = QuoteInitiatedFrom.HOPE,
-            attributedTo = Partner.HEDVIG,
-            state = QuoteState.QUOTED,
-            breachedUnderwritingGuidelines = null,
-            price = BigDecimal.valueOf(100)
-        )
-        val updatedQuote = quote.update(
-            QuoteRequest(
-                firstName = null,
-                lastName = null,
-                email = null,
-                productType = null,
-                ssn = "201212121212",
-                currentInsurer = null,
-                incompleteQuoteData = null,
-                originatingProductId = null,
-                quotingPartner = null,
-                birthDate = null,
-                memberId = null,
-                startDate = null,
-                dataCollectionId = null
-            )
-        )
-        assertThat(updatedQuote.id).isEqualTo(quote.id)
-        assertThat((updatedQuote.data as SwedishApartmentData).ssn).isEqualTo("201212121212")
-    }
-
-    @Test
     fun updatesQuoteFromApartmentToHouse() {
         val quote = Quote(
             id = UUID.randomUUID(),
