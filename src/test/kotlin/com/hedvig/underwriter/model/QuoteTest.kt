@@ -11,8 +11,8 @@ import org.junit.Test
 import java.time.LocalDate
 
 class QuoteTest {
-    @Test
-    fun updatesQuote() {
+    @Test(expected = IllegalArgumentException::class)
+    fun `Does not update quote when incompleteQuoteData is null in request`() {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
@@ -24,7 +24,7 @@ class QuoteTest {
             breachedUnderwritingGuidelines = null,
             price = BigDecimal.valueOf(100)
         )
-        val updatedQuote = quote.update(
+        val shouldThrow = quote.update(
             QuoteRequest(
                 firstName = null,
                 lastName = null,
@@ -41,8 +41,6 @@ class QuoteTest {
                 dataCollectionId = null
             )
         )
-        assertThat(updatedQuote.id).isEqualTo(quote.id)
-        assertThat((updatedQuote.data as SwedishApartmentData).ssn).isEqualTo("201212121212")
     }
 
     @Test
