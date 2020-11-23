@@ -129,8 +129,11 @@ class Mutation @Autowired constructor(
     private fun getQuoteResultFromError(errorResponse: ErrorResponseDto) = when (errorResponse.errorCode) {
         ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES -> {
             UnderwritingLimitsHit(
-                errorResponse.breachedUnderwritingGuidelines?.map { description ->
-                    UnderwritingLimit(description)
+                errorResponse.breachedUnderwritingGuidelines?.map { breachedGuideline ->
+                    UnderwritingLimit(
+                        description = breachedGuideline.message,
+                        code = breachedGuideline.code
+                    )
                 } ?: throw IllegalStateException("Breached underwriting guidelines with no list")
             )
         }

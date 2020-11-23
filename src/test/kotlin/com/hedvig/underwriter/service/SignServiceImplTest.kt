@@ -8,10 +8,7 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.ssn
-import com.hedvig.underwriter.service.SignServiceImpl.Companion.MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE
-import com.hedvig.underwriter.service.SignServiceImpl.Companion.SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE
-import com.hedvig.underwriter.service.SignServiceImpl.Companion.TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE
-import com.hedvig.underwriter.service.SignServiceImpl.Companion.VARIOUS_MEMBER_ID_ERROR_MESSAGE
+import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -448,7 +445,10 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE
+            StartSignErrors.noMemberIdOnQuote.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.noMemberIdOnQuote.errorCode
         )
     }
 
@@ -467,7 +467,10 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            VARIOUS_MEMBER_ID_ERROR_MESSAGE
+            StartSignErrors.variousMemberId.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.variousMemberId.errorCode
         )
     }
 
@@ -484,7 +487,10 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE
+            StartSignErrors.targetURLNotProvided.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.targetURLNotProvided.errorCode
         )
     }
 
@@ -498,7 +504,10 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE
+            StartSignErrors.contactChat.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.contactChat.errorCode
         )
     }
 

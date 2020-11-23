@@ -426,6 +426,7 @@ type UnderwritingLimitsHit {
 
 type UnderwritingLimit {
     description: String!
+    code: String!
 }
 
 type MonetaryAmountV2 {
@@ -585,7 +586,8 @@ type DanishBankIdSession {
 }
 
 type FailedToStartSign {
-    errorMessage: String
+    errorMessage: String!
+    errorCode: String!
 }
 
 input QuoteBundleInput {

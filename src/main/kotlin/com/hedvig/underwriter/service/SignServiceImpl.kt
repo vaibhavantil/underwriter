@@ -18,6 +18,7 @@ import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -61,7 +62,7 @@ class SignServiceImpl(
     ): StartSignResponse {
 
         if (memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()).memberAlreadySigned) {
-            return StartSignResponse.FailedToStartSign(MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE)
+            return StartSignErrors.contactChat
         }
 
         val quotes = quoteService.getQuotes(quoteIds)
@@ -69,16 +70,16 @@ class SignServiceImpl(
             quote.memberId?.let { quoteMemberId ->
                 if (memberId != quoteMemberId) {
                     logger.info("Member [id: $memberId] tried to sign quote with member id: $quoteMemberId. [Quotes: $quotes]")
-                    return StartSignResponse.FailedToStartSign(VARIOUS_MEMBER_ID_ERROR_MESSAGE)
+                    return StartSignErrors.variousMemberId
                 }
             } ?: run {
                 logger.info("Member [id: $memberId] tried to sign quote without member id. [Quotes: $quotes]")
-                return StartSignResponse.FailedToStartSign(SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE)
+                return StartSignErrors.noMemberIdOnQuote
             }
 
             val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
-                return StartSignResponse.FailedToStartSign(quoteNotSignableErrorDto.errorMessage)
+                return StartSignErrors.fromErrorResponse(quoteNotSignableErrorDto)
             }
         }
 
@@ -101,10 +102,11 @@ class SignServiceImpl(
 
                 return response.autoStartToken?.let { autoStartToken ->
                     StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
-                } ?: StartSignResponse.FailedToStartSign(errorMessage = response.internalErrorMessage!!)
+                } ?: StartSignErrors.emptyAuthTokenFromBankId(response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
-                return genericStartRedirectSign(successUrl, failUrl, quoteIds,
+                return genericStartRedirectSign(
+                    successUrl, failUrl, quoteIds,
                     { signSessionId, successUrl, failUrl ->
                         memberService.startNorwegianBankIdSignQuotes(
                             data.memberId.toLong(),
@@ -123,7 +125,8 @@ class SignServiceImpl(
                 )
             }
             is QuotesSignData.DanishBankId -> {
-                return genericStartRedirectSign(successUrl, failUrl, quoteIds,
+                return genericStartRedirectSign(
+                    successUrl, failUrl, quoteIds,
                     { signSessionId, successUrl, failUrl ->
                         memberService.startDanishBankIdSignQuotes(
                             data.memberId.toLong(),
@@ -142,7 +145,7 @@ class SignServiceImpl(
                 )
             }
             is QuotesSignData.CanNotBeBundled ->
-                return StartSignResponse.FailedToStartSign("Quotes can not be bundled")
+                return StartSignErrors.quotesCanNotBeBundled
         }
     }
 
@@ -154,7 +157,7 @@ class SignServiceImpl(
         successfulReturn: (signSessionId: UUID, redirectUrl: String) -> StartSignResponse
     ): StartSignResponse {
         if (successUrl == null || failUrl == null) {
-            return StartSignResponse.FailedToStartSign(TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE)
+            return StartSignErrors.targetURLNotProvided
         }
 
         val signSessionId = signSessionRepository.insert(quoteIds)
@@ -164,8 +167,8 @@ class SignServiceImpl(
         return response.redirectUrl?.let { redirectUrl ->
             successfulReturn(signSessionId, redirectUrl)
         } ?: response.internalErrorMessage?.let {
-            StartSignResponse.FailedToStartSign(it)
-        } ?: StartSignResponse.FailedToStartSign(response.errorMessages!!.joinToString(", "))
+            StartSignErrors.emptyRedirectUrlFromBankId(it)
+        } ?: StartSignErrors.emptyRedirectUrlFromBankId(response.errorMessages!!.joinToString(", "))
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
@@ -175,7 +178,8 @@ class SignServiceImpl(
         val createContractResponse = when (completeSignSessionData) {
             is CompleteSignSessionData.SwedishBankIdDataComplete ->
                 productPricingService.createContractsFromQuotes(
-                    quotes, SignRequest(
+                    quotes,
+                    SignRequest(
                         referenceToken = completeSignSessionData.referenceToken,
                         signature = completeSignSessionData.signature,
                         oscpResponse = completeSignSessionData.oscpResponse
@@ -469,10 +473,5 @@ class SignServiceImpl(
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
-        const val SIGNING_QUOTE_WITH_OUT_MEMBER_ID_ERROR_MESSAGE = "quotes must have member id to be able to sign"
-        const val VARIOUS_MEMBER_ID_ERROR_MESSAGE = "creation and signing must be made by the same member"
-        const val TARGET_URL_NOT_PROVIDED_ERROR_MESSAGE =
-            "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign"
-        const val MEMBER_HAS_ALREADY_SIGNED_ERROR_MESSAGE = "Member has already signed"
     }
 }
