@@ -262,7 +262,7 @@ data class Quote(
         }
 
     fun update(quoteRequest: QuoteRequest): Quote {
-        var newQuote = copy(
+        val newQuote = copy(
             productType = quoteRequest.productType ?: productType,
             startDate = quoteRequest.startDate?.toStockholmLocalDate() ?: startDate,
             data = when (data) {
@@ -322,7 +322,7 @@ data class Quote(
             }
         )
 
-        when (val requestData = quoteRequest.incompleteQuoteData) {
+        return when (val requestData = quoteRequest.incompleteQuoteData) {
             is SwedishApartment -> {
                 val newQuoteData: SwedishApartmentData = when (val data = newQuote.data) {
                     is SwedishApartmentData -> data
@@ -343,7 +343,7 @@ data class Quote(
                     }
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -374,7 +374,7 @@ data class Quote(
                     }
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -396,7 +396,7 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -415,7 +415,7 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
                         isYouth = requestData.isYouth ?: newQuoteData.isYouth
@@ -428,7 +428,7 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -447,7 +447,7 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -464,7 +464,7 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                newQuote = newQuote.copy(
+                newQuote.copy(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
@@ -474,7 +474,6 @@ data class Quote(
                 )
             }
         }
-        return newQuote
     }
 
     fun recoverBirthDateFromSSN() = when {
