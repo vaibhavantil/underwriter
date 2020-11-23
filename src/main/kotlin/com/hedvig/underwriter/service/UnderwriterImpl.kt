@@ -16,15 +16,10 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuideline
-import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentsGuidelines
-import com.hedvig.underwriter.service.guidelines.NorwegianPersonGuidelines
-import com.hedvig.underwriter.service.guidelines.NorwegianTravelGuidelines
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentGuidelines
-import com.hedvig.underwriter.service.guidelines.SwedishHouseGuidelines
-import com.hedvig.underwriter.service.guidelines.SwedishPersonalGuidelines
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.util.toStockholmLocalDate
@@ -36,8 +31,8 @@ import java.util.UUID
 
 @Service
 class UnderwriterImpl(
-    private val debtChecker: DebtChecker,
-    private val priceEngineService: PriceEngineService
+    private val priceEngineService: PriceEngineService,
+    private val strategyService: StrategyService
 ) : Underwriter {
 
     override fun createQuote(
@@ -199,7 +194,10 @@ class UnderwriterImpl(
         }
     }
 
-    private fun logBreachedUnderwritingGuidelines(quote: Quote, breachedUnderwritingGuidelines: List<BreachedGuideline>) {
+    private fun logBreachedUnderwritingGuidelines(
+        quote: Quote,
+        breachedUnderwritingGuidelines: List<BreachedGuideline>
+    ) {
         when (quote.initiatedFrom) {
             QuoteInitiatedFrom.WEBONBOARDING,
             QuoteInitiatedFrom.APP,
@@ -256,76 +254,13 @@ class UnderwriterImpl(
     fun validateGuidelines(data: QuoteData): List<BreachedGuideline> {
         val errors = mutableListOf<BreachedGuideline>()
 
-        errors.addAll(validatePersonalGuidelines(data))
-
-        errors.addAll(validateProductGuidelines(data))
+        val strategy = strategyService.getStrategy(data)
+        errors.addAll(runRules(data, strategy.getPersonalGuidelines(data)))
+        errors.addAll(runRules(data, strategy.getProductRules(data)))
         return errors
     }
 
-    private fun validatePersonalGuidelines(data: QuoteData): List<BreachedGuideline> =
-        when (data) {
-            is SwedishApartmentData,
-            is SwedishHouseData ->
-                runRules(
-                    data, SwedishPersonalGuidelines(
-                        debtChecker
-                    ).setOfRules
-                )
-            is NorwegianHomeContentsData,
-            is NorwegianTravelData -> runRules(
-                data, NorwegianPersonGuidelines.setOfRules
-            )
-            is DanishHomeContentsData -> {
-                // TODO: fix when we have guidlines
-                mutableListOf()
-            }
-            is DanishAccidentData -> {
-                // TODO: fix when we have guidlines
-                mutableListOf()
-            }
-            is DanishTravelData -> {
-                // TODO: fix when we have guidlines
-                mutableListOf()
-            }
-        }
-
-    private fun validateProductGuidelines(data: QuoteData): List<BreachedGuideline> =
-        when (data) {
-            is SwedishHouseData ->
-                runRules(
-                    data,
-                    SwedishHouseGuidelines.setOfRules
-                )
-            is SwedishApartmentData ->
-                runRules(
-                    data,
-                    SwedishApartmentGuidelines.setOfRules
-                )
-            is NorwegianHomeContentsData ->
-                runRules(
-                    data,
-                    NorwegianHomeContentsGuidelines.setOfRules
-                )
-            is NorwegianTravelData ->
-                runRules(
-                    data,
-                    NorwegianTravelGuidelines.setOfRules
-                )
-            is DanishHomeContentsData -> {
-                // TODO: fix when we have guidelines
-                mutableListOf()
-            }
-            is DanishAccidentData -> {
-                // TODO: fix when we have guidelines
-                mutableListOf()
-            }
-            is DanishTravelData -> {
-                // TODO: fix when we have guidelines
-                mutableListOf()
-            }
-        }
-
-    fun <T> runRules(
+    fun <T : QuoteData> runRules(
         data: T,
         listOfRules: Set<BaseGuideline<T>>
     ): MutableList<BreachedGuideline> {

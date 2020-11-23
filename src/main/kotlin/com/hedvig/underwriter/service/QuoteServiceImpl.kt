@@ -2,20 +2,12 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.orNull
-import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.model.DanishAccidentData
-import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.Market
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
@@ -24,6 +16,7 @@ import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
+import com.hedvig.underwriter.serviceIntegration.notificationService.StrategyService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData
@@ -31,7 +24,6 @@ import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import org.javamoney.moneta.Money
 import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -42,7 +34,8 @@ class QuoteServiceImpl(
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository,
-    val notificationService: NotificationService
+    val notificationService: NotificationService,
+    val strategyService: StrategyService
 ) : QuoteService {
 
     val logger = getLogger(QuoteServiceImpl::class.java)!!
@@ -284,25 +277,9 @@ class QuoteServiceImpl(
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
 
-        return when (quote.data) {
-            is SwedishHouseData,
-            is SwedishApartmentData -> productPricingService.calculateInsuranceCost(
-                Money.of(quote.price, "SEK"), memberId
-            )
-            is NorwegianHomeContentsData,
-            is NorwegianTravelData -> productPricingService.calculateInsuranceCost(
-                Money.of(quote.price, "NOK"), memberId
-            )
-            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> {
-                // TODO: Implement actual request
-                InsuranceCost(
-                    MonetaryAmountV2("9999.00", "DKK"),
-                    MonetaryAmountV2("0", "DKK"),
-                    MonetaryAmountV2("9999.00", "DKK"),
-                    null
-                )
-            }
-        }
+        val strategy = strategyService.getStrategy(quote)
+
+        return strategy.getInsuranceCost(quote)
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {
