@@ -3,6 +3,9 @@ package com.hedvig.underwriter.model
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.service.model.QuoteRequestData.DanishAccident
+import com.hedvig.underwriter.service.model.QuoteRequestData.DanishHomeContents
+import com.hedvig.underwriter.service.model.QuoteRequestData.DanishTravel
 import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianHomeContents
 import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianTravel
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
@@ -54,6 +57,12 @@ val Quote.norwegianTravel
 
 val Quote.danishHomeContents
     get() = (data as? DanishHomeContentsData)
+
+val Quote.danishAccident
+    get() = (data as? DanishAccidentData)
+
+val Quote.danishTravel
+    get() = (data as? DanishTravelData)
 
 val Quote.validTo
     get() = this.createdAt.plusSeconds(this.validity)!!
@@ -413,6 +422,57 @@ data class Quote(
                     )
                 )
             }
+            is DanishHomeContents -> {
+                val newQuoteData: DanishHomeContentsData = when (newQuote.data) {
+                    is DanishHomeContentsData -> newQuote.data as DanishHomeContentsData
+                    else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
+                }
+
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured,
+                        isStudent = requestData.isStudent ?: newQuoteData.isStudent,
+                        type = requestData.subType ?: newQuoteData.type
+                    )
+                )
+            }
+            is DanishAccident -> {
+                val newQuoteData: DanishAccidentData = when (newQuote.data) {
+                    is DanishAccidentData -> newQuote.data as DanishAccidentData
+                    is DanishHomeContentsData -> newQuote.data as DanishAccidentData
+                    is DanishTravelData -> newQuote.data as DanishAccidentData
+                    else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
+                }
+
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured,
+                        isStudent = requestData.isStudent ?: newQuoteData.isStudent
+                    )
+                )
+            }
+            is DanishTravel -> {
+                val newQuoteData: DanishTravelData = when (newQuote.data) {
+                    is DanishAccidentData -> newQuote.data as DanishTravelData
+                    is DanishHomeContentsData -> newQuote.data as DanishTravelData
+                    is DanishTravelData -> newQuote.data as DanishTravelData
+                    else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
+                }
+
+                newQuote = newQuote.copy(
+                    data = newQuoteData.copy(
+                        street = requestData.street ?: newQuoteData.street,
+                        zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        coInsured = requestData.coInsured ?: newQuoteData.coInsured,
+                        isStudent = requestData.isStudent ?: newQuoteData.isStudent
+                    )
+                )
+            }
         }
         return newQuote
     }
@@ -420,6 +480,7 @@ data class Quote(
     fun recoverBirthDateFromSSN() = when {
         this.swedishApartment != null || this.swedishHouse != null -> this.ssn.birthDateFromSwedishSsn()
         this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn.birthDateFromNorwegianSsn()
+        this.danishHomeContents != null || this.danishAccident != null || this.danishTravel != null -> this.ssn.birthDateFromDanishSsn()
         else -> null
     }
 
@@ -428,7 +489,9 @@ data class Quote(
         is SwedishApartmentData -> ZoneId.of("Europe/Stockholm")
         is NorwegianHomeContentsData,
         is NorwegianTravelData -> ZoneId.of("Europe/Oslo")
-        is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> ZoneId.of("Europe/Copenhagen")
+        is DanishHomeContentsData,
+        is DanishAccidentData,
+        is DanishTravelData -> ZoneId.of("Europe/Copenhagen")
     }
 
     companion object {
