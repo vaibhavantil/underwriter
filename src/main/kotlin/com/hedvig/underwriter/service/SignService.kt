@@ -25,7 +25,7 @@ interface SignService {
     )
 
     fun signQuote(
-        completeQuoteId: UUID,
+        quoteId: UUID,
         body: SignQuoteRequest
     ): Either<ErrorResponseDto, SignedQuoteResponseDto>
 
