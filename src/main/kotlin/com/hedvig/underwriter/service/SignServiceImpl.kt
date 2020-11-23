@@ -2,6 +2,8 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.flatMap
+import arrow.core.toOption
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
@@ -200,88 +202,109 @@ class SignServiceImpl(
         agreementId: UUID,
         shouldCompleteSignInMemberService: Boolean,
         contractId: UUID
-    ): SignedQuoteResponseDto {
-        val quoteWithProductId = quoteRepository.update(
-            quote.copy(agreementId = agreementId, contractId = contractId)
+    ): Either<Nothing, SignedQuoteResponseDto> {
+        val signedAt = Instant.now()
+        return Right(
+            quoteRepository.update(
+                quote.copy(agreementId = agreementId, contractId = contractId)
+            )
         )
-        checkNotNull(quoteWithProductId.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+            .map {
+                redeemCampaigns(it)
+            }
+            .map {
+                completeInMemberService(it, shouldCompleteSignInMemberService)
+            }
+            .map {
+                quoteRepository.update(it.copy(state = QuoteState.SIGNED), signedAt)
+            }
+            .map {
+                updateCustomerIO(it)
+            }
+            .map {
+                checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }
+                SignedQuoteResponseDto(contractId, it.memberId, signedAt)
+            }
+    }
 
-        quoteWithProductId.attributedTo.campaignCode?.let { campaignCode ->
+    private fun updateCustomerIO(quote: Quote): Quote {
+        try {
+            customerIO.postSignUpdate(quote)
+        } catch (ex: Exception) {
+            logger.error(
+                "Something went wrong while posting a signing update to customerIO " +
+                    "[SignQuote: $quote]"
+            )
+        }
+        return quote
+    }
+
+    private fun completeInMemberService(
+        quote: Quote,
+        shouldCompleteSignInMemberService: Boolean
+    ): Quote {
+        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+        if (shouldCompleteSignInMemberService && quote.data is PersonPolicyHolder<*>) {
+            memberService.signQuote(
+                quote.memberId.toLong(),
+                UnderwriterQuoteSignRequest(quote.data.ssn!!)
+            )
+        }
+        return quote
+    }
+
+    private fun redeemCampaigns(
+        quote: Quote
+    ): Quote {
+        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
+        quote.attributedTo.campaignCode?.let { campaignCode ->
             try {
                 productPricingService.redeemCampaign(
                     RedeemCampaignDto(
-                        quoteWithProductId.memberId,
+                        quote.memberId,
                         campaignCode,
                         LocalDate.now(quote.getTimeZoneId())
                     )
                 )
             } catch (e: FeignException) {
-                logger.error("Failed to redeem $campaignCode for partner ${quoteWithProductId.attributedTo} with response ${e.message}")
+                logger.error("Failed to redeem $campaignCode for partner ${quote.attributedTo} with response ${e.message}")
             }
         }
-
-        if (shouldCompleteSignInMemberService && quoteWithProductId.data is PersonPolicyHolder<*>) {
-            memberService.signQuote(
-                quoteWithProductId.memberId.toLong(),
-                UnderwriterQuoteSignRequest(quoteWithProductId.data.ssn!!)
-            )
-        }
-
-        val signedAt = Instant.now()
-        val signedQuote = quoteWithProductId.copy(state = QuoteState.SIGNED)
-
-        quoteRepository.update(signedQuote, signedAt)
-
-        try {
-            customerIO.postSignUpdate(quoteWithProductId)
-        } catch (ex: Exception) {
-            logger.error(
-                "Something went wrong while posting a signing update to customerIO " +
-                    "[SignQuote: $signedQuote]"
-            )
-        }
-
-        return SignedQuoteResponseDto(contractId, quoteWithProductId.memberId, signedAt)
+        return quote
     }
 
     override fun signQuote(
-        completeQuoteId: UUID,
+        quoteId: UUID,
         body: SignQuoteRequest
-    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
-        val quote = quoteRepository.find(completeQuoteId)
-            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
-
-        if (quote.agreementId != null) {
-            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> = quoteRepository.find(quoteId)
+        .toOption()
+        .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
+        .map(::assertAgreementIdIsNotNull)
+        .map { updateNameFromRequest(it, body) }
+        .map { updateStartTimeFromRequest(it, body) }
+        .flatMap { createMemberMaybe(it) }
+        .flatMap {
+            signQuoteWithMemberId(
+                it,
+                true,
+                SignRequest("", "", ""),
+                body.email
+            )
         }
 
-        val updatedName = if (body.name != null && quote.data is PersonPolicyHolder<*>) {
-            quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
-        } else {
-            quote
-        }
+    private fun createMemberMaybe(
+        quote: Quote
+    ): Either<ErrorResponseDto, Quote> {
+        if (quote.memberId == null) {
+            require(quote.data is PersonPolicyHolder<*>)
 
-        val updatedStartTime = when {
-            body.startDate != null -> {
-                updatedName.copy(
-                    startDate = body.startDate
-                )
-            }
-            else -> updatedName.copy(startDate = null)
-        }
-
-        val quoteWithMember = if (quote.memberId == null) {
             val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
                 return Either.left(quoteNotSignableErrorDto)
             }
+            val memberAlreadySigned = checkIfMemberHasSignedInsurance(quote)
 
-            val memberAlreadySigned = when (quote.data) {
-                is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-                else -> throw RuntimeException("Unsupported quote data class")
-            }
-
-            if (memberAlreadySigned.ssnAlreadySignedMember) {
+            if (memberAlreadySigned) {
                 return Either.Left(
                     ErrorResponseDto(
                         ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
@@ -289,24 +312,14 @@ class SignServiceImpl(
                     )
                 )
             }
-
             val memberId = memberService.createMember()
 
             memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
 
-            quoteRepository.update(updatedStartTime.copy(memberId = memberId))
+            return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
         } else {
-            quote
+            return Either.Right(quote)
         }
-
-        return Right(
-            signQuoteWithMemberId(
-                quoteWithMember,
-                true,
-                SignRequest("", "", ""),
-                body.email
-            )
-        )
     }
 
     override fun signQuoteFromHope(
@@ -316,9 +329,7 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        if (quote.agreementId != null) {
-            throw RuntimeException("There is a signed product id ${quote.agreementId} already")
-        }
+        assertAgreementIdIsNotNull(quote)
 
         if (quote.memberId == null) {
             Either.Left(
@@ -334,12 +345,9 @@ class SignServiceImpl(
             return Either.left(quoteNotSignableErrorDto)
         }
 
-        val memberAlreadySigned = when (quote.data) {
-            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!)
-            else -> throw RuntimeException("Unsupported quote data class")
-        }
+        val memberAlreadySigned = checkIfMemberHasSignedInsurance(quote)
 
-        if (!memberAlreadySigned.ssnAlreadySignedMember) {
+        if (!memberAlreadySigned) {
             return Either.Left(
                 ErrorResponseDto(
                     ErrorCodes.MEMBER_DOES_NOT_HAVE_EXISTING_SIGNED_INSURANCE,
@@ -350,14 +358,21 @@ class SignServiceImpl(
 
         val updatedQuote = quote.copy(startDate = request.activationDate, signFromHopeTriggeredBy = request.token)
 
-        return Right(
-            signQuoteWithMemberId(
-                updatedQuote,
-                false,
-                SignRequest("", "", ""),
-                (quote.data as PersonPolicyHolder<*>).email!!
-            )
+        return signQuoteWithMemberId(
+            updatedQuote,
+            false,
+            SignRequest("", "", ""),
+            (quote.data as PersonPolicyHolder<*>).email!!
         )
+    }
+
+    private fun checkIfMemberHasSignedInsurance(
+        quote: Quote
+    ): Boolean {
+        return when (quote.data) {
+            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!).ssnAlreadySignedMember
+            else -> throw RuntimeException("Unsupported quote data class")
+        }
     }
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
@@ -371,27 +386,40 @@ class SignServiceImpl(
         shouldCompleteSignInMemberService: Boolean,
         signedRequest: SignRequest,
         email: String?
-    ): SignedQuoteResponseDto {
-        checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
-        checkNotNull(quote.price) { "Quote must have a price to sign! Quote id: ${quote.id}" }
+    ): Either<Nothing, SignedQuoteResponseDto> {
+        return Right(quote)
+            .map { checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }; it }
+            .map { checkNotNull(it.price) { "Quote must have a price to sign! Quote id: ${it.id}" }; it }
+            .map { finalizeQuoteFromRapio(it, email) }
+            .map { createContractsForQuote(it, signedRequest) }
+            .flatMap {
+                redeemAndSignQuoteAndPostToCustomerio(
+                    it,
+                    it.agreementId!!,
+                    shouldCompleteSignInMemberService,
+                    it.contractId!!
+                )
+            }
+    }
 
+    private fun createContractsForQuote(quote: Quote, signedRequest: SignRequest): Quote {
+        val result =
+            productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
+                .first()
+
+        return quoteRepository.update(
+            quote.copy(agreementId = result.agreementId, contractId = result.contractId)
+        )
+    }
+
+    private fun finalizeQuoteFromRapio(quote: Quote, email: String?): Quote {
         if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
             email?.let {
                 memberService.finalizeOnboarding(quote, it)
             }
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
-
-        val result =
-            productPricingService.createContractsFromQuotes(listOf(quote), signedRequest, quote.signFromHopeTriggeredBy)
-                .first()
-
-        return redeemAndSignQuoteAndPostToCustomerio(
-            quote,
-            result.agreementId,
-            shouldCompleteSignInMemberService,
-            result.contractId
-        )
+        return quote
     }
 
     private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
@@ -473,5 +501,37 @@ class SignServiceImpl(
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
+    }
+}
+
+private fun assertAgreementIdIsNotNull(quote: Quote): Quote {
+    if (quote.agreementId != null) {
+        throw RuntimeException("There is a signed product id ${quote.agreementId} already")
+    }
+    return quote
+}
+
+private fun updateStartTimeFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+    return when {
+        body.startDate != null -> {
+            quote.copy(
+                startDate = body.startDate
+            )
+        }
+        else -> quote.copy(startDate = null)
+    }
+}
+
+private fun updateNameFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+    return if (body.name != null && quote.data is PersonPolicyHolder<*>) {
+        quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+    } else {
+        quote
     }
 }
