@@ -473,7 +473,7 @@ data class Quote(
                     )
                 )
             }
-            null -> throw IllegalStateException("Unable to update quote when data is null (quoteId=${this.id})")
+            null -> throw IllegalArgumentException("Unable to update quote when incompleteData is null in request (quoteId=${this.id})")
         }
     }
 
