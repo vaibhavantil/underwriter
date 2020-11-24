@@ -277,9 +277,7 @@ class QuoteServiceImpl(
         val memberId = quote.memberId
             ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
 
-        val strategy = strategyService.getStrategy(quote)
-
-        return strategy.getInsuranceCost(quote)
+        return strategyService.getInsuranceCost(quote)
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {

@@ -182,7 +182,7 @@ class UnderwriterImpl(
         val breachedUnderwritingGuidelines = mutableListOf<BreachedGuideline>()
         if (underwritingGuidelinesBypassedBy == null) {
             breachedUnderwritingGuidelines.addAll(
-                validateGuidelines(quote.data)
+                validateGuidelines(quote)
             )
         }
 
@@ -251,12 +251,11 @@ class UnderwriterImpl(
         }
     }
 
-    fun validateGuidelines(data: QuoteData): List<BreachedGuideline> {
+    fun validateGuidelines(data: Quote): List<BreachedGuideline> {
         val errors = mutableListOf<BreachedGuideline>()
-
-        val strategy = strategyService.getStrategy(data)
-        errors.addAll(runRules(data, strategy.getPersonalGuidelines(data)))
-        errors.addAll(runRules(data, strategy.getProductRules(data)))
+        
+        val guidelines = strategyService.getAllGuidelines(data)
+        errors.addAll(runRules(data.data, guidelines))
         return errors
     }
 
@@ -282,3 +281,4 @@ class UnderwriterImpl(
         private val logger = LoggerFactory.getLogger(UnderwriterImpl::class.java)
     }
 }
+

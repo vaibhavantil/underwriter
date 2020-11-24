@@ -15,10 +15,8 @@ class NotificationServiceImpl(
     private val strategyService: StrategyService
 ) : NotificationService {
     override fun sendQuoteCreatedEvent(quote: Quote) {
-        val strategy = strategyService.getStrategy(quote)
-        client.quoteCreated(
-            strategy.createNotificationEvent(quote)
-        )
+        val event = strategyService.createQuoteCreatedEvent(quote)
+        client.quoteCreated(event)
     }
 }
 
