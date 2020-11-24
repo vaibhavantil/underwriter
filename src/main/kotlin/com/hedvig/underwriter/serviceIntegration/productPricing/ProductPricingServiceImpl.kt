@@ -30,8 +30,11 @@ class ProductPricingServiceImpl @Autowired constructor(
     ) = productPricingClient.signedQuote(signedQuoteRequest, memberId).body
         ?: throw RuntimeException("Create product returned with empty body")
 
-    override fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest) =
-        productPricingClient.addAgreement(AddAgreementRequest.from(quote, request))
+    override fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest, token: String?) =
+        productPricingClient.addAgreement(
+            request = AddAgreementRequest.from(quote, request),
+            token = token
+        )
 
     override fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto) =
         this.productPricingClient.redeemCampaign(redeemCampaignDto)

@@ -309,7 +309,7 @@ class QuoteServiceImpl(
         return quoteRepository.findQuotes(quoteIds)
     }
 
-    override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote> {
+    override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest, token: String?): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
 
@@ -320,7 +320,8 @@ class QuoteServiceImpl(
 
         val response = productPricingService.addAgreementFromQuote(
             quote = quote,
-            request = request
+            request = request,
+            token = token
         )
 
         val updatedQuote = quoteRepository.update(
