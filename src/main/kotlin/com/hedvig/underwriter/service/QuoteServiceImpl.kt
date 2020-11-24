@@ -63,7 +63,7 @@ class QuoteServiceImpl(
         return try {
             quoteRepository.modify(quote.id) { quoteToUpdate ->
                 val updatedQuote = quoteToUpdate!!.update(quoteRequest)
-                underwriter.updateQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+                underwriter.validateAndCompleteQuote(updatedQuote, underwritingGuidelinesBypassedBy)
                     .bimap(
                         { errors ->
                             throw QuoteCompletionFailedException(

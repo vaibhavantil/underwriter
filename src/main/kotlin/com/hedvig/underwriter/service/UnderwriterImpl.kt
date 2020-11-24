@@ -168,14 +168,7 @@ class UnderwriterImpl(
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
-    override fun updateQuote(
-        quote: Quote,
-        underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
-        return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
-    }
-
-    private fun validateAndCompleteQuote(
+    override fun validateAndCompleteQuote(
         quote: Quote,
         underwritingGuidelinesBypassedBy: String?
     ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
@@ -185,7 +178,6 @@ class UnderwriterImpl(
                 validateGuidelines(quote)
             )
         }
-
         return if (breachedUnderwritingGuidelines.isEmpty()) {
             Either.right(complete(quote))
         } else {
@@ -253,7 +245,7 @@ class UnderwriterImpl(
 
     fun validateGuidelines(data: Quote): List<BreachedGuideline> {
         val errors = mutableListOf<BreachedGuideline>()
-        
+
         val guidelines = strategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
         return errors
