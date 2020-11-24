@@ -19,7 +19,7 @@ interface ProductPricingService {
 
     fun signedQuote(signedQuoteRequest: SignedQuoteRequest, memberId: String): SignedProductResponseDto
 
-    fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest): AddAgreementResponse
+    fun addAgreementFromQuote(quote: Quote, request: AddAgreementFromQuoteRequest, token: String?): AddAgreementResponse
 
     fun redeemCampaign(redeemCampaignDto: RedeemCampaignDto): ResponseEntity<Void>
 

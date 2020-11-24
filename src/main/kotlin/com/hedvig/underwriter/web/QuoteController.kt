@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -169,9 +170,10 @@ class QuoteController @Autowired constructor(
 
     @PostMapping("/add/agreement")
     fun addAgreementToContractTimeline(
-        @Valid @RequestBody request: AddAgreementFromQuoteRequest
+        @Valid @RequestBody request: AddAgreementFromQuoteRequest,
+        @RequestHeader("Authorization") token: String?
     ): ResponseEntity<Any> {
-        val result = quoteService.addAgreementFromQuote(request)
+        val result = quoteService.addAgreementFromQuote(request, token)
 
         return when (result) {
             is Either.Left -> ResponseEntity.status(422).body(result.a)

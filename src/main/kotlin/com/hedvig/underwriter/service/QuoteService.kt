@@ -50,7 +50,7 @@ interface QuoteService {
 
     fun getQuotes(quoteIds: List<UUID>): List<Quote>
 
-    fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest): Either<ErrorResponseDto, Quote>
+    fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest, token: String?): Either<ErrorResponseDto, Quote>
 
     fun createQuoteForNewContractFromHope(
         quoteRequest: QuoteRequest,

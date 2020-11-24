@@ -43,7 +43,7 @@ class AddAgreementToContractTest {
 
         val agreementId = UUID.randomUUID()
         val contractId = UUID.randomUUID()
-        every { productPricingService.addAgreementFromQuote(any(), any()) } returns AddAgreementResponse(
+        every { productPricingService.addAgreementFromQuote(any(), any(), any()) } returns AddAgreementResponse(
             quoteId,
             agreementId,
             contractId
@@ -56,7 +56,8 @@ class AddAgreementToContractTest {
                 null,
                 null,
                 null
-            )
+            ),
+            null
         )
 
         assertThat(quoteRepository.find(quoteId)).isNotNull().all {
