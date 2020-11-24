@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.model
 
+import arrow.core.Either
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
@@ -131,13 +132,13 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         )
     }
 
-    override fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?) =
-        jdbi.inTransaction<Quote?, RuntimeException> { h ->
+    override fun <A> modify(quoteId: UUID, modifier: (Quote?) -> Either<A, Quote>): Either<A, Quote> =
+        jdbi.inTransaction<Either<A, Quote>, RuntimeException> { h ->
             val modifiedQuote = modifier(find(quoteId, h))
-            if (modifiedQuote != null) {
-                update(modifiedQuote, Instant.now(), h)
+            modifiedQuote.map { mq ->
+                update(mq, Instant.now(), h)
+                mq
             }
-            return@inTransaction modifiedQuote
         }
 
     override fun update(updatedQuote: Quote, timestamp: Instant): Quote =
