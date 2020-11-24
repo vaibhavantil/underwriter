@@ -267,8 +267,7 @@ class QuoteServiceImpl(
     }
 
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
-        val memberId = quote.memberId
-            ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
+        check(quote.memberId != null) { "Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]" }
 
         return strategyService.getInsuranceCost(quote)
     }

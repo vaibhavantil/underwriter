@@ -273,4 +273,3 @@ class UnderwriterImpl(
         private val logger = LoggerFactory.getLogger(UnderwriterImpl::class.java)
     }
 }
-
