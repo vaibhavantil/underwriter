@@ -322,7 +322,9 @@ data class Quote(
             }
         )
 
-        return when (val requestData = quoteRequest.incompleteQuoteData) {
+        val requestData = quoteRequest.incompleteQuoteData ?: return newQuote
+
+        return when (requestData) {
             is SwedishApartment -> {
                 val newQuoteData: SwedishApartmentData = when (val data = newQuote.data) {
                     is SwedishApartmentData -> data
@@ -473,7 +475,6 @@ data class Quote(
                     )
                 )
             }
-            null -> throw IllegalArgumentException("Unable to update quote when incompleteData is null in request (quoteId=${this.id})")
         }
     }
 
