@@ -47,10 +47,7 @@ class QuoteServiceImpl(
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, Quote> {
 
-        return quoteRepository
-            .find(id)
-            .toOption()
-            .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id") }
+        return findQuoteOrError(id)
             .filterOrOther(
                 { it.state == QuoteState.QUOTED || it.state == QuoteState.INCOMPLETE },
                 {
@@ -70,31 +67,33 @@ class QuoteServiceImpl(
             //         )
             //     } else Either.Right(q)
             // }
-            .flatMap { q ->
-                quoteRepository.modify(q.id) { quoteToUpdate ->
-                    val updatedQuote = quoteToUpdate!!.update(quoteRequest)
-                    underwriter
-                        .validateAndCompleteQuote(updatedQuote, underwritingGuidelinesBypassedBy)
-                        .mapLeft { e ->
-                            ErrorResponseDto(
-                                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                                "quote [Id: ${q.id}] cannot be calculated, underwriting guidelines are breached [Quote: $q]",
-                                e.second
-                            )
-                        }
-                }
-            }
+            .map { it.update(quoteRequest) }
+            .flatMap { updatedQuote ->
+                underwriter
+                    .validateAndCompleteQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+                    .mapLeft { e ->
+                        ErrorResponseDto(
+                            ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                            "quote [Id: ${updatedQuote.id}] cannot be calculated, underwriting guidelines are breached [Quote: $updatedQuote]",
+                            e.second
+                        )
+                    }
+            }.map { quoteRepository.update(it) }
     }
 
+    private fun findQuoteOrError(id: UUID) =
+        quoteRepository
+            .find(id)
+            .toOption()
+            .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id") }
+
     override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> =
-        quoteRepository.modify(id) { quoteToUpdate ->
-            Either.right(quoteToUpdate!!.copy(currentInsurer = null))
-        }
+        findQuoteOrError(id)
+            .map { quoteRepository.update(it.copy(currentInsurer = null)) }
 
     override fun removeStartDateFromQuote(id: UUID): Either<ErrorResponseDto, Quote> =
-        quoteRepository.modify(id) { quoteToUpdate ->
-            Either.right(quoteToUpdate!!.copy(startDate = null))
-        }
+        findQuoteOrError(id)
+            .map { quoteRepository.update(it.copy(startDate = null)) }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
         return quoteRepository.find(completeQuoteId)
