@@ -56,17 +56,6 @@ class QuoteServiceImpl(
                         "quote [Id: ${it.id}] must be quoted to update but was really ${it.state} [Quote: $it]"
                     )
                 })
-            // filterOrOther is the same as the function below
-            // .flatMap { q ->
-            //     if (q.state != QuoteState.QUOTED && q.state != QuoteState.INCOMPLETE) {
-            //         Either.Left(
-            //             ErrorResponseDto(
-            //                 ErrorCodes.INVALID_STATE,
-            //                 "quote [Id: ${q.id}] must be quoted to update but was really ${q.state} [Quote: $q]"
-            //             )
-            //         )
-            //     } else Either.Right(q)
-            // }
             .map { it.update(quoteRequest) }
             .flatMap { updatedQuote ->
                 underwriter
