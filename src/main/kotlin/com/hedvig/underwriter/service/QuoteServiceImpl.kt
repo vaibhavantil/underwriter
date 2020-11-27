@@ -1,7 +1,9 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import arrow.core.orNull
+import arrow.core.filterOrOther
+import arrow.core.flatMap
+import arrow.core.toOption
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
@@ -10,7 +12,6 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.validTo
-import com.hedvig.underwriter.service.exceptions.QuoteCompletionFailedException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -45,68 +46,43 @@ class QuoteServiceImpl(
         id: UUID,
         underwritingGuidelinesBypassedBy: String?
     ): Either<ErrorResponseDto, Quote> {
-        val quote = quoteRepository
-            .find(id)
-            ?: return Either.Left(
-                ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id")
-            )
 
-        if (quote.state != QuoteState.QUOTED && quote.state != QuoteState.INCOMPLETE) {
-            return Either.Left(
-                ErrorResponseDto(
-                    ErrorCodes.INVALID_STATE,
-                    "quote [Id: ${quote.id}] must be quoted to update but was really ${quote.state} [Quote: $quote]"
-                )
-            )
-        }
-
-        return try {
-            quoteRepository.modify(quote.id) { quoteToUpdate ->
-                val updatedQuote = quoteToUpdate!!.update(quoteRequest)
-                underwriter.validateAndCompleteQuote(updatedQuote, underwritingGuidelinesBypassedBy)
-                    .bimap(
-                        { errors ->
-                            throw QuoteCompletionFailedException(
-                                "Unable to complete quote: ${errors.second}",
-                                errors.second
-                            )
-                        },
-                        { quote -> quote }
-                    ).orNull()
-            }!!.let { updatedQuote -> Either.right(updatedQuote) }
-        } catch (e: QuoteCompletionFailedException) {
-            e.breachedUnderwritingGuidelines?.let { breachedUnderwritingGuidelines ->
-                Either.left(
+        return findQuoteOrError(id)
+            .filterOrOther(
+                { it.state == QuoteState.QUOTED || it.state == QuoteState.INCOMPLETE },
+                {
                     ErrorResponseDto(
-                        ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                        "quote [Id: ${quote.id}] cannot be calculated, underwriting guidelines are breached [Quote: $quote]",
-                        breachedUnderwritingGuidelines
+                        ErrorCodes.INVALID_STATE,
+                        "quote [Id: ${it.id}] must be quoted to update but was really ${it.state} [Quote: $it]"
                     )
-                )
-            } ?: Either.left(
-                ErrorResponseDto(
-                    ErrorCodes.UNKNOWN_ERROR_CODE,
-                    "Unable to complete quote [Quote: $quote]"
-                )
-            )
-        }
+                })
+            .map { it.update(quoteRequest) }
+            .flatMap { updatedQuote ->
+                underwriter
+                    .validateAndCompleteQuote(updatedQuote, underwritingGuidelinesBypassedBy)
+                    .mapLeft { e ->
+                        ErrorResponseDto(
+                            ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                            "quote [Id: ${updatedQuote.id}] cannot be calculated, underwriting guidelines are breached [Quote: $updatedQuote]",
+                            e.second
+                        )
+                    }
+            }.map { quoteRepository.update(it) }
     }
 
-    override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
-        val updatedQuote = quoteRepository.modify(id) { quoteToUpdate ->
-            quoteToUpdate!!.copy(currentInsurer = null)
-        }
+    private fun findQuoteOrError(id: UUID) =
+        quoteRepository
+            .find(id)
+            .toOption()
+            .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $id") }
 
-        return Either.right(updatedQuote!!)
-    }
+    override fun removeCurrentInsurerFromQuote(id: UUID): Either<ErrorResponseDto, Quote> =
+        findQuoteOrError(id)
+            .map { quoteRepository.update(it.copy(currentInsurer = null)) }
 
-    override fun removeStartDateFromQuote(id: UUID): Either<ErrorResponseDto, Quote> {
-        val updatedQuote = quoteRepository.modify(id) { quoteToUpdate ->
-            quoteToUpdate!!.copy(startDate = null)
-        }
-
-        return Either.right(updatedQuote!!)
-    }
+    override fun removeStartDateFromQuote(id: UUID): Either<ErrorResponseDto, Quote> =
+        findQuoteOrError(id)
+            .map { quoteRepository.update(it.copy(startDate = null)) }
 
     override fun getQuote(completeQuoteId: UUID): Quote? {
         return quoteRepository.find(completeQuoteId)
@@ -233,7 +209,12 @@ class QuoteServiceImpl(
         underwritingGuidelinesBypassedBy: String?
     ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
         val breachedGuidelinesOrQuote =
-            underwriter.createQuote(quoteData, quoteId, initiatedFrom, underwritingGuidelinesBypassedBy)
+            underwriter.createQuote(
+                quoteData,
+                quoteId,
+                initiatedFrom,
+                underwritingGuidelinesBypassedBy
+            )
         val quote = breachedGuidelinesOrQuote.getQuote()
 
         quoteRepository.insert(quote)
@@ -274,8 +255,7 @@ class QuoteServiceImpl(
     }
 
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
-        val memberId = quote.memberId
-            ?: throw RuntimeException("Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]")
+        check(quote.memberId != null) { "Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]" }
 
         return strategyService.getInsuranceCost(quote)
     }

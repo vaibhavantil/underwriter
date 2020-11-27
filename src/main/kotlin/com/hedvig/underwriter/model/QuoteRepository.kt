@@ -11,7 +11,6 @@ interface QuoteRepository {
     fun findOneByMemberId(memberId: String): Quote?
     fun findLatestOneByMemberId(memberId: String): Quote?
     fun expireQuote(id: UUID): Quote?
-    fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?): Quote?
     fun update(updatedQuote: Quote, timestamp: Instant = Instant.now()): Quote
     fun findByContractId(contractId: UUID): Quote?
 }
