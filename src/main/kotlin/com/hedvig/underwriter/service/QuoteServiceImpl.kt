@@ -15,7 +15,7 @@ import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.quoteStrategies.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -36,7 +36,7 @@ class QuoteServiceImpl(
     val productPricingService: ProductPricingService,
     val quoteRepository: QuoteRepository,
     val notificationService: NotificationService,
-    val strategyService: StrategyService
+    val quoteStrategyService: QuoteStrategyService
 ) : QuoteService {
 
     val logger = getLogger(QuoteServiceImpl::class.java)!!
@@ -257,7 +257,7 @@ class QuoteServiceImpl(
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
         check(quote.memberId != null) { "Can't calculate InsuranceCost on a quote without memberId [Quote: $quote]" }
 
-        return strategyService.getInsuranceCost(quote)
+        return quoteStrategyService.getInsuranceCost(quote)
     }
 
     override fun getQuotes(quoteIds: List<UUID>): List<Quote> {

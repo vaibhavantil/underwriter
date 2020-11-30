@@ -17,7 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import org.springframework.stereotype.Service
 
 @Service
-class StrategyService(
+class QuoteStrategyService(
     private val debtChecker: DebtChecker,
     private val productPricingService: ProductPricingService
 ) {

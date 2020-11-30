@@ -6,7 +6,7 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteRepository
-import com.hedvig.underwriter.service.quoteStrategies.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.a
@@ -48,7 +48,7 @@ class QuoteServiceImplTest {
             productPricingService,
             quoteRepository,
             mockk(),
-            StrategyService(mockk(), productPricingService)
+            QuoteStrategyService(mockk(), productPricingService)
         )
         every { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") } returns
             InsuranceCost(

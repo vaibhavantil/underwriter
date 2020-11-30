@@ -19,7 +19,7 @@ import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.service.quoteStrategies.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.util.toStockholmLocalDate
@@ -32,7 +32,7 @@ import java.util.UUID
 @Service
 class UnderwriterImpl(
     private val priceEngineService: PriceEngineService,
-    private val strategyService: StrategyService
+    private val quoteStrategyService: QuoteStrategyService
 ) : Underwriter {
 
     override fun createQuote(
@@ -246,7 +246,7 @@ class UnderwriterImpl(
     fun validateGuidelines(data: Quote): List<BreachedGuideline> {
         val errors = mutableListOf<BreachedGuideline>()
 
-        val guidelines = strategyService.getAllGuidelines(data)
+        val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
         return errors
     }

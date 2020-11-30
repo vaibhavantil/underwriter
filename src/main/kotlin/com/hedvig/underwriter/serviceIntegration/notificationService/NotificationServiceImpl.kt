@@ -5,17 +5,17 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
-import com.hedvig.underwriter.service.quoteStrategies.StrategyService
+import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.notificationService.dtos.QuoteCreatedEvent
 import org.springframework.stereotype.Service
 
 @Service
 class NotificationServiceImpl(
     private val client: NotificationServiceClient,
-    private val strategyService: StrategyService
+    private val quoteStrategyService: QuoteStrategyService
 ) : NotificationService {
     override fun sendQuoteCreatedEvent(quote: Quote) {
-        val event = strategyService.createQuoteCreatedEvent(quote)
+        val event = quoteStrategyService.createQuoteCreatedEvent(quote)
         client.quoteCreated(event)
     }
 }
