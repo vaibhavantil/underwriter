@@ -2,7 +2,7 @@ package com.hedvig.underwriter.service.quoteStrategies
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.model.DanishAccidentData
+import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
@@ -11,7 +11,7 @@ import com.hedvig.underwriter.serviceIntegration.notificationService.quoteCreate
 
 class DanishTravelDataStrategy : QuoteStrategy() {
     override fun createNotificationEvent(quote: Quote): QuoteCreatedEvent {
-        require(quote.data is DanishAccidentData)
+        require(quote.data is DanishTravelData)
 
         return quoteCreatedEvent(
             quote,
