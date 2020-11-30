@@ -6,6 +6,7 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteRepository
+import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.a
@@ -41,7 +42,14 @@ class QuoteServiceImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        cut = QuoteServiceImpl(underwriter, memberService, productPricingService, quoteRepository, mockk())
+        cut = QuoteServiceImpl(
+            underwriter,
+            memberService,
+            productPricingService,
+            quoteRepository,
+            mockk(),
+            QuoteStrategyService(mockk(), productPricingService)
+        )
         every { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") } returns
             InsuranceCost(
                 MonetaryAmountV2.of(BigDecimal.TEN, "SEK"),
@@ -82,7 +90,8 @@ class QuoteServiceImplTest {
     @Test
     fun returnTheCorrectMarketForNorwegianHomeContent() {
         val quote =
-            a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianHomeContentDataBuilder()).build()
+            a.QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = a.NorwegianHomeContentDataBuilder())
+                .build()
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
 

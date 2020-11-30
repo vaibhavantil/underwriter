@@ -38,6 +38,7 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             quoteRepository,
+            mockk(),
             mockk()
         )
 
@@ -60,6 +61,7 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             quoteRepository,
+            mockk(),
             mockk()
         )
 
@@ -78,6 +80,7 @@ class FindQuoteByContractIdTest {
             mockk(),
             mockk(),
             quoteRepository,
+            mockk(),
             mockk()
         )
 

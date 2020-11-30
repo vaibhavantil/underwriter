@@ -1,6 +1,10 @@
 package com.hedvig.underwriter.service.guidelines
 
-interface BaseGuideline<T> {
+import com.hedvig.underwriter.model.QuoteData
+import kotlin.reflect.KClass
+import kotlin.reflect.full.cast
+
+interface BaseGuideline<in T : QuoteData> {
 
     val breachedGuideline: BreachedGuideline
     val validate: (T) -> Boolean
@@ -14,4 +18,15 @@ interface BaseGuideline<T> {
         }
         return null
     }
+}
+
+class TypedGuideline<G : QuoteData, Q : QuoteData>(
+    private val guideline: BaseGuideline<Q>,
+    private val q: KClass<Q>
+) : BaseGuideline<G> {
+
+    override val breachedGuideline: BreachedGuideline
+        get() = guideline.breachedGuideline
+    override val validate: (G) -> Boolean
+        get() = { t -> guideline.validate(q.cast(t)) }
 }

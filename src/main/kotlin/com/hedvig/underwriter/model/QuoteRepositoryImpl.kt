@@ -131,15 +131,6 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         )
     }
 
-    override fun modify(quoteId: UUID, modifier: (Quote?) -> Quote?) =
-        jdbi.inTransaction<Quote?, RuntimeException> { h ->
-            val modifiedQuote = modifier(find(quoteId, h))
-            if (modifiedQuote != null) {
-                update(modifiedQuote, Instant.now(), h)
-            }
-            return@inTransaction modifiedQuote
-        }
-
     override fun update(updatedQuote: Quote, timestamp: Instant): Quote =
         jdbi.inTransaction<Quote, RuntimeException> { h ->
             update(updatedQuote, timestamp, h)

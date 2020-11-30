@@ -2,16 +2,16 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_BIG_EXTRA_BUILDING_SIZE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_EARLY_YEAR_OF_CONSTRUCTION
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_HOUSE_HOLD_SIZE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_BATHROOMS
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MANY_EXTRA_BUILDINGS
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_EXTRA_BUILDING_SIZE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_EARLY_YEAR_OF_CONSTRUCTION
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
 
-interface SwedishHouseGuideline : BaseGuideline<SwedishHouseData>
+typealias SwedishHouseGuideline = BaseGuideline<SwedishHouseData>
 
 object SwedishHouseGuidelines {
     val setOfRules = setOf(

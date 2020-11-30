@@ -15,7 +15,7 @@ interface Underwriter {
         underwritingGuidelinesBypassedBy: String?
     ): Either<Pair<Quote, List<BreachedGuideline>>, Quote>
 
-    fun updateQuote(
+    fun validateAndCompleteQuote(
         quote: Quote,
         underwritingGuidelinesBypassedBy: String?
     ): Either<Pair<Quote, List<BreachedGuideline>>, Quote>
