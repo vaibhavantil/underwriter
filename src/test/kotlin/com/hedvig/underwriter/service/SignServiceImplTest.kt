@@ -504,10 +504,10 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            StartSignErrors.contactChat.errorMessage
+            StartSignErrors.memberIsAlreadySigned.errorMessage
         )
         assertThat(result.errorCode).isEqualTo(
-            StartSignErrors.contactChat.errorCode
+            StartSignErrors.memberIsAlreadySigned.errorCode
         )
     }
 

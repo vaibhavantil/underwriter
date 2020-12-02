@@ -64,7 +64,7 @@ class SignServiceImpl(
     ): StartSignResponse {
 
         if (memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()).memberAlreadySigned) {
-            return StartSignErrors.contactChat
+            return StartSignErrors.memberIsAlreadySigned
         }
 
         val quotes = quoteService.getQuotes(quoteIds)
@@ -104,7 +104,7 @@ class SignServiceImpl(
 
                 return response.autoStartToken?.let { autoStartToken ->
                     StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
-                } ?: StartSignErrors.emptyAuthTokenFromBankId(response.internalErrorMessage!!)
+                } ?: StartSignErrors.failedToStartSign(response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
                 return genericStartRedirectSign(

@@ -4,9 +4,9 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 
 object StartSignErrors {
 
-    val contactChat = StartSignResponse.FailedToStartSign(
-        "contact chat",
-        "CONTACT_CHAT"
+    val memberIsAlreadySigned = StartSignResponse.FailedToStartSign(
+        "provided member id is already signed",
+        "MEMBER_IS_ALREADY_SIGNED"
     )
 
     val variousMemberId = StartSignResponse.FailedToStartSign(
@@ -31,10 +31,10 @@ object StartSignErrors {
             error.errorCode.name
         )
 
-    fun emptyAuthTokenFromBankId(message: String) =
+    fun failedToStartSign(message: String) =
         StartSignResponse.FailedToStartSign(
             message,
-            "EMPTY_AUTH_TOKEN_FROM_BANK_ID"
+            "FAILED_TO_START_SIGN"
         )
 
     val quotesCanNotBeBundled =
