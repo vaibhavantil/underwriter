@@ -182,7 +182,11 @@ class UnderwriterImpl(
             Either.right(complete(quote))
         } else {
             logBreachedUnderwritingGuidelines(quote, breachedUnderwritingGuidelines)
-            Either.left(quote to breachedUnderwritingGuidelines)
+            Either.left(
+                quote.copy(
+                    breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it.code }
+                ) to breachedUnderwritingGuidelines
+            )
         }
     }
 
