@@ -5,6 +5,7 @@ import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.ExtraBuilding
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
@@ -32,7 +33,8 @@ import java.util.UUID
 @Service
 class UnderwriterImpl(
     private val priceEngineService: PriceEngineService,
-    private val quoteStrategyService: QuoteStrategyService
+    private val quoteStrategyService: QuoteStrategyService,
+    private val metrics: Metrics
 ) : Underwriter {
 
     override fun createQuote(
@@ -252,6 +254,9 @@ class UnderwriterImpl(
 
         val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
+        errors.forEach {
+            metrics.increment(data.market, it.code)
+        }
         return errors
     }
 
