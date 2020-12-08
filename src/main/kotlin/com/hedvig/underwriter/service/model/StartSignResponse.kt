@@ -5,17 +5,14 @@ import java.util.UUID
 sealed class StartSignResponse {
 
     data class SwedishBankIdSession(
-        val session: UUID,
         val autoStartToken: String
     ) : StartSignResponse()
 
     data class NorwegianBankIdSession(
-        val session: UUID,
         val redirectUrl: String
     ) : StartSignResponse()
 
     data class DanishBankIdSession(
-        val session: UUID,
         val redirectUrl: String
     ) : StartSignResponse()
 
