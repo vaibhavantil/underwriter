@@ -571,6 +571,7 @@ union StartSignResponse =
     SwedishBankIdSession
     | NorwegianBankIdSession
     | DanishBankIdSession
+    | SimpleSignSession
     | FailedToStartSign
 
 type SwedishBankIdSession {
@@ -583,6 +584,10 @@ type NorwegianBankIdSession {
 
 type DanishBankIdSession {
     redirectUrl: String
+}
+
+type SimpleSignSession {
+    id: ID!
 }
 
 type FailedToStartSign {

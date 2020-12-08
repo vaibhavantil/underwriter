@@ -47,6 +47,7 @@ class GraphQLConfig {
                     StartSignResponse.SwedishBankIdSession::class.java,
                     StartSignResponse.NorwegianBankIdSession::class.java,
                     StartSignResponse.DanishBankIdSession::class.java,
+                    StartSignResponse.SimpleSignSession::class.java,
                     StartSignResponse.FailedToStartSign::class.java,
                     ExtraBuilding.ExtraBuildingGarage::class.java,
                     ExtraBuilding.ExtraBuildingCarport::class.java,

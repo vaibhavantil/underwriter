@@ -19,6 +19,10 @@ sealed class StartSignResponse {
         val redirectUrl: String
     ) : StartSignResponse()
 
+    data class SimpleSignSession(
+        val id: UUID
+    ) : StartSignResponse()
+
     data class FailedToStartSign(
         val errorMessage: String,
         val errorCode: String
