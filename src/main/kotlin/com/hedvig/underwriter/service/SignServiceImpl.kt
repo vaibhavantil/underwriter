@@ -103,7 +103,7 @@ class SignServiceImpl(
                 )
 
                 return response.autoStartToken?.let { autoStartToken ->
-                    StartSignResponse.SwedishBankIdSession(signSessionId, autoStartToken)
+                    StartSignResponse.SwedishBankIdSession(autoStartToken)
                 } ?: StartSignErrors.failedToStartSign(response.internalErrorMessage!!)
             }
             is QuotesSignData.NorwegianBankId -> {
@@ -120,7 +120,6 @@ class SignServiceImpl(
                     },
                     { signSessionId, redirectUrl ->
                         StartSignResponse.NorwegianBankIdSession(
-                            signSessionId,
                             redirectUrl
                         )
                     }
@@ -140,7 +139,6 @@ class SignServiceImpl(
                     },
                     { signSessionId, redirectUrl ->
                         StartSignResponse.DanishBankIdSession(
-                            signSessionId,
                             redirectUrl
                         )
                     }
