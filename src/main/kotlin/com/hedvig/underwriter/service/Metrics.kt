@@ -4,15 +4,16 @@ import com.hedvig.underwriter.model.Market
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Component
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class Metrics(private val registry: MeterRegistry) {
 
-    private val breachedUnderwritingGuidelineCounters = mutableMapOf<Market, MutableMap<String, Counter>>()
+    private val breachedUnderwritingGuidelineCounters = ConcurrentHashMap<Market, ConcurrentHashMap<String, Counter>>()
 
     fun increment(market: Market, breachedGuidelineCode: String) {
         val marketMap = breachedUnderwritingGuidelineCounters[market] ?: run {
-            val marketMap = mutableMapOf<String, Counter>()
+            val marketMap = ConcurrentHashMap<String, Counter>()
             breachedUnderwritingGuidelineCounters[market] = marketMap
             marketMap
         }
