@@ -32,7 +32,8 @@ import java.util.UUID
 @Service
 class UnderwriterImpl(
     private val priceEngineService: PriceEngineService,
-    private val quoteStrategyService: QuoteStrategyService
+    private val quoteStrategyService: QuoteStrategyService,
+    private val metrics: Metrics
 ) : Underwriter {
 
     override fun createQuote(
@@ -252,6 +253,9 @@ class UnderwriterImpl(
 
         val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
+        errors.forEach {
+            metrics.increment(data.market, it.code)
+        }
         return errors
     }
 

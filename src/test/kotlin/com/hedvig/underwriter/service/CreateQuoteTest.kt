@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
@@ -13,6 +14,7 @@ import com.hedvig.underwriter.testhelp.databuilder.a
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.javamoney.moneta.Money
 import org.junit.Test
 import java.util.UUID
@@ -21,9 +23,10 @@ class CreateQuoteTest {
     val strategyService = mockk<QuoteStrategyService>()
     val priceEngineService = mockk<PriceEngineService>()
     val quoteRepository = mockk<QuoteRepository>()
+    val metrics = mockk<Metrics>(relaxed = true)
 
     val cut = QuoteServiceImpl(
-        UnderwriterImpl(priceEngineService, strategyService),
+        UnderwriterImpl(priceEngineService, strategyService, metrics),
         mockk(),
         mockk(),
         quoteRepository,
@@ -70,5 +73,6 @@ class CreateQuoteTest {
         val result = cut.createQuote(request, UUID.randomUUID(), QuoteInitiatedFrom.ANDROID, null, true)
         require(result is Either.Left)
         assert(result.a.errorCode == ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES)
+        verify { metrics.increment(Market.NORWAY, "errorcode") }
     }
 }
