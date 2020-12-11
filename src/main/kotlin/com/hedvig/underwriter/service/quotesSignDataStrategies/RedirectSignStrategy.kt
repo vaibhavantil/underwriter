@@ -46,16 +46,16 @@ class RedirectSignStrategy(
     ): StartRedirectBankIdSignResponse {
         return when {
             quotes.areValidNorwegianQuotes() -> memberService.startNorwegianBankIdSignQuotes(
-                quotes[0].memberId!!.toLong(),
+                quotes.getMemberId(),
                 signSessionId,
-                quotes.safelyGetSSN(),
+                quotes.getSSN(),
                 successUrl,
                 failUrl
             )
             quotes.areValidDanishQuotes() -> memberService.startDanishBankIdSignQuotes(
-                quotes[0].memberId!!.toLong(),
+                quotes.getMemberId(),
                 signSessionId,
-                quotes.safelyGetSSN(),
+                quotes.getSSN(),
                 successUrl,
                 failUrl
             )
