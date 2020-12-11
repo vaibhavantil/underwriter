@@ -4,7 +4,6 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -27,7 +26,7 @@ class SwedishBankIdSignStrategy(
 
         val quoteIds = quotes.map { it.id }
 
-        val ssn = quotes[0].ssn
+        val ssn = quotes.safelyGetSSN()
 
         val isSwitching = quotes[0].currentInsurer != null
 

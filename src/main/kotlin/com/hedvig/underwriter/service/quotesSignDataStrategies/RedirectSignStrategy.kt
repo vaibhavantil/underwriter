@@ -7,7 +7,6 @@ import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
-import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -49,14 +48,14 @@ class RedirectSignStrategy(
             quotes.areValidNorwegianQuotes() -> memberService.startNorwegianBankIdSignQuotes(
                 quotes[0].memberId!!.toLong(),
                 signSessionId,
-                quotes[0].ssn,
+                quotes.safelyGetSSN(),
                 successUrl,
                 failUrl
             )
             quotes.areValidDanishQuotes() -> memberService.startDanishBankIdSignQuotes(
                 quotes[0].memberId!!.toLong(),
                 signSessionId,
-                quotes[0].ssn,
+                quotes.safelyGetSSN(),
                 successUrl,
                 failUrl
             )

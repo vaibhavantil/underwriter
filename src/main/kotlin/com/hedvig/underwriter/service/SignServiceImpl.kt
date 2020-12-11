@@ -334,21 +334,6 @@ class SignServiceImpl(
         return quote
     }
 
-    private fun getSSNFromQuotes(quotes: List<Quote>): String {
-        var ssn: String? = null
-        quotes.forEach { quote ->
-            if (quote.data is PersonPolicyHolder<*>) {
-                quote.data.ssn?.let {
-                    ssn = it
-                    return@forEach
-                }
-            } else {
-                throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
-            }
-        }
-        return ssn!!
-    }
-
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
     }
