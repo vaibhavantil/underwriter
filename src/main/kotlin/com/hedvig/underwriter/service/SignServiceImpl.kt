@@ -317,16 +317,15 @@ class SignServiceImpl(
             val ssn = quote.data.ssn!!
             memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(
                 ssn = ssn,
-                ssnWithNationality = SsnWithNationality(
-                    ssn,
-                    // TODO let's fix this properly with the strategy
+                // TODO let's fix this properly with the strategy
+                nationality =
                     when (ssn.length) {
                         10 -> Nationality.DENMARK
                         11 -> Nationality.NORWAY
                         12 -> Nationality.SWEDEN
                         else -> throw RuntimeException("Can't get nationality from ssn")
                     }
-                )))
+                ))
 
             return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
         } else {
