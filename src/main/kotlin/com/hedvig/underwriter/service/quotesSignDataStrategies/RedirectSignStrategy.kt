@@ -70,7 +70,7 @@ class RedirectSignStrategy(
     ): StartSignResponse {
         return when {
             quotes.areValidNorwegianQuotes() -> StartSignResponse.NorwegianBankIdSession(redirectUrl)
-            quotes.areValidDanishQuotes()-> StartSignResponse.DanishBankIdSession(redirectUrl)
+            quotes.areValidDanishQuotes() -> StartSignResponse.DanishBankIdSession(redirectUrl)
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
     }
