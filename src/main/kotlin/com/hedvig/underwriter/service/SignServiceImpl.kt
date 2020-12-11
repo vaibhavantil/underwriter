@@ -22,6 +22,7 @@ import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
@@ -51,6 +52,7 @@ class SignServiceImpl(
     val memberService: MemberService,
     val productPricingService: ProductPricingService,
     val signSessionRepository: SignSessionRepository,
+    val signStrategyService: SignStrategyService,
     val customerIO: CustomerIO,
     val env: Environment
 ) : SignService {
@@ -84,6 +86,8 @@ class SignServiceImpl(
                 return StartSignErrors.fromErrorResponse(quoteNotSignableErrorDto)
             }
         }
+
+        // return signStrategyService.startSign(quotes, ipAddress)
 
         when (val data = getSignDataFromQuotes(quotes)) {
             is QuotesSignData.SwedishBankId -> {
