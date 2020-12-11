@@ -319,7 +319,7 @@ class SignServiceImpl(
                 ssn = ssn,
                 ssnWithNationality = SsnWithNationality(
                     ssn,
-                    //TODO let's fix this properly with the strategy
+                    // TODO let's fix this properly with the strategy
                     when (ssn.length) {
                         10 -> Nationality.DENMARK
                         11 -> Nationality.NORWAY
