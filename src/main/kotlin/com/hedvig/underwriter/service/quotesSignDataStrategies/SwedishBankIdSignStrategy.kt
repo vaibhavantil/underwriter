@@ -2,8 +2,6 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
@@ -16,10 +14,8 @@ class SwedishBankIdSignStrategy(
     private val signSessionRepository: SignSessionRepository,
     private val memberService: MemberService
 ) : SignStrategy {
-    override fun startSign(quotes: List<Quote>, ipAddress: String?): StartSignResponse {
-        quotes.forEach { quote ->
-            require(quote.data is SwedishApartmentData || quote.data is SwedishHouseData)
-        }
+    override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
+        SignUtil.requireValidSwedishQuotes(quotes)
 
         val quoteIds = quotes.map { it.id }
 
@@ -29,7 +25,7 @@ class SwedishBankIdSignStrategy(
 
         val signSessionId = signSessionRepository.insert(quoteIds)
 
-        val ip = ipAddress ?: run {
+        val ip = signData.ipAddress ?: run {
             logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quoteIds]")
             "127.0.0.1"
         }

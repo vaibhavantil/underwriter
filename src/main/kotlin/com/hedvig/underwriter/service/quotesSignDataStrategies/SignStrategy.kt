@@ -4,5 +4,5 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.model.StartSignResponse
 
 interface SignStrategy {
-    fun startSign(quotes: List<Quote>, ipAddress: String?): StartSignResponse
+    fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse
 }
