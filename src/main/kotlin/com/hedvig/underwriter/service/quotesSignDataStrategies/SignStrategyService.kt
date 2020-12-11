@@ -26,11 +26,24 @@ class SignStrategyService(
                     is NorwegianTravelData,
                     is DanishHomeContentsData -> redirectSignStrategy.startSign(quotes, signData)
                     is DanishAccidentData,
-                    is DanishTravelData -> TODO("explode")
+                    is DanishTravelData -> StartSignResponse.FailedToStartSign("", "")
                 }
-            2 -> TODO("WIP")
-            3 -> TODO("WIP")
-            else -> TODO("Explode")
+            2 -> {
+                when {
+                    SignUtil.areTwoValidNorwegianQuotes(quotes) ||
+                        SignUtil.areTwoValidDanishQuotes(quotes) -> redirectSignStrategy.startSign(quotes, signData)
+                    else -> {
+                        StartSignResponse.FailedToStartSign("", "")
+                    }
+                }
+            }
+            3 -> when {
+                SignUtil.areThreeValidDanishQuotes(quotes) -> redirectSignStrategy.startSign(quotes, signData)
+                else -> {
+                    StartSignResponse.FailedToStartSign("", "")
+                }
+            }
+            else -> StartSignResponse.FailedToStartSign("", "")
         }
     }
 }

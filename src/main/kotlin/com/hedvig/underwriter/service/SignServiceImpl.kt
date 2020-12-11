@@ -4,24 +4,17 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.core.toOption
-import com.hedvig.underwriter.model.DanishAccidentData
-import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.DanishTravelData
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
-import com.hedvig.underwriter.model.SwedishApartmentData
-import com.hedvig.underwriter.model.SwedishHouseData
-import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignData
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -87,70 +80,10 @@ class SignServiceImpl(
             }
         }
 
-        // return signStrategyService.startSign(quotes, ipAddress)
-
-        when (val data = getSignDataFromQuotes(quotes)) {
-            is QuotesSignData.SwedishBankId -> {
-                val signSessionId = signSessionRepository.insert(quoteIds)
-
-                val ip = ipAddress ?: run {
-                    logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quotes]")
-                    "127.0.0.1"
-                }
-
-                val response = memberService.startSwedishBankIdSignQuotes(
-                    data.memberId.toLong(),
-                    signSessionId,
-                    data.ssn,
-                    ip,
-                    data.isSwitching
-                )
-
-                return response.autoStartToken?.let { autoStartToken ->
-                    StartSignResponse.SwedishBankIdSession(autoStartToken)
-                } ?: StartSignErrors.failedToStartSign(response.internalErrorMessage!!)
-            }
-            is QuotesSignData.NorwegianBankId -> {
-                return genericStartRedirectSign(
-                    successUrl, failUrl, quoteIds,
-                    { signSessionId, successUrl, failUrl ->
-                        memberService.startNorwegianBankIdSignQuotes(
-                            data.memberId.toLong(),
-                            signSessionId,
-                            data.ssn,
-                            successUrl,
-                            failUrl
-                        )
-                    },
-                    { signSessionId, redirectUrl ->
-                        StartSignResponse.NorwegianBankIdSession(
-                            redirectUrl
-                        )
-                    }
-                )
-            }
-            is QuotesSignData.DanishBankId -> {
-                return genericStartRedirectSign(
-                    successUrl, failUrl, quoteIds,
-                    { signSessionId, successUrl, failUrl ->
-                        memberService.startDanishBankIdSignQuotes(
-                            data.memberId.toLong(),
-                            signSessionId,
-                            data.ssn,
-                            successUrl,
-                            failUrl
-                        )
-                    },
-                    { signSessionId, redirectUrl ->
-                        StartSignResponse.DanishBankIdSession(
-                            redirectUrl
-                        )
-                    }
-                )
-            }
-            is QuotesSignData.CanNotBeBundled ->
-                return StartSignErrors.quotesCanNotBeBundled
-        }
+        return signStrategyService.startSign(
+            quotes = quotes,
+            signData = SignData(ipAddress, successUrl, failUrl)
+        )
     }
 
     private fun genericStartRedirectSign(
@@ -424,51 +357,6 @@ class SignServiceImpl(
         return quote
     }
 
-    private fun getSignDataFromQuotes(quotes: List<Quote>): QuotesSignData {
-        return when (quotes.size) {
-            1 ->
-                when (quotes[0].data) {
-                    is SwedishApartmentData,
-                    is SwedishHouseData -> QuotesSignData.SwedishBankId(
-                        quotes[0].memberId!!,
-                        quotes[0].ssn,
-                        quotes[0].currentInsurer != null
-                    )
-                    is NorwegianHomeContentsData,
-                    is NorwegianTravelData -> QuotesSignData.NorwegianBankId(quotes[0].memberId!!, quotes[0].ssn)
-                    is DanishHomeContentsData -> QuotesSignData.DanishBankId(quotes[0].memberId!!, quotes[0].ssn)
-                    is DanishAccidentData,
-                    is DanishTravelData -> {
-                        logger.error("${quotes[0].data::class.java.simpleName} cannot be signed as a stand alone quote. MemberId: ${quotes[0].memberId}")
-                        QuotesSignData.CanNotBeBundled
-                    }
-                }
-            2 -> when {
-                areTwoValidNorwegianQuotes(quotes) -> {
-                    val ssn: String = getSSNFromQuotes(quotes)
-                    QuotesSignData.NorwegianBankId(quotes[0].memberId!!, ssn)
-                }
-                areTwoValidDanishQuotes(quotes) -> {
-                    val ssn: String = getSSNFromQuotes(quotes)
-                    QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
-                }
-                else -> {
-                    QuotesSignData.CanNotBeBundled
-                }
-            }
-            3 -> when {
-                areThreeValidDanishQuotes(quotes) -> {
-                    val ssn: String = getSSNFromQuotes(quotes)
-                    QuotesSignData.DanishBankId(quotes[0].memberId!!, ssn)
-                }
-                else -> {
-                    QuotesSignData.CanNotBeBundled
-                }
-            }
-            else -> QuotesSignData.CanNotBeBundled
-        }
-    }
-
     private fun getSSNFromQuotes(quotes: List<Quote>): String {
         var ssn: String? = null
         quotes.forEach { quote ->
@@ -483,23 +371,6 @@ class SignServiceImpl(
         }
         return ssn!!
     }
-
-    private fun areTwoValidNorwegianQuotes(quotes: List<Quote>): Boolean =
-        quotes.size == 2 &&
-            quotes.any { quote -> quote.data is NorwegianHomeContentsData } &&
-            quotes.any { quote -> quote.data is NorwegianTravelData }
-
-    private fun areTwoValidDanishQuotes(quotes: List<Quote>): Boolean =
-        quotes.size == 2 &&
-            (quotes.any { quote -> quote.data is DanishHomeContentsData } &&
-                (quotes.any { quote -> quote.data is DanishAccidentData } ||
-                    quotes.any { quote -> quote.data is DanishTravelData }))
-
-    private fun areThreeValidDanishQuotes(quotes: List<Quote>): Boolean =
-        quotes.size == 3 &&
-            quotes.any { quote -> quote.data is DanishHomeContentsData } &&
-            quotes.any { quote -> quote.data is DanishAccidentData } &&
-            quotes.any { quote -> quote.data is DanishTravelData }
 
     companion object {
         val logger = LoggerFactory.getLogger(this.javaClass)!!
