@@ -18,7 +18,6 @@ import com.hedvig.underwriter.service.quotesSignDataStrategies.SignData
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
@@ -84,28 +83,6 @@ class SignServiceImpl(
             quotes = quotes,
             signData = SignData(ipAddress, successUrl, failUrl)
         )
-    }
-
-    private fun genericStartRedirectSign(
-        successUrl: String?,
-        failUrl: String?,
-        quoteIds: List<UUID>,
-        memberServiceStartMethod: (signSessionId: UUID, successUrl: String, failUrl: String) -> StartRedirectBankIdSignResponse,
-        successfulReturn: (signSessionId: UUID, redirectUrl: String) -> StartSignResponse
-    ): StartSignResponse {
-        if (successUrl == null || failUrl == null) {
-            return StartSignErrors.targetURLNotProvided
-        }
-
-        val signSessionId = signSessionRepository.insert(quoteIds)
-
-        val response = memberServiceStartMethod(signSessionId, successUrl, failUrl)
-
-        return response.redirectUrl?.let { redirectUrl ->
-            successfulReturn(signSessionId, redirectUrl)
-        } ?: response.internalErrorMessage?.let {
-            StartSignErrors.emptyRedirectUrlFromBankId(it)
-        } ?: StartSignErrors.emptyRedirectUrlFromBankId(response.errorMessages!!.joinToString(", "))
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {

@@ -30,15 +30,15 @@ class SignStrategyService(
                 }
             2 -> {
                 when {
-                    SignUtil.areTwoValidNorwegianQuotes(quotes) ||
-                        SignUtil.areTwoValidDanishQuotes(quotes) -> redirectSignStrategy.startSign(quotes, signData)
+                    quotes.areTwoValidNorwegianQuotes() ||
+                        quotes.areTwoValidDanishQuotes() -> redirectSignStrategy.startSign(quotes, signData)
                     else -> {
                         StartSignResponse.FailedToStartSign("", "")
                     }
                 }
             }
             3 -> when {
-                SignUtil.areThreeValidDanishQuotes(quotes) -> redirectSignStrategy.startSign(quotes, signData)
+                quotes.areThreeValidDanishQuotes() -> redirectSignStrategy.startSign(quotes, signData)
                 else -> {
                     StartSignResponse.FailedToStartSign("", "")
                 }
@@ -46,4 +46,20 @@ class SignStrategyService(
             else -> StartSignResponse.FailedToStartSign("", "")
         }
     }
+
+    private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
+        this.size == 2 &&
+            this.any { it.data is NorwegianHomeContentsData } &&
+            this.any { it.data is NorwegianTravelData }
+
+    private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
+        this.size == 2 &&
+            (this.any { it.data is DanishHomeContentsData } &&
+                (this.any { it.data is DanishAccidentData } || this.any { it.data is DanishTravelData }))
+
+    private fun List<Quote>.areThreeValidDanishQuotes(): Boolean =
+        this.size == 3 &&
+            this.any { it.data is DanishHomeContentsData } &&
+            this.any { it.data is DanishAccidentData } &&
+            this.any { it.data is DanishTravelData }
 }

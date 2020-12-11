@@ -2,6 +2,8 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
@@ -15,7 +17,13 @@ class SwedishBankIdSignStrategy(
     private val memberService: MemberService
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        SignUtil.requireValidSwedishQuotes(quotes)
+        require(quotes.isNotEmpty())
+        quotes.forEach {
+            require(
+                it.data is SwedishApartmentData ||
+                    it.data is SwedishHouseData
+            )
+        }
 
         val quoteIds = quotes.map { it.id }
 
