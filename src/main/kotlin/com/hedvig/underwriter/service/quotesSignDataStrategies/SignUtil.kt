@@ -36,21 +36,4 @@ object SignUtil {
             )
         }
     }
-
-    fun areValidNorwegianQuotes(quotes: List<Quote>): Boolean {
-        return quotes.isNotEmpty() &&
-            quotes.all { quote ->
-                quote.data is NorwegianHomeContentsData ||
-                    quote.data is NorwegianTravelData
-            }
-    }
-
-    fun areValidDanishQuotes(quotes: List<Quote>): Boolean {
-        return quotes.isNotEmpty() &&
-            quotes.all { quote ->
-                quote.data is DanishHomeContentsData ||
-                    quote.data is DanishAccidentData ||
-                    quote.data is DanishTravelData
-            }
-    }
 }
