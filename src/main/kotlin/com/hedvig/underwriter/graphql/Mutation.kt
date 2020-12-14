@@ -108,7 +108,7 @@ class Mutation @Autowired constructor(
             env.getEndUserIp(),
             input.successUrl,
             input.failUrl,
-            env.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("Simple-Sign-Enable") == "true"
+            env.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("Enable-Simple-Sign") == "true"
         )
 
     private fun responseForEditedQuote(
