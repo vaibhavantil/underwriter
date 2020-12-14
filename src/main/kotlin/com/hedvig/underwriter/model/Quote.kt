@@ -68,17 +68,6 @@ val Quote.danishTravel
 val Quote.validTo
     get() = this.createdAt.plusSeconds(this.validity)!!
 
-val Quote.nationality
-    get() = when (this.data) {
-        is SwedishHouseData,
-        is SwedishApartmentData -> Nationality.SWEDEN
-        is NorwegianHomeContentsData,
-        is NorwegianTravelData -> Nationality.NORWAY
-        is DanishHomeContentsData,
-        is DanishAccidentData,
-        is DanishTravelData -> Nationality.DENMARK
-    }
-
 fun String.birthDateFromSwedishSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")
     return LocalDate.parse(

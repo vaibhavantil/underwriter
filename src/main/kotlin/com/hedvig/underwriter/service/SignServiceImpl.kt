@@ -9,7 +9,6 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
-import com.hedvig.underwriter.model.nationality
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -19,6 +18,7 @@ import com.hedvig.underwriter.service.quotesSignDataStrategies.SignData
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
@@ -230,7 +230,7 @@ class SignServiceImpl(
             val ssn = quote.data.ssn!!
             memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(
                 ssn = ssn,
-                nationality = quote.nationality
+                nationality = Nationality.fromQuote(quote)
                 ))
 
             return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
