@@ -101,7 +101,6 @@ class SignStrategyService(
             this.any { it.data is DanishHomeContentsData } &&
             this.any { it.data is DanishAccidentData } &&
             this.any { it.data is DanishTravelData }
-
 }
 
 fun List<Quote>.areNorwegianQuotes(): Boolean {
