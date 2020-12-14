@@ -17,49 +17,28 @@ class SignStrategyService(
     val redirectSignStrategy: RedirectSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        return when (quotes.size) {
-            1 ->
-                when (quotes[0].data) {
-                    is SwedishApartmentData,
-                    is SwedishHouseData -> swedishBankIdSignStrategy.startSign(quotes, signData)
-                    is NorwegianHomeContentsData,
-                    is NorwegianTravelData,
-                    is DanishHomeContentsData -> redirectSignStrategy.startSign(quotes, signData)
-                    is DanishAccidentData,
-                    is DanishTravelData -> StartSignResponse.FailedToStartSign("", "")
-                }
-            2 -> {
-                when {
-                    quotes.areTwoValidNorwegianQuotes() ||
-                        quotes.areTwoValidDanishQuotes() -> redirectSignStrategy.startSign(quotes, signData)
-                    else -> {
-                        StartSignResponse.FailedToStartSign("", "")
-                    }
-                }
-            }
-            3 -> when {
-                quotes.areThreeValidDanishQuotes() -> redirectSignStrategy.startSign(quotes, signData)
-                else -> {
-                    StartSignResponse.FailedToStartSign("", "")
-                }
-            }
-            else -> StartSignResponse.FailedToStartSign("", "")
+        val strategy = quotes.getStrategiesFromQuotes()
+
+        if (strategy.isEmpty()) {
+            return StartSignResponse.FailedToStartSign("", "")
         }
+
+        if (strategy.size > 1) {
+            return StartSignResponse.FailedToStartSign("", "")
+        }
+
+        return strategy.first().startSign(quotes, signData)
     }
 
-    private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
-        this.size == 2 &&
-            this.any { it.data is NorwegianHomeContentsData } &&
-            this.any { it.data is NorwegianTravelData }
-
-    private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
-        this.size == 2 &&
-            (this.any { it.data is DanishHomeContentsData } &&
-                (this.any { it.data is DanishAccidentData } || this.any { it.data is DanishTravelData }))
-
-    private fun List<Quote>.areThreeValidDanishQuotes(): Boolean =
-        this.size == 3 &&
-            this.any { it.data is DanishHomeContentsData } &&
-            this.any { it.data is DanishAccidentData } &&
-            this.any { it.data is DanishTravelData }
+    private fun List<Quote>.getStrategiesFromQuotes() = this.map {
+        when (it.data) {
+            is SwedishHouseData,
+            is SwedishApartmentData -> swedishBankIdSignStrategy
+            is NorwegianHomeContentsData,
+            is NorwegianTravelData,
+            is DanishHomeContentsData,
+            is DanishAccidentData,
+            is DanishTravelData -> redirectSignStrategy
+        }
+    }.toSet()
 }

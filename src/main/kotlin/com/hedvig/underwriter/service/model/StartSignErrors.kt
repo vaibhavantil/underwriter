@@ -43,6 +43,12 @@ object StartSignErrors {
             "QUOTES_CAN_NOT_BE_BUNDLED"
         )
 
+    val noQuotes =
+        StartSignResponse.FailedToStartSign(
+            "Quotes can not be empty",
+            "EMPTY_LIST_OF_QUOTES"
+        )
+
     fun emptyRedirectUrlFromBankId(message: String) =
         StartSignResponse.FailedToStartSign(
             message,
