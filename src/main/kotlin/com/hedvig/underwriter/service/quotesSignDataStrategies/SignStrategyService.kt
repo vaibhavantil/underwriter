@@ -17,17 +17,17 @@ class SignStrategyService(
     val redirectSignStrategy: RedirectSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        val strategy = quotes.getStrategiesFromQuotes()
+        val strategies = quotes.getStrategiesFromQuotes()
 
-        if (strategy.isEmpty()) {
+        if (strategies.isEmpty()) {
             throw RuntimeException("No strategy from quotes: $quotes")
         }
 
-        if (strategy.size > 1) {
+        if (strategies.size > 1) {
             throw RuntimeException("More than one strategy from quotes: $quotes")
         }
 
-        return strategy.first().startSign(quotes, signData)
+        return strategies.first().startSign(quotes, signData)
     }
 
     private fun List<Quote>.getStrategiesFromQuotes() = this.map {
