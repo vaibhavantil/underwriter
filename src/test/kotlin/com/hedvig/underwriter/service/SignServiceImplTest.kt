@@ -10,6 +10,9 @@ import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import com.hedvig.underwriter.service.quotesSignDataStrategies.RedirectSignStrategy
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
@@ -57,6 +60,11 @@ class SignServiceImplTest {
     @MockK
     lateinit var customerIO: CustomerIO
 
+    lateinit var signStrategyService: SignStrategyService
+
+    lateinit var swedishBankIdSignStrategy: SwedishBankIdSignStrategy
+    lateinit var redirectSignStrategy: RedirectSignStrategy
+
     @MockK
     lateinit var env: Environment
 
@@ -65,12 +73,24 @@ class SignServiceImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
+        swedishBankIdSignStrategy = SwedishBankIdSignStrategy(
+            signSessionRepository, memberService
+        )
+
+        redirectSignStrategy = RedirectSignStrategy(
+            signSessionRepository, memberService
+        )
+        signStrategyService = SignStrategyService(
+            swedishBankIdSignStrategy, redirectSignStrategy
+        )
+
         cut = SignServiceImpl(
             quoteService,
             quoteRepository,
             memberService,
             productPricingService,
             signSessionRepository,
+            signStrategyService,
             customerIO,
             env
         )
