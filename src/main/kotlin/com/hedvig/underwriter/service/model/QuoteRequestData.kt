@@ -2,11 +2,24 @@ package com.hedvig.underwriter.service.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.model.DanishAccidentData
+import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishHomeContentsType
+import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.ExtraBuilding
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
+import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.model.QuoteData
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
+import java.util.UUID
 
 sealed class QuoteRequestData {
+
+    abstract fun createQuoteData(quoteRequest: QuoteRequest): QuoteData
+
     data class SwedishHouse(
         val street: String?,
         val zipCode: String?,
@@ -20,7 +33,26 @@ sealed class QuoteRequestData {
         @field:JsonProperty("subleted")
         val isSubleted: Boolean?,
         val floor: Int? = 0
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = SwedishHouseData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate,
+            firstName = quoteRequest.firstName,
+            lastName = quoteRequest.lastName,
+            email = quoteRequest.email,
+            street = this.street,
+            zipCode = this.zipCode,
+            city = this.city,
+            householdSize = this.householdSize,
+            livingSpace = this.livingSpace,
+            numberOfBathrooms = this.numberOfBathrooms,
+            isSubleted = this.isSubleted,
+            extraBuildings = this.extraBuildings?.map((ExtraBuilding)::from),
+            ancillaryArea = this.ancillaryArea,
+            yearOfConstruction = this.yearOfConstruction
+        )
+    }
 
     data class SwedishApartment(
         val street: String?,
@@ -30,7 +62,22 @@ sealed class QuoteRequestData {
         val householdSize: Int?,
         val floor: Int?,
         val subType: ApartmentProductSubType?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = SwedishApartmentData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate,
+            firstName = quoteRequest.firstName,
+            lastName = quoteRequest.lastName,
+            email = quoteRequest.email,
+            subType = this.subType,
+            street = this.street,
+            zipCode = this.zipCode,
+            city = this.city,
+            householdSize = this.householdSize,
+            livingSpace = this.livingSpace
+        )
+    }
 
     data class NorwegianHomeContents(
         val street: String?,
@@ -41,13 +88,40 @@ sealed class QuoteRequestData {
         @field:JsonProperty("youth")
         val isYouth: Boolean?,
         val subType: NorwegianHomeContentsType?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = NorwegianHomeContentsData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate!!,
+            firstName = quoteRequest.firstName!!,
+            lastName = quoteRequest.lastName!!,
+            email = quoteRequest.email,
+            type = this.subType!!,
+            street = this.street!!,
+            zipCode = this.zipCode!!,
+            city = this.city,
+            isYouth = this.isYouth!!,
+            coInsured = this.coInsured!!,
+            livingSpace = this.livingSpace!!
+        )
+    }
 
     data class NorwegianTravel(
         val coInsured: Int?,
         @field:JsonProperty("youth")
         val isYouth: Boolean?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = NorwegianTravelData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate!!,
+            firstName = quoteRequest.firstName!!,
+            lastName = quoteRequest.lastName!!,
+            email = quoteRequest.email,
+            coInsured = this.coInsured!!,
+            isYouth = this.isYouth!!
+        )
+    }
 
     data class DanishHomeContents(
         val street: String?,
@@ -57,7 +131,22 @@ sealed class QuoteRequestData {
         @field:JsonProperty("student")
         val isStudent: Boolean?,
         val subType: DanishHomeContentsType?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = DanishHomeContentsData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate!!,
+            firstName = quoteRequest.firstName!!,
+            lastName = quoteRequest.lastName!!,
+            email = quoteRequest.email,
+            street = this.street!!,
+            zipCode = this.zipCode!!,
+            coInsured = this.coInsured!!,
+            livingSpace = this.livingSpace!!,
+            isStudent = this.isStudent!!,
+            type = this.subType!!
+        )
+    }
 
     data class DanishAccident(
         val street: String?,
@@ -65,7 +154,20 @@ sealed class QuoteRequestData {
         val coInsured: Int?,
         @field:JsonProperty("student")
         val isStudent: Boolean?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = DanishAccidentData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate!!,
+            firstName = quoteRequest.firstName!!,
+            lastName = quoteRequest.lastName!!,
+            email = quoteRequest.email,
+            street = this.street!!,
+            zipCode = this.zipCode!!,
+            coInsured = this.coInsured!!,
+            isStudent = this.isStudent!!
+        )
+    }
 
     data class DanishTravel(
         val street: String?,
@@ -73,7 +175,20 @@ sealed class QuoteRequestData {
         val coInsured: Int?,
         @field:JsonProperty("student")
         val isStudent: Boolean?
-    ) : QuoteRequestData()
+    ) : QuoteRequestData() {
+        override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = DanishTravelData(
+            id = UUID.randomUUID(),
+            ssn = quoteRequest.ssn,
+            birthDate = quoteRequest.birthDate!!,
+            firstName = quoteRequest.firstName!!,
+            lastName = quoteRequest.lastName!!,
+            email = quoteRequest.email,
+            street = this.street!!,
+            zipCode = this.zipCode!!,
+            coInsured = this.coInsured!!,
+            isStudent = this.isStudent!!
+        )
+    }
 
     companion object {
         fun from(quoteSchema: QuoteSchema) = when (quoteSchema) {
