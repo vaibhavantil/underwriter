@@ -1,10 +1,5 @@
 package com.hedvig.underwriter.service.quotesSignDataStrategies
 
-import com.hedvig.underwriter.model.DanishAccidentData
-import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.DanishTravelData
-import com.hedvig.underwriter.model.NorwegianHomeContentsData
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.StartSignErrors
@@ -22,39 +17,6 @@ class RedirectSignStrategy(
     private val memberService: MemberService
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        if (quotes.isEmpty()) {
-            logger.error("No quotes on start sign RedirectSignStrategy")
-            return StartSignErrors.noQuotes
-        }
-        when {
-            quotes.areValidNorwegianQuotes() -> {
-                if (quotes.size > 1 && !quotes.areTwoValidNorwegianQuotes()) {
-                    logger.error("Norwegian quotes is not valid in RedirectSignStrategy [Quotes: $quotes]")
-                    return StartSignErrors.quotesCanNotBeBundled
-                }
-            }
-            quotes.areValidDanishQuotes() -> {
-                when {
-                    quotes.size == 1 -> {
-                        if (quotes[0].data !is DanishHomeContentsData) {
-                            logger.error("Single danish quote can not be signed alone RedirectSignStrategy [Quotes: $quotes]")
-                            return StartSignErrors.singleQuoteCanNotBeSignedAlone
-                        }
-                    }
-                    quotes.size > 1 -> {
-                        if (!quotes.areTwoValidDanishQuotes() && !quotes.areThreeValidDanishQuotes()) {
-                            logger.error("Danish quotes is not valid in RedirectSignStrategy [Quotes: $quotes]")
-                            return StartSignErrors.quotesCanNotBeBundled
-                        }
-                    }
-                }
-            }
-            else -> {
-                logger.error("Quotes are not norwegian or danish in RedirectSignStrategy [Quotes: $quotes]")
-                return StartSignErrors.quotesCanNotBeBundled
-            }
-        }
-
         if (signData.successUrl == null || signData.failUrl == null) {
             return StartSignErrors.targetURLNotProvided
         }
@@ -77,14 +39,14 @@ class RedirectSignStrategy(
         failUrl: String
     ): StartRedirectBankIdSignResponse {
         return when {
-            quotes.areValidNorwegianQuotes() -> memberService.startNorwegianBankIdSignQuotes(
+            quotes.areNorwegianQuotes() -> memberService.startNorwegianBankIdSignQuotes(
                 quotes.safelyGetMemberId(),
                 signSessionId,
                 quotes.safelyGetSsn(),
                 successUrl,
                 failUrl
             )
-            quotes.areValidDanishQuotes() -> memberService.startDanishBankIdSignQuotes(
+            quotes.areDanishQuotes() -> memberService.startDanishBankIdSignQuotes(
                 quotes.safelyGetMemberId(),
                 signSessionId,
                 quotes.safelyGetSsn(),
@@ -100,43 +62,11 @@ class RedirectSignStrategy(
         redirectUrl: String
     ): StartSignResponse {
         return when {
-            quotes.areValidNorwegianQuotes() -> StartSignResponse.NorwegianBankIdSession(redirectUrl)
-            quotes.areValidDanishQuotes() -> StartSignResponse.DanishBankIdSession(redirectUrl)
+            quotes.areNorwegianQuotes() -> StartSignResponse.NorwegianBankIdSession(redirectUrl)
+            quotes.areDanishQuotes() -> StartSignResponse.DanishBankIdSession(redirectUrl)
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
     }
-
-    private fun List<Quote>.areValidNorwegianQuotes(): Boolean {
-        return this.all { quote ->
-            quote.data is NorwegianHomeContentsData ||
-                quote.data is NorwegianTravelData
-        }
-    }
-
-    private fun List<Quote>.areValidDanishQuotes(): Boolean {
-        return this.all { quote ->
-            quote.data is DanishHomeContentsData ||
-                quote.data is DanishAccidentData ||
-                quote.data is DanishTravelData
-        }
-    }
-
-    private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
-        this.size == 2 &&
-            this.any { it.data is NorwegianHomeContentsData } &&
-            this.any { it.data is NorwegianTravelData }
-
-    private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
-        this.size == 2 &&
-            (this.any { it.data is DanishHomeContentsData } &&
-                (this.any { it.data is DanishAccidentData } || this.any { it.data is DanishTravelData }))
-
-    private fun List<Quote>.areThreeValidDanishQuotes(): Boolean =
-        this.size == 3 &&
-            this.any { it.data is DanishHomeContentsData } &&
-            this.any { it.data is DanishAccidentData } &&
-            this.any { it.data is DanishTravelData }
-
     companion object {
         val logger = LoggerFactory.getLogger(this::class.java)!!
     }

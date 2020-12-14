@@ -80,6 +80,8 @@ class SignServiceImpl(
             }
         }
 
+
+
         return signStrategyService.startSign(
             quotes = quotes,
             signData = SignData(ipAddress, successUrl, failUrl)
