@@ -10,6 +10,7 @@ import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianHomeConten
 import com.hedvig.underwriter.service.model.QuoteRequestData.NorwegianTravel
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import java.math.BigDecimal
 import java.time.Instant
@@ -66,6 +67,17 @@ val Quote.danishTravel
 
 val Quote.validTo
     get() = this.createdAt.plusSeconds(this.validity)!!
+
+val Quote.nationality
+    get() = when (this.data) {
+        is SwedishHouseData,
+        is SwedishApartmentData -> Nationality.SWEDEN
+        is NorwegianHomeContentsData,
+        is NorwegianTravelData -> Nationality.NORWAY
+        is DanishHomeContentsData,
+        is DanishAccidentData,
+        is DanishTravelData -> Nationality.DENMARK
+    }
 
 fun String.birthDateFromSwedishSsn(): LocalDate {
     val trimmedInput = this.trim().replace("-", "").replace(" ", "")

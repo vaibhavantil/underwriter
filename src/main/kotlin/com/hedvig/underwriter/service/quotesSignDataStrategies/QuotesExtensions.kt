@@ -4,7 +4,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
-fun List<Quote>.getSSN(): String {
+fun List<Quote>.safelyGetSsn(): String {
 
     val ssn = this.first { it.data is PersonPolicyHolder<*> }.ssn
 
@@ -15,7 +15,7 @@ fun List<Quote>.getSSN(): String {
     return ssn
 }
 
-fun List<Quote>.getMemberId(): Long {
+fun List<Quote>.safelyGetMemberId(): Long {
     val memberId = this[0].memberId!!
 
     if (this.any { it.memberId != memberId }) {

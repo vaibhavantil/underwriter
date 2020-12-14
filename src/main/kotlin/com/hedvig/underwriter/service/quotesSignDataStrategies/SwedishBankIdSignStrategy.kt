@@ -26,7 +26,7 @@ class SwedishBankIdSignStrategy(
 
         val quoteIds = quotes.map { it.id }
 
-        val ssn = quotes.getSSN()
+        val ssn = quotes.safelyGetSsn()
 
         val isSwitching = quotes[0].currentInsurer != null
 
@@ -38,7 +38,7 @@ class SwedishBankIdSignStrategy(
         }
 
         val response = memberService.startSwedishBankIdSignQuotes(
-            quotes.getMemberId(),
+            quotes.safelyGetMemberId(),
             signSessionId,
             ssn,
             ip,
