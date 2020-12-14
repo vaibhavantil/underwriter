@@ -34,9 +34,19 @@ class RedirectSignStrategy(
                 }
             }
             quotes.areValidDanishQuotes() -> {
-                if (quotes.size > 1 && (!quotes.areTwoValidDanishQuotes() || quotes.areThreeValidDanishQuotes())) {
-                    logger.error("Danish quotes is not valid in RedirectSignStrategy [Quotes: $quotes]")
-                    return StartSignErrors.quotesCanNotBeBundled
+                when {
+                    quotes.size == 1 -> {
+                        if (quotes[0].data !is DanishHomeContentsData) {
+                            logger.error("Single danish quote can not be signed alone RedirectSignStrategy [Quotes: $quotes]")
+                            return StartSignErrors.singleQuoteCanNotBeSignedAlone
+                        }
+                    }
+                    quotes.size > 1 -> {
+                        if (!quotes.areTwoValidDanishQuotes() && !quotes.areThreeValidDanishQuotes()) {
+                            logger.error("Danish quotes is not valid in RedirectSignStrategy [Quotes: $quotes]")
+                            return StartSignErrors.quotesCanNotBeBundled
+                        }
+                    }
                 }
             }
             else -> {

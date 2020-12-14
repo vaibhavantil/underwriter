@@ -210,7 +210,7 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
-        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo("Failed")
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo("Quotes can not be bundled")
     }
 
     @Test

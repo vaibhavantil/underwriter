@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import org.springframework.stereotype.Service
 
@@ -17,17 +18,17 @@ class SignStrategyService(
     val redirectSignStrategy: RedirectSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        val strategies = quotes.getStrategiesFromQuotes()
+        val strategy = quotes.getStrategiesFromQuotes()
 
-        if (strategies.isEmpty()) {
-            throw RuntimeException("No strategy from quotes: $quotes")
+        if (strategy.isEmpty()) {
+            return StartSignErrors.noQuotes
         }
 
-        if (strategies.size > 1) {
-            throw RuntimeException("More than one strategy from quotes: $quotes")
+        if (strategy.size > 1) {
+            return StartSignErrors.quotesCanNotBeBundled
         }
 
-        return strategies.first().startSign(quotes, signData)
+        return strategy.first().startSign(quotes, signData)
     }
 
     private fun List<Quote>.getStrategiesFromQuotes() = this.map {

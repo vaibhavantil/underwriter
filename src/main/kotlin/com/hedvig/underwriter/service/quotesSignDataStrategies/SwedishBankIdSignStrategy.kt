@@ -20,7 +20,7 @@ class SwedishBankIdSignStrategy(
             logger.error("No quotes on start sign SwedishBankIdSignStrategy")
             return StartSignErrors.noQuotes
         }
-        if (quotes.size > 1 || (quotes[0].data !is SwedishApartmentData || quotes[0].data !is SwedishHouseData)) {
+        if (quotes.size > 1 || (quotes[0].data !is SwedishApartmentData && quotes[0].data !is SwedishHouseData)) {
             logger.error("Can not start signing quotes in [Quotes: $quotes] SwedishBankIdSignStrategy")
             return StartSignErrors.quotesCanNotBeBundled
         }
