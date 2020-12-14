@@ -24,6 +24,7 @@ import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -312,7 +313,18 @@ class SignServiceImpl(
             }
             val memberId = memberService.createMember()
 
-            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(ssn = quote.data.ssn!!))
+            val ssn = quote.data.ssn!!
+            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(
+                ssn = ssn,
+                // TODO let's fix this properly with the strategy
+                nationality =
+                    when (ssn.length) {
+                        10 -> Nationality.DENMARK
+                        11 -> Nationality.NORWAY
+                        12 -> Nationality.SWEDEN
+                        else -> throw RuntimeException("Can't get nationality from ssn")
+                    }
+                ))
 
             return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
         } else {
