@@ -5,14 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.service.quotesSignDataStrategies.safelyGetSsn
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.util.maskSsn
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -123,8 +125,14 @@ class MemberServiceImpl @Autowired constructor(
 
     override fun startSimpleSign(
         memberId: Long,
-        request: UnderwriterStartSignSessionRequest.SimpleSign
+        underwriterSessionReference: UUID,
+        nationalIdentification: NationalIdentification
     ): UnderwriterStartSignSessionResponse.SimpleSign {
+
+        val request = UnderwriterStartSignSessionRequest.SimpleSign(
+            underwriterSessionReference,
+            nationalIdentification
+        )
         val response = client.startSign(memberId, request).body
         require(response is UnderwriterStartSignSessionResponse.SimpleSign)
         return response

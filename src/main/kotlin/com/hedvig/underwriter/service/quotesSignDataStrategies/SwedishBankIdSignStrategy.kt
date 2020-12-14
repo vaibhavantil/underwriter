@@ -5,7 +5,7 @@ import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.NationalIdentification
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

@@ -26,7 +26,6 @@ fun List<Quote>.safelyGetMemberId(): Long {
     return memberId.toLong()
 }
 
-
 fun List<Quote>.safelyNationality(): Nationality {
     val nationality = Nationality.fromQuote(this[0])
 

@@ -16,10 +16,9 @@ import com.hedvig.underwriter.service.quotesSignDataStrategies.SimpleSignStrateg
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.NationalIdentification
-import com.hedvig.underwriter.serviceIntegration.memberService.RedirectCountry
-import com.hedvig.underwriter.serviceIntegration.memberService.UnderwriterStartSignSessionRequest
-import com.hedvig.underwriter.serviceIntegration.memberService.UnderwriterStartSignSessionResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
@@ -180,7 +179,10 @@ class SignServiceImplTest {
             memberService.startSwedishBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.SWEDEN),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.SWEDEN
+                ),
                 ipAddress,
                 false
             )
@@ -207,7 +209,10 @@ class SignServiceImplTest {
             memberService.startSwedishBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.SWEDEN),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.SWEDEN
+                ),
                 ipAddress,
                 false
             )
@@ -253,7 +258,10 @@ class SignServiceImplTest {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.NORWAY),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.NORWAY
+                ),
                 successUrl,
                 failUrl,
                 RedirectCountry.NORWAY
@@ -283,7 +291,10 @@ class SignServiceImplTest {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.NORWAY),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.NORWAY
+                ),
                 successUrl,
                 failUrl,
                 RedirectCountry.NORWAY
@@ -374,7 +385,10 @@ class SignServiceImplTest {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.DENMARK),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.DENMARK
+                ),
                 successUrl,
                 failUrl,
                 RedirectCountry.DENMARK
@@ -404,7 +418,10 @@ class SignServiceImplTest {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                NationalIdentification(quote.ssn, Nationality.DENMARK),
+                NationalIdentification(
+                    quote.ssn,
+                    Nationality.DENMARK
+                ),
                 successUrl,
                 failUrl,
                 RedirectCountry.DENMARK
@@ -600,7 +617,10 @@ class SignServiceImplTest {
             memberService.startRedirectBankIdSign(
                 memberId.toLong(),
                 signSessionReference,
-                NationalIdentification("1212120000", Nationality.DENMARK),
+                NationalIdentification(
+                    "1212120000",
+                    Nationality.DENMARK
+                ),
                 successUrl,
                 failUrl,
                 RedirectCountry.DENMARK

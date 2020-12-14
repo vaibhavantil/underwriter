@@ -5,7 +5,7 @@ import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.NationalIdentification
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,6 +18,7 @@ class SimpleSignStrategy(
 
         val response = memberService.startSimpleSign(
             memberId = quotes.safelyGetMemberId(),
+            underwriterSessionReference = signSessionId,
             nationalIdentification = NationalIdentification(
                 quotes.safelyGetSsn(),
                 quotes.safelyNationality()
