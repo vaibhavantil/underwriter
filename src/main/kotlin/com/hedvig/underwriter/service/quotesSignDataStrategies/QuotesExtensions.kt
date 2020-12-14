@@ -1,30 +1,26 @@
 package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 
 fun List<Quote>.getSSN(): String {
-    var ssn: String? = null
-    this.forEach { quote ->
-        if (quote.data is PersonPolicyHolder<*>) {
-            quote.data.ssn?.let {
-                ssn = it
-                return@forEach
-            }
-        } else {
-            throw RuntimeException("Quote data should not be able to be of type ${quote.data::class}")
-        }
+
+    val ssn = this.first { it.data is PersonPolicyHolder<*> }.ssn
+
+    if (this.any { (it.data as PersonPolicyHolder<*>?)?.let { it.ssn != ssn } == true }) {
+        throw RuntimeException("ssn is not matching when getting ssn from quotes")
     }
-    return ssn!!
+
+    return ssn
 }
 
 fun List<Quote>.getMemberId(): Long {
-    var memberId: String? = null
-    this.forEach { quote ->
-        quote.memberId?.let {
-            memberId = it
-            return@forEach
-        }
+    val memberId = this[0].memberId!!
+
+    if (this.any { it.memberId != memberId }) {
+        throw RuntimeException("memberId is not matching when getting memberid from quotes")
     }
-    return memberId!!.toLong()
+
+    return memberId.toLong()
 }
