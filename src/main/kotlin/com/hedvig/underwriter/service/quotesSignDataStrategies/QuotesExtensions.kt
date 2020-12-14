@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 
 fun List<Quote>.safelyGetSsn(): String {
 
@@ -23,4 +24,14 @@ fun List<Quote>.safelyGetMemberId(): Long {
     }
 
     return memberId.toLong()
+}
+
+fun List<Quote>.safelyNationality(): Nationality {
+    val nationality = Nationality.fromQuote(this[0])
+
+    if (this.any { Nationality.fromQuote(it) != nationality }) {
+        throw RuntimeException("nationality is not matching when getting nationality from quotes")
+    }
+
+    return nationality
 }

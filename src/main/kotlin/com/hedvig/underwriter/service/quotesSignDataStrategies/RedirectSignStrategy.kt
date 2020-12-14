@@ -5,7 +5,10 @@ import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -37,21 +40,29 @@ class RedirectSignStrategy(
         signSessionId: UUID,
         successUrl: String,
         failUrl: String
-    ): StartRedirectBankIdSignResponse {
+    ): UnderwriterStartSignSessionResponse.BankIdRedirect {
         return when {
-            quotes.areNorwegianQuotes() -> memberService.startNorwegianBankIdSignQuotes(
+            quotes.areNorwegianQuotes() -> memberService.startRedirectBankIdSign(
                 quotes.safelyGetMemberId(),
                 signSessionId,
-                quotes.safelyGetSsn(),
+                NationalIdentification(
+                    quotes.safelyGetSsn(),
+                    Nationality.NORWAY
+                ),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.NORWAY
             )
-            quotes.areDanishQuotes() -> memberService.startDanishBankIdSignQuotes(
+            quotes.areDanishQuotes() -> memberService.startRedirectBankIdSign(
                 quotes.safelyGetMemberId(),
                 signSessionId,
-                quotes.safelyGetSsn(),
+                NationalIdentification(
+                    quotes.safelyGetSsn(),
+                    Nationality.DENMARK
+                ),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.DENMARK
             )
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
@@ -67,6 +78,7 @@ class RedirectSignStrategy(
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
     }
+
     companion object {
         val logger = LoggerFactory.getLogger(this::class.java)!!
     }

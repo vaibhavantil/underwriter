@@ -10,15 +10,18 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
 class SignStrategyService(
-    val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
-    val redirectSignStrategy: RedirectSignStrategy
+    private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
+    private val redirectSignStrategy: RedirectSignStrategy,
+    private val simpleSignStrategy: SimpleSignStrategy,
+    private val env: Environment
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        val strategy = quotes.getStrategiesFromQuotes()
+        val strategy = quotes.getStrategiesFromQuotes(signData.enableSimpleSign)
 
         if (strategy.isEmpty()) {
             return StartSignErrors.noQuotes
@@ -62,12 +65,16 @@ class SignStrategyService(
         return strategy.first().startSign(quotes, signData)
     }
 
-    private fun List<Quote>.getStrategiesFromQuotes() = this.map {
+    private fun List<Quote>.getStrategiesFromQuotes(enableSimpleSign: Boolean) = this.map {
         when (it.data) {
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData,
+            is NorwegianTravelData -> if (enableSimpleSign && env.activeProfiles.contains("staging")) {
+                simpleSignStrategy
+            } else {
+                redirectSignStrategy
+            }
             is DanishHomeContentsData,
             is DanishAccidentData,
             is DanishTravelData -> redirectSignStrategy
