@@ -5,16 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.service.quotesSignDataStrategies.safelyGetSsn
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.util.maskSsn
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -85,53 +83,51 @@ class MemberServiceImpl @Autowired constructor(
         client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
     }
 
-    override fun startSwedishBankIdSignQuotes(
+    override fun startSwedishBankIdSign(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String,
+        nationalIdentification: NationalIdentification,
         ipAddress: String,
         isSwitching: Boolean
-    ): StartSwedishBankIdSignResponse {
-        return client.startSwedishBankIdSign(
-            memberId,
-            UnderwriterStartSwedishBankIdSignSessionRequest(underwriterSessionReference, ssn, ipAddress, isSwitching)
-        ).body!!
+    ): UnderwriterStartSignSessionResponse.SwedishBankId {
+        val request = UnderwriterStartSignSessionRequest.SwedishBankId(
+            underwriterSessionReference,
+            nationalIdentification,
+            ipAddress,
+            isSwitching
+        )
+        val response = client.startSign(memberId, request).body
+        require(response is UnderwriterStartSignSessionResponse.SwedishBankId)
+        return response
     }
 
-    override fun startNorwegianBankIdSignQuotes(
+    override fun startRedirectBankIdSign(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String,
+        nationalIdentification: NationalIdentification,
         successUrl: String,
-        failUrl: String
-    ): StartRedirectBankIdSignResponse {
-        return client.startNorwegianSign(
-            memberId,
-            UnderwriterStartRedirectBankIdSignSessionRequest(
-                underwriterSessionReference,
-                ssn,
-                successUrl,
-                failUrl
-            )
-        ).body!!
+        failUrl: String,
+        redirectCountry: RedirectCountry
+    ): UnderwriterStartSignSessionResponse.BankIdRedirect {
+        val request = UnderwriterStartSignSessionRequest.BankIdRedirect(
+            underwriterSessionReference,
+            nationalIdentification,
+            successUrl,
+            failUrl,
+            redirectCountry
+        )
+        val response = client.startSign(memberId, request).body
+        require(response is UnderwriterStartSignSessionResponse.BankIdRedirect)
+        return response
     }
 
-    override fun startDanishBankIdSignQuotes(
+    override fun startSimpleSign(
         memberId: Long,
-        underwriterSessionReference: UUID,
-        ssn: String,
-        successUrl: String,
-        failUrl: String
-    ): StartRedirectBankIdSignResponse {
-        return client.startDanishSign(
-            memberId,
-            UnderwriterStartRedirectBankIdSignSessionRequest(
-                underwriterSessionReference,
-                ssn,
-                successUrl,
-                failUrl
-            )
-        ).body!!
+        request: UnderwriterStartSignSessionRequest.SimpleSign
+    ): UnderwriterStartSignSessionResponse.SimpleSign {
+        val response = client.startSign(memberId, request).body
+        require(response is UnderwriterStartSignSessionResponse.SimpleSign)
+        return response
     }
 
     override fun getMember(memberId: Long): InternalMember {

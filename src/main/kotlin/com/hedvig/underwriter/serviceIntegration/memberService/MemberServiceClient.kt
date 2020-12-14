@@ -1,16 +1,16 @@
 package com.hedvig.underwriter.serviceIntegration.memberService
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectAuthenticationResponseError
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.Headers
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import java.util.UUID
 
 @Headers("Accept: application/json;charset=utf-8")
 @FeignClient(
@@ -60,26 +61,83 @@ interface MemberServiceClient {
         @RequestBody req: FinalizeOnBoardingRequest
     ): ResponseEntity<*>
 
-    @PostMapping("_/member/start/sign/swedish/bankid/{memberId}")
-    fun startSwedishBankIdSign(
+    @PostMapping("_/member/start/sign/{memberId}")
+    fun startSign(
         @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartSwedishBankIdSignSessionRequest
-    ): ResponseEntity<StartSwedishBankIdSignResponse>
-
-    @PostMapping("_/member/start/sign/norwegian/bankid/{memberId}")
-    fun startNorwegianSign(
-        @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
-    ): ResponseEntity<StartRedirectBankIdSignResponse>
-
-    @PostMapping("_/member/start/sign/danish/bankid/{memberId}")
-    fun startDanishSign(
-        @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
-    ): ResponseEntity<StartRedirectBankIdSignResponse>
+        @RequestBody request: UnderwriterStartSignSessionRequest
+    ): ResponseEntity<UnderwriterStartSignSessionResponse>
 
     @GetMapping("/_/member/{memberId}")
     fun getMember(
         @PathVariable("memberId") memberId: Long
     ): ResponseEntity<InternalMember>
+}
+
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionRequest.SwedishBankId::class, name = "SwedishBankId"),
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionRequest.BankIdRedirect::class, name = "BankIdRedirect"),
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionRequest.SimpleSign::class, name = "SimpleSign")
+)
+sealed class UnderwriterStartSignSessionRequest {
+
+    abstract val underwriterSessionReference: UUID
+
+    data class SwedishBankId(
+        override val underwriterSessionReference: UUID,
+        val nationalIdentification: NationalIdentification,
+        val ipAddress: String,
+        val isSwitching: Boolean
+    ) : UnderwriterStartSignSessionRequest()
+
+    data class BankIdRedirect(
+        override val underwriterSessionReference: UUID,
+        val nationalIdentification: NationalIdentification,
+        val successUrl: String,
+        val failUrl: String,
+        val country: RedirectCountry
+    ) : UnderwriterStartSignSessionRequest()
+
+    data class SimpleSign(
+        override val underwriterSessionReference: UUID,
+        val nationalIdentification: NationalIdentification
+    ) : UnderwriterStartSignSessionRequest()
+}
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionResponse.SwedishBankId::class, name = "SwedishBankId"),
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionResponse.BankIdRedirect::class, name = "BankIdRedirect"),
+    JsonSubTypes.Type(value = UnderwriterStartSignSessionResponse.SimpleSign::class, name = "SimpleSign")
+)
+sealed class UnderwriterStartSignSessionResponse {
+
+    abstract val internalErrorMessage: String?
+
+    data class SwedishBankId(
+        val autoStartToken: String?,
+        override val internalErrorMessage: String? = null
+    ) : UnderwriterStartSignSessionResponse()
+
+    data class BankIdRedirect(
+        val redirectUrl: String?,
+        override val internalErrorMessage: String? = null,
+        val errorMessages: List<RedirectAuthenticationResponseError>? = null
+    ) : UnderwriterStartSignSessionResponse()
+
+    data class SimpleSign(
+        val successfullyStarted: Boolean,
+        override val internalErrorMessage: String? = null
+    ) : UnderwriterStartSignSessionResponse()
+}
+
+data class NationalIdentification(
+    val identification: String,
+    val nationality: Nationality
+)
+
+enum class RedirectCountry {
+    NORWAY,
+    DENMARK
 }

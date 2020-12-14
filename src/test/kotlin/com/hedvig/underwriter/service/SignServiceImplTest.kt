@@ -12,13 +12,17 @@ import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.RedirectSignStrategy
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SimpleSignStrategy
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.memberService.NationalIdentification
+import com.hedvig.underwriter.serviceIntegration.memberService.RedirectCountry
+import com.hedvig.underwriter.serviceIntegration.memberService.UnderwriterStartSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
@@ -64,6 +68,7 @@ class SignServiceImplTest {
 
     lateinit var swedishBankIdSignStrategy: SwedishBankIdSignStrategy
     lateinit var redirectSignStrategy: RedirectSignStrategy
+    lateinit var simpleSignStrategy: SimpleSignStrategy
 
     @MockK
     lateinit var env: Environment
@@ -80,8 +85,12 @@ class SignServiceImplTest {
         redirectSignStrategy = RedirectSignStrategy(
             signSessionRepository, memberService
         )
+        simpleSignStrategy = SimpleSignStrategy(
+            signSessionRepository, memberService
+        )
+
         signStrategyService = SignStrategyService(
-            swedishBankIdSignStrategy, redirectSignStrategy
+            swedishBankIdSignStrategy, redirectSignStrategy, simpleSignStrategy, env
         )
 
         cut = SignServiceImpl(
@@ -168,14 +177,14 @@ class SignServiceImplTest {
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
 
         every {
-            memberService.startSwedishBankIdSignQuotes(
+            memberService.startSwedishBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.SWEDEN),
                 ipAddress,
                 false
             )
-        } returns StartSwedishBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.SwedishBankId(
             "autoStartToken"
         )
 
@@ -195,14 +204,14 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startSwedishBankIdSignQuotes(
-                memberId.toLong(),
+            memberService.startSwedishBankIdSign(
+                quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.SWEDEN),
                 ipAddress,
                 false
             )
-        } returns StartSwedishBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.SwedishBankId(
             autoStartToken = null,
             internalErrorMessage = "Failed"
         )
@@ -241,14 +250,15 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startNorwegianBankIdSignQuotes(
+            memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.NORWAY),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.NORWAY
             )
-        } returns StartRedirectBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
 
@@ -270,14 +280,15 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startNorwegianBankIdSignQuotes(
+            memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.NORWAY),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.NORWAY
             )
-        } returns StartRedirectBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
 
@@ -360,14 +371,15 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startDanishBankIdSignQuotes(
+            memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.DENMARK),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.DENMARK
             )
-        } returns StartRedirectBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
 
@@ -389,14 +401,15 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startDanishBankIdSignQuotes(
+            memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
-                quote.ssn,
+                NationalIdentification(quote.ssn, Nationality.DENMARK),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.DENMARK
             )
-        } returns StartRedirectBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
 
@@ -410,8 +423,10 @@ class SignServiceImplTest {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
         val quote =
             a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
-        val quote3 = a.QuoteBuilder(id = quoteIds[2], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 =
+            a.QuoteBuilder(id = quoteIds[1], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote3 =
+            a.QuoteBuilder(id = quoteIds[2], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
@@ -582,14 +597,15 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startDanishBankIdSignQuotes(
+            memberService.startRedirectBankIdSign(
                 memberId.toLong(),
                 signSessionReference,
-                "1212120000",
+                NationalIdentification("1212120000", Nationality.DENMARK),
                 successUrl,
-                failUrl
+                failUrl,
+                RedirectCountry.DENMARK
             )
-        } returns StartRedirectBankIdSignResponse(
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
 
