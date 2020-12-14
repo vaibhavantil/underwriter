@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.filterOrOther
 import arrow.core.flatMap
 import arrow.core.toOption
@@ -173,12 +175,12 @@ class QuoteServiceImpl(
 
         val member = memberService.getMember(memberId.toLong())
 
-        val incompleteQuoteData = agreementData.toQuoteRequestData()
+        val quoteRequestData = agreementData.toQuoteRequestData()
 
         val quoteData = QuoteRequest.from(
             member = member,
             agreementData = agreementData,
-            incompleteQuoteData = incompleteQuoteData
+            incompleteQuoteData = quoteRequestData
         )
 
         val breachedGuidelinesOrQuote = createAndSaveQuote(
@@ -232,26 +234,27 @@ class QuoteServiceImpl(
         potentiallySavedQuote: Either<Pair<Quote, List<BreachedGuideline>>, Quote>,
         quoteId: UUID
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-        return potentiallySavedQuote.bimap(
-            { breachedUnderwritingGuidelines ->
-                logger.info(
-                    "Underwriting guidelines breached for incomplete quote $quoteId: {}",
-                    breachedUnderwritingGuidelines
-                )
-                ErrorResponseDto(
-                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                    "quote cannot be calculated, underwriting guidelines are breached [Quote: ${breachedUnderwritingGuidelines.first}",
-                    breachedUnderwritingGuidelines.second
-                )
-            },
-            { completeQuote ->
+        val quote = potentiallySavedQuote.getQuote()
+
+        return if (!quote.breachedUnderwritingGuidelines.isNullOrEmpty()) {
+            logger.info(
+                "Underwriting guidelines breached for incomplete quote $quoteId: {}",
+                quote.breachedUnderwritingGuidelines
+            )
+            Left(ErrorResponseDto(
+                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                "quote cannot be calculated, underwriting guidelines are breached [Quote: $quote",
+                quote.breachedUnderwritingGuidelines.map { BreachedGuideline("", it) }
+            ))
+        } else {
+            Right(
                 CompleteQuoteResponseDto(
-                    id = completeQuote.id,
-                    price = completeQuote.price!!,
-                    validTo = completeQuote.validTo
+                    id = quote.id,
+                    price = quote.price!!,
+                    validTo = quote.validTo
                 )
-            }
-        )
+            )
+        }
     }
 
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
@@ -264,7 +267,10 @@ class QuoteServiceImpl(
         return quoteRepository.findQuotes(quoteIds)
     }
 
-    override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest, token: String?): Either<ErrorResponseDto, Quote> {
+    override fun addAgreementFromQuote(
+        request: AddAgreementFromQuoteRequest,
+        token: String?
+    ): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
 

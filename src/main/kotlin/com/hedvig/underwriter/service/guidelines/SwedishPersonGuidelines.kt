@@ -2,11 +2,8 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.DebtChecker
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.DEBT_CHECK
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN_LENGTH
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
-import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.UNDERAGE
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
@@ -20,11 +17,29 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
     )
 }
 
+private val invalidSsnLength = BreachedGuideline(
+    "SSN Invalid length",
+    INVALID_SSN_LENGTH
+)
+private val ssnDoesNotMatchBirthDate = BreachedGuideline(
+    "Birth date does not match SSN",
+    SSN_DOES_NOT_MATCH_BIRTH_DATE
+)
+private val invalidSsn = BreachedGuideline(
+    "Invalid SSN",
+    BreachedGuidelinesCodes.INVALID_SSN
+)
+private val underage = BreachedGuideline(
+    "member is younger than 18",
+    BreachedGuidelinesCodes.UNDERAGE
+)
+private val debtCheck = BreachedGuideline(
+    PersonalDebt.ERROR_MESSAGE,
+    BreachedGuidelinesCodes.DEBT_CHECK
+)
+
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuideline(
-        "SSN Invalid length",
-        INVALID_SSN_LENGTH
-    )
+    override val breachedGuideline = invalidSsnLength
 
     override val skipAfter: Boolean
         get() = true
@@ -41,10 +56,7 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuideline(
-        "Birth date does not match SSN",
-        SSN_DOES_NOT_MATCH_BIRTH_DATE
-    )
+    override val breachedGuideline = ssnDoesNotMatchBirthDate
 
     override val validate = { data: QuoteData ->
         !LocalDate.parse(getPossibleDateFromSSN(data)).isEqual((data as PersonPolicyHolder<*>).birthDate)
@@ -52,10 +64,7 @@ object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuideline(
-        "Invalid SSN",
-        INVALID_SSN
-    )
+    override val breachedGuideline = invalidSsn
 
     override
     val skipAfter: Boolean
@@ -76,10 +85,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 }
 
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuideline(
-        "member is younger than 18",
-        UNDERAGE
-    )
+    override val breachedGuideline = underage
 
     override val skipAfter: Boolean
         get() = true
@@ -87,11 +93,8 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val validate = { data: QuoteData -> (data as PersonPolicyHolder<*>).age() < 18 }
 }
 
-class PersonalDebt(val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuideline(
-        ERROR_MESSAGE,
-        DEBT_CHECK
-    )
+class PersonalDebt(private val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
+    override val breachedGuideline = debtCheck
 
     override val skipAfter: Boolean
         get() = true
