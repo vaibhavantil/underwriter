@@ -60,4 +60,10 @@ object StartSignErrors {
             message,
             "EMPTY_REDIRECT_URL_FROM_BANK_ID"
         )
+
+    fun failedToStartSimpleSign(message: String) =
+        StartSignResponse.FailedToStartSign(
+            message,
+            "FAILED_TO_START_SIMPLE_SIGN"
+        )
 }

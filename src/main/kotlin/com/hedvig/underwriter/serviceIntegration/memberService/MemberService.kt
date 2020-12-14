@@ -55,7 +55,7 @@ interface MemberService {
 
     fun startSimpleSign(
         memberId: Long,
-        request: UnderwriterStartSignSessionRequest.SimpleSign
+        nationalIdentification: NationalIdentification
     ): UnderwriterStartSignSessionResponse.SimpleSign
 
     fun getMember(memberId: Long): InternalMember
