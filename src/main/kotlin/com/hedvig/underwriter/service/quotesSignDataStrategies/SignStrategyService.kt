@@ -20,11 +20,11 @@ class SignStrategyService(
         val strategy = quotes.getStrategiesFromQuotes()
 
         if (strategy.isEmpty()) {
-            return StartSignResponse.FailedToStartSign("", "")
+            throw RuntimeException("No strategy from quotes: $quotes")
         }
 
         if (strategy.size > 1) {
-            return StartSignResponse.FailedToStartSign("", "")
+            throw RuntimeException("More than one strategy from quotes: $quotes")
         }
 
         return strategy.first().startSign(quotes, signData)
