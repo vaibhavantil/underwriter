@@ -145,7 +145,7 @@ internal class GraphQlMutationsIntegrationTest {
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
-        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000003")
+        assert(createQuote["id"].textValue() == "f87654f0-3eed-11eb-a2f2-275abc72e5ce")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
         assert(createQuote["details"]["street"].textValue() == "Kungsgatan 1")
@@ -513,7 +513,7 @@ internal class GraphQlMutationsIntegrationTest {
 
         graphQLTestTemplate.addHeader("hedvig.token", "12345")
         val response = graphQLTestTemplate.perform("/mutations/editQuoteWithPhoneNumber.graphql", null)
-        val createQuote = response.readTree()["data"]["createQuote"]
+        val createQuote = response.readTree()["data"]["editQuote"]
 
         assert(response.isOk)
         assert(createQuote["phoneNumber"].textValue() == "0812331321")
