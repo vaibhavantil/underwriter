@@ -5,13 +5,13 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import com.hedvig.underwriter.service.quotesSignDataStrategies.StrategyHelper.createSignData
 import com.hedvig.underwriter.testhelp.databuilder.a
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.core.env.Environment
-
 
 class SignStrategyServiceTest {
 
@@ -237,12 +237,5 @@ class SignStrategyServiceTest {
         verify(exactly = 1) { redirectSignStrategy.startSign(any(), any()) }
     }
 
-    fun createSignData(
-        ipAddress: String? = null,
-        successUrl: String? = null,
-        failUrl: String? = null,
-        enableSimpleSign: Boolean = false
-    ) = SignData(
-        ipAddress, successUrl, failUrl, enableSimpleSign
-    )
 }
+
