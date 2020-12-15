@@ -10,6 +10,7 @@ import com.hedvig.underwriter.model.QuoteRepositoryImpl
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.SignSessionRepositoryImpl
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -35,6 +36,7 @@ class CompletedSignSessionTest {
     lateinit var quoteRepository: QuoteRepository
     lateinit var memberService: MemberService
     lateinit var sut: SignServiceImpl
+    lateinit var signStrategyService: SignStrategyService
 
     @Before
     fun setUp() {
@@ -46,12 +48,14 @@ class CompletedSignSessionTest {
         quoteService = mockk()
         productPricingService = mockk()
         memberService = mockk()
+        signStrategyService = mockk()
         sut = SignServiceImpl(
             quoteService,
             quoteRepository,
             memberService,
             productPricingService,
             signSessionRepository,
+            signStrategyService,
             mockk(),
             mockk()
         )

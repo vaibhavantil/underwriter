@@ -6,11 +6,9 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMemb
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartRedirectBankIdSignSessionRequest
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSwedishBankIdSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionRequest
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.Headers
@@ -60,23 +58,11 @@ interface MemberServiceClient {
         @RequestBody req: FinalizeOnBoardingRequest
     ): ResponseEntity<*>
 
-    @PostMapping("_/member/start/sign/swedish/bankid/{memberId}")
-    fun startSwedishBankIdSign(
+    @PostMapping("_/member/start/sign/{memberId}")
+    fun startSign(
         @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartSwedishBankIdSignSessionRequest
-    ): ResponseEntity<StartSwedishBankIdSignResponse>
-
-    @PostMapping("_/member/start/sign/norwegian/bankid/{memberId}")
-    fun startNorwegianSign(
-        @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
-    ): ResponseEntity<StartRedirectBankIdSignResponse>
-
-    @PostMapping("_/member/start/sign/danish/bankid/{memberId}")
-    fun startDanishSign(
-        @PathVariable("memberId") memberId: Long,
-        @RequestBody request: UnderwriterStartRedirectBankIdSignSessionRequest
-    ): ResponseEntity<StartRedirectBankIdSignResponse>
+        @RequestBody request: UnderwriterStartSignSessionRequest
+    ): ResponseEntity<UnderwriterStartSignSessionResponse>
 
     @GetMapping("/_/member/{memberId}")
     fun getMember(

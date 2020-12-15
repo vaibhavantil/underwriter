@@ -16,7 +16,8 @@ interface SignService {
         memberId: String,
         ipAddress: String?,
         successUrl: String?,
-        failUrl: String?
+        failUrl: String?,
+        enableSimpleSign: Boolean = false
     ): StartSignResponse
 
     fun completedSignSession(
