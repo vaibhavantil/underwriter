@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.filterOrOther
 import arrow.core.flatMap
 import arrow.core.toOption
@@ -13,7 +15,7 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.validTo
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -22,6 +24,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
+import com.hedvig.underwriter.web.dtos.BreachedGuideline
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
@@ -56,6 +59,7 @@ class QuoteServiceImpl(
                         "quote [Id: ${it.id}] must be quoted to update but was really ${it.state} [Quote: $it]"
                     )
                 })
+            .map { it.clearBreachedUnderwritingGuidelines() }
             .map { it.update(quoteRequest) }
             .flatMap { updatedQuote ->
                 underwriter
@@ -64,7 +68,7 @@ class QuoteServiceImpl(
                         ErrorResponseDto(
                             ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
                             "quote [Id: ${updatedQuote.id}] cannot be calculated, underwriting guidelines are breached [Quote: $updatedQuote]",
-                            e.second
+                            e.second.map { BreachedGuideline("Deprecated", it) }
                         )
                     }
             }.map { quoteRepository.update(it) }
@@ -173,12 +177,12 @@ class QuoteServiceImpl(
 
         val member = memberService.getMember(memberId.toLong())
 
-        val incompleteQuoteData = agreementData.toQuoteRequestData()
+        val quoteRequestData = agreementData.toQuoteRequestData()
 
         val quoteData = QuoteRequest.from(
             member = member,
             agreementData = agreementData,
-            incompleteQuoteData = incompleteQuoteData
+            incompleteQuoteData = quoteRequestData
         )
 
         val breachedGuidelinesOrQuote = createAndSaveQuote(
@@ -207,7 +211,7 @@ class QuoteServiceImpl(
         quoteId: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
+    ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
         val breachedGuidelinesOrQuote =
             underwriter.createQuote(
                 quoteData,
@@ -221,7 +225,7 @@ class QuoteServiceImpl(
         return breachedGuidelinesOrQuote
     }
 
-    private fun Either<Pair<Quote, List<BreachedGuideline>>, Quote>.getQuote(): Quote {
+    private fun Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote>.getQuote(): Quote {
         return when (this) {
             is Either.Left -> a.first
             is Either.Right -> b
@@ -229,29 +233,30 @@ class QuoteServiceImpl(
     }
 
     private fun transformCompleteQuoteReturn(
-        potentiallySavedQuote: Either<Pair<Quote, List<BreachedGuideline>>, Quote>,
+        potentiallySavedQuote: Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote>,
         quoteId: UUID
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto> {
-        return potentiallySavedQuote.bimap(
-            { breachedUnderwritingGuidelines ->
-                logger.info(
-                    "Underwriting guidelines breached for incomplete quote $quoteId: {}",
-                    breachedUnderwritingGuidelines
-                )
-                ErrorResponseDto(
-                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                    "quote cannot be calculated, underwriting guidelines are breached [Quote: ${breachedUnderwritingGuidelines.first}",
-                    breachedUnderwritingGuidelines.second
-                )
-            },
-            { completeQuote ->
+        val quote = potentiallySavedQuote.getQuote()
+
+        return if (!quote.breachedUnderwritingGuidelines.isNullOrEmpty()) {
+            logger.info(
+                "Underwriting guidelines breached for incomplete quote $quoteId: {}",
+                quote.breachedUnderwritingGuidelines
+            )
+            Left(ErrorResponseDto(
+                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                "quote cannot be calculated, underwriting guidelines are breached [Quote: $quote",
+                quote.breachedUnderwritingGuidelines.map { BreachedGuideline("Deprecated", it) }
+            ))
+        } else {
+            Right(
                 CompleteQuoteResponseDto(
-                    id = completeQuote.id,
-                    price = completeQuote.price!!,
-                    validTo = completeQuote.validTo
+                    id = quote.id,
+                    price = quote.price!!,
+                    validTo = quote.validTo
                 )
-            }
-        )
+            )
+        }
     }
 
     override fun calculateInsuranceCost(quote: Quote): InsuranceCost {
@@ -264,7 +269,10 @@ class QuoteServiceImpl(
         return quoteRepository.findQuotes(quoteIds)
     }
 
-    override fun addAgreementFromQuote(request: AddAgreementFromQuoteRequest, token: String?): Either<ErrorResponseDto, Quote> {
+    override fun addAgreementFromQuote(
+        request: AddAgreementFromQuoteRequest,
+        token: String?
+    ): Either<ErrorResponseDto, Quote> {
         val quote = getQuote(request.quoteId)
             ?: throw QuoteNotFoundException("Quote ${request.quoteId} not found when trying to add agreement")
 

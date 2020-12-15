@@ -4,7 +4,6 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
-import com.hedvig.underwriter.model.ExtraBuilding
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
@@ -15,10 +14,8 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
-import com.hedvig.underwriter.service.guidelines.PersonalDebt
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
@@ -41,7 +38,7 @@ class UnderwriterImpl(
         id: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
+    ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
         val now = Instant.now()
 
         val quote = Quote(
@@ -51,111 +48,7 @@ class UnderwriterImpl(
             initiatedFrom = initiatedFrom,
             attributedTo = quoteRequest.quotingPartner
                 ?: Partner.HEDVIG,
-            data = when (val quoteData = quoteRequest.incompleteQuoteData) {
-                is QuoteRequestData.SwedishApartment ->
-                    SwedishApartmentData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate,
-                        firstName = quoteRequest.firstName,
-                        lastName = quoteRequest.lastName,
-                        email = quoteRequest.email,
-                        subType = quoteData.subType,
-                        street = quoteData.street,
-                        zipCode = quoteData.zipCode,
-                        city = quoteData.city,
-                        householdSize = quoteData.householdSize,
-                        livingSpace = quoteData.livingSpace
-                    )
-                is QuoteRequestData.SwedishHouse ->
-                    SwedishHouseData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate,
-                        firstName = quoteRequest.firstName,
-                        lastName = quoteRequest.lastName,
-                        email = quoteRequest.email,
-                        street = quoteData.street,
-                        zipCode = quoteData.zipCode,
-                        city = quoteData.city,
-                        householdSize = quoteData.householdSize,
-                        livingSpace = quoteData.livingSpace,
-                        numberOfBathrooms = quoteData.numberOfBathrooms,
-                        isSubleted = quoteData.isSubleted,
-                        extraBuildings = quoteData.extraBuildings?.map((ExtraBuilding)::from),
-                        ancillaryArea = quoteData.ancillaryArea,
-                        yearOfConstruction = quoteData.yearOfConstruction
-                    )
-                is QuoteRequestData.NorwegianHomeContents ->
-                    NorwegianHomeContentsData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate!!,
-                        firstName = quoteRequest.firstName!!,
-                        lastName = quoteRequest.lastName!!,
-                        email = quoteRequest.email,
-                        type = quoteData.subType!!,
-                        street = quoteData.street!!,
-                        zipCode = quoteData.zipCode!!,
-                        city = quoteData.city,
-                        isYouth = quoteData.isYouth!!,
-                        coInsured = quoteData.coInsured!!,
-                        livingSpace = quoteData.livingSpace!!
-                    )
-                is QuoteRequestData.NorwegianTravel ->
-                    NorwegianTravelData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate!!,
-                        firstName = quoteRequest.firstName!!,
-                        lastName = quoteRequest.lastName!!,
-                        email = quoteRequest.email,
-                        coInsured = quoteData.coInsured!!,
-                        isYouth = quoteData.isYouth!!
-                    )
-                is QuoteRequestData.DanishHomeContents ->
-                    DanishHomeContentsData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate!!,
-                        firstName = quoteRequest.firstName!!,
-                        lastName = quoteRequest.lastName!!,
-                        email = quoteRequest.email,
-                        street = quoteData.street!!,
-                        zipCode = quoteData.zipCode!!,
-                        coInsured = quoteData.coInsured!!,
-                        livingSpace = quoteData.livingSpace!!,
-                        isStudent = quoteData.isStudent!!,
-                        type = quoteData.subType!!
-                    )
-                is QuoteRequestData.DanishAccident ->
-                    DanishAccidentData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate!!,
-                        firstName = quoteRequest.firstName!!,
-                        lastName = quoteRequest.lastName!!,
-                        email = quoteRequest.email,
-                        street = quoteData.street!!,
-                        zipCode = quoteData.zipCode!!,
-                        coInsured = quoteData.coInsured!!,
-                        isStudent = quoteData.isStudent!!
-                    )
-                is QuoteRequestData.DanishTravel ->
-                    DanishTravelData(
-                        id = UUID.randomUUID(),
-                        ssn = quoteRequest.ssn,
-                        birthDate = quoteRequest.birthDate!!,
-                        firstName = quoteRequest.firstName!!,
-                        lastName = quoteRequest.lastName!!,
-                        email = quoteRequest.email,
-                        street = quoteData.street!!,
-                        zipCode = quoteData.zipCode!!,
-                        coInsured = quoteData.coInsured!!,
-                        isStudent = quoteData.isStudent!!
-                    )
-                null -> throw IllegalArgumentException("Must provide either house or apartment data")
-            },
+            data = createQuoteData(quoteRequest),
             state = QuoteState.INCOMPLETE,
             memberId = quoteRequest.memberId,
             breachedUnderwritingGuidelines = null,
@@ -169,11 +62,15 @@ class UnderwriterImpl(
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
 
+    private fun createQuoteData(quoteRequest: QuoteRequest): QuoteData =
+        quoteRequest.incompleteQuoteData?.createQuoteData(quoteRequest)
+            ?: throw IllegalArgumentException("Must provide either house or apartment data")
+
     override fun validateAndCompleteQuote(
         quote: Quote,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
-        val breachedUnderwritingGuidelines = mutableListOf<BreachedGuideline>()
+    ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
+        val breachedUnderwritingGuidelines = mutableListOf<BreachedGuidelineCode>()
         if (underwritingGuidelinesBypassedBy == null) {
             breachedUnderwritingGuidelines.addAll(
                 validateGuidelines(quote)
@@ -182,32 +79,11 @@ class UnderwriterImpl(
         return if (breachedUnderwritingGuidelines.isEmpty()) {
             Either.right(complete(quote))
         } else {
-            logBreachedUnderwritingGuidelines(quote, breachedUnderwritingGuidelines)
             Either.left(
                 quote.copy(
-                    breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it.code }
+                    breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it }
                 ) to breachedUnderwritingGuidelines
             )
-        }
-    }
-
-    private fun logBreachedUnderwritingGuidelines(
-        quote: Quote,
-        breachedUnderwritingGuidelines: List<BreachedGuideline>
-    ) {
-        when (quote.initiatedFrom) {
-            QuoteInitiatedFrom.WEBONBOARDING,
-            QuoteInitiatedFrom.APP,
-            QuoteInitiatedFrom.IOS,
-            QuoteInitiatedFrom.ANDROID -> {
-                if (breachedUnderwritingGuidelines != listOf(PersonalDebt.ERROR_MESSAGE)) {
-                    logger.error("Breached underwriting guidelines from a controlled flow. Quote: $quote Breached underwriting guidelines: $breachedUnderwritingGuidelines")
-                }
-            }
-            QuoteInitiatedFrom.HOPE,
-            QuoteInitiatedFrom.RAPIO -> {
-                // no-op
-            }
         }
     }
 
@@ -248,13 +124,13 @@ class UnderwriterImpl(
         }
     }
 
-    fun validateGuidelines(data: Quote): List<BreachedGuideline> {
-        val errors = mutableListOf<BreachedGuideline>()
+    fun validateGuidelines(data: Quote): List<BreachedGuidelineCode> {
+        val errors = mutableListOf<BreachedGuidelineCode>()
 
         val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
         errors.forEach {
-            metrics.increment(data.market, it.code)
+            metrics.increment(data.market, it)
         }
         return errors
     }
@@ -262,8 +138,8 @@ class UnderwriterImpl(
     fun <T : QuoteData> runRules(
         data: T,
         listOfRules: Set<BaseGuideline<T>>
-    ): MutableList<BreachedGuideline> {
-        val guidelineErrors = mutableListOf<BreachedGuideline>()
+    ): MutableList<BreachedGuidelineCode> {
+        val guidelineErrors = mutableListOf<BreachedGuidelineCode>()
 
         listOfRules.forEach {
             val error = it.invokeValidate(data)

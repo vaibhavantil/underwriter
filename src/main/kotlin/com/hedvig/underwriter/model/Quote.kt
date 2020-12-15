@@ -478,6 +478,8 @@ data class Quote(
         }
     }
 
+    fun clearBreachedUnderwritingGuidelines(): Quote = this.copy(breachedUnderwritingGuidelines = listOf())
+
     fun recoverBirthDateFromSSN() = when {
         this.swedishApartment != null || this.swedishHouse != null -> this.ssn.birthDateFromSwedishSsn()
         this.norwegianHomeContents != null || this.norwegianTravel != null -> this.ssn.birthDateFromNorwegianSsn()

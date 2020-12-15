@@ -511,6 +511,6 @@ class UnderwriterImplTest {
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
         assertThat(result.a.second).hasSize(1)
-        verify(exactly = 1) { metrics.increment(Market.NORWAY, NorwegianSsnNotMatchesBirthDate.breachedGuideline.code) }
+        verify(exactly = 1) { metrics.increment(Market.NORWAY, NorwegianSsnNotMatchesBirthDate.breachedGuideline) }
     }
 }

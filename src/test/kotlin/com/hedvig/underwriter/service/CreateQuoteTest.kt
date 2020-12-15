@@ -6,7 +6,7 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
@@ -57,8 +57,8 @@ class CreateQuoteTest {
 
         every { strategyService.getAllGuidelines(any()) } returns setOf(
             object : BaseGuideline<QuoteData> {
-                override val breachedGuideline: BreachedGuideline
-                    get() = BreachedGuideline("This guideline will always fail", "errorcode")
+                override val breachedGuideline: BreachedGuidelineCode
+                    get() = "errorcode"
                 override val validate: (QuoteData) -> Boolean
                     get() = { true }
             }
