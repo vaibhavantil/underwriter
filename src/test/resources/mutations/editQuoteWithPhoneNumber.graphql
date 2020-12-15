@@ -1,0 +1,24 @@
+mutation create {
+    editQuote(input: {
+        id: "a64d8f3a-3edf-11eb-a021-6f36afe75b8f"
+        firstName: "first"
+        lastName: "family"
+        ssn: "191212121212"
+        phoneNumber: "0812331321"
+        house: {
+            street: "Kungsgatan 1"
+            livingSpace: 30
+            zipCode: "12345"
+            householdSize: 2
+            ancillarySpace: 100
+            isSubleted: false
+            numberOfBathrooms: 1
+            yearOfConstruction: 1925
+            extraBuildings: []
+        }}) {
+        ... on CompleteQuote {
+            id
+            phoneNumber
+        }
+    }
+}

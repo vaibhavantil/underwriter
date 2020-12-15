@@ -116,7 +116,7 @@ interface QuoteDao {
             INSERT INTO quote_revision_apartment_data
             (id, ssn, birth_date, first_name, last_name, email, phone_number, street, city, zip_code, household_size, living_space, sub_type)
             VALUES
-            (:id, :ssn, :birthDate, :firstName, :lastName, :email, :phone_number, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
+            (:id, :ssn, :birthDate, :firstName, :lastName, :email, :phoneNumber, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
             RETURNING *
         """
     )

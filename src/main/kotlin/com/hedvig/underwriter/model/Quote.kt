@@ -275,6 +275,7 @@ data class Quote(
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber,
                     subType = when (val quoteData = quoteRequest.incompleteQuoteData) {
                         is SwedishApartment? -> quoteData?.subType ?: data.subType
                         else -> null
@@ -285,42 +286,48 @@ data class Quote(
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is NorwegianHomeContentsData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is NorwegianTravelData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is DanishHomeContentsData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is DanishAccidentData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is DanishTravelData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,
                     birthDate = quoteRequest.birthDate ?: data.birthDate,
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
-                    email = quoteRequest.email ?: data.email
+                    email = quoteRequest.email ?: data.email,
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
             }
         )
@@ -343,7 +350,8 @@ data class Quote(
                             zipCode = data.zipCode,
                             city = data.city,
                             householdSize = data.householdSize,
-                            livingSpace = data.livingSpace
+                            livingSpace = data.livingSpace,
+                            phoneNumber = data.phoneNumber
                         )
                     }
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
@@ -374,7 +382,8 @@ data class Quote(
                             zipCode = data.zipCode,
                             city = data.city,
                             householdSize = data.householdSize,
-                            livingSpace = data.livingSpace
+                            livingSpace = data.livingSpace,
+                            phoneNumber = data.phoneNumber
                         )
                     }
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
