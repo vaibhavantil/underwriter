@@ -31,17 +31,21 @@ class SignStrategyService(
             return StartSignErrors.quotesCanNotBeBundled
         }
 
-        when {
+        val bundleErrorOrNull = when {
             quotes.areSwedishQuotes() -> {
                 if (quotes.size > 1) {
                     SwedishBankIdSignStrategy.logger.error("Can not start signing swedish quotes [Quotes: $quotes]")
-                    return StartSignErrors.quotesCanNotBeBundled
+                    StartSignErrors.quotesCanNotBeBundled
+                } else {
+                    null
                 }
             }
             quotes.areNorwegianQuotes() -> {
                 if (quotes.size > 1 && !quotes.areTwoValidNorwegianQuotes()) {
                     RedirectSignStrategy.logger.error("Norwegian quotes is not valid [Quotes: $quotes]")
-                    return StartSignErrors.quotesCanNotBeBundled
+                    StartSignErrors.quotesCanNotBeBundled
+                } else {
+                    null
                 }
             }
             quotes.areDanishQuotes() -> {
@@ -49,17 +53,27 @@ class SignStrategyService(
                     quotes.size == 1 -> {
                         if (quotes[0].data !is DanishHomeContentsData) {
                             RedirectSignStrategy.logger.error("Single danish quote can not be signed alone [Quotes: $quotes]")
-                            return StartSignErrors.singleQuoteCanNotBeSignedAlone
+                            StartSignErrors.singleQuoteCanNotBeSignedAlone
+                        } else {
+                            null
                         }
                     }
                     quotes.size > 1 -> {
                         if (!quotes.isValidDanishQuoteBundle()) {
                             RedirectSignStrategy.logger.error("Danish quotes is not valid [Quotes: $quotes]")
-                            return StartSignErrors.quotesCanNotBeBundled
+                            StartSignErrors.quotesCanNotBeBundled
+                        } else {
+                            null
                         }
                     }
+                    else -> null
                 }
             }
+            else -> StartSignErrors.quotesCanNotBeBundled
+        }
+
+        if (bundleErrorOrNull != null) {
+            return bundleErrorOrNull
         }
 
         return strategy.first().startSign(quotes, signData)
@@ -81,14 +95,16 @@ class SignStrategyService(
         }
     }.toSet()
 
-    private fun List<Quote>.areSwedishQuotes() = this.all { it.data is SwedishApartmentData || it.data is SwedishHouseData }
+    private fun List<Quote>.areSwedishQuotes() =
+        this.all { it.data is SwedishApartmentData || it.data is SwedishHouseData }
 
     private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
         this.size == 2 &&
             this.any { it.data is NorwegianHomeContentsData } &&
             this.any { it.data is NorwegianTravelData }
 
-    private fun List<Quote>.isValidDanishQuoteBundle(): Boolean = this.areTwoValidDanishQuotes() || this.areThreeValidDanishQuotes()
+    private fun List<Quote>.isValidDanishQuoteBundle(): Boolean =
+        this.areTwoValidDanishQuotes() || this.areThreeValidDanishQuotes()
 
     private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
         this.size == 2 &&
