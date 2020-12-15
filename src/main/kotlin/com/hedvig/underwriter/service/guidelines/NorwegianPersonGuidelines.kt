@@ -15,18 +15,8 @@ object NorwegianPersonGuidelines {
     )
 }
 
-private val ssnDoesNotMatchBirthDate = BreachedGuideline(
-    "breaches underwriting guidelines ssn does not match birth date",
-    SSN_DOES_NOT_MATCH_BIRTH_DATE
-)
-
-private val invalidSsn = BreachedGuideline(
-    "breaches underwriting guidelines ssn is not valid",
-    INVALID_SSN
-)
-
 object NorwegianSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = ssnDoesNotMatchBirthDate
+    override val breachedGuideline = SSN_DOES_NOT_MATCH_BIRTH_DATE
 
     override val validate =
         { data: QuoteData ->
@@ -41,7 +31,7 @@ object NorwegianSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
 }
 
 object NorwegianSSnIsValid : BaseGuideline<QuoteData> {
-    override val breachedGuideline = invalidSsn
+    override val breachedGuideline = INVALID_SSN
 
     override val validate = { data: QuoteData ->
         (data as PersonPolicyHolder<*>).ssn?.let { !it.isValidNorwegianSsn() } ?: false

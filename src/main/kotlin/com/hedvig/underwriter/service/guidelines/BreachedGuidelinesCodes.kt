@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.service.guidelines
 
+typealias BreachedGuidelineCode = String
+
 object BreachedGuidelinesCodes {
     const val INVALID_SSN = "INVALID_SSN"
     const val INVALID_SSN_LENGTH = "INVALID_SSN_LENGTH"

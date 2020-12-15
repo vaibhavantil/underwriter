@@ -14,7 +14,7 @@ import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
@@ -39,7 +39,7 @@ class UnderwriterImpl(
         id: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
+    ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
         val now = Instant.now()
 
         val quote = Quote(
@@ -70,8 +70,8 @@ class UnderwriterImpl(
     override fun validateAndCompleteQuote(
         quote: Quote,
         underwritingGuidelinesBypassedBy: String?
-    ): Either<Pair<Quote, List<BreachedGuideline>>, Quote> {
-        val breachedUnderwritingGuidelines = mutableListOf<BreachedGuideline>()
+    ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
+        val breachedUnderwritingGuidelines = mutableListOf<BreachedGuidelineCode>()
         if (underwritingGuidelinesBypassedBy == null) {
             breachedUnderwritingGuidelines.addAll(
                 validateGuidelines(quote)
@@ -83,7 +83,7 @@ class UnderwriterImpl(
             logBreachedUnderwritingGuidelines(quote, breachedUnderwritingGuidelines)
             Either.left(
                 quote.copy(
-                    breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it.code }
+                    breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it }
                 ) to breachedUnderwritingGuidelines
             )
         }
@@ -91,7 +91,7 @@ class UnderwriterImpl(
 
     private fun logBreachedUnderwritingGuidelines(
         quote: Quote,
-        breachedUnderwritingGuidelines: List<BreachedGuideline>
+        breachedUnderwritingGuidelines: List<BreachedGuidelineCode>
     ) {
         when (quote.initiatedFrom) {
             QuoteInitiatedFrom.WEBONBOARDING,
@@ -146,13 +146,13 @@ class UnderwriterImpl(
         }
     }
 
-    fun validateGuidelines(data: Quote): List<BreachedGuideline> {
-        val errors = mutableListOf<BreachedGuideline>()
+    fun validateGuidelines(data: Quote): List<BreachedGuidelineCode> {
+        val errors = mutableListOf<BreachedGuidelineCode>()
 
         val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
         errors.forEach {
-            metrics.increment(data.market, it.code)
+            metrics.increment(data.market, it)
         }
         return errors
     }
@@ -160,8 +160,8 @@ class UnderwriterImpl(
     fun <T : QuoteData> runRules(
         data: T,
         listOfRules: Set<BaseGuideline<T>>
-    ): MutableList<BreachedGuideline> {
-        val guidelineErrors = mutableListOf<BreachedGuideline>()
+    ): MutableList<BreachedGuidelineCode> {
+        val guidelineErrors = mutableListOf<BreachedGuidelineCode>()
 
         listOfRules.forEach {
             val error = it.invokeValidate(data)

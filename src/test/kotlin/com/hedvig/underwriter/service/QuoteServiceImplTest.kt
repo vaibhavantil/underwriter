@@ -9,9 +9,7 @@ import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.DEBT_CHECK
-import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -121,7 +119,7 @@ class QuoteServiceImplTest {
             underwriter.createQuote(any(), any(), any(), any())
         } returns Either.left(
             a.QuoteBuilder(breachedUnderwritingGuidelines = listOf(DEBT_CHECK)).build() to
-                listOf(BreachedGuideline(PersonalDebt.ERROR_MESSAGE, DEBT_CHECK))
+                listOf(DEBT_CHECK)
         )
 
         val captureList = mutableListOf<Quote>()
@@ -131,7 +129,13 @@ class QuoteServiceImplTest {
 
         val quoteRequestWithRandomUWGLBreach = a.SwedishApartmentQuoteRequestBuilder().build()
 
-        val result = cut.createQuote(quoteRequestWithRandomUWGLBreach, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null, false)
+        val result = cut.createQuote(
+            quoteRequestWithRandomUWGLBreach,
+            UUID.randomUUID(),
+            QuoteInitiatedFrom.WEBONBOARDING,
+            null,
+            false
+        )
 
         require(result is Either.Left)
         assertThat(captureList[0].breachedUnderwritingGuidelines).isEqualTo(listOf(DEBT_CHECK))

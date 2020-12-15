@@ -1,7 +1,13 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue
-import com.hedvig.underwriter.service.guidelines.BreachedGuideline
+
+data class BreachedGuideline(
+    val message: String,
+    val code: String
+) {
+    override fun toString() = "[code: $code, message: $message]"
+}
 
 data class ErrorResponseDto(
     override val errorCode: ErrorCodes = ErrorCodes.UNKNOWN_ERROR_CODE,

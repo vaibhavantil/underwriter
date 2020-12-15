@@ -17,29 +17,8 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
     )
 }
 
-private val invalidSsnLength = BreachedGuideline(
-    "SSN Invalid length",
-    INVALID_SSN_LENGTH
-)
-private val ssnDoesNotMatchBirthDate = BreachedGuideline(
-    "Birth date does not match SSN",
-    SSN_DOES_NOT_MATCH_BIRTH_DATE
-)
-private val invalidSsn = BreachedGuideline(
-    "Invalid SSN",
-    BreachedGuidelinesCodes.INVALID_SSN
-)
-private val underage = BreachedGuideline(
-    "member is younger than 18",
-    BreachedGuidelinesCodes.UNDERAGE
-)
-private val debtCheck = BreachedGuideline(
-    PersonalDebt.ERROR_MESSAGE,
-    BreachedGuidelinesCodes.DEBT_CHECK
-)
-
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
-    override val breachedGuideline = invalidSsnLength
+    override val breachedGuideline = INVALID_SSN_LENGTH
 
     override val skipAfter: Boolean
         get() = true
@@ -56,7 +35,7 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = ssnDoesNotMatchBirthDate
+    override val breachedGuideline = SSN_DOES_NOT_MATCH_BIRTH_DATE
 
     override val validate = { data: QuoteData ->
         !LocalDate.parse(getPossibleDateFromSSN(data)).isEqual((data as PersonPolicyHolder<*>).birthDate)
@@ -64,7 +43,7 @@ object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
 }
 
 object SocialSecurityDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = invalidSsn
+    override val breachedGuideline = BreachedGuidelinesCodes.INVALID_SSN
 
     override
     val skipAfter: Boolean
@@ -85,7 +64,7 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
 }
 
 object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
-    override val breachedGuideline = underage
+    override val breachedGuideline = BreachedGuidelinesCodes.UNDERAGE
 
     override val skipAfter: Boolean
         get() = true
@@ -94,7 +73,7 @@ object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
 }
 
 class PersonalDebt(private val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val breachedGuideline = debtCheck
+    override val breachedGuideline = BreachedGuidelinesCodes.DEBT_CHECK
 
     override val skipAfter: Boolean
         get() = true
