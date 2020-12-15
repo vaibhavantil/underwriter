@@ -31,21 +31,17 @@ class SignStrategyService(
             return StartSignErrors.quotesCanNotBeBundled
         }
 
-        val bundleErrorOrNull = when {
+        when {
             quotes.areSwedishQuotes() -> {
                 if (quotes.size > 1) {
                     SwedishBankIdSignStrategy.logger.error("Can not start signing swedish quotes [Quotes: $quotes]")
-                    StartSignErrors.quotesCanNotBeBundled
-                } else {
-                    null
+                    return StartSignErrors.quotesCanNotBeBundled
                 }
             }
             quotes.areNorwegianQuotes() -> {
                 if (quotes.size > 1 && !quotes.areTwoValidNorwegianQuotes()) {
                     RedirectSignStrategy.logger.error("Norwegian quotes is not valid [Quotes: $quotes]")
-                    StartSignErrors.quotesCanNotBeBundled
-                } else {
-                    null
+                    return StartSignErrors.quotesCanNotBeBundled
                 }
             }
             quotes.areDanishQuotes() -> {
@@ -53,27 +49,21 @@ class SignStrategyService(
                     quotes.size == 1 -> {
                         if (quotes[0].data !is DanishHomeContentsData) {
                             RedirectSignStrategy.logger.error("Single danish quote can not be signed alone [Quotes: $quotes]")
-                            StartSignErrors.singleQuoteCanNotBeSignedAlone
-                        } else {
-                            null
+                            return StartSignErrors.singleQuoteCanNotBeSignedAlone
                         }
                     }
                     quotes.size > 1 -> {
                         if (!quotes.isValidDanishQuoteBundle()) {
                             RedirectSignStrategy.logger.error("Danish quotes is not valid [Quotes: $quotes]")
-                            StartSignErrors.quotesCanNotBeBundled
-                        } else {
-                            null
+                            return StartSignErrors.quotesCanNotBeBundled
                         }
                     }
-                    else -> null
                 }
             }
-            else -> StartSignErrors.quotesCanNotBeBundled
-        }
-
-        if (bundleErrorOrNull != null) {
-            return bundleErrorOrNull
+            else -> {
+                RedirectSignStrategy.logger.error("Quotes are not apart of the same market [Quotes: $quotes]")
+                return StartSignErrors.quotesCanNotBeBundled
+            }
         }
 
         return strategy.first().startSign(quotes, signData)
