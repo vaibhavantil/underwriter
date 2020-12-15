@@ -59,6 +59,7 @@ class QuoteServiceImpl(
                         "quote [Id: ${it.id}] must be quoted to update but was really ${it.state} [Quote: $it]"
                     )
                 })
+            .map { it.clearBreachedUnderwritingGuidelines() }
             .map { it.update(quoteRequest) }
             .flatMap { updatedQuote ->
                 underwriter
