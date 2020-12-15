@@ -15,7 +15,6 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
-import com.hedvig.underwriter.service.guidelines.PersonalDebt
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
@@ -80,32 +79,11 @@ class UnderwriterImpl(
         return if (breachedUnderwritingGuidelines.isEmpty()) {
             Either.right(complete(quote))
         } else {
-            logBreachedUnderwritingGuidelines(quote, breachedUnderwritingGuidelines)
             Either.left(
                 quote.copy(
                     breachedUnderwritingGuidelines = breachedUnderwritingGuidelines.map { it }
                 ) to breachedUnderwritingGuidelines
             )
-        }
-    }
-
-    private fun logBreachedUnderwritingGuidelines(
-        quote: Quote,
-        breachedUnderwritingGuidelines: List<BreachedGuidelineCode>
-    ) {
-        when (quote.initiatedFrom) {
-            QuoteInitiatedFrom.WEBONBOARDING,
-            QuoteInitiatedFrom.APP,
-            QuoteInitiatedFrom.IOS,
-            QuoteInitiatedFrom.ANDROID -> {
-                if (breachedUnderwritingGuidelines != listOf(PersonalDebt.ERROR_MESSAGE)) {
-                    logger.error("Breached underwriting guidelines from a controlled flow. Quote: $quote Breached underwriting guidelines: $breachedUnderwritingGuidelines")
-                }
-            }
-            QuoteInitiatedFrom.HOPE,
-            QuoteInitiatedFrom.RAPIO -> {
-                // no-op
-            }
         }
     }
 
