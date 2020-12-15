@@ -67,7 +67,8 @@ data class EditQuoteInput(
         memberId = memberId,
         originatingProductId = originatingProductId,
         startDate = this.startDate?.atStartOfDay()?.toStockholmInstant(),
-        dataCollectionId = this.dataCollectionId
+        dataCollectionId = this.dataCollectionId,
+        phoneNumber = null
     )
 
     fun getProductType(): ProductType? =

@@ -114,9 +114,9 @@ interface QuoteDao {
     @SqlUpdate(
         """
             INSERT INTO quote_revision_apartment_data
-            (id, ssn, birth_date, first_name, last_name, email, street, city, zip_code, household_size, living_space, sub_type)
+            (id, ssn, birth_date, first_name, last_name, email, phone_number, street, city, zip_code, household_size, living_space, sub_type)
             VALUES
-            (:id, :ssn, :birthDate, :firstName, :lastName, :email, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
+            (:id, :ssn, :birthDate, :firstName, :lastName, :email, :phone_number, :street, :city, :zipCode, :householdSize, :livingSpace, :subType)
             RETURNING *
         """
     )
@@ -175,6 +175,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 street,
                 city,
                 zip_code,
@@ -195,6 +196,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :street,
                 :city,
                 :zipCode,
@@ -230,6 +232,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 street,
                 city,
                 zip_code,
@@ -246,6 +249,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :street,
                 :city,
                 :zipCode,
@@ -277,6 +281,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 co_insured,
                 is_youth
             )
@@ -288,6 +293,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :coInsured,
                 :isYouth
             )
@@ -314,6 +320,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 street,
                 zip_code,
                 living_space,
@@ -329,6 +336,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :street,
                 :zipCode,
                 :livingSpace,
@@ -359,6 +367,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 street,
                 zip_code,
                 co_insured,                
@@ -372,6 +381,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :street,
                 :zipCode,
                 :coInsured,
@@ -400,6 +410,7 @@ interface QuoteDao {
                 first_name,
                 last_name,
                 email,
+                phone_number,
                 street,
                 zip_code,
                 co_insured,                
@@ -413,6 +424,7 @@ interface QuoteDao {
                 :firstName,
                 :lastName,
                 :email,
+                :phoneNumber,
                 :street,
                 :zipCode,
                 :coInsured,

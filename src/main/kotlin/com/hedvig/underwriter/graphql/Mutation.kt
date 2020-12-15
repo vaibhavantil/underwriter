@@ -12,10 +12,10 @@ import com.hedvig.resolver.LocaleResolver
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteResult
 import com.hedvig.underwriter.graphql.type.EditQuoteInput
+import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.graphql.type.RemoveCurrentInsurerInput
 import com.hedvig.underwriter.graphql.type.RemoveStartDateInput
 import com.hedvig.underwriter.graphql.type.SignQuotesInput
-import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.graphql.type.UnderwritingLimit
 import com.hedvig.underwriter.graphql.type.UnderwritingLimitsHit
 import com.hedvig.underwriter.model.Quote
@@ -25,9 +25,9 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
-import java.time.LocalDate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.time.LocalDate
 
 @Component
 class Mutation @Autowired constructor(
@@ -51,7 +51,7 @@ class Mutation @Autowired constructor(
         }
 
         val completeQuote = quoteService.createQuote(
-            incompleteQuoteData = input.toQuoteRequest(memberId = env.getTokenOrNull()),
+            quoteRequest = input.toQuoteRequest(memberId = env.getTokenOrNull()),
             id = input.id,
             initiatedFrom = when {
                 env.isAndroid() -> QuoteInitiatedFrom.ANDROID

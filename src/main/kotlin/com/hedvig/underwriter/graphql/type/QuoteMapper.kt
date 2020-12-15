@@ -25,6 +25,7 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.norwegianHomeContents
 import com.hedvig.underwriter.model.norwegianTravel
+import com.hedvig.underwriter.model.phoneNumber
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.model.swedishApartment
 import com.hedvig.underwriter.model.swedishHouse
@@ -124,6 +125,7 @@ class QuoteMapper(
             firstName = quote.firstName,
             lastName = quote.lastName,
             email = quote.email,
+            phoneNumber = quote.phoneNumber,
             currentInsurer = quote.currentInsurer?.let { CurrentInsurer.create(it) },
             ssn = quote.ssnMaybe,
             birthDate = quote.birthDate,
@@ -382,8 +384,10 @@ class QuoteMapper(
                 isStudent = it.isStudent
             )
         }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
-            " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data")
+        ?: throw IllegalStateException(
+            "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
+                " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
+        )
 
     private fun mapCompleteQuoteResult(
         quote: Quote,
@@ -422,8 +426,10 @@ class QuoteMapper(
         } ?: quote.danishTravel?.let {
             CompleteQuoteDetails.UnknownQuoteDetails()
         }
-        ?: throw IllegalStateException("Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
-            " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data")
+        ?: throw IllegalStateException(
+            "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
+                " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
+        )
 
     private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
         localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale)

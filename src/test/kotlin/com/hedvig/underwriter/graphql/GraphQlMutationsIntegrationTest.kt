@@ -294,6 +294,7 @@ internal class GraphQlMutationsIntegrationTest {
             firstName = "",
             lastName = "",
             email = null,
+            phoneNumber = null,
             currentInsurer = null,
             ssn = "21126114165",
             birthDate = "21126114165".birthDateFromNorwegianSsn(),
@@ -417,6 +418,7 @@ internal class GraphQlMutationsIntegrationTest {
             firstName = "",
             lastName = "",
             email = null,
+            phoneNumber = null,
             currentInsurer = null,
             ssn = "1212121212",
             birthDate = null,
@@ -453,5 +455,29 @@ internal class GraphQlMutationsIntegrationTest {
 
         assert(response.isOk)
         assert(createQuote["limits"][0]["description"].textValue() != null)
+    }
+
+    @Test
+    fun createQuoteWithPhoneNumber() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                any(),
+                any()
+            )
+        } returns InsuranceCost(
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            null
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "12345")
+        val response = graphQLTestTemplate.perform("/mutations/createQuoteWithPhoneNumber.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["phoneNumber"].textValue() == "0812331321")
     }
 }

@@ -19,7 +19,7 @@ interface QuoteService {
     fun getLatestQuoteForMemberId(memberId: String): Quote?
     fun getQuotesForMemberId(memberId: String): List<QuoteDto>
     fun createQuote(
-        incompleteQuoteData: QuoteRequest,
+        quoteRequest: QuoteRequest,
         id: UUID? = null,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?,

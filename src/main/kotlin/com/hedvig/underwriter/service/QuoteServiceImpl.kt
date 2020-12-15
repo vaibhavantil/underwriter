@@ -105,7 +105,7 @@ class QuoteServiceImpl(
             .map((QuoteDto)::fromQuote)
 
     override fun createQuote(
-        incompleteQuoteData: QuoteRequest,
+        quoteRequest: QuoteRequest,
         id: UUID?,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?,
@@ -114,7 +114,7 @@ class QuoteServiceImpl(
         val quoteId = id ?: UUID.randomUUID()
 
         val breachedGuidelinesOrQuote = createAndSaveQuote(
-            quoteData = incompleteQuoteData,
+            quoteRequest = quoteRequest,
             quoteId = quoteId,
             initiatedFrom = initiatedFrom,
             underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
@@ -145,7 +145,7 @@ class QuoteServiceImpl(
         val updatedQuoteRequest = updateQuoteRequestWithMember(quoteRequest)
 
         val breachedGuidelinesOrQuote = createAndSaveQuote(
-            quoteData = updatedQuoteRequest,
+            quoteRequest = updatedQuoteRequest,
             quoteId = quoteId,
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
@@ -207,14 +207,14 @@ class QuoteServiceImpl(
     }
 
     private fun createAndSaveQuote(
-        quoteData: QuoteRequest,
+        quoteRequest: QuoteRequest,
         quoteId: UUID,
         initiatedFrom: QuoteInitiatedFrom,
         underwritingGuidelinesBypassedBy: String?
     ): Either<Pair<Quote, List<BreachedGuidelineCode>>, Quote> {
         val breachedGuidelinesOrQuote =
             underwriter.createQuote(
-                quoteData,
+                quoteRequest,
                 quoteId,
                 initiatedFrom,
                 underwritingGuidelinesBypassedBy

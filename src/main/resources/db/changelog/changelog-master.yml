@@ -62,3 +62,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20201117-1030-add-danish-accident-and-travel-table.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20201215-1418-add-phonenumber-to-quote.sql
+      relativeToChangelogFile: true

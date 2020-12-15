@@ -22,6 +22,7 @@ sealed class QuoteResult {
         val startDate: LocalDate?,
         val expiresAt: LocalDate,
         val email: String?,
+        val phoneNumber: String?,
         val dataCollectionId: UUID?
     ) : QuoteResult(), CreateQuoteResult {
         val typeOfContract: ContractAgreementType

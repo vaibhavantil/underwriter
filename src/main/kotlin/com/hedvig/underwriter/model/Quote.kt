@@ -43,6 +43,9 @@ val Quote.birthDate
 val Quote.email
     get() = (data as? PersonPolicyHolder<*>)?.email
 
+val Quote.phoneNumber
+    get() = (data as? PersonPolicyHolder<*>)?.phoneNumber
+
 val Quote.swedishApartment
     get() = (data as? SwedishApartmentData)
 
@@ -394,7 +397,7 @@ data class Quote(
             }
             is NorwegianHomeContents -> {
                 val newQuoteData: NorwegianHomeContentsData = when (newQuote.data) {
-                    is NorwegianHomeContentsData -> newQuote.data as NorwegianHomeContentsData
+                    is NorwegianHomeContentsData -> newQuote.data
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
@@ -413,7 +416,7 @@ data class Quote(
             is NorwegianTravel -> {
                 val newQuoteData: NorwegianTravelData = when (newQuote.data) {
                     is NorwegianHomeContentsData -> newQuote.data as NorwegianTravelData
-                    is NorwegianTravelData -> newQuote.data as NorwegianTravelData
+                    is NorwegianTravelData -> newQuote.data
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
@@ -426,7 +429,7 @@ data class Quote(
             }
             is DanishHomeContents -> {
                 val newQuoteData: DanishHomeContentsData = when (newQuote.data) {
-                    is DanishHomeContentsData -> newQuote.data as DanishHomeContentsData
+                    is DanishHomeContentsData -> newQuote.data
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
@@ -443,7 +446,7 @@ data class Quote(
             }
             is DanishAccident -> {
                 val newQuoteData: DanishAccidentData = when (newQuote.data) {
-                    is DanishAccidentData -> newQuote.data as DanishAccidentData
+                    is DanishAccidentData -> newQuote.data
                     is DanishHomeContentsData -> newQuote.data as DanishAccidentData
                     is DanishTravelData -> newQuote.data as DanishAccidentData
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
@@ -462,7 +465,7 @@ data class Quote(
                 val newQuoteData: DanishTravelData = when (newQuote.data) {
                     is DanishAccidentData -> newQuote.data as DanishTravelData
                     is DanishHomeContentsData -> newQuote.data as DanishTravelData
-                    is DanishTravelData -> newQuote.data as DanishTravelData
+                    is DanishTravelData -> newQuote.data
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 

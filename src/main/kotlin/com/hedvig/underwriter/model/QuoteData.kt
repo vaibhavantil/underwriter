@@ -41,7 +41,7 @@ data class SwedishHouseData(
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
-
+    override val phoneNumber: String? = null,
     override val street: String? = null,
     override val zipCode: String? = null,
     override val city: String? = null,
@@ -76,7 +76,7 @@ data class SwedishApartmentData(
     override val firstName: String? = null,
     override val lastName: String? = null,
     override val email: String? = null,
-
+    override val phoneNumber: String? = null,
     override val street: String? = null,
     override val city: String? = null,
     override val zipCode: String? = null,
@@ -110,7 +110,7 @@ data class NorwegianHomeContentsData(
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
-
+    override val phoneNumber: String? = null,
     override val street: String,
     override val city: String?,
     override val zipCode: String,
@@ -142,6 +142,7 @@ data class NorwegianTravelData(
     override val firstName: String,
     override val lastName: String,
     override val email: String? = null,
+    override val phoneNumber: String? = null,
     val coInsured: Int,
     @get:JvmName("getIsYouth")
     val isYouth: Boolean,
@@ -168,6 +169,7 @@ data class DanishHomeContentsData(
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
+    override val phoneNumber: String? = null,
     override val street: String,
     override val zipCode: String,
     val livingSpace: Int,
@@ -200,6 +202,7 @@ data class DanishAccidentData(
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
+    override val phoneNumber: String? = null,
     override val street: String,
     override val zipCode: String,
     val coInsured: Int,
@@ -230,6 +233,7 @@ data class DanishTravelData(
     override val firstName: String,
     override val lastName: String,
     override val email: String?,
+    override val phoneNumber: String? = null,
     override val street: String,
     override val zipCode: String,
     val coInsured: Int,
