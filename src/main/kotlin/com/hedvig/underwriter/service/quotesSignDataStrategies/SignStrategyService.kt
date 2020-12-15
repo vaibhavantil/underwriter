@@ -60,6 +60,10 @@ class SignStrategyService(
                     }
                 }
             }
+            else -> {
+                RedirectSignStrategy.logger.error("Quotes are not apart of the same market [Quotes: $quotes]")
+                return StartSignErrors.quotesCanNotBeBundled
+            }
         }
 
         return strategy.first().startSign(quotes, signData)
@@ -81,14 +85,16 @@ class SignStrategyService(
         }
     }.toSet()
 
-    private fun List<Quote>.areSwedishQuotes() = this.all { it.data is SwedishApartmentData || it.data is SwedishHouseData }
+    private fun List<Quote>.areSwedishQuotes() =
+        this.all { it.data is SwedishApartmentData || it.data is SwedishHouseData }
 
     private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
         this.size == 2 &&
             this.any { it.data is NorwegianHomeContentsData } &&
             this.any { it.data is NorwegianTravelData }
 
-    private fun List<Quote>.isValidDanishQuoteBundle(): Boolean = this.areTwoValidDanishQuotes() || this.areThreeValidDanishQuotes()
+    private fun List<Quote>.isValidDanishQuoteBundle(): Boolean =
+        this.areTwoValidDanishQuotes() || this.areThreeValidDanishQuotes()
 
     private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
         this.size == 2 &&
