@@ -425,7 +425,7 @@ type UnderwritingLimitsHit {
 }
 
 type UnderwritingLimit {
-    description: String!
+    description: String! @deprecated(reason: "Use code")
     code: String!
 }
 
