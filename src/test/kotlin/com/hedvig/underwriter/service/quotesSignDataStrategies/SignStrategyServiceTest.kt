@@ -236,6 +236,4 @@ class SignStrategyServiceTest {
 
         verify(exactly = 1) { redirectSignStrategy.startSign(any(), any()) }
     }
-
 }
-
