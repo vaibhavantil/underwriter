@@ -37,7 +37,7 @@ interface MemberService {
     fun isSsnAlreadySignedMemberEntity(ssn: String): IsSsnAlreadySignedMemberResponse
     fun isMemberIdAlreadySignedMemberEntity(memberId: Long): IsMemberAlreadySignedResponse
 
-    fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String? = null)
+    fun finalizeOnboarding(quote: Quote, email: String)
 
     fun startSwedishBankIdSign(
         memberId: Long,
