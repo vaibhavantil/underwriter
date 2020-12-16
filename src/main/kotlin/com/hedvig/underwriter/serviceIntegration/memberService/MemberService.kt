@@ -5,16 +5,17 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartRedirectBankIdSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.StartSwedishBankIdSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
-import java.util.UUID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 interface MemberService {
     val logger: Logger
@@ -38,29 +39,28 @@ interface MemberService {
 
     fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String? = null)
 
-    fun startSwedishBankIdSignQuotes(
+    fun startSwedishBankIdSign(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String,
+        nationalIdentification: NationalIdentification,
         ipAddress: String,
         isSwitching: Boolean
-    ): StartSwedishBankIdSignResponse
+    ): UnderwriterStartSignSessionResponse.SwedishBankId
 
-    fun startNorwegianBankIdSignQuotes(
+    fun startRedirectBankIdSign(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String,
+        nationalIdentification: NationalIdentification,
         successUrl: String,
-        failUrl: String
-    ): StartRedirectBankIdSignResponse
+        failUrl: String,
+        redirectCountry: RedirectCountry
+    ): UnderwriterStartSignSessionResponse.BankIdRedirect
 
-    fun startDanishBankIdSignQuotes(
+    fun startSimpleSign(
         memberId: Long,
         underwriterSessionReference: UUID,
-        ssn: String,
-        successUrl: String,
-        failUrl: String
-    ): StartRedirectBankIdSignResponse
+        nationalIdentification: NationalIdentification
+    ): UnderwriterStartSignSessionResponse.SimpleSign
 
     fun getMember(memberId: Long): InternalMember
 }

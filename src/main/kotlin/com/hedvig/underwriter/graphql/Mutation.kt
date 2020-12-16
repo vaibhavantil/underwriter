@@ -25,6 +25,7 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
+import graphql.servlet.context.GraphQLServletContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -106,7 +107,8 @@ class Mutation @Autowired constructor(
             env.getToken(),
             env.getEndUserIp(),
             input.successUrl,
-            input.failUrl
+            input.failUrl,
+            env.getContext<GraphQLServletContext?>()?.httpServletRequest?.getHeader("Enable-Simple-Sign") == "true"
         )
 
     private fun responseForEditedQuote(
