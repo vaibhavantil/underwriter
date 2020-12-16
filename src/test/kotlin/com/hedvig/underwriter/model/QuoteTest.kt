@@ -3,12 +3,12 @@ package com.hedvig.underwriter.model
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
-import java.math.BigDecimal
-import java.time.Instant
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import java.math.BigDecimal
+import java.time.Instant
 import java.time.LocalDate
+import java.util.UUID
 
 class QuoteTest {
     @Test
@@ -29,6 +29,7 @@ class QuoteTest {
                 firstName = null,
                 lastName = null,
                 email = null,
+                phoneNumber = null,
                 productType = null,
                 ssn = "201212121212",
                 currentInsurer = null,
@@ -67,6 +68,7 @@ class QuoteTest {
                 firstName = null,
                 lastName = null,
                 email = null,
+                phoneNumber = null,
                 productType = ProductType.HOUSE,
                 ssn = "201212121213",
                 currentInsurer = null,
@@ -118,6 +120,7 @@ class QuoteTest {
                 firstName = null,
                 lastName = null,
                 email = null,
+                phoneNumber = null,
                 productType = ProductType.APARTMENT,
                 ssn = "201212121213",
                 currentInsurer = null,

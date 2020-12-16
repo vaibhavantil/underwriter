@@ -32,7 +32,8 @@ data class CreateQuoteInput(
     val danishHomeContents: CreateDanishHomeContentsInput?,
     val danishAccident: CreateDanishAccidentInput?,
     val danishTravel: CreateDanishTravelInput?,
-    val dataCollectionId: UUID?
+    val dataCollectionId: UUID?,
+    val phoneNumber: String?
 ) {
     fun toQuoteRequest(
         quotingPartner: Partner? = null,
@@ -42,6 +43,7 @@ data class CreateQuoteInput(
         firstName = this.firstName,
         lastName = this.lastName,
         email = this.email,
+        phoneNumber = this.phoneNumber,
         currentInsurer = this.currentInsurer,
         birthDate = this.birthDate ?: when {
             this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()

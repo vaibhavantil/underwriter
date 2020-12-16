@@ -26,6 +26,7 @@ data class QuoteRequest(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
+    val phoneNumber: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
     val ssn: String?,
@@ -93,7 +94,8 @@ data class QuoteRequest(
                 memberId = quoteRequestDto.memberId,
                 originatingProductId = quoteRequestDto.originatingProductId,
                 startDate = quoteRequestDto.startDate,
-                dataCollectionId = quoteRequestDto.dataCollectionId
+                dataCollectionId = quoteRequestDto.dataCollectionId,
+                phoneNumber = null
             )
         }
 
@@ -115,7 +117,8 @@ data class QuoteRequest(
                 dataCollectionId = null,
                 memberId = member.memberId.toString(),
                 originatingProductId = agreementData.id,
-                startDate = agreementData.fromDate?.atStartOfDay(ZoneId.of("Europe/Stockholm"))?.toInstant()
+                startDate = agreementData.fromDate?.atStartOfDay(ZoneId.of("Europe/Stockholm"))?.toInstant(),
+                phoneNumber = member.phoneNumber
             )
         }
 
@@ -139,7 +142,8 @@ data class QuoteRequest(
                 dataCollectionId = null,
                 memberId = memberId,
                 originatingProductId = null,
-                startDate = null
+                startDate = null,
+                phoneNumber = null
             )
         }
 
@@ -163,7 +167,8 @@ data class QuoteRequest(
                 dataCollectionId = null,
                 memberId = quote.memberId,
                 originatingProductId = quote.originatingProductId,
-                startDate = null
+                startDate = null,
+                phoneNumber = null
             )
         }
     }

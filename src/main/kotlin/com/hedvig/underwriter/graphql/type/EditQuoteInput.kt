@@ -17,6 +17,7 @@ data class EditQuoteInput(
     val firstName: String?,
     val lastName: String?,
     val email: String?,
+    val phoneNumber: String?,
     val currentInsurer: String?,
     val ssn: String?,
     val birthDate: LocalDate?,
@@ -42,6 +43,7 @@ data class EditQuoteInput(
         firstName = this.firstName,
         lastName = this.lastName,
         email = this.email,
+        phoneNumber = this.phoneNumber,
         currentInsurer = this.currentInsurer,
         birthDate = this.birthDate ?: when {
             this.swedishApartment != null || this.swedishHouse != null || this.apartment != null || this.house != null -> this.ssn?.birthDateFromSwedishSsn()

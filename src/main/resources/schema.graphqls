@@ -36,6 +36,7 @@ input CreateQuoteInput {
     danishTravel: CreateDanishTravelInput
     email: String
     dataCollectionId: ID
+    phoneNumber: String
 }
 
 input CreateNorwegianHomeContentsInput {
@@ -143,6 +144,7 @@ input EditQuoteInput {
     danishAccident: EditDanishAccidentInput
     danishTravel: EditDanishTravelInput
     email: String
+    phoneNumber: String
 }
 
 input EditApartmentInput {
@@ -306,6 +308,7 @@ type CompleteQuote {
     email: String
     dataCollectionId: ID
     typeOfContract: TypeOfContract!
+    phoneNumber: String
 }
 
 type CurrentInsurer {

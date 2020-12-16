@@ -9,14 +9,18 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
+import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
+import com.hedvig.underwriter.testhelp.databuilder.a
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -37,6 +41,9 @@ internal class GraphQlMutationsIntegrationTest {
     @Autowired
     private lateinit var graphQLTestTemplate: GraphQLTestTemplate
 
+    @Autowired
+    private lateinit var quoteService: QuoteService
+
     @MockkBean(relaxUnitFun = true)
     lateinit var memberService: MemberService
 
@@ -48,6 +55,9 @@ internal class GraphQlMutationsIntegrationTest {
 
     @MockkBean
     lateinit var priceEngineService: PriceEngineService
+
+    @MockkBean(relaxed = true)
+    lateinit var notificationService: NotificationService
 
     @MockkBean
     lateinit var signService: SignService
@@ -135,7 +145,7 @@ internal class GraphQlMutationsIntegrationTest {
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
-        assert(createQuote["id"].textValue() == "00000000-0000-0000-0000-000000000003")
+        assert(createQuote["id"].textValue() == "f87654f0-3eed-11eb-a2f2-275abc72e5ce")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "1.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "SEK")
         assert(createQuote["details"]["street"].textValue() == "Kungsgatan 1")
@@ -294,6 +304,7 @@ internal class GraphQlMutationsIntegrationTest {
             firstName = "",
             lastName = "",
             email = null,
+            phoneNumber = null,
             currentInsurer = null,
             ssn = "21126114165",
             birthDate = "21126114165".birthDateFromNorwegianSsn(),
@@ -417,6 +428,7 @@ internal class GraphQlMutationsIntegrationTest {
             firstName = "",
             lastName = "",
             email = null,
+            phoneNumber = null,
             currentInsurer = null,
             ssn = "1212121212",
             birthDate = null,
@@ -453,5 +465,57 @@ internal class GraphQlMutationsIntegrationTest {
 
         assert(response.isOk)
         assert(createQuote["limits"][0]["description"].textValue() != null)
+    }
+
+    @Test
+    fun createQuoteWithPhoneNumber() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                any(),
+                any()
+            )
+        } returns InsuranceCost(
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            null
+        )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "12345")
+        val response = graphQLTestTemplate.perform("/mutations/createQuoteWithPhoneNumber.graphql", null)
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["phoneNumber"].textValue() == "0812331321")
+    }
+
+    @Test
+    fun modifyQuoteWithPhoneNumber() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                any(),
+                any()
+            )
+        } returns InsuranceCost(
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            MonetaryAmountV2.Companion.of(BigDecimal.ONE, "SEK"),
+            null
+        )
+
+        val req = a.SwedishApartmentQuoteRequestBuilder(phoneNumber = null, memberId = "12345").build()
+        val quoteId = UUID.fromString("a64d8f3a-3edf-11eb-a021-6f36afe75b8f")
+        quoteService.createQuote(req, quoteId, QuoteInitiatedFrom.ANDROID, null, false)
+
+        graphQLTestTemplate.addHeader("hedvig.token", "12345")
+        val response = graphQLTestTemplate.perform("/mutations/editQuoteWithPhoneNumber.graphql", null)
+        val createQuote = response.readTree()["data"]["editQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["phoneNumber"].textValue() == "0812331321")
     }
 }
