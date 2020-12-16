@@ -10,7 +10,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.hedvig.underwriter.model.QuoteRepositoryImpl
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import io.mockk.mockk
 import org.jdbi.v3.jackson2.Jackson2Config
 import org.junit.Before
@@ -43,7 +43,7 @@ class FindQuoteByContractIdTest {
         )
 
         val contractId = UUID.randomUUID()
-        val quote = a.QuoteBuilder(state = QuoteState.SIGNED, contractId = contractId).build()
+        val quote = QuoteBuilder(state = QuoteState.SIGNED, contractId = contractId).build()
         quoteRepository.insert(quote)
 
         val result = sut.getQuoteByContractId(contractId)
@@ -85,14 +85,14 @@ class FindQuoteByContractIdTest {
         )
 
         val contractId = UUID.randomUUID()
-        val firstQuote = a.QuoteBuilder(
+        val firstQuote = QuoteBuilder(
             state = QuoteState.SIGNED,
             contractId = contractId,
             agreementId = UUID.randomUUID()
         ).build()
         quoteRepository.insert(firstQuote)
 
-        val secondQuote = a.QuoteBuilder(
+        val secondQuote = QuoteBuilder(
             id = UUID.randomUUID(),
             state = QuoteState.SIGNED,
             contractId = contractId,

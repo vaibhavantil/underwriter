@@ -6,7 +6,13 @@ import assertk.assertions.isInstanceOf
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.StrategyHelper.createSignData
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.DanishAccidentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.SwedishHouseDataBuilder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -41,9 +47,9 @@ class SignStrategyServiceTest {
     fun `start sign swedish and norwegian quote returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder().build(),
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder().build(),
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -59,11 +65,11 @@ class SignStrategyServiceTest {
     fun `start sign norwegian and danish quote returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.DanishHomeContentsDataBuilder()
+                QuoteBuilder(
+                    data = DanishHomeContentsDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -79,9 +85,9 @@ class SignStrategyServiceTest {
     fun `start sign with two swedish quotes returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder().build(),
-                a.QuoteBuilder(
-                    data = a.SwedishHouseDataBuilder()
+                QuoteBuilder().build(),
+                QuoteBuilder(
+                    data = SwedishHouseDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -97,11 +103,11 @@ class SignStrategyServiceTest {
     fun `start sign with two norwegian home content quotes returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.NorwegianHomeContentDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianHomeContentDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.NorwegianHomeContentDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianHomeContentDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -117,11 +123,11 @@ class SignStrategyServiceTest {
     fun `start sign with two norwegian travel quotes returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -137,8 +143,8 @@ class SignStrategyServiceTest {
     fun `start sign with one danish accident quotes returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.DanishAccidentDataBuilder()
+                QuoteBuilder(
+                    data = DanishAccidentDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -154,8 +160,8 @@ class SignStrategyServiceTest {
     fun `start sign with one danish travel quotes returns can not be bundled`() {
         val result = cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.DanishTravelDataBuilder()
+                QuoteBuilder(
+                    data = DanishTravelDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -171,7 +177,7 @@ class SignStrategyServiceTest {
     fun `start sign of one swedish quote calls swedishBankIdSignStrategy startSign`() {
         cut.startSign(
             listOf(
-                a.QuoteBuilder().build()
+                QuoteBuilder().build()
             ),
             createSignData()
         )
@@ -183,11 +189,11 @@ class SignStrategyServiceTest {
     fun `start sign of norwegian quotes calls redirectSignStrategy startSign`() {
         cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.NorwegianHomeContentDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianHomeContentDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build()
             ),
             createSignData()
@@ -204,11 +210,11 @@ class SignStrategyServiceTest {
 
         cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.NorwegianHomeContentDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianHomeContentDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.NorwegianTravelDataBuilder()
+                QuoteBuilder(
+                    data = NorwegianTravelDataBuilder()
                 ).build()
             ),
             createSignData(enableSimpleSign = true)
@@ -221,14 +227,14 @@ class SignStrategyServiceTest {
     fun `start sign of danish quotes calls redirectSignStrategy startSign`() {
         cut.startSign(
             listOf(
-                a.QuoteBuilder(
-                    data = a.DanishAccidentDataBuilder()
+                QuoteBuilder(
+                    data = DanishAccidentDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.DanishTravelDataBuilder()
+                QuoteBuilder(
+                    data = DanishTravelDataBuilder()
                 ).build(),
-                a.QuoteBuilder(
-                    data = a.DanishHomeContentsDataBuilder()
+                QuoteBuilder(
+                    data = DanishHomeContentsDataBuilder()
                 ).build()
             ),
             createSignData()

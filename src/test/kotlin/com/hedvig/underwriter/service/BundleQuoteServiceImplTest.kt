@@ -9,19 +9,22 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.InsuranceType
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.ApartmentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import java.math.BigDecimal
-import java.util.Locale
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import java.math.BigDecimal
+import java.util.Locale
+import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
 class BundleQuoteServiceImplTest {
@@ -50,14 +53,14 @@ class BundleQuoteServiceImplTest {
     fun bundleNorwegianYouthQuotes() {
         val ids = listOf(UUID.randomUUID(), UUID.randomUUID())
 
-        val quote1 = a.QuoteBuilder(
+        val quote1 = QuoteBuilder(
             id = ids[0],
-            data = a.NorwegianHomeContentDataBuilder(isYouth = true),
+            data = NorwegianHomeContentDataBuilder(isYouth = true),
             price = BigDecimal.TEN
         ).build()
-        val quote2 = a.QuoteBuilder(
+        val quote2 = QuoteBuilder(
             id = ids[1],
-            data = a.NorwegianTravelDataBuilder(isYouth = true),
+            data = NorwegianTravelDataBuilder(isYouth = true),
             price = BigDecimal.TEN
         ).build()
 
@@ -105,14 +108,14 @@ class BundleQuoteServiceImplTest {
     fun bundleNorwegianRegularQuotes() {
         val ids = listOf(UUID.randomUUID(), UUID.randomUUID())
 
-        val quote1 = a.QuoteBuilder(
+        val quote1 = QuoteBuilder(
             id = ids[0],
-            data = a.NorwegianHomeContentDataBuilder(),
+            data = NorwegianHomeContentDataBuilder(),
             price = BigDecimal.TEN
         ).build()
-        val quote2 = a.QuoteBuilder(
+        val quote2 = QuoteBuilder(
             id = ids[1],
-            data = a.NorwegianTravelDataBuilder(),
+            data = NorwegianTravelDataBuilder(),
             price = BigDecimal.TEN
         ).build()
 
@@ -160,9 +163,9 @@ class BundleQuoteServiceImplTest {
     fun bundleSwedishStudentQuote() {
         val id = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
+        val quote = QuoteBuilder(
             id = id,
-            data = a.ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF),
+            data = ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF),
             price = BigDecimal.TEN
         ).build()
 
@@ -206,9 +209,9 @@ class BundleQuoteServiceImplTest {
     fun bundleSwedishRegularQuote() {
         val id = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
+        val quote = QuoteBuilder(
             id = id,
-            data = a.ApartmentDataBuilder(),
+            data = ApartmentDataBuilder(),
             price = BigDecimal.TEN
         ).build()
 

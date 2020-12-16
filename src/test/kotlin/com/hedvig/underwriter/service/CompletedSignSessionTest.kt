@@ -16,7 +16,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import io.mockk.every
 import io.mockk.mockk
 import java.util.UUID
@@ -66,7 +66,7 @@ class CompletedSignSessionTest {
 
         val quoteId = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
+        val quote = QuoteBuilder(
             id = quoteId,
             memberId = "1338"
         ).build()
@@ -99,7 +99,7 @@ class CompletedSignSessionTest {
 
         val quoteId = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
+        val quote = QuoteBuilder(
             id = quoteId,
             memberId = "1339"
         ).build()

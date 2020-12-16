@@ -15,7 +15,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
@@ -51,7 +51,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     fun `memberSigned saves contractId`() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            a.QuoteBuilder(
+            QuoteBuilder(
                 quoteId,
                 memberId = "1337",
                 initiatedFrom = QuoteInitiatedFrom.IOS
@@ -87,7 +87,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     fun `signQuoteSavesContractId`() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            a.QuoteBuilder(
+            QuoteBuilder(
                 quoteId,
                 memberId = "1337",
                 initiatedFrom = QuoteInitiatedFrom.IOS
@@ -129,7 +129,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     fun `signQuoteFromHome savesContractid`() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            a.QuoteBuilder(
+            QuoteBuilder(
                 quoteId,
                 memberId = "1337",
                 initiatedFrom = QuoteInitiatedFrom.IOS

@@ -10,7 +10,7 @@ import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import io.mockk.every
 import io.mockk.mockk
@@ -37,7 +37,7 @@ class CreateQuoteTest {
     @Test
     fun successfully_create_quote() {
 
-        val request = a.NorwegianHomeContentsQuoteRequestBuilder().build()
+        val request = NorwegianHomeContentsQuoteRequestBuilder().build()
 
         every { strategyService.getAllGuidelines(any()) } returns setOf()
         every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
@@ -53,7 +53,7 @@ class CreateQuoteTest {
     @Test
     fun fail_uw_guideline_returns_error_response_dto() {
 
-        val request = a.NorwegianHomeContentsQuoteRequestBuilder().build()
+        val request = NorwegianHomeContentsQuoteRequestBuilder().build()
 
         every { strategyService.getAllGuidelines(any()) } returns setOf(
             object : BaseGuideline<QuoteData> {

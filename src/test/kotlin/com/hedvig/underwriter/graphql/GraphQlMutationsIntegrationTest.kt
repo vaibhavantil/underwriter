@@ -20,7 +20,7 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -507,7 +507,7 @@ internal class GraphQlMutationsIntegrationTest {
             null
         )
 
-        val req = a.SwedishApartmentQuoteRequestBuilder(phoneNumber = null, memberId = "12345").build()
+        val req = SwedishApartmentQuoteRequestBuilder(phoneNumber = null, memberId = "12345").build()
         val quoteId = UUID.fromString("a64d8f3a-3edf-11eb-a021-6f36afe75b8f")
         quoteService.createQuote(req, quoteId, QuoteInitiatedFrom.ANDROID, null, false)
 

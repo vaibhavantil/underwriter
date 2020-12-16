@@ -8,7 +8,7 @@ import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.service.quotesSignDataStrategies.StrategyHelper.createSignData
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -35,7 +35,8 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(true)
 
-        val result = cut.startSign(listOf(a.QuoteBuilder(
+        val result = cut.startSign(listOf(
+            QuoteBuilder(
             memberId = "1234"
         ).build()), createSignData())
 
@@ -58,7 +59,8 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(false, "Something went wrong")
 
-        val result = cut.startSign(listOf(a.QuoteBuilder(
+        val result = cut.startSign(listOf(
+            QuoteBuilder(
             memberId = "1234"
         ).build()), createSignData())
 
@@ -82,7 +84,8 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(false)
 
-        val result = cut.startSign(listOf(a.QuoteBuilder(
+        val result = cut.startSign(listOf(
+            QuoteBuilder(
             memberId = "1234"
         ).build()), createSignData())
 

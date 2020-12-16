@@ -5,7 +5,9 @@ import assertk.assertThat
 import assertk.assertions.isNullOrEmpty
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -27,10 +29,10 @@ class QuoteServiceUpdateQuotes {
             quoteStrategyService
         )
 
-        val request = a.SwedishApartmentQuoteRequestBuilder()
-        every { quoteRepository.find(any()) } returns a.QuoteBuilder(
+        val request = SwedishApartmentQuoteRequestBuilder()
+        every { quoteRepository.find(any()) } returns QuoteBuilder(
             id = request.id,
-            data = a.SwedishApartmentDataBuilder(),
+            data = SwedishApartmentDataBuilder(),
             breachedUnderwritingGuidelines = listOf("UW_GL_HIT")
         ).build()
         every { quoteRepository.update(any(), any()) } returnsArgument 0

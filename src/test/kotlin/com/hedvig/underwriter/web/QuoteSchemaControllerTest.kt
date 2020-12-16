@@ -8,7 +8,8 @@ import com.hedvig.underwriter.service.QuoteSchemaService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteSchema
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
@@ -85,16 +86,16 @@ internal class QuoteSchemaControllerTest {
         }
     """.trimIndent()
 
-    private val QUOTE = a.QuoteBuilder().copy(
+    private val QUOTE = QuoteBuilder().copy(
         id = QUOTE_ID,
         memberId = MEMBER_ID
-    ).w(a.NorwegianTravelDataBuilder()).build()
+    ).w(NorwegianTravelDataBuilder()).build()
 
-    private val QUOTE_FROM_SCHEMA_DATA = a.QuoteBuilder().copy(
+    private val QUOTE_FROM_SCHEMA_DATA = QuoteBuilder().copy(
         id = QUOTE_ID,
         memberId = MEMBER_ID
     ).w(
-        a.NorwegianTravelDataBuilder().copy(
+        NorwegianTravelDataBuilder().copy(
             coInsured = SCHEMA_DATA.numberCoInsured,
             isYouth = SCHEMA_DATA.isYouth
         )

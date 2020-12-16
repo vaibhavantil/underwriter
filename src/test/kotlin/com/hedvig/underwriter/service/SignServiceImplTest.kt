@@ -16,16 +16,22 @@ import com.hedvig.underwriter.service.quotesSignDataStrategies.SimpleSignStrateg
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
 import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
+import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.DanishAccidentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.SwedishHouseDataBuilder
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import io.mockk.MockKAnnotations
@@ -107,7 +113,7 @@ class SignServiceImplTest {
     @Test
     fun givenPartnerSendsPartnerIdToCustomerIO() {
         val quoteId = UUID.randomUUID()
-        val quote = a.QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
+        val quote = QuoteBuilder(id = quoteId, attributedTo = Partner.COMPRICER).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
@@ -138,7 +144,7 @@ class SignServiceImplTest {
     @Test
     fun givenPartnerIsHedvigSendPartnerIdToCustomerIO() {
         val quoteId = UUID.randomUUID()
-        val quote = a.QuoteBuilder(attributedTo = Partner.HEDVIG).build()
+        val quote = QuoteBuilder(attributedTo = Partner.HEDVIG).build()
 
         every { quoteRepository.find(any()) } returns quote
         every { quoteRepository.update(any(), any()) } returnsArgument 0
@@ -168,7 +174,7 @@ class SignServiceImplTest {
     @Test
     fun startSigningOfSwedishQuote_startSwedishSign() {
         val quoteIds = listOf(UUID.randomUUID())
-        val quote = a.QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
+        val quote = QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -199,7 +205,7 @@ class SignServiceImplTest {
     @Test
     fun startSigningOfSwedishQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
-        val quote = a.QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
+        val quote = QuoteBuilder(id = quoteIds[0], memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -230,7 +236,7 @@ class SignServiceImplTest {
     @Test
     fun startSigningOfSwedishQuotes_getQuoteStateNotSignableErrorOrNullReturnsError_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
-        val quote = a.QuoteBuilder(
+        val quote = QuoteBuilder(
             id = quoteIds[0],
             memberId = memberId,
             state = QuoteState.EXPIRED
@@ -248,7 +254,7 @@ class SignServiceImplTest {
     fun startSigningOfNorwegianQuote_startNorwegianSign() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -279,9 +285,9 @@ class SignServiceImplTest {
     fun startSigningOfNorwegianQuotes_startNorwegianSign() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
         val quote2 =
-            a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianTravelDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[1], data = NorwegianTravelDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -312,8 +318,8 @@ class SignServiceImplTest {
     fun startSigningOfSwedishAndNorwegianQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.SwedishHouseDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+        val quote2 = QuoteBuilder(id = quoteIds[1], data = SwedishHouseDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
@@ -328,7 +334,7 @@ class SignServiceImplTest {
     fun startSigningOfOnlyDanishAccidentQuote_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishAccidentDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
@@ -343,7 +349,7 @@ class SignServiceImplTest {
     fun startSigningOfOnlyDanishTravelQuote_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishTravelDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
@@ -358,8 +364,8 @@ class SignServiceImplTest {
     fun startSigningOfDanishAccidentAndDanishTravelQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishAccidentDataBuilder(), memberId = memberId).build()
+        val quote2 = QuoteBuilder(id = quoteIds[1], data = DanishTravelDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
@@ -374,8 +380,8 @@ class SignServiceImplTest {
     fun startSigningOfDanishHomeContentAndDanishAccidentQuotes_returnsDanishBankIdSession() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 = QuoteBuilder(id = quoteIds[1], data = DanishAccidentDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -406,9 +412,9 @@ class SignServiceImplTest {
     fun startSigningOfAllDanishTypeOfQuotes_returnsDanishBankIdSession() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
-        val quote2 = a.QuoteBuilder(id = quoteIds[1], data = a.DanishAccidentDataBuilder(), memberId = memberId).build()
-        val quote3 = a.QuoteBuilder(id = quoteIds[2], data = a.DanishTravelDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
+        val quote2 = QuoteBuilder(id = quoteIds[1], data = DanishAccidentDataBuilder(), memberId = memberId).build()
+        val quote3 = QuoteBuilder(id = quoteIds[2], data = DanishTravelDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
@@ -439,11 +445,11 @@ class SignServiceImplTest {
     fun startSigningOfThreeDanishHomeContentQuotes_returnsFailedToStartSign() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
         val quote2 =
-            a.QuoteBuilder(id = quoteIds[1], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[1], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
         val quote3 =
-            a.QuoteBuilder(id = quoteIds[2], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[2], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
@@ -470,11 +476,11 @@ class SignServiceImplTest {
     fun startSigningThreeQuotes_returnsFailResponse() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote1 =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
         val quote2 =
-            a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[1], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
         val quote3 =
-            a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianTravelDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[1], data = NorwegianTravelDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
@@ -488,7 +494,7 @@ class SignServiceImplTest {
     fun failStartSignQuotesWithNoMemberId() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote1 =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = null).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = null).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1)
@@ -508,9 +514,9 @@ class SignServiceImplTest {
     fun failStartSignQuotesWithDifferentMemberIdFromHedvigToken() {
         val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
         val quote1 =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
         val quote2 =
-            a.QuoteBuilder(id = quoteIds[1], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[1], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
@@ -530,7 +536,7 @@ class SignServiceImplTest {
     fun failStartSignNorwegianQuotesNoTargetUrls() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
@@ -567,7 +573,7 @@ class SignServiceImplTest {
     fun verifyThatMemberServiceIsNotTriggeredWhenSigningFromHope() {
         val quoteId = UUID.fromString("3D6D0502-5E40-4C90-9330-722132F69B94")
         val quote =
-            a.QuoteBuilder(id = quoteId, data = a.NorwegianHomeContentDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteId, data = NorwegianHomeContentDataBuilder(), memberId = memberId).build()
 
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(
             ssnAlreadySignedMember = true
@@ -607,7 +613,7 @@ class SignServiceImplTest {
     fun startSigningOfDanishQuote_startDanishSign() {
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
-            a.QuoteBuilder(id = quoteIds[0], data = a.DanishHomeContentsDataBuilder(), memberId = memberId).build()
+            QuoteBuilder(id = quoteIds[0], data = DanishHomeContentsDataBuilder(), memberId = memberId).build()
         val signSessionReference = UUID.randomUUID()
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
