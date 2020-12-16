@@ -15,7 +15,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
@@ -33,9 +33,9 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     @get:Rule
     val jdbiRule = JdbiRule.create()
 
-    lateinit var quoteRepository: QuoteRepositoryImpl
-    lateinit var productPricingService: ProductPricingService
-    lateinit var memberService: MemberService
+    private lateinit var quoteRepository: QuoteRepositoryImpl
+    private lateinit var productPricingService: ProductPricingService
+    private lateinit var memberService: MemberService
 
     @Before
     fun setUp() {
@@ -51,11 +51,11 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     fun `memberSigned saves contractId`() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            QuoteBuilder(
-                quoteId,
-                memberId = "1337",
+            quote {
+                id = quoteId
+                memberId = "1337"
                 initiatedFrom = QuoteInitiatedFrom.IOS
-            ).build()
+            }
         )
 
         val signServiceImpl = SignServiceImpl(
@@ -84,14 +84,14 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     }
 
     @Test
-    fun `signQuoteSavesContractId`() {
+    fun signQuoteSavesContractId() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            QuoteBuilder(
-                quoteId,
-                memberId = "1337",
+            quote {
+                id = quoteId
+                memberId = "1337"
                 initiatedFrom = QuoteInitiatedFrom.IOS
-            ).build()
+            }
         )
 
         val signServiceImpl = SignServiceImpl(
@@ -129,11 +129,11 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
     fun `signQuoteFromHome savesContractid`() {
         val quoteId = UUID.randomUUID()
         quoteRepository.insert(
-            QuoteBuilder(
-                quoteId,
-                memberId = "1337",
+            quote {
+                id = quoteId
+                memberId = "1337"
                 initiatedFrom = QuoteInitiatedFrom.IOS
-            ).build()
+            }
         )
 
         val signServiceImpl = SignServiceImpl(

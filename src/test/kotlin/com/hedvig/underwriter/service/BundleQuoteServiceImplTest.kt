@@ -12,7 +12,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.InsuranceTy
 import com.hedvig.underwriter.testhelp.databuilder.ApartmentDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
-import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -38,9 +38,9 @@ class BundleQuoteServiceImplTest {
     @MockK
     lateinit var localizationService: LocalizationService
 
-    lateinit var quoteMapper: QuoteMapper
+    private lateinit var quoteMapper: QuoteMapper
 
-    lateinit var cut: BundleQuotesServiceImpl
+    private lateinit var cut: BundleQuotesServiceImpl
 
     @Before
     fun setUp() {
@@ -53,16 +53,16 @@ class BundleQuoteServiceImplTest {
     fun bundleNorwegianYouthQuotes() {
         val ids = listOf(UUID.randomUUID(), UUID.randomUUID())
 
-        val quote1 = QuoteBuilder(
-            id = ids[0],
-            data = NorwegianHomeContentDataBuilder(isYouth = true),
+        val quote1 = quote {
+            id = ids[0]
+            data = NorwegianHomeContentDataBuilder(isYouth = true)
             price = BigDecimal.TEN
-        ).build()
-        val quote2 = QuoteBuilder(
-            id = ids[1],
-            data = NorwegianTravelDataBuilder(isYouth = true),
+        }
+        val quote2 = quote {
+            id = ids[1]
+            data = NorwegianTravelDataBuilder(isYouth = true)
             price = BigDecimal.TEN
-        ).build()
+        }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
 
@@ -108,16 +108,16 @@ class BundleQuoteServiceImplTest {
     fun bundleNorwegianRegularQuotes() {
         val ids = listOf(UUID.randomUUID(), UUID.randomUUID())
 
-        val quote1 = QuoteBuilder(
-            id = ids[0],
-            data = NorwegianHomeContentDataBuilder(),
+        val quote1 = quote {
+            id = ids[0]
+            data = NorwegianHomeContentDataBuilder()
             price = BigDecimal.TEN
-        ).build()
-        val quote2 = QuoteBuilder(
-            id = ids[1],
-            data = NorwegianTravelDataBuilder(),
+        }
+        val quote2 = quote {
+            id = ids[1]
+            data = NorwegianTravelDataBuilder()
             price = BigDecimal.TEN
-        ).build()
+        }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
 
@@ -163,11 +163,11 @@ class BundleQuoteServiceImplTest {
     fun bundleSwedishStudentQuote() {
         val id = UUID.randomUUID()
 
-        val quote = QuoteBuilder(
-            id = id,
-            data = ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF),
+        val quote = quote {
+            this.id = id
+            data = ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF)
             price = BigDecimal.TEN
-        ).build()
+        }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
 
@@ -209,11 +209,11 @@ class BundleQuoteServiceImplTest {
     fun bundleSwedishRegularQuote() {
         val id = UUID.randomUUID()
 
-        val quote = QuoteBuilder(
-            id = id,
-            data = ApartmentDataBuilder(),
+        val quote = quote {
+            this.id = id
+            data = ApartmentDataBuilder()
             price = BigDecimal.TEN
-        ).build()
+        }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
 

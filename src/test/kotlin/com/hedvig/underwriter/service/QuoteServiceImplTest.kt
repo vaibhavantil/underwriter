@@ -15,9 +15,9 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
-import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishHouseDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -46,7 +46,7 @@ class QuoteServiceImplTest {
     @MockK
     lateinit var quoteRepository: QuoteRepository
 
-    lateinit var cut: QuoteService
+    private lateinit var cut: QuoteService
 
     @BeforeEach
     fun setUp() {
@@ -70,16 +70,22 @@ class QuoteServiceImplTest {
 
     @Test
     fun calculateInsuranceCost() {
-        val quote = QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
+        val quote = quote {
+            memberId = "12345"
+            price = BigDecimal.TEN
+        }
 
-        val result = cut.calculateInsuranceCost(quote)
+        cut.calculateInsuranceCost(quote)
 
         verify(exactly = 1) { productPricingService.calculateInsuranceCost(Money.of(BigDecimal.TEN, "SEK"), "12345") }
     }
 
     @Test
     fun returnTheCorrectMarketForApartmentQuote() {
-        val quote = QuoteBuilder(memberId = "12345", price = BigDecimal.TEN).build()
+        val quote = quote {
+            memberId = "12345"
+            price = BigDecimal.TEN
+        }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
 
@@ -89,7 +95,11 @@ class QuoteServiceImplTest {
     @Test
     fun returnTheCorrectMarketForHouseQuote() {
         val quote =
-            QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = SwedishHouseDataBuilder()).build()
+            quote {
+                memberId = "12345"
+                price = BigDecimal.TEN
+                data = SwedishHouseDataBuilder()
+            }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
 
@@ -99,8 +109,11 @@ class QuoteServiceImplTest {
     @Test
     fun returnTheCorrectMarketForNorwegianHomeContent() {
         val quote =
-            QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = NorwegianHomeContentDataBuilder())
-                .build()
+            quote {
+                memberId = "12345"
+                price = BigDecimal.TEN
+                data = NorwegianHomeContentDataBuilder()
+            }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
 
@@ -110,7 +123,11 @@ class QuoteServiceImplTest {
     @Test
     fun returnTheCorrectMarketForNorwegianTravel() {
         val quote =
-            QuoteBuilder(memberId = "12345", price = BigDecimal.TEN, data = NorwegianTravelDataBuilder()).build()
+            quote {
+                memberId = "12345"
+                price = BigDecimal.TEN
+                data = NorwegianTravelDataBuilder()
+            }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
 
@@ -122,7 +139,7 @@ class QuoteServiceImplTest {
         every {
             underwriter.createQuote(any(), any(), any(), any())
         } returns Either.left(
-            QuoteBuilder(breachedUnderwritingGuidelines = listOf(DEBT_CHECK)).build() to
+            quote { breachedUnderwritingGuidelines = listOf(DEBT_CHECK) } to
                 listOf(DEBT_CHECK)
         )
 

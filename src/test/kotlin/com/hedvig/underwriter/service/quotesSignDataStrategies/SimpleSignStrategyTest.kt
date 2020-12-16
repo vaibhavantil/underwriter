@@ -5,10 +5,10 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.StartSignResponse
-import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.service.quotesSignDataStrategies.StrategyHelper.createSignData
+import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
-import com.hedvig.underwriter.testhelp.databuilder.QuoteBuilder
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -35,10 +35,12 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(true)
 
-        val result = cut.startSign(listOf(
-            QuoteBuilder(
-            memberId = "1234"
-        ).build()), createSignData())
+        val result = cut.startSign(
+            listOf(
+                quote {
+                    memberId = "1234"
+                }), createSignData()
+        )
 
         assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class)
         require(result is StartSignResponse.SimpleSignSession)
@@ -59,10 +61,12 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(false, "Something went wrong")
 
-        val result = cut.startSign(listOf(
-            QuoteBuilder(
-            memberId = "1234"
-        ).build()), createSignData())
+        val result = cut.startSign(
+            listOf(
+                quote {
+                    memberId = "1234"
+                }), createSignData()
+        )
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class)
         require(result is StartSignResponse.FailedToStartSign)
@@ -84,10 +88,12 @@ class SimpleSignStrategyTest {
             )
         } returns UnderwriterStartSignSessionResponse.SimpleSign(false)
 
-        val result = cut.startSign(listOf(
-            QuoteBuilder(
-            memberId = "1234"
-        ).build()), createSignData())
+        val result = cut.startSign(
+            listOf(
+                quote {
+                    memberId = "1234"
+                }), createSignData()
+        )
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class)
         require(result is StartSignResponse.FailedToStartSign)
