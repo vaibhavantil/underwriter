@@ -67,7 +67,7 @@ class FinalizeOnBoardingRequest(
                         firstName = quote.firstName,
                         lastName = quote.lastName,
                         email = email,
-                        phoneNumber = phoneNumber,
+                        phoneNumber = quote.phoneNumber,
                         address = null,
                         birthDate = quote.birthDate
                     )
