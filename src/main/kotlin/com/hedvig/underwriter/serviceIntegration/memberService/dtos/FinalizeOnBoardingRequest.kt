@@ -12,6 +12,7 @@ import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
+import com.hedvig.underwriter.model.phoneNumber
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
@@ -48,7 +49,7 @@ class FinalizeOnBoardingRequest(
                         firstName = personPolicyHolder.firstName!!,
                         lastName = personPolicyHolder.lastName!!,
                         email = email,
-                        phoneNumber = phoneNumber,
+                        phoneNumber = quote.phoneNumber,
                         address = Address(
                             street = addressInsurance.street!!,
                             city = addressInsurance.city ?: "",
