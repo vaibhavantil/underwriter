@@ -14,13 +14,8 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import java.math.BigDecimal
-import java.time.Instant
-import java.util.UUID
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
@@ -30,6 +25,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.UUID
 
 @RunWith(SpringRunner::class)
 @WebMvcTest(controllers = [QuoteController::class], secure = false)
@@ -176,50 +174,5 @@ internal class QuoteControllerTest {
                 get("/_/v1/quotes/contracts/$contractId")
             )
             .andExpect(status().is4xxClientError)
-    }
-
-    @Ignore
-    @Test
-    fun completeQuote() {
-
-        val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
-
-        val incompleteQuote = Quote(
-            id = UUID.randomUUID(),
-            createdAt = Instant.now(),
-            productType = ProductType.APARTMENT,
-            state = QuoteState.INCOMPLETE,
-            initiatedFrom = QuoteInitiatedFrom.APP,
-            attributedTo = Partner.COMPRICER,
-            data =
-            SwedishApartmentData(
-                street = "123 Baker street",
-                zipCode = "11216",
-                livingSpace = 33,
-                householdSize = 4,
-                city = "nul",
-                subType = ApartmentProductSubType.BRF,
-                firstName = "null",
-                lastName = "null",
-                id = UUID.randomUUID()
-            ),
-            breachedUnderwritingGuidelines = null,
-            currentInsurer = null
-        )
-
-        Mockito.`when`(quoteService.getQuote(uuid))
-            .thenReturn(incompleteQuote)
-
-        mockMvc
-            .perform(
-                post("/_/v1/quotes/71919787-70d2-4614-bd4a-26427861991d/completeQuote")
-            )
-            .andExpect(status().is2xxSuccessful)
-    }
-
-    @Ignore
-    @Test
-    fun shouldNotCompleteQuoteIfDataIsIncomplete() {
-//        TODO
     }
 }
