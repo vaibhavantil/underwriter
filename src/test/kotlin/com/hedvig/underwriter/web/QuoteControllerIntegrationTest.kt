@@ -41,7 +41,7 @@ class QuoteControllerIntegrationTest {
     @MockkBean(relaxed = true)
     lateinit var notificationServiceClient: NotificationServiceClient
 
-    @MockkBean()
+    @MockkBean
     lateinit var priceEngineService: PriceEngineService
 
     @MockkBean
@@ -59,6 +59,7 @@ class QuoteControllerIntegrationTest {
     @Test
     fun completeQuote() {
 
+        // GIVEN
         val uuid: UUID = UUID.fromString("71919787-70d2-4614-bd4a-26427861991d")
 
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
@@ -83,6 +84,7 @@ class QuoteControllerIntegrationTest {
             false
         )
 
+        // WHEN
         val signData = """
             {
             "name": {
@@ -94,18 +96,24 @@ class QuoteControllerIntegrationTest {
             }
         """.trimIndent()
 
+        val result: JsonNode? = postJson("/_/v1/quotes/71919787-70d2-4614-bd4a-26427861991d/sign", signData)
+
+        // THEN
+        verify { memberService.finalizeOnboarding(any(), eq("s@hedvig.com")) }
+    }
+
+    private fun postJson(url: String, signData: String): JsonNode? {
         val headers = HttpHeaders()
         headers.accept = listOf(MediaType.APPLICATION_JSON)
         headers.contentType = MediaType.APPLICATION_JSON
 
         val result: JsonNode? = restTemplate
             .postForObject(
-                "/_/v1/quotes/71919787-70d2-4614-bd4a-26427861991d/sign",
+                url,
                 HttpEntity(
                     signData, headers
                 )
             )
-
-        verify { memberService.finalizeOnboarding(any(), eq("s@hedvig.com")) }
+        return result
     }
 }
