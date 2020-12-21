@@ -10,7 +10,7 @@ import com.hedvig.underwriter.model.QuoteRepositoryImpl
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.AddAgreementResponse
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import io.mockk.every
 import io.mockk.mockk
@@ -39,7 +39,7 @@ class AddAgreementToContractTest {
 
         val quoteId = UUID.randomUUID()
 
-        quoteRepository.insert(a.QuoteBuilder(id = quoteId).build())
+        quoteRepository.insert(quote { id = quoteId })
 
         val agreementId = UUID.randomUUID()
         val contractId = UUID.randomUUID()

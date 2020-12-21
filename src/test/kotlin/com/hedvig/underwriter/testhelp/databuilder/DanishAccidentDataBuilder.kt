@@ -1,0 +1,34 @@
+package com.hedvig.underwriter.testhelp.databuilder
+
+import com.hedvig.underwriter.model.DanishAccidentData
+import com.hedvig.underwriter.model.QuoteData
+import java.time.LocalDate
+import java.util.UUID
+
+data class DanishAccidentDataBuilder(
+    val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be5"),
+    val ssn: String? = "1212120000",
+    val birthDate: LocalDate = LocalDate.of(1912, 12, 12),
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String? = "em@i.l",
+
+    val street: String = "",
+    val zipCode: String = "",
+    val coInsured: Int = 3,
+    val isStudent: Boolean = false
+) : DataBuilder<QuoteData> {
+
+    override fun build() = DanishAccidentData(
+        id = id,
+        ssn = ssn,
+        birthDate = birthDate,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        street = street,
+        zipCode = zipCode,
+        coInsured = coInsured,
+        isStudent = isStudent
+    )
+}

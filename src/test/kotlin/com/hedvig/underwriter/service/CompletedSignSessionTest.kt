@@ -16,27 +16,27 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.JdbiRule
-import com.hedvig.underwriter.testhelp.databuilder.a
+import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.every
 import io.mockk.mockk
-import java.util.UUID
 import org.jdbi.v3.jackson2.Jackson2Config
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.UUID
 
 class CompletedSignSessionTest {
 
     @get:Rule
     val jdbiRule = JdbiRule.create()
 
-    lateinit var signSessionRepository: SignSessionRepository
-    lateinit var quoteService: QuoteService
-    lateinit var productPricingService: ProductPricingService
-    lateinit var quoteRepository: QuoteRepository
-    lateinit var memberService: MemberService
-    lateinit var sut: SignServiceImpl
-    lateinit var signStrategyService: SignStrategyService
+    private lateinit var signSessionRepository: SignSessionRepository
+    private lateinit var quoteService: QuoteService
+    private lateinit var productPricingService: ProductPricingService
+    private lateinit var quoteRepository: QuoteRepository
+    private lateinit var memberService: MemberService
+    private lateinit var sut: SignServiceImpl
+    private lateinit var signStrategyService: SignStrategyService
 
     @Before
     fun setUp() {
@@ -66,10 +66,10 @@ class CompletedSignSessionTest {
 
         val quoteId = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
-            id = quoteId,
+        val quote = quote {
+            id = quoteId
             memberId = "1338"
-        ).build()
+        }
         quoteRepository.insert(quote)
 
         val signSessionId = signSessionRepository.insert(listOf(quoteId))
@@ -99,10 +99,10 @@ class CompletedSignSessionTest {
 
         val quoteId = UUID.randomUUID()
 
-        val quote = a.QuoteBuilder(
-            id = quoteId,
+        val quote = quote {
+            id = quoteId
             memberId = "1339"
-        ).build()
+        }
         quoteRepository.insert(quote)
 
         val signSessionId = signSessionRepository.insert(listOf(quoteId))

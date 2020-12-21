@@ -6,3 +6,6 @@ spring:
 
 graphcms.project: Underwriter
 graphcms.url: empty
+
+lokalise:
+  useFakes: true

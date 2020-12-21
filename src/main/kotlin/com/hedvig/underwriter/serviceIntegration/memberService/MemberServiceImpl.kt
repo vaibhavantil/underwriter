@@ -20,11 +20,11 @@ import com.hedvig.underwriter.util.maskSsn
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClientResponseException
+import java.util.UUID
 
 @Service
 @EnableFeignClients
@@ -80,9 +80,9 @@ class MemberServiceImpl @Autowired constructor(
         return memberId!!.memberId
     }
 
-    override fun finalizeOnboarding(quote: Quote, email: String, phoneNumber: String?) {
+    override fun finalizeOnboarding(quote: Quote, email: String) {
         logger.debug("Finalizing web on boarding by populating member-service")
-        client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email, phoneNumber))
+        client.finalizeOnBoarding(quote.memberId!!, FinalizeOnBoardingRequest.fromQuote(quote, email))
     }
 
     override fun startSwedishBankIdSign(
