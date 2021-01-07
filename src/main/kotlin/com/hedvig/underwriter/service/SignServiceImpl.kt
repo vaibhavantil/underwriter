@@ -22,6 +22,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
+import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -30,7 +31,6 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -338,10 +338,6 @@ class SignServiceImpl(
                 ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
         }
         return quote
-    }
-
-    companion object {
-        val logger = LoggerFactory.getLogger(this.javaClass)!!
     }
 }
 

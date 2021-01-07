@@ -11,6 +11,7 @@ import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
+import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -22,7 +23,6 @@ import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequest
 import com.hedvig.underwriter.web.dtos.SignRequest
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -223,9 +223,5 @@ class QuoteController @Autowired constructor(
     fun getMarketInfoFromLatestQuote(@PathVariable memberId: String): ResponseEntity<MarketInfo> {
         val market = quoteService.getMarketFromLatestQuote(memberId)
         return ResponseEntity.ok(MarketInfo(market = market))
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(QuoteController::class.java)
     }
 }

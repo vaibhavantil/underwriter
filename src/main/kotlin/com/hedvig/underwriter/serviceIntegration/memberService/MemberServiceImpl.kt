@@ -16,6 +16,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQ
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
+import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.maskSsn
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest

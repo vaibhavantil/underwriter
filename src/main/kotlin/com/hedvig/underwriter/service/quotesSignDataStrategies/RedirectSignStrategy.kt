@@ -9,7 +9,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIden
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 import kotlin.IllegalStateException
@@ -77,9 +76,5 @@ class RedirectSignStrategy(
             quotes.areDanishQuotes() -> StartSignResponse.DanishBankIdSession(redirectUrl)
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
-    }
-
-    companion object {
-        val logger = LoggerFactory.getLogger(this::class.java)!!
     }
 }

@@ -13,13 +13,9 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterS
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.util.UUID
 
 interface MemberService {
-    val logger: Logger
-        get() = LoggerFactory.getLogger("MemberService")
 
     fun createMember(): String
 
