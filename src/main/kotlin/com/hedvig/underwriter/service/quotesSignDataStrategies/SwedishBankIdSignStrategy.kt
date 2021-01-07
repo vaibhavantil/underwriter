@@ -7,7 +7,7 @@ import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
-import org.slf4j.LoggerFactory
+import com.hedvig.underwriter.util.logger
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,9 +43,5 @@ class SwedishBankIdSignStrategy(
         return response.autoStartToken?.let { autoStartToken ->
             StartSignResponse.SwedishBankIdSession(autoStartToken)
         } ?: StartSignErrors.failedToStartSign(response.internalErrorMessage!!)
-    }
-
-    companion object {
-        val logger = LoggerFactory.getLogger(this::class.java)!!
     }
 }

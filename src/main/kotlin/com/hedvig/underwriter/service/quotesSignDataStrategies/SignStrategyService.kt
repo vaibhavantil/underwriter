@@ -10,6 +10,7 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
+import com.hedvig.underwriter.util.logger
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
@@ -34,13 +35,13 @@ class SignStrategyService(
         when {
             quotes.areSwedishQuotes() -> {
                 if (quotes.size > 1) {
-                    SwedishBankIdSignStrategy.logger.error("Can not start signing swedish quotes [Quotes: $quotes]")
+                    logger.error("Can not start signing swedish quotes [Quotes: $quotes]")
                     return StartSignErrors.quotesCanNotBeBundled
                 }
             }
             quotes.areNorwegianQuotes() -> {
                 if (quotes.size > 1 && !quotes.areTwoValidNorwegianQuotes()) {
-                    RedirectSignStrategy.logger.error("Norwegian quotes is not valid [Quotes: $quotes]")
+                    logger.error("Norwegian quotes is not valid [Quotes: $quotes]")
                     return StartSignErrors.quotesCanNotBeBundled
                 }
             }
@@ -48,20 +49,20 @@ class SignStrategyService(
                 when {
                     quotes.size == 1 -> {
                         if (quotes[0].data !is DanishHomeContentsData) {
-                            RedirectSignStrategy.logger.error("Single danish quote can not be signed alone [Quotes: $quotes]")
+                            logger.error("Single danish quote can not be signed alone [Quotes: $quotes]")
                             return StartSignErrors.singleQuoteCanNotBeSignedAlone
                         }
                     }
                     quotes.size > 1 -> {
                         if (!quotes.isValidDanishQuoteBundle()) {
-                            RedirectSignStrategy.logger.error("Danish quotes is not valid [Quotes: $quotes]")
+                            logger.error("Danish quotes is not valid [Quotes: $quotes]")
                             return StartSignErrors.quotesCanNotBeBundled
                         }
                     }
                 }
             }
             else -> {
-                RedirectSignStrategy.logger.error("Quotes are not apart of the same market [Quotes: $quotes]")
+                logger.error("Quotes are not apart of the same market [Quotes: $quotes]")
                 return StartSignErrors.quotesCanNotBeBundled
             }
         }

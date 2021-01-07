@@ -20,7 +20,6 @@ import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.util.toStockholmLocalDate
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
@@ -151,9 +150,5 @@ class UnderwriterImpl(
             }
         }
         return guidelineErrors
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(UnderwriterImpl::class.java)
     }
 }

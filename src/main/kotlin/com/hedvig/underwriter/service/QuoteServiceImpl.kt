@@ -23,12 +23,12 @@ import com.hedvig.underwriter.serviceIntegration.notificationService.Notificatio
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData
+import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.BreachedGuideline
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -41,8 +41,6 @@ class QuoteServiceImpl(
     val notificationService: NotificationService,
     val quoteStrategyService: QuoteStrategyService
 ) : QuoteService {
-
-    val logger = getLogger(QuoteServiceImpl::class.java)!!
 
     override fun updateQuote(
         quoteRequest: QuoteRequest,
