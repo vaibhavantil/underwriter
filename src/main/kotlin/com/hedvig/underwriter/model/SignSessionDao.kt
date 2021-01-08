@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.model
 
+import com.hedvig.underwriter.service.model.SignMethod
 import java.time.Instant
 import java.util.UUID
 import org.jdbi.v3.sqlobject.customizer.Bind
@@ -11,14 +12,14 @@ interface SignSessionDao {
     @SqlUpdate(
         """
             INSERT INTO sign_sessions (
-                id, created_at
+                id, signMethod, created_at
             )
             VALUES (
-                :id, :createdAt
+                :id, :signMethod, :createdAt
             )
     """
     )
-    fun insert(id: UUID, @Bind createdAt: Instant = Instant.now())
+    fun insert(id: UUID, signMethod: SignMethod, @Bind createdAt: Instant = Instant.now())
 
     @SqlUpdate(
         """
@@ -39,5 +40,14 @@ interface SignSessionDao {
             WHERE sign_session_id = :sessionId
         """
     )
-    fun find(sessionId: UUID): List<UUID>
+    fun findQuotes(sessionId: UUID): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT signMethod 
+            FROM sign_sessions
+            WHERE id = :sessionId
+        """
+    )
+    fun findSignMethod(sessionId: UUID): SignMethod?
 }

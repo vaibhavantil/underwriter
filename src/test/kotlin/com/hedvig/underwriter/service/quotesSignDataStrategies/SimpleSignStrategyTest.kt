@@ -25,7 +25,7 @@ class SimpleSignStrategyTest {
     fun `start sign calls member service startSimpleSign successfully and returns SimpleSignSession`() {
         val sessionId = UUID.randomUUID()
         every {
-            signSessionRepository.insert(any())
+            signSessionRepository.insert(any(), any())
         } returns sessionId
         every {
             memberService.startSimpleSign(
@@ -51,7 +51,7 @@ class SimpleSignStrategyTest {
     fun `start sign calls member service startSimpleSign failed and returns StartSignErrors`() {
         val sessionId = UUID.randomUUID()
         every {
-            signSessionRepository.insert(any())
+            signSessionRepository.insert(any(), any())
         } returns sessionId
         every {
             memberService.startSimpleSign(
@@ -78,7 +78,7 @@ class SimpleSignStrategyTest {
     fun `start sign calls member service startSimpleSign failed with no error message and returns StartSignErrors`() {
         val sessionId = UUID.randomUUID()
         every {
-            signSessionRepository.insert(any())
+            signSessionRepository.insert(any(), any())
         } returns sessionId
         every {
             memberService.startSimpleSign(

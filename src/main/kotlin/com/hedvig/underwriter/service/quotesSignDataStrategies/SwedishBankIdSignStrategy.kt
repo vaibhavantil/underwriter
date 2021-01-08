@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -22,7 +23,7 @@ class SwedishBankIdSignStrategy(
 
         val isSwitching = quotes[0].currentInsurer != null
 
-        val signSessionId = signSessionRepository.insert(quoteIds)
+        val signSessionId = signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, quoteIds)
 
         val ip = signData.ipAddress ?: run {
             logger.error("Trying to sign swedish quotes without an ip address [Quotes: $quoteIds]")

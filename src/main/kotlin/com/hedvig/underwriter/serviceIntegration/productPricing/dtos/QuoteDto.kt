@@ -14,6 +14,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.service.model.SignMethod
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -43,6 +44,7 @@ data class QuoteDto(
     val dataCollectionId: UUID? = null
 ) {
 
+    @Deprecated("Get sign method from session")
     val signMethod = when (this.data) {
         is SwedishApartmentData, is SwedishHouseData -> SignMethod.SWEDISH_BANK_ID
         is NorwegianHomeContentsData, is NorwegianTravelData -> SignMethod.NORWEGIAN_BANK_ID

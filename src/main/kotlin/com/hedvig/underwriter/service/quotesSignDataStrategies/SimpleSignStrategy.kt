@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -14,7 +15,7 @@ class SimpleSignStrategy(
     private val memberService: MemberService
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        val signSessionId = signSessionRepository.insert(quotes.map { it.id })
+        val signSessionId = signSessionRepository.insert(SignMethod.SIMPLE_SIGN, quotes.map { it.id })
 
         val response = memberService.startSimpleSign(
             memberId = quotes.safelyGetMemberId(),

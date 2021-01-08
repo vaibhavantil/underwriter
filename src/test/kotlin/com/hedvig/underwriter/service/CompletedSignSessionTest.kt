@@ -10,6 +10,7 @@ import com.hedvig.underwriter.model.QuoteRepositoryImpl
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.SignSessionRepositoryImpl
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
@@ -72,7 +73,7 @@ class CompletedSignSessionTest {
         }
         quoteRepository.insert(quote)
 
-        val signSessionId = signSessionRepository.insert(listOf(quoteId))
+        val signSessionId = signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, listOf(quoteId))
 
         val agreementId = UUID.randomUUID()
         val contractId = UUID.randomUUID()
@@ -105,7 +106,7 @@ class CompletedSignSessionTest {
         }
         quoteRepository.insert(quote)
 
-        val signSessionId = signSessionRepository.insert(listOf(quoteId))
+        val signSessionId = signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, listOf(quoteId))
 
         val agreementId = UUID.randomUUID()
         val contractId = UUID.randomUUID()

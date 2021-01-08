@@ -2,9 +2,12 @@ package com.hedvig.underwriter.web
 
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.web.dtos.SignRequest
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -34,11 +37,17 @@ class SignSessionController @Autowired constructor(
     }
 
     @PostMapping("/{sessionId}/completed")
-    fun singSessionComplete(
+    fun signSessionComplete(
         @PathVariable sessionId: UUID
     ) {
         signService.completedSignSession(
             sessionId, CompleteSignSessionData.NoMandate
         )
     }
+
+    @GetMapping("/{sessionId}/signMethod")
+    fun signMethodFromSession(
+        @PathVariable sessionId: UUID
+    ): ResponseEntity<SignMethod> =
+        ResponseEntity.ok(signService.signMethodFromSession(sessionId))
 }

@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -10,6 +11,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCoun
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import org.springframework.stereotype.Service
+import java.lang.RuntimeException
 import java.util.UUID
 import kotlin.IllegalStateException
 
@@ -23,7 +25,13 @@ class RedirectSignStrategy(
             return StartSignErrors.targetURLNotProvided
         }
 
-        val signSessionId = signSessionRepository.insert(quotes.map { it.id })
+        val signMethod = when {
+            quotes.areNorwegianQuotes() -> SignMethod.NORWEGIAN_BANK_ID
+            quotes.areDanishQuotes() -> SignMethod.DANISH_BANK_ID
+            else -> throw RuntimeException("Could not get sign method from quotes [$quotes]")
+        }
+
+        val signSessionId = signSessionRepository.insert(signMethod, quotes.map { it.id })
 
         val response = getRedirectBankIdSignResponse(quotes, signSessionId, signData.successUrl, signData.failUrl)
 

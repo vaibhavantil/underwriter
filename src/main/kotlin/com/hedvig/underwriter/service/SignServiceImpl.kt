@@ -4,11 +4,18 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.core.toOption
+import com.hedvig.underwriter.model.DanishAccidentData
+import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -23,6 +30,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -297,6 +305,21 @@ class SignServiceImpl(
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, false, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
+    }
+
+    override fun signMethodFromSession(signSessionId: UUID): SignMethod {
+        signSessionRepository.findSignMethod(signSessionId)?.let {
+            return it
+        }
+
+        val quoteId = signSessionRepository.find(signSessionId).first()
+
+        return when (quoteRepository.find(quoteId)?.data) {
+            is SwedishHouseData, is SwedishApartmentData -> SignMethod.SWEDISH_BANK_ID
+            is NorwegianHomeContentsData, is NorwegianTravelData -> SignMethod.NORWEGIAN_BANK_ID
+            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> SignMethod.DANISH_BANK_ID
+            null -> throw RuntimeException("Could not find quote with quote id: '$quoteId' when getting sign method")
+        }
     }
 
     private fun signQuoteWithMemberId(

@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.RedirectSignStrategy
@@ -190,7 +191,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, quoteIds) } returns signSessionReference
 
         every {
             memberService.startSwedishBankIdSign(
@@ -209,7 +210,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 1) { signSessionRepository.insert(any()) }
+        verify(exactly = 1) { signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, any()) }
         assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
     }
 
@@ -225,7 +226,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.SWEDISH_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startSwedishBankIdSign(
                 quote.memberId!!.toLong(),
@@ -280,7 +281,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.NORWEGIAN_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
@@ -322,7 +323,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.NORWEGIAN_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
@@ -365,7 +366,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -385,7 +386,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -405,7 +406,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -430,7 +431,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -453,7 +454,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.DANISH_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
@@ -499,7 +500,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.DANISH_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startRedirectBankIdSign(
                 quote.memberId!!.toLong(),
@@ -548,7 +549,7 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -562,7 +563,7 @@ class SignServiceImplTest {
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
     }
 
@@ -594,7 +595,7 @@ class SignServiceImplTest {
 
         cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        verify(exactly = 0) { signSessionRepository.insert(any()) }
+        verify(exactly = 0) { signSessionRepository.insert(any(), any()) }
     }
 
     @Test
@@ -755,7 +756,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { signSessionRepository.insert(quoteIds) } returns signSessionReference
+        every { signSessionRepository.insert(SignMethod.DANISH_BANK_ID, quoteIds) } returns signSessionReference
         every {
             memberService.startRedirectBankIdSign(
                 memberId.toLong(),
