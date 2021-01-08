@@ -12,7 +12,7 @@ interface SignSessionDao {
     @SqlUpdate(
         """
             INSERT INTO sign_sessions (
-                id, signMethod, created_at
+                id, sign_method, created_at
             )
             VALUES (
                 :id, :signMethod, :createdAt
