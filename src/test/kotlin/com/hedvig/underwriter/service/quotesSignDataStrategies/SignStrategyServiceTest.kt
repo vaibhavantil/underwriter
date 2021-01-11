@@ -217,7 +217,7 @@ class SignStrategyServiceTest {
                     data = NorwegianTravelDataBuilder()
                 }
             ),
-            createSignData(enableSimpleSign = true)
+            createSignData()
         )
 
         verify(exactly = 1) { simpleSignStrategy.startSign(any(), any()) }

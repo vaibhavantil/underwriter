@@ -55,8 +55,7 @@ class SignServiceImpl(
         memberId: String,
         ipAddress: String?,
         successUrl: String?,
-        failUrl: String?,
-        enableSimpleSign: Boolean
+        failUrl: String?
     ): StartSignResponse {
 
         if (memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()).memberAlreadySigned) {
@@ -83,7 +82,7 @@ class SignServiceImpl(
 
         return signStrategyService.startSign(
             quotes = quotes,
-            signData = SignData(ipAddress, successUrl, failUrl, enableSimpleSign)
+            signData = SignData(ipAddress, successUrl, failUrl)
         )
     }
 

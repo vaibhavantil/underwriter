@@ -22,7 +22,7 @@ class SignStrategyService(
     private val env: Environment
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
-        val strategy = quotes.getStrategiesFromQuotes(signData.enableSimpleSign)
+        val strategy = quotes.getStrategiesFromQuotes()
 
         if (strategy.isEmpty()) {
             return StartSignErrors.noQuotes
@@ -70,12 +70,12 @@ class SignStrategyService(
         return strategy.first().startSign(quotes, signData)
     }
 
-    private fun List<Quote>.getStrategiesFromQuotes(enableSimpleSign: Boolean) = this.map {
+    private fun List<Quote>.getStrategiesFromQuotes() = this.map {
         when (it.data) {
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> if (enableSimpleSign && env.activeProfiles.contains("staging")) {
+            is NorwegianTravelData -> if (env.activeProfiles.contains("staging")) {
                 simpleSignStrategy
             } else {
                 redirectSignStrategy

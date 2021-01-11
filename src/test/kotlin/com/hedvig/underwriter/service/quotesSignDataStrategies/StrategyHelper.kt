@@ -4,9 +4,8 @@ object StrategyHelper {
     fun createSignData(
         ipAddress: String? = null,
         successUrl: String? = null,
-        failUrl: String? = null,
-        enableSimpleSign: Boolean = false
+        failUrl: String? = null
     ) = SignData(
-        ipAddress, successUrl, failUrl, enableSimpleSign
+        ipAddress, successUrl, failUrl
     )
 }
