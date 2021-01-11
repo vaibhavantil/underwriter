@@ -296,6 +296,7 @@ class SignServiceImplTest {
         } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
             "redirect url"
         )
+        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
 
@@ -339,6 +340,8 @@ class SignServiceImplTest {
             "redirect url"
         )
 
+        every { env.activeProfiles } returns arrayOf<String>()
+
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
@@ -362,6 +365,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
+        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -591,6 +595,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
+        every { env.activeProfiles } returns arrayOf<String>()
 
         cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -666,6 +671,7 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
+        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
 
