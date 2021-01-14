@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -33,4 +34,6 @@ class SimpleSignStrategy(
             } ?: StartSignErrors.failedToStartSign("No error message")
         }
     }
+
+    override fun getSignMethod(quotes: List<Quote>) = SignMethod.SIMPLE_SIGN
 }

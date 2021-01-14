@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -44,4 +45,6 @@ class SwedishBankIdSignStrategy(
             StartSignResponse.SwedishBankIdSession(autoStartToken)
         } ?: StartSignErrors.failedToStartSign(response.internalErrorMessage!!)
     }
+
+    override fun getSignMethod(quotes: List<Quote>) = SignMethod.SWEDISH_BANK_ID
 }

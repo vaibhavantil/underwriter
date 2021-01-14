@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service
 
 import arrow.core.Either
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -35,4 +36,6 @@ interface SignService {
     ): Either<ErrorResponseDto, SignedQuoteResponseDto>
 
     fun memberSigned(memberId: String, signedRequest: SignRequest)
+
+    fun getSignMethodFromQuotes(quoteIds: List<UUID>): SignMethod
 }

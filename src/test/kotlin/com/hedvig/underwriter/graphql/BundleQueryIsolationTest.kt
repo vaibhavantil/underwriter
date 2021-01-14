@@ -7,6 +7,7 @@ import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import graphql.schema.DataFetchingEnvironment
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -20,6 +21,9 @@ class BundleQueryIsolationTest {
 
     @MockK
     lateinit var quoteService: QuoteService
+
+    @MockK
+    lateinit var signService: SignService
 
     @MockK
     lateinit var bundleQuoteService: BundleQuotesService
@@ -43,6 +47,7 @@ class BundleQueryIsolationTest {
 
         val query = Query(
             quoteService,
+            signService,
             bundleQuoteService,
             QuoteMapper(localizationService)
             )

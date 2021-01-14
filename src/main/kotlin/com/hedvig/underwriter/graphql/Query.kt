@@ -7,17 +7,20 @@ import com.hedvig.resolver.LocaleResolver
 import com.hedvig.underwriter.graphql.type.QuoteBundle
 import com.hedvig.underwriter.graphql.type.QuoteBundleInputInput
 import com.hedvig.underwriter.graphql.type.QuoteMapper
+import com.hedvig.underwriter.graphql.type.SignMethod
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
+import com.hedvig.underwriter.service.SignService
 import graphql.schema.DataFetchingEnvironment
-import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 class Query @Autowired constructor(
     private val quoteService: QuoteService,
+    private val signService: SignService,
     private val bundleQuotesService: BundleQuotesService,
     private val quoteMapper: QuoteMapper
 ) : GraphQLQueryResolver {
@@ -42,6 +45,9 @@ class Query @Autowired constructor(
             LocaleResolver.resolveLocale(env.getAcceptLanguage())
         )
     }
+
+    fun signMethodForQuotes(input: List<UUID>): SignMethod =
+        signService.getSignMethodFromQuotes(input).toGraphQL()
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = quoteMapper.mapToQuoteResult(
         this,

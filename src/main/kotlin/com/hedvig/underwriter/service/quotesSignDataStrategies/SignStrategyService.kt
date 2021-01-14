@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.util.logger
@@ -107,6 +108,10 @@ class SignStrategyService(
             this.any { it.data is DanishHomeContentsData } &&
             this.any { it.data is DanishAccidentData } &&
             this.any { it.data is DanishTravelData }
+
+    override fun getSignMethod(quotes: List<Quote>): SignMethod {
+        throw RuntimeException("Don't run getSignMethod on SignStrategyService")
+    }
 }
 
 fun List<Quote>.areNorwegianQuotes(): Boolean {
