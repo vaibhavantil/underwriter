@@ -12,6 +12,7 @@ import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignData
@@ -296,6 +297,11 @@ class SignServiceImpl(
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
             signQuoteWithMemberId(quote, false, signedRequest, null)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
+    }
+
+    override fun getSignMethodFromQuotes(quoteIds: List<UUID>): SignMethod {
+        val quotes = quoteService.getQuotes(quoteIds)
+        return signStrategyService.getSignMethod(quotes)
     }
 
     private fun signQuoteWithMemberId(

@@ -2,6 +2,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -32,6 +33,12 @@ class RedirectSignStrategy(
         } ?: response.internalErrorMessage?.let {
             StartSignErrors.emptyRedirectUrlFromBankId(it)
         } ?: StartSignErrors.emptyRedirectUrlFromBankId(response.errorMessages!!.joinToString(", "))
+    }
+
+    override fun getSignMethod(quotes: List<Quote>): SignMethod = when {
+        quotes.areNorwegianQuotes() -> SignMethod.NORWEGIAN_BANK_ID
+        quotes.areDanishQuotes() -> SignMethod.DANISH_BANK_ID
+        else -> throw RuntimeException("quotes are not valid while getting the sign method [Quotes: $quotes]")
     }
 
     private fun getRedirectBankIdSignResponse(
