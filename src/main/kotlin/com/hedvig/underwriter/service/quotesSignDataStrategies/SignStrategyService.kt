@@ -110,7 +110,17 @@ class SignStrategyService(
             this.any { it.data is DanishTravelData }
 
     override fun getSignMethod(quotes: List<Quote>): SignMethod {
-        throw RuntimeException("Don't run getSignMethod on SignStrategyService")
+        val strategy = quotes.getStrategiesFromQuotes()
+
+        if (strategy.isEmpty()) {
+            throw RuntimeException("No strategy on getSignMethod for [Quotes: $quotes]")
+        }
+
+        if (strategy.size > 1) {
+            throw RuntimeException("Multiple strategies on getSignMethod for [Quotes: $quotes]")
+        }
+
+        return strategy.first().getSignMethod(quotes)
     }
 }
 
