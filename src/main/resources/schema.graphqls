@@ -7,6 +7,7 @@ type Query {
     quote(id: ID): Quote!
     lastQuoteOfMember: Quote!
     quoteBundle(input: QuoteBundleInput!): QuoteBundle!
+    signMethodForQuotes(input: [ID!]!): SignMethod!
 }
 
 type Mutation {
@@ -621,6 +622,13 @@ type BundledQuote {
     email: String
     dataCollectionId: ID
     typeOfContract: TypeOfContract!
+}
+
+enum SignMethod {
+    SWEDISH_BANK_ID
+    NORWEGIAN_BANK_ID
+    DANISH_BANK_ID
+    SIMPLE_SIGN
 }
 
 scalar LocalDate
