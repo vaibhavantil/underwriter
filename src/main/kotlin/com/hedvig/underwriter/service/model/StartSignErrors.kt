@@ -20,7 +20,7 @@ object StartSignErrors {
     )
 
     val personalInfoNotMatching = StartSignResponse.FailedToStartSign(
-        "quotes must have same firstName, lastName and ss",
+        "quotes must have matching firstName, lastName, ssn, birthDate and email",
         "PERSONAL_INFO_NOT_MATCHING"
     )
 
