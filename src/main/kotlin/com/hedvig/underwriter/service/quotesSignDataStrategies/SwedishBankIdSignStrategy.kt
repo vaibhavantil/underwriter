@@ -21,7 +21,7 @@ class SwedishBankIdSignStrategy(
 
         val ssn = quotes.safelyGetSsn()
 
-        val isSwitching = quotes.any { quote -> quote.currentInsurer != null}
+        val isSwitching = quotes.any { quote -> quote.currentInsurer != null }
 
         val signSessionId = signSessionRepository.insert(quoteIds)
 

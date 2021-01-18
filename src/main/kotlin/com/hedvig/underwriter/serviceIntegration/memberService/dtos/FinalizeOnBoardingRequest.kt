@@ -7,7 +7,6 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.phoneNumber
 import com.hedvig.underwriter.model.ssn
-import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
 class FinalizeOnBoardingRequest(
