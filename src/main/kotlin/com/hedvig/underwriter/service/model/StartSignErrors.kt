@@ -19,6 +19,11 @@ object StartSignErrors {
         "NO_MEMBER_ID_ON_QUOTE"
     )
 
+    val personalInfoNotMatching = StartSignResponse.FailedToStartSign(
+        "quotes must have same firstName, lastName and ss",
+        "PERSONAL_INFO_NOT_MATCHING"
+    )
+
     val targetURLNotProvided =
         StartSignResponse.FailedToStartSign(
             "Bad request: Must provide `successUrl` and `failUrl` when starting norwegian sign",

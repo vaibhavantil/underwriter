@@ -76,11 +76,12 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> if (env.activeProfiles.contains("staging")) {
-                simpleSignStrategy
-            } else {
-                redirectSignStrategy
-            }
+            is NorwegianTravelData ->
+                if (env.activeProfiles.contains("staging")) {
+                    simpleSignStrategy
+                } else {
+                    redirectSignStrategy
+                }
             is DanishHomeContentsData,
             is DanishAccidentData,
             is DanishTravelData -> redirectSignStrategy
@@ -100,8 +101,10 @@ class SignStrategyService(
 
     private fun List<Quote>.areTwoValidDanishQuotes(): Boolean =
         this.size == 2 &&
-            (this.any { it.data is DanishHomeContentsData } &&
-                (this.any { it.data is DanishAccidentData } || this.any { it.data is DanishTravelData }))
+            (
+                this.any { it.data is DanishHomeContentsData } &&
+                    (this.any { it.data is DanishAccidentData } || this.any { it.data is DanishTravelData })
+                )
 
     private fun List<Quote>.areThreeValidDanishQuotes(): Boolean =
         this.size == 3 &&
