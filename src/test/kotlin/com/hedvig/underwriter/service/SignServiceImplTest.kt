@@ -4,9 +4,11 @@ import arrow.core.Right
 import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
@@ -109,8 +111,7 @@ class SignServiceImplTest {
             productPricingService,
             signSessionRepository,
             signStrategyService,
-            customerIO,
-            env
+            customerIO
         )
     }
 
@@ -142,7 +143,6 @@ class SignServiceImplTest {
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(ofType(Quote::class)) }
@@ -172,7 +172,6 @@ class SignServiceImplTest {
         )
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
@@ -211,6 +210,10 @@ class SignServiceImplTest {
 
         verify(exactly = 1) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.SwedishBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 
     @Test
@@ -246,6 +249,9 @@ class SignServiceImplTest {
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
         assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo("Failed")
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -264,6 +270,9 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -301,6 +310,10 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 
     @Test
@@ -336,15 +349,16 @@ class SignServiceImplTest {
                 failUrl,
                 RedirectCountry.NORWAY
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
-        )
-
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect("redirect url")
         every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 
     @Test
@@ -365,12 +379,15 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -391,6 +408,10 @@ class SignServiceImplTest {
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -411,6 +432,10 @@ class SignServiceImplTest {
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -436,6 +461,10 @@ class SignServiceImplTest {
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -477,6 +506,10 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 
     @Test
@@ -523,6 +556,10 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 
     @Test
@@ -554,6 +591,10 @@ class SignServiceImplTest {
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -568,6 +609,10 @@ class SignServiceImplTest {
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -596,22 +641,24 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
         every { env.activeProfiles } returns arrayOf<String>()
-
         cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
     fun failStartSignQuotesWithNoMemberId() {
         val memberId = "1337"
         val quoteIds = listOf(UUID.randomUUID())
-        val quote1 =
-            quote {
-                id = quoteIds[0]
-                data = NorwegianHomeContentDataBuilder()
-                this.memberId = null
-            }
+        val quote1 = quote {
+            id = quoteIds[0]
+            data = NorwegianHomeContentDataBuilder()
+            this.memberId = null
+        }
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1)
@@ -625,6 +672,10 @@ class SignServiceImplTest {
         assertThat(result.errorCode).isEqualTo(
             StartSignErrors.noMemberIdOnQuote.errorCode
         )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -656,6 +707,150 @@ class SignServiceImplTest {
         assertThat(result.errorCode).isEqualTo(
             StartSignErrors.variousMemberId.errorCode
         )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
+    }
+
+    @Test
+    fun failStartSignQuotesWithDifferentFirstNameFromHedvigToken() {
+        val memberId = "1337"
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote1 =
+            quote {
+                id = quoteIds[0]
+                data = NorwegianHomeContentDataBuilder().copy(firstName = "Tolvan")
+                this.memberId = memberId
+            }
+        val quote2 =
+            quote {
+                id = quoteIds[1]
+                data = NorwegianTravelDataBuilder().copy(firstName = "Tolvansbror")
+                this.memberId = memberId
+            }
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorCode
+        )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
+    }
+
+    @Test
+    fun failStartSignQuotesWithDifferentLastNameFromHedvigToken() {
+        val memberId = "1337"
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote1 =
+            quote {
+                id = quoteIds[0]
+                data = NorwegianHomeContentDataBuilder().copy(lastName = "Tolvansson")
+                this.memberId = memberId
+            }
+        val quote2 =
+            quote {
+                id = quoteIds[1]
+                data = NorwegianTravelDataBuilder().copy(lastName = "Tolvansbrorsson")
+                this.memberId = memberId
+            }
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorCode
+        )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
+    }
+
+    @Test
+    fun failStartSignQuotesWithDifferentSsnFromHedvigToken() {
+        val memberId = "1337"
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote1 =
+            quote {
+                id = quoteIds[0]
+                data = NorwegianHomeContentDataBuilder().copy(ssn = "123456789")
+                this.memberId = memberId
+            }
+        val quote2 =
+            quote {
+                id = quoteIds[1]
+                data = NorwegianTravelDataBuilder().copy(ssn = "987654321")
+                this.memberId = memberId
+            }
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorCode
+        )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
+    }
+
+    @Test
+    fun failStartSignQuotesWithDifferentEmailFromHedvigToken() {
+        val memberId = "1337"
+        val quoteIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val quote1 =
+            quote {
+                id = quoteIds[0]
+                data = NorwegianHomeContentDataBuilder().copy(email = "test@hedvig.com")
+                this.memberId = memberId
+            }
+        val quote2 =
+            quote {
+                id = quoteIds[1]
+                data = NorwegianTravelDataBuilder().copy(email = "com@hedvig.test")
+                this.memberId = memberId
+            }
+
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2)
+
+        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
+
+        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
+        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorMessage
+        )
+        assertThat(result.errorCode).isEqualTo(
+            StartSignErrors.personalInfoNotMatching.errorCode
+        )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -672,7 +867,6 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { env.activeProfiles } returns arrayOf<String>()
-
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
@@ -682,6 +876,10 @@ class SignServiceImplTest {
         assertThat(result.errorCode).isEqualTo(
             StartSignErrors.targetURLNotProvided.errorCode
         )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -700,6 +898,10 @@ class SignServiceImplTest {
         assertThat(result.errorCode).isEqualTo(
             StartSignErrors.memberIsAlreadySigned.errorCode
         )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
     }
 
     @Test
@@ -711,6 +913,7 @@ class SignServiceImplTest {
                 id = quoteId
                 data = NorwegianHomeContentDataBuilder()
                 this.memberId = memberId
+                initiatedFrom = QuoteInitiatedFrom.HOPE
             }
 
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(
@@ -738,6 +941,10 @@ class SignServiceImplTest {
             quoteId,
             SignQuoteFromHopeRequest(activationDate = LocalDate.parse("2020-05-11"), token = null)
         )
+
+        verify(inverse = true) {
+            memberService.finalizeOnboarding(any(), any())
+        }
 
         verify(inverse = true) {
             memberService.signQuote(
@@ -781,5 +988,9 @@ class SignServiceImplTest {
         val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
 
         assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+
+        verify {
+            memberService.finalizeOnboarding(quote, quote.email!!)
+        }
     }
 }

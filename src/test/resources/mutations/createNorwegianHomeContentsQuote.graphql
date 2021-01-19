@@ -4,6 +4,7 @@ mutation {
         firstName: "first"
         lastName: "family"
         ssn: "21126114165"
+        email: "test@email.com"
         norwegianHomeContents: {
             street: "Kungsgatan 2"
             livingSpace: 30

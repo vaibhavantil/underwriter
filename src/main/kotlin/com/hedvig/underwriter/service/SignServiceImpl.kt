@@ -9,6 +9,11 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
+import com.hedvig.underwriter.model.birthDate
+import com.hedvig.underwriter.model.email
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
+import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -32,7 +37,6 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
@@ -47,8 +51,7 @@ class SignServiceImpl(
     val productPricingService: ProductPricingService,
     val signSessionRepository: SignSessionRepository,
     val signStrategyService: SignStrategyService,
-    val customerIO: CustomerIO,
-    val env: Environment
+    val customerIO: CustomerIO
 ) : SignService {
 
     override fun startSigningQuotes(
@@ -65,26 +68,36 @@ class SignServiceImpl(
 
         val quotes = quoteService.getQuotes(quoteIds)
         quotes.forEach { quote ->
-            quote.memberId?.let { quoteMemberId ->
-                if (memberId != quoteMemberId) {
-                    logger.info("Member [id: $memberId] tried to sign quote with member id: $quoteMemberId. [Quotes: $quotes]")
-                    return StartSignErrors.variousMemberId
-                }
-            } ?: run {
-                logger.info("Member [id: $memberId] tried to sign quote without member id. [Quotes: $quotes]")
+            if (quote.memberId == null) {
+                logger.error("Member [id: $memberId] tried to sign quote without memberId [Quotes: $quotes]")
                 return StartSignErrors.noMemberIdOnQuote
+            }
+            if (memberId != quote.memberId) {
+                logger.error("Member [id: $memberId] tried to sign quote with mismatching memberId [Quotes: $quotes]")
+                return StartSignErrors.variousMemberId
             }
 
             val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
             if (quoteNotSignableErrorDto != null) {
+                logger.error("Member [id: $memberId] tried to sign quote that was either signed or expired [Quotes: $quotes]")
                 return StartSignErrors.fromErrorResponse(quoteNotSignableErrorDto)
             }
         }
 
-        return signStrategyService.startSign(
+        val personalInfoMatching = bundlePersonalInfoMatching(quotes)
+        if (!personalInfoMatching) {
+            logger.error("Member [id: $memberId] tried to sign bundle with mismatching personal info [Quotes: $quotes]")
+            return StartSignErrors.personalInfoNotMatching
+        }
+
+        val startSignResponse = signStrategyService.startSign(
             quotes = quotes,
             signData = SignData(ipAddress, successUrl, failUrl)
         )
+        if (startSignResponse !is StartSignResponse.FailedToStartSign) {
+            memberService.finalizeOnboarding(quotes[0], quotes[0].email!!)
+        }
+        return startSignResponse
     }
 
     override fun completedSignSession(signSessionId: UUID, completeSignSessionData: CompleteSignSessionData) {
@@ -229,10 +242,13 @@ class SignServiceImpl(
             val memberId = memberService.createMember()
 
             val ssn = quote.data.ssn!!
-            memberService.updateMemberSsn(memberId.toLong(), UpdateSsnRequest(
-                ssn = ssn,
-                nationality = Nationality.fromQuote(quote)
-                ))
+            memberService.updateMemberSsn(
+                memberId.toLong(),
+                UpdateSsnRequest(
+                    ssn = ssn,
+                    nationality = Nationality.fromQuote(quote)
+                )
+            )
 
             return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
         } else {
@@ -344,6 +360,14 @@ class SignServiceImpl(
         }
         return quote
     }
+}
+
+private fun bundlePersonalInfoMatching(quotes: List<Quote>): Boolean = quotes.windowed(2).all { (left, right) ->
+    left.firstName == right.firstName &&
+        left.lastName == right.lastName &&
+        left.ssn == right.ssn &&
+        left.email == right.email &&
+        left.birthDate == right.birthDate
 }
 
 private fun assertAgreementIdIsNotNull(quote: Quote): Quote {

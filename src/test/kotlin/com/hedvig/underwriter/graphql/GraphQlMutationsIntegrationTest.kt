@@ -303,7 +303,7 @@ internal class GraphQlMutationsIntegrationTest {
             id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
             firstName = "",
             lastName = "",
-            email = null,
+            email = "test@email.com",
             phoneNumber = null,
             currentInsurer = null,
             ssn = "21126114165",
@@ -427,7 +427,7 @@ internal class GraphQlMutationsIntegrationTest {
             id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae6"),
             firstName = "",
             lastName = "",
-            email = null,
+            email = "test@email.com",
             phoneNumber = null,
             currentInsurer = null,
             ssn = "1212121212",
@@ -453,7 +453,7 @@ internal class GraphQlMutationsIntegrationTest {
         )
         val createQuote = response.readTree()["data"]["createQuote"]
 
-        verify { memberService.finalizeOnboarding(any(), "") }
+        verify { memberService.finalizeOnboarding(any(), "test@email.com") }
     }
 
     @Test

@@ -3,8 +3,10 @@ package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 import com.hedvig.underwriter.model.AddressData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.birthDate
+import com.hedvig.underwriter.model.firstName
+import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.phoneNumber
-import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.model.ssn
 import java.time.LocalDate
 
 class FinalizeOnBoardingRequest(
@@ -34,13 +36,11 @@ class FinalizeOnBoardingRequest(
                 )
             }
 
-            val personPolicyHolder = quote.data as PersonPolicyHolder<*>
-
             return FinalizeOnBoardingRequest(
                 memberId = quote.memberId!!,
-                ssn = personPolicyHolder.ssn,
-                firstName = personPolicyHolder.firstName!!,
-                lastName = personPolicyHolder.lastName!!,
+                ssn = quote.ssn,
+                firstName = quote.firstName,
+                lastName = quote.lastName,
                 email = email,
                 phoneNumber = quote.phoneNumber,
                 address = address,

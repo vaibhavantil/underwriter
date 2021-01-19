@@ -56,7 +56,6 @@ class CompletedSignSessionTest {
             productPricingService,
             signSessionRepository,
             signStrategyService,
-            mockk(),
             mockk()
         )
     }

@@ -5,6 +5,7 @@ mutation create {
         lastName: "family"
         ssn: "191212121212"
         phoneNumber: "0812331321"
+        email: "test@email.com"
         house: {
             street: "Kungsgatan 1"
             livingSpace: 30

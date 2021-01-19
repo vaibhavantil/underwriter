@@ -56,7 +56,8 @@ class QuoteServiceImpl(
                         ErrorCodes.INVALID_STATE,
                         "quote [Id: ${it.id}] must be quoted to update but was really ${it.state} [Quote: $it]"
                     )
-                })
+                }
+            )
             .map { it.clearBreachedUnderwritingGuidelines() }
             .map { it.update(quoteRequest) }
             .flatMap { updatedQuote ->
@@ -120,7 +121,7 @@ class QuoteServiceImpl(
 
         val quote = breachedGuidelinesOrQuote.getQuote()
         if (updateMemberService && quote.memberId != null) {
-            memberService.finalizeOnboarding(quote, quote.email ?: "")
+            memberService.finalizeOnboarding(quote, quote.email!!)
         }
 
         if (quote.memberId != null && quote.email != null) {
@@ -241,11 +242,13 @@ class QuoteServiceImpl(
                 "Underwriting guidelines breached for incomplete quote $quoteId: {}",
                 quote.breachedUnderwritingGuidelines
             )
-            Left(ErrorResponseDto(
-                ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
-                "quote cannot be calculated, underwriting guidelines are breached [Quote: $quote",
-                quote.breachedUnderwritingGuidelines.map { BreachedGuideline("Deprecated", it) }
-            ))
+            Left(
+                ErrorResponseDto(
+                    ErrorCodes.MEMBER_BREACHES_UW_GUIDELINES,
+                    "quote cannot be calculated, underwriting guidelines are breached [Quote: $quote",
+                    quote.breachedUnderwritingGuidelines.map { BreachedGuideline("Deprecated", it) }
+                )
+            )
         } else {
             Right(
                 CompleteQuoteResponseDto(
