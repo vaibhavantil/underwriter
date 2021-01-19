@@ -37,7 +37,6 @@ import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
@@ -52,8 +51,7 @@ class SignServiceImpl(
     val productPricingService: ProductPricingService,
     val signSessionRepository: SignSessionRepository,
     val signStrategyService: SignStrategyService,
-    val customerIO: CustomerIO,
-    val env: Environment
+    val customerIO: CustomerIO
 ) : SignService {
 
     override fun startSigningQuotes(
@@ -86,13 +84,7 @@ class SignServiceImpl(
             }
         }
 
-        val personalInfoMatching = quotes.windowed(2).all { (predecessor, successor) ->
-            predecessor.firstName == successor.firstName &&
-                predecessor.lastName == successor.lastName &&
-                predecessor.ssn == successor.ssn &&
-                predecessor.email == successor.email &&
-                predecessor.birthDate == successor.birthDate
-        }
+        val personalInfoMatching = bundlePersonalInfoMatching(quotes)
         if (!personalInfoMatching) {
             logger.error("Member [id: $memberId] tried to sign bundle with mismatching personal info [Quotes: $quotes]")
             return StartSignErrors.personalInfoNotMatching
@@ -368,6 +360,14 @@ class SignServiceImpl(
         }
         return quote
     }
+}
+
+private fun bundlePersonalInfoMatching(quotes: List<Quote>): Boolean = quotes.windowed(2).all { (left, right) ->
+    left.firstName == right.firstName &&
+        left.lastName == right.lastName &&
+        left.ssn == right.ssn &&
+        left.email == right.email &&
+        left.birthDate == right.birthDate
 }
 
 private fun assertAgreementIdIsNotNull(quote: Quote): Quote {
