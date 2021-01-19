@@ -65,7 +65,6 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
             productPricingService,
             mockk(),
             mockk(),
-            mockk(),
             mockk()
         )
 
@@ -99,7 +98,6 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
             quoteRepository,
             memberService,
             productPricingService,
-            mockk(),
             mockk(),
             mockk(),
             mockk()
@@ -141,7 +139,6 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
             quoteRepository,
             memberService,
             productPricingService,
-            mockk(),
             mockk(),
             mockk(),
             mockk()

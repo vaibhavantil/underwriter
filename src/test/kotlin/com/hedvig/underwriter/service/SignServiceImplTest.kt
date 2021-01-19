@@ -111,8 +111,7 @@ class SignServiceImplTest {
             productPricingService,
             signSessionRepository,
             signStrategyService,
-            customerIO,
-            env
+            customerIO
         )
     }
 
@@ -144,7 +143,6 @@ class SignServiceImplTest {
         every { productPricingService.redeemCampaign(any()) } returns ResponseEntity.ok().build()
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(ofType(Quote::class)) }
@@ -174,7 +172,6 @@ class SignServiceImplTest {
         )
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
@@ -352,10 +349,7 @@ class SignServiceImplTest {
                 failUrl,
                 RedirectCountry.NORWAY
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
-        )
-
+        } returns UnderwriterStartSignSessionResponse.BankIdRedirect("redirect url")
         every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
@@ -385,7 +379,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
-        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
@@ -648,7 +641,6 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
         every { env.activeProfiles } returns arrayOf<String>()
-
         cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
@@ -875,7 +867,6 @@ class SignServiceImplTest {
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { env.activeProfiles } returns arrayOf<String>()
-
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
