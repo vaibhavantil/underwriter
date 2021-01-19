@@ -6,7 +6,6 @@ import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.phoneNumber
-import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.model.ssnMaybe
 import java.time.LocalDate
 
