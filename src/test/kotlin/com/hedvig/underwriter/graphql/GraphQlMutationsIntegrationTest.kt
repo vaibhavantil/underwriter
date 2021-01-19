@@ -303,7 +303,7 @@ internal class GraphQlMutationsIntegrationTest {
             id = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae7"),
             firstName = "",
             lastName = "",
-            email = null,
+            email = "test@email.com",
             phoneNumber = null,
             currentInsurer = null,
             ssn = "21126114165",
