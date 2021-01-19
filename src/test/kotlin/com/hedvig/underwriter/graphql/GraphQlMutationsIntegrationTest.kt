@@ -453,7 +453,7 @@ internal class GraphQlMutationsIntegrationTest {
         )
         val createQuote = response.readTree()["data"]["createQuote"]
 
-        verify { memberService.finalizeOnboarding(any(), "") }
+        verify { memberService.finalizeOnboarding(any(), "test@email.com") }
     }
 
     @Test
