@@ -43,7 +43,6 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 import java.time.LocalDate
 import java.util.UUID
