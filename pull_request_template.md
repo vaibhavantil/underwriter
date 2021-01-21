@@ -7,7 +7,7 @@
 - 
 
 ## Optional checklist
-- [ ] Boyscouted
+- [ ] Codescouted
 - [ ] Unit tests written
-- [ ] Tested locally
+- [ ] Tested locally
 
