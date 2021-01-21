@@ -14,6 +14,7 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -303,8 +304,9 @@ class SignServiceImpl(
     private fun checkIfMemberHasSignedInsurance(
         quote: Quote
     ): Boolean {
+        val ssn = quote.ssnMaybe ?: memberService.getMember(quote.memberId!!.toLong()).ssn
         return when (quote.data) {
-            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(quote.data.ssn!!).ssnAlreadySignedMember
+            is PersonPolicyHolder<*> -> memberService.isSsnAlreadySignedMemberEntity(ssn).ssnAlreadySignedMember
             else -> throw RuntimeException("Unsupported quote data class")
         }
     }
