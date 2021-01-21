@@ -29,8 +29,7 @@ class SignStrategyServiceTest {
     private val cut = SignStrategyService(
         swedishBankIdSignStrategy,
         redirectSignStrategy,
-        simpleSignStrategy,
-        env
+        simpleSignStrategy
     )
 
     @Test
@@ -199,7 +198,7 @@ class SignStrategyServiceTest {
             createSignData()
         )
 
-        verify(exactly = 1) { redirectSignStrategy.startSign(any(), any()) }
+        verify(exactly = 1) { simpleSignStrategy.startSign(any(), any()) }
     }
 
     @Test

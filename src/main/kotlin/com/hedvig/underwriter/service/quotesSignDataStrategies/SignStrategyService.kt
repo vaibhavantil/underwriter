@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service
 class SignStrategyService(
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
     private val redirectSignStrategy: RedirectSignStrategy,
-    private val simpleSignStrategy: SimpleSignStrategy,
-    private val env: Environment
+    private val simpleSignStrategy: SimpleSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
         val strategy = quotes.getStrategiesFromQuotes()
@@ -76,12 +75,7 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData ->
-                if (env.activeProfiles.contains("staging")) {
-                    simpleSignStrategy
-                } else {
-                    redirectSignStrategy
-                }
+            is NorwegianTravelData -> simpleSignStrategy
             is DanishHomeContentsData,
             is DanishAccidentData,
             is DanishTravelData -> redirectSignStrategy
