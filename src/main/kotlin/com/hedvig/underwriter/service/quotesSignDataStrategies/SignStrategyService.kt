@@ -76,12 +76,7 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData ->
-                if (env.activeProfiles.contains("staging")) {
-                    simpleSignStrategy
-                } else {
-                    redirectSignStrategy
-                }
+            is NorwegianTravelData,
             is DanishHomeContentsData,
             is DanishAccidentData,
             is DanishTravelData -> redirectSignStrategy
