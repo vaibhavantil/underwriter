@@ -202,7 +202,7 @@ class SignStrategyServiceTest {
         verify(exactly = 1) { redirectSignStrategy.startSign(any(), any()) }
     }
 
-    //@Test
+    // @Test
     fun `start sign of norwegian quotes with enableSimpleSign set and activeProfiles profile staging has   to true calls simpleSignStrategy startSign`() {
         every {
             env.activeProfiles
