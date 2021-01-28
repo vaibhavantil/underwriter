@@ -17,14 +17,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
-import org.springframework.core.env.Environment
 
 class SignStrategyServiceTest {
 
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy = mockk(relaxed = true)
     private val redirectSignStrategy: RedirectSignStrategy = mockk(relaxed = true)
     private val simpleSignStrategy: SimpleSignStrategy = mockk(relaxed = true)
-    private val env: Environment = mockk(relaxed = true)
 
     private val cut = SignStrategyService(
         swedishBankIdSignStrategy,
@@ -185,28 +183,7 @@ class SignStrategyServiceTest {
     }
 
     @Test
-    fun `start sign of norwegian quotes calls redirectSignStrategy startSign`() {
-        cut.startSign(
-            listOf(
-                quote {
-                    data = NorwegianHomeContentDataBuilder()
-                },
-                quote {
-                    data = NorwegianTravelDataBuilder()
-                }
-            ),
-            createSignData()
-        )
-
-        verify(exactly = 1) { simpleSignStrategy.startSign(any(), any()) }
-    }
-
-    @Test
-    fun `start sign of norwegian quotes with enableSimpleSign set and activeProfiles profile staging has   to true calls simpleSignStrategy startSign`() {
-        every {
-            env.activeProfiles
-        } returns arrayOf("staging")
-
+    fun `start sign of norwegian quotes calls simpleSignStrategy startSign`() {
         cut.startSign(
             listOf(
                 quote {
