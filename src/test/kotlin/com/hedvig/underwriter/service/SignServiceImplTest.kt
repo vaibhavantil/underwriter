@@ -43,7 +43,6 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 import java.time.LocalDate
 import java.util.UUID
@@ -77,9 +76,6 @@ class SignServiceImplTest {
     private lateinit var redirectSignStrategy: RedirectSignStrategy
     private lateinit var simpleSignStrategy: SimpleSignStrategy
 
-    @MockK
-    lateinit var env: Environment
-
     private lateinit var cut: SignService
 
     private val ipAddress = "127.0.0.1"
@@ -101,7 +97,7 @@ class SignServiceImplTest {
         )
 
         signStrategyService = SignStrategyService(
-            swedishBankIdSignStrategy, redirectSignStrategy, simpleSignStrategy, env
+            swedishBankIdSignStrategy, redirectSignStrategy, simpleSignStrategy
         )
 
         cut = SignServiceImpl(
@@ -291,25 +287,21 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startRedirectBankIdSign(
+            memberService.startSimpleSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
                 NationalIdentification(
                     quote.ssn,
                     Nationality.NORWAY
-                ),
-                successUrl,
-                failUrl,
-                RedirectCountry.NORWAY
+                )
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
+        } returns UnderwriterStartSignSessionResponse.SimpleSign(
+            true
         )
-        every { env.activeProfiles } returns arrayOf<String>()
 
         val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
 
-        assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+        assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class.java)
 
         verify {
             memberService.finalizeOnboarding(quote, quote.email!!)
@@ -338,23 +330,19 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startRedirectBankIdSign(
+            memberService.startSimpleSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
                 NationalIdentification(
                     quote.ssn,
                     Nationality.NORWAY
-                ),
-                successUrl,
-                failUrl,
-                RedirectCountry.NORWAY
+                )
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect("redirect url")
-        every { env.activeProfiles } returns arrayOf<String>()
+        } returns UnderwriterStartSignSessionResponse.SimpleSign(true)
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        assertThat(result).isInstanceOf(StartSignResponse.NorwegianBankIdSession::class.java)
+        assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class.java)
 
         verify {
             memberService.finalizeOnboarding(quote, quote.email!!)
@@ -640,7 +628,6 @@ class SignServiceImplTest {
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote1, quote2, quote3)
-        every { env.activeProfiles } returns arrayOf<String>()
         cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
         verify(exactly = 0) { signSessionRepository.insert(any()) }
@@ -854,19 +841,18 @@ class SignServiceImplTest {
     }
 
     @Test
-    fun failStartSignNorwegianQuotesNoTargetUrls() {
+    fun failStartSignDanishQuotesNoTargetUrls() {
         val memberId = "1337"
         val quoteIds = listOf(UUID.randomUUID())
         val quote =
             quote {
                 id = quoteIds[0]
-                data = NorwegianHomeContentDataBuilder()
+                data = DanishHomeContentsDataBuilder()
                 this.memberId = memberId
             }
 
         every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        every { env.activeProfiles } returns arrayOf<String>()
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)

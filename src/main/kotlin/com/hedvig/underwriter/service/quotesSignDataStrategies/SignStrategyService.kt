@@ -12,15 +12,13 @@ import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.util.logger
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
 class SignStrategyService(
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
     private val redirectSignStrategy: RedirectSignStrategy,
-    private val simpleSignStrategy: SimpleSignStrategy,
-    private val env: Environment
+    private val simpleSignStrategy: SimpleSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
         val strategy = quotes.getStrategiesFromQuotes()
@@ -76,7 +74,7 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData,
+            is NorwegianTravelData -> simpleSignStrategy
             is DanishHomeContentsData,
             is DanishAccidentData,
             is DanishTravelData -> redirectSignStrategy
