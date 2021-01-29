@@ -13,7 +13,6 @@ import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuild
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishHouseDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.quote
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
