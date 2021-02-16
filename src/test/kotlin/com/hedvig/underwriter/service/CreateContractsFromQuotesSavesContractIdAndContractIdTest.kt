@@ -113,7 +113,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
         signServiceImpl.signQuote(
             quoteId,
             SignQuoteRequest(
-                Name("Mr Test", "Tester"), LocalDate.of(2020, 1, 1), "a@email.com"
+                Name("Mr Test", "Tester"), null, LocalDate.of(2020, 1, 1), "a@email.com"
             )
         )
 

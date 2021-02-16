@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.core.toOption
+import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
@@ -208,6 +209,8 @@ class SignServiceImpl(
         .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
         .map(::assertAgreementIdIsNotNull)
         .map { updateNameFromRequest(it, body) }
+        .map { updateEmailFromRequest(it, body) }
+        .map { updateSsnFromRequest(it, body) }
         .map { updateStartTimeFromRequest(it, body) }
         .flatMap { createMemberMaybe(it) }
         .flatMap {
@@ -397,6 +400,36 @@ private fun updateNameFromRequest(
 ): Quote {
     return if (body.name != null && quote.data is PersonPolicyHolder<*>) {
         quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+    } else {
+        quote
+    }
+}
+
+private fun updateSsnFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+
+    if (body.ssn == null) {
+        return quote
+    }
+
+    if (quote.data is NorwegianTravelData && quote.data.ssn == null) {
+        return quote.copy(data = quote.data.copy(
+            ssn = body.ssn
+        ))
+    }
+
+    return quote
+}
+
+private fun updateEmailFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+
+    return if (quote.data is PersonPolicyHolder<*>) {
+        quote.copy(data = quote.data.updateEmail(email = body.email))
     } else {
         quote
     }

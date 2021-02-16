@@ -67,6 +67,8 @@ data class SwedishHouseData(
         }
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
+
+    override fun updateEmail(email: String) = this.copy(email = email)
 }
 
 data class SwedishApartmentData(
@@ -101,6 +103,8 @@ data class SwedishApartmentData(
     override fun updateName(firstName: String, lastName: String): SwedishApartmentData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
+
+    override fun updateEmail(email: String) = this.copy(email = email)
 }
 
 data class NorwegianHomeContentsData(
@@ -127,6 +131,8 @@ data class NorwegianHomeContentsData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
+    override fun updateEmail(email: String) = this.copy(email = email)
+
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
         get() = when (null) {
@@ -139,8 +145,8 @@ data class NorwegianTravelData(
     override val id: UUID,
     override val ssn: String? = null,
     override val birthDate: LocalDate,
-    override val firstName: String,
-    override val lastName: String,
+    override val firstName: String?,
+    override val lastName: String?,
     override val email: String? = null,
     override val phoneNumber: String? = null,
     val coInsured: Int,
@@ -153,6 +159,8 @@ data class NorwegianTravelData(
     override fun updateName(firstName: String, lastName: String): NorwegianTravelData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
+
+    override fun updateEmail(email: String) = this.copy(email = email)
 
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
@@ -188,6 +196,8 @@ data class DanishHomeContentsData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
+    override fun updateEmail(email: String) = this.copy(email = email)
+
     override val isComplete: Boolean
         get() = when (null) {
             firstName, lastName, coInsured -> false
@@ -219,6 +229,8 @@ data class DanishAccidentData(
         return this.copy(firstName = firstName, lastName = lastName)
     }
 
+    override fun updateEmail(email: String) = this.copy(email = email)
+
     override val isComplete: Boolean
         get() = when (null) {
             firstName, lastName, coInsured -> false
@@ -249,6 +261,8 @@ data class DanishTravelData(
     override fun updateName(firstName: String, lastName: String): DanishTravelData {
         return this.copy(firstName = firstName, lastName = lastName)
     }
+
+    override fun updateEmail(email: String) = this.copy(email = email)
 
     override val isComplete: Boolean
         get() = when (null) {
