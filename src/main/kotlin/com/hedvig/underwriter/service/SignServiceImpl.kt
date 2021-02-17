@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.core.toOption
-import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
@@ -418,17 +417,11 @@ private fun updateSsnFromRequest(
     body: SignQuoteRequest
 ): Quote {
 
-    if (body.ssn == null) {
-        return quote
+    return if (body.ssn != null && quote.data is PersonPolicyHolder<*>) {
+        quote.copy(data = quote.data.updateSsn(ssn = body.ssn))
+    } else {
+        quote
     }
-
-    if (quote.data is NorwegianTravelData && quote.data.ssn == null) {
-        return quote.copy(data = quote.data.copy(
-            ssn = body.ssn
-        ))
-    }
-
-    return quote
 }
 
 private fun updateEmailFromRequest(

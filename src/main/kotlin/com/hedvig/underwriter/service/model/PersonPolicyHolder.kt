@@ -16,6 +16,8 @@ interface PersonPolicyHolder<T : QuoteData> {
 
     fun updateEmail(email: String): T
 
+    fun updateSsn(ssn: String): T
+
     fun age(): Long {
         val dateToday = LocalDate.now()
 

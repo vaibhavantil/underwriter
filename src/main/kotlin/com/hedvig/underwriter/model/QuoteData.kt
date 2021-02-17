@@ -67,8 +67,8 @@ data class SwedishHouseData(
         }
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
-
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 }
 
 data class SwedishApartmentData(
@@ -100,11 +100,9 @@ data class SwedishApartmentData(
     val isStudent: Boolean
         get() = subType == ApartmentProductSubType.STUDENT_BRF || subType == ApartmentProductSubType.STUDENT_RENT
 
-    override fun updateName(firstName: String, lastName: String): SwedishApartmentData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 }
 
 data class NorwegianHomeContentsData(
@@ -127,11 +125,9 @@ data class NorwegianHomeContentsData(
     val internalId: Int? = null
 ) : QuoteData(), AddressData, PersonPolicyHolder<NorwegianHomeContentsData> {
 
-    override fun updateName(firstName: String, lastName: String): NorwegianHomeContentsData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
@@ -156,11 +152,9 @@ data class NorwegianTravelData(
     val internalId: Int? = null
 ) : QuoteData(), PersonPolicyHolder<NorwegianTravelData> {
 
-    override fun updateName(firstName: String, lastName: String): NorwegianTravelData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
@@ -192,11 +186,9 @@ data class DanishHomeContentsData(
     // Should probably be removed from AddressData
     override val city: String? = null
 
-    override fun updateName(firstName: String, lastName: String): DanishHomeContentsData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -225,11 +217,9 @@ data class DanishAccidentData(
     // Should probably be removed from AddressData
     override val city: String? = null
 
-    override fun updateName(firstName: String, lastName: String): DanishAccidentData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -258,11 +248,9 @@ data class DanishTravelData(
     // Should probably be removed from AddressData
     override val city: String? = null
 
-    override fun updateName(firstName: String, lastName: String): DanishTravelData {
-        return this.copy(firstName = firstName, lastName = lastName)
-    }
-
+    override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
+    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
 
     override val isComplete: Boolean
         get() = when (null) {
