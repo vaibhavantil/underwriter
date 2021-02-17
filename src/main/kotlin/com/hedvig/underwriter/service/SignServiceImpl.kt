@@ -207,11 +207,12 @@ class SignServiceImpl(
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> = quoteRepository.find(quoteId)
         .toOption()
         .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
-        .map(::assertAgreementIdIsNotNull)
         .map { updateNameFromRequest(it, body) }
         .map { updateEmailFromRequest(it, body) }
         .map { updateSsnFromRequest(it, body) }
         .map { updateStartTimeFromRequest(it, body) }
+        .map(::assertAgreementIdIsNull)
+        .map(::assertSsnIsNotNull)
         .flatMap { createMemberMaybe(it) }
         .flatMap {
             signQuoteWithMemberId(
@@ -266,7 +267,7 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        assertAgreementIdIsNotNull(quote)
+        assertAgreementIdIsNull(quote)
 
         if (quote.memberId == null) {
             Either.Left(
@@ -373,9 +374,16 @@ private fun bundlePersonalInfoMatching(quotes: List<Quote>): Boolean = quotes.wi
         left.birthDate == right.birthDate
 }
 
-private fun assertAgreementIdIsNotNull(quote: Quote): Quote {
+private fun assertAgreementIdIsNull(quote: Quote): Quote {
     if (quote.agreementId != null) {
         throw RuntimeException("There is a signed product id ${quote.agreementId} already")
+    }
+    return quote
+}
+
+private fun assertSsnIsNotNull(quote: Quote): Quote {
+    if (quote.ssn.isEmpty()) {
+        throw RuntimeException("No ssn")
     }
     return quote
 }
