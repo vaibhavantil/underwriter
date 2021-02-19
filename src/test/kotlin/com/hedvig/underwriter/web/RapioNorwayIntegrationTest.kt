@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.web
 
 import arrow.core.Right
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.DebtChecker
@@ -41,7 +42,7 @@ import kotlin.random.Random.Default.nextLong
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class RapioNorwayQuoteTest {
+class RapioNorwayIntegrationTest {
 
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
@@ -148,7 +149,7 @@ class RapioNorwayQuoteTest {
         assertEquals(agreementId, quote.agreementId)
         assertEquals(contractId, quote.contractId)
 
-        val data: NorwegianTravelData = quote.data as NorwegianTravelData
+        val data = quote.data as NorwegianTravelData
         assertEquals("12121212345", data.ssn)
         assertEquals("1912-12-12", data.birthDate.toString())
         assertEquals("Apan", data.firstName)
@@ -223,6 +224,112 @@ class RapioNorwayQuoteTest {
         assertThrows(RuntimeException::class.java) {
             postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequest.replace("12121212345", ""))!!
         }
+    }
+
+    @Test
+    fun `Create home content quote and sign it successfully`() {
+
+        val memberId = nextLong(Long.MAX_VALUE).toString()
+        val agreementId = UUID.randomUUID()
+        val contractId = UUID.randomUUID()
+        val now = Instant.now()
+        val today = LocalDate.now()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+        every { priceEngineService.queryNorwegianHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(12, "NOK")
+        )
+        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
+        every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
+        every { memberService.createMember() } returns memberId
+        every { memberService.updateMemberSsn(any(), any()) } returns Unit
+        every { productPricingService.createContractsFromQuotes(any(), any(), any()) } returns listOf(
+            CreateContractResponse(UUID.randomUUID(), agreementId, contractId)
+        )
+        every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1L, true))
+        every { memberService.finalizeOnboarding(any(), any()) } returns Unit
+
+        val quoteRequest = """
+            {
+                "firstName": null,
+                "lastName": null,
+                "currentInsurer": null,
+                "birthDate": "1988-01-01",
+                "ssn": null,
+                "quotingPartner": "HEDVIG",
+                "productType": "HOME_CONTENT",
+                "incompleteQuoteData": {
+                    "type": "norwegianHomeContents",
+                    "street": "ApGatan",
+                    "zipCode": "1234",
+                    "city": "ApCity",
+                    "livingSpace": 122,
+                    "coInsured": 0,
+                    "youth": false,
+                    "subType": "OWN"
+                },
+                "shouldComplete": true,
+                "underwritingGuidelinesBypassedBy": null
+            }
+        """.trimIndent()
+
+        val quoteResponse = postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequest)!!
+
+        assertNotNull(quoteResponse.id)
+        assertEquals("12", quoteResponse.price.toString())
+        assertTrue(quoteResponse.validTo.isAfter(now))
+
+        val signRequest = """
+            {
+                "name": {
+                    "firstName": "Apan",
+                    "lastName": "Apansson"
+                },
+                "ssn": "12121212345",
+                "startDate": "$today",
+                "email": "apan@apansson.se"
+            }
+        """.trimIndent()
+
+        val signResponse = postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequest)!!
+
+        assertNotNull(signResponse.id)
+        assertEquals(memberId, signResponse.memberId)
+
+        val quote = restTemplate.getForObject("/_/v1/quotes/${quoteResponse.id}", Quote::class.java)
+
+        assertEquals(quoteResponse.id, quote.id)
+        assertTrue(quote.createdAt.isAfter(now))
+        assertEquals(quoteResponse.price, quote.price)
+        assertEquals("HOME_CONTENT", quote.productType.name)
+        assertEquals("SIGNED", quote.state.name)
+        assertEquals("RAPIO", quote.initiatedFrom.name)
+        assertEquals("HEDVIG", quote.attributedTo.name)
+        assertTrue(quote.data is NorwegianHomeContentsData)
+        assertEquals(today, quote.startDate)
+        assertEquals(30 * 24 * 60 * 60, quote.validity)
+        assertNull(quote.breachedUnderwritingGuidelines)
+        assertNull(quote.underwritingGuidelinesBypassedBy)
+        assertEquals(memberId, quote.memberId)
+        assertEquals(agreementId, quote.agreementId)
+        assertEquals(contractId, quote.contractId)
+
+        val data = quote.data as NorwegianHomeContentsData
+        assertEquals("12121212345", data.ssn)
+        assertEquals("1988-01-01", data.birthDate.toString())
+        assertEquals("Apan", data.firstName)
+        assertEquals("Apansson", data.lastName)
+        assertEquals("apan@apansson.se", data.email)
+        assertEquals(null, data.phoneNumber)
+        assertEquals("ApGatan", data.street)
+        assertEquals("ApCity", data.city)
+        assertEquals("1234", data.zipCode)
+        assertEquals(122, data.livingSpace)
+        assertEquals(0, data.coInsured)
+        assertEquals(false, data.isYouth)
+        assertEquals("OWN", data.type.name)
+        assertEquals(null, data.internalId)
     }
 
     private inline fun <reified T : Any> postJson(url: String, data: String): T? {

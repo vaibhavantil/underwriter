@@ -4,6 +4,10 @@
 
 ALTER TABLE quote_revision_norwegian_travel_data ALTER COLUMN first_name DROP NOT NULL;
 ALTER TABLE quote_revision_norwegian_travel_data ALTER COLUMN last_name DROP NOT NULL;
+ALTER TABLE quote_revision_norwegian_home_contents_data ALTER COLUMN first_name DROP NOT NULL;
+ALTER TABLE quote_revision_norwegian_home_contents_data ALTER COLUMN last_name DROP NOT NULL;
 
 --rollback ALTER TABLE quote_revision_norwegian_travel_data ALTER COLUMN first_name SET NOT NULL;
 --rollback ALTER TABLE quote_revision_norwegian_travel_data ALTER COLUMN last_name SET NOT NULL;
+--rollback ALTER TABLE quote_revision_norwegian_home_contents_data ALTER COLUMN first_name SET NOT NULL;
+--rollback ALTER TABLE quote_revision_norwegian_home_contents_data ALTER COLUMN last_name SET NOT NULL;

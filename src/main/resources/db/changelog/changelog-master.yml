@@ -68,3 +68,4 @@ databaseChangeLog:
   - include:
       file: ./migrations/20210215-1200-make-norwegian-first-and-last-name-nullable.sql
       relativeToChangelogFile: true
+
