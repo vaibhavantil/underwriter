@@ -140,7 +140,7 @@ class SignServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
+        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), null, LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(ofType(Quote::class)) }
     }
 
@@ -169,7 +169,7 @@ class SignServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), LocalDate.now(), "null"))
+        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), null, LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
     }
 

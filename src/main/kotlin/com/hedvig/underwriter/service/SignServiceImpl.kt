@@ -206,9 +206,12 @@ class SignServiceImpl(
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> = quoteRepository.find(quoteId)
         .toOption()
         .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
-        .map(::assertAgreementIdIsNotNull)
         .map { updateNameFromRequest(it, body) }
+        .map { updateEmailFromRequest(it, body) }
+        .map { updateSsnFromRequest(it, body) }
         .map { updateStartTimeFromRequest(it, body) }
+        .map(::assertAgreementIdIsNull)
+        .map(::assertSsnIsNotNull)
         .flatMap { createMemberMaybe(it) }
         .flatMap {
             signQuoteWithMemberId(
@@ -263,7 +266,7 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        assertAgreementIdIsNotNull(quote)
+        assertAgreementIdIsNull(quote)
 
         if (quote.memberId == null) {
             Either.Left(
@@ -370,9 +373,16 @@ private fun bundlePersonalInfoMatching(quotes: List<Quote>): Boolean = quotes.wi
         left.birthDate == right.birthDate
 }
 
-private fun assertAgreementIdIsNotNull(quote: Quote): Quote {
+private fun assertAgreementIdIsNull(quote: Quote): Quote {
     if (quote.agreementId != null) {
         throw RuntimeException("There is a signed product id ${quote.agreementId} already")
+    }
+    return quote
+}
+
+private fun assertSsnIsNotNull(quote: Quote): Quote {
+    if (quote.ssn.isEmpty()) {
+        throw RuntimeException("No ssn")
     }
     return quote
 }
@@ -397,6 +407,35 @@ private fun updateNameFromRequest(
 ): Quote {
     return if (body.name != null && quote.data is PersonPolicyHolder<*>) {
         quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+    } else {
+        quote
+    }
+}
+
+private fun updateSsnFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+
+    if (body.ssn == null || body.ssn.isBlank() || quote.data !is PersonPolicyHolder<*>) {
+        return quote
+    }
+
+    // Cannot override existing ssn with a different one
+    if (quote.data.ssn != null && quote.data.ssn == body.ssn) {
+        throw IllegalArgumentException("Invalid ssn, does not match existing ssn in quote")
+    }
+
+    return quote.copy(data = quote.data.updateSsn(ssn = body.ssn))
+}
+
+private fun updateEmailFromRequest(
+    quote: Quote,
+    body: SignQuoteRequest
+): Quote {
+
+    return if (quote.data is PersonPolicyHolder<*>) {
+        quote.copy(data = quote.data.updateEmail(email = body.email))
     } else {
         quote
     }
