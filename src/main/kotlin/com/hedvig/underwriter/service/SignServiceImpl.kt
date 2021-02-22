@@ -417,11 +417,16 @@ private fun updateSsnFromRequest(
     body: SignQuoteRequest
 ): Quote {
 
-    return if (body.ssn != null && quote.data is PersonPolicyHolder<*>) {
-        quote.copy(data = quote.data.updateSsn(ssn = body.ssn))
-    } else {
-        quote
+    if (body.ssn == null || body.ssn.isBlank() || quote.data !is PersonPolicyHolder<*>) {
+        return quote
     }
+
+    // Cannot override existing ssn with a different one
+    if (quote.data.ssn != null && quote.data.ssn == body.ssn) {
+        throw IllegalArgumentException("Invalid ssn, does not match existing ssn in quote")
+    }
+
+    return quote.copy(data = quote.data.updateSsn(ssn = body.ssn))
 }
 
 private fun updateEmailFromRequest(

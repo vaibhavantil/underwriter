@@ -127,7 +127,11 @@ data class NorwegianHomeContentsData(
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
-    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
+    override fun updateSsn(ssn: String) =
+        if (ssn.isValidNorwegianSsn())
+            this.copy(ssn = ssn)
+        else
+            throw IllegalArgumentException("Invalid Norwegian SSN")
 
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean
@@ -154,7 +158,11 @@ data class NorwegianTravelData(
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
-    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
+    override fun updateSsn(ssn: String) =
+        if (ssn.isValidNorwegianSsn())
+            this.copy(ssn = ssn)
+        else
+            throw IllegalArgumentException("Invalid Norwegian SSN")
 
     // TODO: Let's remove the concept of complete
     override val isComplete: Boolean

@@ -120,7 +120,7 @@ class RapioNorwayIntegrationTest {
                     "firstName": "Apan",
                     "lastName": "Apansson"
                 },
-                "ssn": "12121212345",
+                "ssn": "11077941012",
                 "startDate": "$today",
                 "email": "apan@apansson.se"
             }
@@ -150,7 +150,7 @@ class RapioNorwayIntegrationTest {
         assertEquals(contractId, quote.contractId)
 
         val data = quote.data as NorwegianTravelData
-        assertEquals("12121212345", data.ssn)
+        assertEquals("11077941012", data.ssn)
         assertEquals("1912-12-12", data.birthDate.toString())
         assertEquals("Apan", data.firstName)
         assertEquals("Apansson", data.lastName)
@@ -161,7 +161,7 @@ class RapioNorwayIntegrationTest {
     }
 
     @Test
-    fun `Create travel quote and sign it without ssn should fail`() {
+    fun `Create travel quote and sign it without or invalid ssn should fail`() {
 
         val memberId = nextLong(Long.MAX_VALUE).toString()
         val agreementId = UUID.randomUUID()
@@ -209,20 +209,62 @@ class RapioNorwayIntegrationTest {
         assertEquals("12", quoteResponse.price.toString())
         assertTrue(quoteResponse.validTo.isAfter(now))
 
-        val signRequest = """
+        val signRequestNoSsn = """
             {
                 "name": {
                     "firstName": "Apan",
                     "lastName": "Banansson"
                 },
-                "ssn": "12121212345",
                 "startDate": "$today",
                 "email": "apan@apansson.se"
             }
         """.trimIndent()
 
         assertThrows(RuntimeException::class.java) {
-            postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequest.replace("12121212345", ""))!!
+            postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequestNoSsn)!!
+        }
+
+        val signRequestInvalidSsn = """
+            {
+                "name": {
+                    "firstName": "Apan",
+                    "lastName": "Banansson"
+                },
+                "ssn": "11077900000",
+                "startDate": "$today",
+                "email": "apan@apansson.se"
+            }
+        """.trimIndent()
+
+        assertThrows(RuntimeException::class.java) {
+            postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequestInvalidSsn)!!
+        }
+    }
+
+    @Test
+    fun `Create travel quote with ssn fails`() {
+
+        val quoteRequestWithSsn = """
+            {
+                "firstName":null,
+                "lastName":null,
+                "currentInsurer":null,
+                "birthDate":"1912-12-12",
+                "ssn":11077941012,
+                "quotingPartner":"HEDVIG",
+                "productType":"TRAVEL",
+                "incompleteQuoteData":{
+                    "type":"norwegianTravel",
+                    "coInsured":1,
+                    "youth":false
+                },
+                "shouldComplete":true,
+                "underwritingGuidelinesBypassedBy":null
+            }
+        """.trimIndent()
+
+        assertThrows(RuntimeException::class.java) {
+            postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequestWithSsn)!!
         }
     }
 
@@ -286,7 +328,7 @@ class RapioNorwayIntegrationTest {
                     "firstName": "Apan",
                     "lastName": "Apansson"
                 },
-                "ssn": "12121212345",
+                "ssn": "11077941012",
                 "startDate": "$today",
                 "email": "apan@apansson.se"
             }
@@ -316,7 +358,7 @@ class RapioNorwayIntegrationTest {
         assertEquals(contractId, quote.contractId)
 
         val data = quote.data as NorwegianHomeContentsData
-        assertEquals("12121212345", data.ssn)
+        assertEquals("11077941012", data.ssn)
         assertEquals("1988-01-01", data.birthDate.toString())
         assertEquals("Apan", data.firstName)
         assertEquals("Apansson", data.lastName)
