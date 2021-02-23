@@ -131,7 +131,7 @@ class QuoteMapper(
             birthDate = quote.birthDate,
             price = MonetaryAmountV2(
                 quote.price!!.toPlainString(),
-                "SEK"
+                quote.currency
             ),
             insuranceCost = insuranceCost,
             details = mapCompleteQuoteResult(
