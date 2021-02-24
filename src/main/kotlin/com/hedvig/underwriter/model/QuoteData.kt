@@ -32,6 +32,14 @@ sealed class QuoteData {
             is DanishAccidentData -> ProductType.ACCIDENT
         }
     }
+
+    fun market(): Market {
+        return when (this) {
+            is SwedishHouseData, is SwedishApartmentData -> Market.SWEDEN
+            is DanishAccidentData, is DanishTravelData, is DanishHomeContentsData -> Market.DENMARK
+            is NorwegianTravelData, is NorwegianHomeContentsData -> Market.NORWAY
+        }
+    }
 }
 
 data class SwedishHouseData(
