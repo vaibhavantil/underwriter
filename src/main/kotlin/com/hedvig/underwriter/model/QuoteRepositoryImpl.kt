@@ -113,6 +113,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             id = databaseQuote.masterQuoteId,
             createdAt = databaseQuote.createdAt!!,
             price = databaseQuote.price,
+            currency = databaseQuote.currency,
             productType = databaseQuote.productType,
             state = databaseQuote.state,
             initiatedFrom = databaseQuote.initiatedFrom!!,

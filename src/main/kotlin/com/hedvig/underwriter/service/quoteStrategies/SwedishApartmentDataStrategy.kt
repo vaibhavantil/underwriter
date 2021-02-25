@@ -24,7 +24,7 @@ class SwedishApartmentDataStrategy(
 
     override fun getInsuranceCost(quote: Quote): InsuranceCost {
         return productPricingService.calculateInsuranceCost(
-            Money.of(quote.price, "SEK"), quote.memberId!!
+            Money.of(quote.price, quote.currency), quote.memberId!!
         )
     }
 

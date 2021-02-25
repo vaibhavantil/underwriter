@@ -61,7 +61,7 @@ class RapioNorwayIntegrationTest {
     lateinit var priceEngineClient: PriceEngineClient
 
     @MockkBean
-   lateinit var memberServiceClient: MemberServiceClient
+    lateinit var memberServiceClient: MemberServiceClient
 
     @MockkBean
     lateinit var productPricingClient: ProductPricingClient
@@ -178,7 +178,7 @@ class RapioNorwayIntegrationTest {
         assertThat(msSignQuoteRequest1.captured).isEqualTo(memberId.toLong())
         assertThat(msSignQuoteRequest2.captured.ssn).isEqualTo(ssn)
         assertThat(msFinalizeOnboardingReques1.captured).isEqualTo(memberId)
-        with (msFinalizeOnboardingReques2) {
+        with(msFinalizeOnboardingReques2) {
             assertThat(captured.memberId).isEqualTo(memberId)
             assertThat(captured.ssn).isEqualTo(ssn)
             assertThat(captured.firstName).isEqualTo("Apan")
@@ -191,7 +191,7 @@ class RapioNorwayIntegrationTest {
         }
 
         // Validate request to Price Enging
-        with (peQueryPriceRequest) {
+        with(peQueryPriceRequest) {
             assertThat(captured.holderMemberId).isNull()
             assertThat(captured.quoteId).isEqualTo(quoteResponse.id)
             assertThat(captured.holderBirthDate.toString()).isEqualTo("1988-01-01")
@@ -447,7 +447,7 @@ class RapioNorwayIntegrationTest {
         assertThat(msSignQuoteRequest1.captured).isEqualTo(memberId.toLong())
         assertThat(msSignQuoteRequest2.captured.ssn).isEqualTo(ssn)
         assertThat(msFinalizeOnboardingReques1.captured).isEqualTo(memberId)
-        with (msFinalizeOnboardingReques2) {
+        with(msFinalizeOnboardingReques2) {
             assertThat(captured.memberId).isEqualTo(memberId)
             assertThat(captured.ssn).isEqualTo(ssn)
             assertThat(captured.firstName).isEqualTo("Apan")
@@ -464,7 +464,7 @@ class RapioNorwayIntegrationTest {
         }
 
         // Validate request to Price Enging
-        with (peQueryPriceRequest) {
+        with(peQueryPriceRequest) {
             assertThat(captured.holderMemberId).isNull()
             assertThat(captured.quoteId).isEqualTo(quoteResponse.id)
             assertThat(captured.holderBirthDate.toString()).isEqualTo("1988-01-01")

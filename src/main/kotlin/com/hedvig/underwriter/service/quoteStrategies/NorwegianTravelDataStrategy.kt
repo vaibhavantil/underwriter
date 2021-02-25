@@ -28,7 +28,7 @@ class NorwegianTravelDataStrategy(val productPricingService: ProductPricingServi
 
     override fun getInsuranceCost(quote: Quote): InsuranceCost {
         return productPricingService.calculateInsuranceCost(
-            Money.of(quote.price, "NOK"), quote.memberId!!
+            Money.of(quote.price, quote.currency), quote.memberId!!
         )
     }
 

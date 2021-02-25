@@ -57,11 +57,13 @@ class BundleQuoteServiceImplTest {
             id = ids[0]
             data = NorwegianHomeContentDataBuilder(isYouth = true)
             price = BigDecimal.TEN
+            currency = "NOK"
         }
         val quote2 = quote {
             id = ids[1]
             data = NorwegianTravelDataBuilder(isYouth = true)
             price = BigDecimal.TEN
+            currency = "NOK"
         }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
@@ -112,11 +114,13 @@ class BundleQuoteServiceImplTest {
             id = ids[0]
             data = NorwegianHomeContentDataBuilder()
             price = BigDecimal.TEN
+            currency = "NOK"
         }
         val quote2 = quote {
             id = ids[1]
             data = NorwegianTravelDataBuilder()
             price = BigDecimal.TEN
+            currency = "NOK"
         }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
@@ -167,6 +171,7 @@ class BundleQuoteServiceImplTest {
             this.id = id
             data = ApartmentDataBuilder(subType = ApartmentProductSubType.STUDENT_BRF)
             price = BigDecimal.TEN
+            currency = "SEK"
         }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()
@@ -213,6 +218,7 @@ class BundleQuoteServiceImplTest {
             this.id = id
             data = ApartmentDataBuilder()
             price = BigDecimal.TEN
+            currency = "SEK"
         }
 
         val requestCaptureMutableList = mutableListOf<CalculateBundleInsuranceCostRequest>()

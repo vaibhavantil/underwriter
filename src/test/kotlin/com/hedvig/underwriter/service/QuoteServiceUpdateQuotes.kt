@@ -5,12 +5,16 @@ import assertk.assertThat
 import assertk.assertions.isNullOrEmpty
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
+import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.every
 import io.mockk.mockk
+import org.javamoney.moneta.Money
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class QuoteServiceUpdateQuotes {
 
@@ -18,10 +22,11 @@ class QuoteServiceUpdateQuotes {
     fun clear_old_breached_underwriting_guidelines() {
 
         val quoteRepository = mockk<QuoteRepository>()
+        val priceEngine = mockk<PriceEngineService>()
 
         val quoteStrategyService = mockk<QuoteStrategyService>(relaxed = true)
         val cut = QuoteServiceImpl(
-            UnderwriterImpl(mockk(relaxed = true), quoteStrategyService, mockk(relaxed = true)),
+            UnderwriterImpl(priceEngine, quoteStrategyService, mockk(relaxed = true)),
             mockk(relaxed = true),
             mockk(relaxed = true),
             quoteRepository,
@@ -35,6 +40,8 @@ class QuoteServiceUpdateQuotes {
             data = SwedishApartmentDataBuilder()
             breachedUnderwritingGuidelines = listOf("UW_GL_HIT")
         }
+        every { priceEngine.querySwedishApartmentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(), Money.of(12, "SEK"))
 
         every { quoteRepository.update(any(), any()) } returnsArgument 0
 
