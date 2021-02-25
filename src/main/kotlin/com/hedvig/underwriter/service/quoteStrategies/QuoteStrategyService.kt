@@ -28,9 +28,9 @@ class QuoteStrategyService(
         is SwedishApartmentData -> SwedishApartmentDataStrategy(debtChecker, productPricingService)
         is NorwegianHomeContentsData -> NorwegianHomeContentsDataStrategy(productPricingService)
         is NorwegianTravelData -> NorwegianTravelDataStrategy(productPricingService)
-        is DanishHomeContentsData -> DanishHomeContentsDataStrategy()
-        is DanishAccidentData -> DanishAccidentDataStrategy()
-        is DanishTravelData -> DanishTravelDataStrategy()
+        is DanishHomeContentsData -> DanishHomeContentsDataStrategy(productPricingService)
+        is DanishAccidentData -> DanishAccidentDataStrategy(productPricingService)
+        is DanishTravelData -> DanishTravelDataStrategy(productPricingService)
     }
 
     fun getInsuranceCost(quote: Quote): InsuranceCost = getStrategy(quote.data).getInsuranceCost(quote)

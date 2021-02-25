@@ -8,8 +8,9 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.serviceIntegration.notificationService.dtos.QuoteCreatedEvent
 import com.hedvig.underwriter.serviceIntegration.notificationService.quoteCreatedEvent
+import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 
-class DanishAccidentDataStrategy : QuoteStrategy() {
+class DanishAccidentDataStrategy(productPricingService: ProductPricingService) : QuoteStrategy(productPricingService) {
     override fun createNotificationEvent(quote: Quote): QuoteCreatedEvent {
         require(quote.data is DanishAccidentData)
 
