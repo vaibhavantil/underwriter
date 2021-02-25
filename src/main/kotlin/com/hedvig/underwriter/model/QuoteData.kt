@@ -22,24 +22,6 @@ import java.util.UUID
 sealed class QuoteData {
     abstract val isComplete: Boolean
     abstract val id: UUID
-
-    fun productType(): ProductType {
-        return when (this) {
-            is SwedishHouseData -> ProductType.HOUSE
-            is SwedishApartmentData -> ProductType.APARTMENT
-            is NorwegianHomeContentsData, is DanishHomeContentsData -> ProductType.HOME_CONTENT
-            is NorwegianTravelData, is DanishTravelData -> ProductType.TRAVEL
-            is DanishAccidentData -> ProductType.ACCIDENT
-        }
-    }
-
-    fun market(): Market {
-        return when (this) {
-            is SwedishHouseData, is SwedishApartmentData -> Market.SWEDEN
-            is DanishAccidentData, is DanishTravelData, is DanishHomeContentsData -> Market.DENMARK
-            is NorwegianTravelData, is NorwegianHomeContentsData -> Market.NORWAY
-        }
-    }
 }
 
 data class SwedishHouseData(

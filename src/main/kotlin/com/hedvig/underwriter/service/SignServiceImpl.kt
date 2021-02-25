@@ -150,7 +150,7 @@ class SignServiceImpl(
             }
             .map {
                 checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }
-                SignedQuoteResponseDto(contractId, it.memberId, signedAt, quote.data.market())
+                SignedQuoteResponseDto(contractId, it.memberId, signedAt, quote.market)
             }
     }
 
