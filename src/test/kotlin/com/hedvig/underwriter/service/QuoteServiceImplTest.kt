@@ -73,6 +73,7 @@ class QuoteServiceImplTest {
         val quote = quote {
             memberId = "12345"
             price = BigDecimal.TEN
+            currency = "SEK"
         }
 
         cut.calculateInsuranceCost(quote)
@@ -85,6 +86,7 @@ class QuoteServiceImplTest {
         val quote = quote {
             memberId = "12345"
             price = BigDecimal.TEN
+            currency = "SEK"
         }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
         val result = cut.getMarketFromLatestQuote("12345")
@@ -98,6 +100,7 @@ class QuoteServiceImplTest {
             quote {
                 memberId = "12345"
                 price = BigDecimal.TEN
+                currency = "SEK"
                 data = SwedishHouseDataBuilder()
             }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
@@ -112,6 +115,7 @@ class QuoteServiceImplTest {
             quote {
                 memberId = "12345"
                 price = BigDecimal.TEN
+                currency = "NOK"
                 data = NorwegianHomeContentDataBuilder()
             }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote
@@ -126,6 +130,7 @@ class QuoteServiceImplTest {
             quote {
                 memberId = "12345"
                 price = BigDecimal.TEN
+                currency = "NOK"
                 data = NorwegianTravelDataBuilder()
             }
         every { cut.getLatestQuoteForMemberId(any()) } returns quote

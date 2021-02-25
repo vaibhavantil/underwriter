@@ -142,6 +142,7 @@ data class DatabaseQuoteRevision(
     val currentInsurer: String? = "",
     val startDate: LocalDate? = null,
     val price: BigDecimal? = null,
+    val currency: String? = null,
     val quoteApartmentDataId: Int?,
     val quoteHouseDataId: Int?,
     val quoteNorwegianHomeContentsDataId: Int?,
@@ -174,6 +175,7 @@ data class DatabaseQuoteRevision(
                 currentInsurer = quote.currentInsurer,
                 startDate = quote.startDate,
                 price = quote.price,
+                currency = quote.currency,
                 quoteApartmentDataId = when (quote.data) {
                     is SwedishApartmentData -> quote.data.internalId
                     else -> null
@@ -222,6 +224,7 @@ data class Quote(
     val id: UUID,
     val createdAt: Instant,
     val price: BigDecimal? = null,
+    val currency: String? = null,
     val productType: ProductType = ProductType.UNKNOWN,
     val state: QuoteState,
     val initiatedFrom: QuoteInitiatedFrom,
@@ -245,16 +248,17 @@ data class Quote(
     val isComplete: Boolean
         get() = when {
             price == null -> false
+            currency == null -> false
             productType == ProductType.UNKNOWN -> false
             !data.isComplete -> false
             else -> true
         }
 
-    val currency: String
-        get() = when (this.data) {
-            is SwedishApartmentData, is SwedishHouseData -> SEK
-            is NorwegianTravelData, is NorwegianHomeContentsData -> NOK
-            is DanishHomeContentsData, is DanishAccidentData, is DanishTravelData -> DKK
+    val currencyWithFallbackOnMarket: String
+        get() = currency ?: when (market) {
+            Market.SWEDEN -> SEK
+            Market.NORWAY -> NOK
+            Market.DENMARK -> DKK
         }
 
     val market: Market

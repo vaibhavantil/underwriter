@@ -254,6 +254,7 @@ class QuoteServiceImpl(
                 CompleteQuoteResponseDto(
                     id = quote.id,
                     price = quote.price!!,
+                    currency = quote.currency!!,
                     validTo = quote.validTo
                 )
             )

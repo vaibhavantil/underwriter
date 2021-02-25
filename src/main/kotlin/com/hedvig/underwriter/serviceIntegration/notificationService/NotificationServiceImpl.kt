@@ -41,7 +41,7 @@ fun quoteCreatedEvent(
         insuranceType = insuranceType,
         currentInsurer = quote.currentInsurer,
         price = quote.price,
-        currency = quote.currency,
+        currency = quote.currencyWithFallbackOnMarket,
         originatingProductId = quote.originatingProductId
     )
 }

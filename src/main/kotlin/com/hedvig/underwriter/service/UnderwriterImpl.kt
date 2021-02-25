@@ -20,10 +20,12 @@ import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
 import com.hedvig.underwriter.util.toStockholmLocalDate
+import org.javamoney.moneta.Money
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import javax.money.MonetaryAmount
 
 @Service
 class UnderwriterImpl(
@@ -89,36 +91,37 @@ class UnderwriterImpl(
     private fun complete(quote: Quote): Quote {
         val price = getPriceRetrievedFromProductPricing(quote)
         return quote.copy(
-            price = price,
+            price = price.number.numberValueExact(BigDecimal::class.java),
+            currency = price.currency.currencyCode,
             state = QuoteState.QUOTED
         )
     }
 
-    private fun getPriceRetrievedFromProductPricing(quote: Quote): BigDecimal {
+    private fun getPriceRetrievedFromProductPricing(quote: Quote): MonetaryAmount {
         return when (quote.data) {
             is SwedishApartmentData -> priceEngineService.querySwedishApartmentPrice(
                 PriceQueryRequest.SwedishApartment.from(quote.id, quote.memberId, quote.data, quote.dataCollectionId)
-            ).priceBigDecimal
+            ).price
             is SwedishHouseData -> priceEngineService.querySwedishHousePrice(
                 PriceQueryRequest.SwedishHouse.from(quote.id, quote.memberId, quote.data, quote.dataCollectionId)
-            ).priceBigDecimal
+            ).price
             is NorwegianHomeContentsData -> priceEngineService.queryNorwegianHomeContentPrice(
                 PriceQueryRequest.NorwegianHomeContent.from(quote.id, quote.memberId, quote.data)
-            ).priceBigDecimal
+            ).price
             is NorwegianTravelData -> priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
-            ).priceBigDecimal
+            ).price
             is DanishHomeContentsData -> {
                 // TODO: fix when pricing is in place
-                BigDecimal(9999)
+                Money.of(9999, "DKK")
             }
             is DanishAccidentData -> {
                 // TODO: fix when pricing is in place
-                BigDecimal(6666)
+                Money.of(6666, "DKK")
             }
             is DanishTravelData -> {
                 // TODO: fix when pricing is in place
-                BigDecimal(3333)
+                Money.of(3333, "DKK")
             }
         }
     }
