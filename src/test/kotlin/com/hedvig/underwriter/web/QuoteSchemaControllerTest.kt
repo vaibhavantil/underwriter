@@ -266,6 +266,7 @@ internal class QuoteSchemaControllerTest {
         val completeQuoteResponse = CompleteQuoteResponseDto(
             id = QUOTE_ID,
             price = BigDecimal.TEN,
+            currency = "SEK",
             validTo = Instant.now().plusSeconds(3600 * 24 * 31)
         )
         every {

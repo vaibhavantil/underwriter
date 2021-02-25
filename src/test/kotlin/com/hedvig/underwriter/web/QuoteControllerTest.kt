@@ -74,6 +74,7 @@ internal class QuoteControllerTest {
             CompleteQuoteResponseDto(
                 UUID.fromString("2baa9736-360d-11ea-bce2-875cabb114ed"),
                 BigDecimal.TEN,
+                "SEK",
                 Instant.now()
             )
         )

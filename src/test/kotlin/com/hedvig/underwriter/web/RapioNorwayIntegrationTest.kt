@@ -119,6 +119,7 @@ class RapioNorwayIntegrationTest {
 
         // Validate quote response
         assertThat(quoteResponse.price.toString()).isEqualTo("12")
+        assertThat(quoteResponse.currency).isEqualTo("NOK")
         assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
 
         val signRequest = """
@@ -147,6 +148,7 @@ class RapioNorwayIntegrationTest {
         assertThat(quote.id).isEqualTo(quoteResponse.id)
         assertThat(quote.createdAt.isAfter(now)).isEqualTo(true)
         assertThat(quote.price).isEqualTo(quoteResponse.price)
+        assertThat(quote.currency).isEqualTo("NOK")
         assertThat(quote.productType.name).isEqualTo("TRAVEL")
         assertThat(quote.state.name).isEqualTo("SIGNED")
         assertThat(quote.initiatedFrom.name).isEqualTo("RAPIO")
@@ -264,6 +266,7 @@ class RapioNorwayIntegrationTest {
         val quoteResponse = postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequest)!!
 
         assertThat(quoteResponse.price.toString(), "12")
+        assertThat(quoteResponse.currency, "NOK")
         assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
 
         val signRequestNoSsn = """
@@ -383,6 +386,7 @@ class RapioNorwayIntegrationTest {
 
         // Validate quote response
         assertThat(quoteResponse.price.toString()).isEqualTo("12")
+        assertThat(quoteResponse.currency).isEqualTo("NOK")
         assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
 
         val signRequest = """
@@ -411,6 +415,7 @@ class RapioNorwayIntegrationTest {
         assertThat(quote.id).isEqualTo(quoteResponse.id)
         assertThat(quote.createdAt.isAfter(now)).isEqualTo(true)
         assertThat(quote.price).isEqualTo(quoteResponse.price)
+        assertThat(quote.currency).isEqualTo("NOK")
         assertThat(quote.productType.name).isEqualTo("HOME_CONTENT")
         assertThat(quote.state.name).isEqualTo("SIGNED")
         assertThat(quote.initiatedFrom.name).isEqualTo("RAPIO")
