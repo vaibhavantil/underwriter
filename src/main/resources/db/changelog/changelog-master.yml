@@ -71,4 +71,7 @@ databaseChangeLog:
   - include:
       file: ./migrations/20210224-1526-add-currency-field-to-quote-revisions.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20210226-1054-add-phonenumber-to-quote-danish-travel.sql
+      relativeToChangelogFile: true
 
