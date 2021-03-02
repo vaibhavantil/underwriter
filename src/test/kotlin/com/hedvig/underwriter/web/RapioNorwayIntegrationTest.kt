@@ -24,13 +24,17 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNull
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.productPricingObjects.dtos.AgreementQuote
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberServiceClient
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigResponseDto
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineClient
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingClient
+import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractsRequest
+import com.hedvig.underwriter.web.dtos.QuoteBundleResponseDto
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -95,54 +99,23 @@ class RapioNorwayIntegrationTest {
         every { productPricingClient.createContract(capture(ppCreateContractRequest), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), agreementId, contractId))
         every { priceEngineClient.queryPrice(capture(peQueryPriceRequest)) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(12, "NOK"))
 
-        val quoteRequest = """
-            {
-                "firstName":null,
-                "lastName":null,
-                "currentInsurer":null,
-                "birthDate":"1988-01-01",
-                "ssn":null,
-                "quotingPartner":"HEDVIG",
-                "productType":"TRAVEL",
-                "incompleteQuoteData":{
-                    "type":"norwegianTravel",
-                    "coInsured":1,
-                    "youth":false
-                },
-                "shouldComplete":true,
-                "underwritingGuidelinesBypassedBy":null
-            }
-        """.trimIndent()
-
         // Create quote
-        val quoteResponse = postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequest)!!
+        val quoteResponse = createTravelQuote("1988-01-01", 1, false)
 
         // Validate quote response
         assertThat(quoteResponse.price.toString()).isEqualTo("12")
         assertThat(quoteResponse.currency).isEqualTo("NOK")
         assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
 
-        val signRequest = """
-            {
-                "name": {
-                    "firstName": "Apan",
-                    "lastName": "Apansson"
-                },
-                "ssn": "$ssn",
-                "startDate": "$today",
-                "email": "apan@apansson.se"
-            }
-        """.trimIndent()
-
         // Sign quote
-        val signResponse = postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequest)!!
+        val signResponse = signQuote(quoteResponse.id, "Apan", "Apansson", ssn, "apan@apansson.se", today.toString())
 
         // Validate sign response
         assertThat(signResponse.memberId).isEqualTo(memberId)
         assertThat(signResponse.market).isEqualTo(Market.NORWAY)
 
         // Get quote
-        val quote = restTemplate.getForObject("/_/v1/quotes/${quoteResponse.id}", Quote::class.java)
+        val quote = getQuote(quoteResponse.id)
 
         // Validate stored quote
         assertThat(quote.id).isEqualTo(quoteResponse.id)
@@ -244,26 +217,7 @@ class RapioNorwayIntegrationTest {
         every { productPricingClient.createContract(any(), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), agreementId, contractId))
         every { priceEngineClient.queryPrice(any()) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(12, "NOK"))
 
-        val quoteRequest = """
-            {
-                "firstName":null,
-                "lastName":null,
-                "currentInsurer":null,
-                "birthDate":"1912-12-12",
-                "ssn":null,
-                "quotingPartner":"HEDVIG",
-                "productType":"TRAVEL",
-                "incompleteQuoteData":{
-                    "type":"norwegianTravel",
-                    "coInsured":1,
-                    "youth":false
-                },
-                "shouldComplete":true,
-                "underwritingGuidelinesBypassedBy":null
-            }
-        """.trimIndent()
-
-        val quoteResponse = postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequest)!!
+        val quoteResponse = createTravelQuote("1912-12-12", 1, false)
 
         assertThat(quoteResponse.price.toString(), "12")
         assertThat(quoteResponse.currency, "NOK")
@@ -357,59 +311,23 @@ class RapioNorwayIntegrationTest {
         every { productPricingClient.createContract(capture(ppCreateContractRequest), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), agreementId, contractId))
         every { priceEngineClient.queryPrice(capture(peQueryPriceRequest)) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(12, "NOK"))
 
-        val quoteRequest = """
-            {
-                "firstName": null,
-                "lastName": null,
-                "currentInsurer": null,
-                "birthDate": "1988-01-01",
-                "ssn": null,
-                "quotingPartner": "HEDVIG",
-                "productType": "HOME_CONTENT",
-                "incompleteQuoteData": {
-                    "type": "norwegianHomeContents",
-                    "street": "ApGatan",
-                    "zipCode": "1234",
-                    "city": "ApCity",
-                    "livingSpace": 122,
-                    "coInsured": 0,
-                    "youth": false,
-                    "subType": "OWN"
-                },
-                "shouldComplete": true,
-                "underwritingGuidelinesBypassedBy": null
-            }
-        """.trimIndent()
-
         // Create quote
-        val quoteResponse = postJson<CompleteQuoteResponseDto>("/_/v1/quotes", quoteRequest)!!
+        val quoteResponse = createHomeContentQuote("1988-01-01", "ApGatan", "1234", "ApCity", 122, 0, false, "OWN")
 
         // Validate quote response
         assertThat(quoteResponse.price.toString()).isEqualTo("12")
         assertThat(quoteResponse.currency).isEqualTo("NOK")
         assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
 
-        val signRequest = """
-            {
-                "name": {
-                    "firstName": "Apan",
-                    "lastName": "Apansson"
-                },
-                "ssn": "$ssn",
-                "startDate": "$today",
-                "email": "apan@apansson.se"
-            }
-        """.trimIndent()
-
         // Sign quote
-        val signResponse = postJson<SignedQuoteResponseDto>("/_/v1/quotes/${quoteResponse.id}/sign", signRequest)!!
+        val signResponse = signQuote(quoteResponse.id, "Apan", "Apansson", ssn, "apan@apansson.se", today.toString())
 
         // Validate sign response
         assertThat(signResponse.memberId).isEqualTo(memberId)
         assertThat(signResponse.market).isEqualTo(Market.NORWAY)
 
         // Get quote
-        val quote = restTemplate.getForObject("/_/v1/quotes/${quoteResponse.id}", Quote::class.java)
+        val quote = getQuote(quoteResponse.id)
 
         // Validate stored quote
         assertThat(quote.id).isEqualTo(quoteResponse.id)
@@ -507,6 +425,131 @@ class RapioNorwayIntegrationTest {
             assertThat(ppQuote.squareMeters).isEqualTo(122)
             assertThat(ppQuote.lineOfBusiness.name).isEqualTo("OWN")
         }
+    }
+
+    @Test
+    fun `Create travel and home content quotes, get bundle price successfully`() {
+
+        val memberId = nextLong(Long.MAX_VALUE).toString()
+        val agreementId = UUID.randomUUID()
+        val contractId = UUID.randomUUID()
+
+        val ppCalculateBundleInsuranceCostRequest = slot<CalculateBundleInsuranceCostRequest>()
+
+        val insuranceCostResponse = InsuranceCost(
+            monthlyGross = MonetaryAmountV2.of(200.0, "NOK"),
+            monthlyDiscount = MonetaryAmountV2.of(50.0, "NOK"),
+            monthlyNet = MonetaryAmountV2.of(150.0, "NOK"),
+            freeUntil = null
+        )
+
+        // Mock clients and capture the outgoing requests for later validation
+        every { memberServiceClient.checkIsSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
+        every { memberServiceClient.createMember() } returns ResponseEntity.status(200).body(HelloHedvigResponseDto(memberId))
+        every { memberServiceClient.updateMemberSsn(any(), any()) } returns Unit
+        every { memberServiceClient.signQuote(any(), any()) } returns ResponseEntity.status(200).body(UnderwriterQuoteSignResponse(1L, true))
+        every { memberServiceClient.finalizeOnBoarding(any(), any()) } returns ResponseEntity.status(200).body("")
+        every { productPricingClient.createContract(any(), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), agreementId, contractId))
+        every { productPricingClient.calculateBundleInsuranceCost(capture(ppCalculateBundleInsuranceCostRequest)) } returns ResponseEntity.status(200).body(insuranceCostResponse)
+        every { priceEngineClient.queryPrice(any()) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(100, "NOK"))
+
+        // Create quotes
+        val travelQuoteResponse = createTravelQuote("1988-01-01", 1, false)
+        val homeContentQuoteResponse = createHomeContentQuote("1988-01-01", "ApGatan", "1234", "ApCity", 122, 1, false, "OWN")
+
+        // Get bundle cost
+        val bundleResponse = createBundle(travelQuoteResponse.id, homeContentQuoteResponse.id)
+
+        assertThat(bundleResponse.bundleCost.monthlyGross.amount.toString()).isEqualTo("200.00")
+        assertThat(bundleResponse.bundleCost.monthlyGross.currency).isEqualTo("NOK")
+        assertThat(bundleResponse.bundleCost.monthlyDiscount.amount.toString()).isEqualTo("50.00")
+        assertThat(bundleResponse.bundleCost.monthlyDiscount.currency).isEqualTo("NOK")
+        assertThat(bundleResponse.bundleCost.monthlyNet.amount.toString()).isEqualTo("150.00")
+        assertThat(bundleResponse.bundleCost.monthlyNet.currency).isEqualTo("NOK")
+    }
+
+    private fun createTravelQuote(birthdate: String, coInsured: Int, youth: Boolean): CompleteQuoteResponseDto {
+        val request = """
+            {
+                "firstName":null,
+                "lastName":null,
+                "currentInsurer":null,
+                "birthDate":"$birthdate",
+                "ssn":null,
+                "quotingPartner":"HEDVIG",
+                "productType":"TRAVEL",
+                "incompleteQuoteData":{
+                    "type":"norwegianTravel",
+                    "coInsured":$coInsured,
+                    "youth":$youth
+                },
+                "shouldComplete":true,
+                "underwritingGuidelinesBypassedBy":null
+            }
+        """.trimIndent()
+
+        return postJson("/_/v1/quotes", request)!!
+    }
+
+    private fun createHomeContentQuote(birthdate: String, street: String, zip: String, city: String, livingSpace: Int, coInsured: Int, youth: Boolean, subType: String): CompleteQuoteResponseDto {
+        val request = """
+            {
+                "firstName": null,
+                "lastName": null,
+                "currentInsurer": null,
+                "birthDate": "$birthdate",
+                "ssn": null,
+                "quotingPartner": "HEDVIG",
+                "productType": "HOME_CONTENT",
+                "incompleteQuoteData": {
+                    "type": "norwegianHomeContents",
+                    "street": "$street",
+                    "zipCode": "$zip",
+                    "city": "$city",
+                    "livingSpace": $livingSpace,
+                    "coInsured": $coInsured,
+                    "youth": $youth,
+                    "subType": "$subType"
+                },
+                "shouldComplete": true,
+                "underwritingGuidelinesBypassedBy": null
+            }
+        """.trimIndent()
+
+        return postJson("/_/v1/quotes", request)!!
+    }
+
+    private fun createBundle(vararg quoteIds: UUID): QuoteBundleResponseDto {
+
+        val ids = quoteIds.joinToString("\", \"", "\"", "\"")
+
+        val request = """
+            {
+                "quoteIds": [$ids]
+            }
+        """.trimIndent()
+
+        return postJson("/_/v1/quotes/bundle", request)!!
+    }
+
+    private fun signQuote(quoteId: UUID, firstName: String, lastName: String, ssn: String, email: String, startDate: String): SignedQuoteResponseDto {
+        val request = """
+            {
+                "name": {
+                    "firstName": "$firstName",
+                    "lastName": "$lastName"
+                },
+                "ssn": "$ssn",
+                "startDate": "$startDate",
+                "email": "$email"
+            }
+        """.trimIndent()
+
+        return postJson("/_/v1/quotes/$quoteId/sign", request)!!
+    }
+
+    private fun getQuote(quoteId: UUID): Quote {
+        return restTemplate.getForObject("/_/v1/quotes/$quoteId", Quote::class.java)
     }
 
     private inline fun <reified T : Any> postJson(url: String, data: String): T? {

@@ -6,6 +6,7 @@ import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.QuoteRequest
@@ -18,6 +19,8 @@ import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.MarketInfo
+import com.hedvig.underwriter.web.dtos.QuoteBundleRequestDto
+import com.hedvig.underwriter.web.dtos.QuoteBundleResponseDto
 import com.hedvig.underwriter.web.dtos.QuoteForNewContractRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
@@ -49,7 +52,8 @@ import javax.validation.constraints.Email
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
     val memberService: MemberService,
-    val signService: SignService
+    val signService: SignService,
+    val bundleQuotesService: BundleQuotesService
 ) {
     @PostMapping
     fun createQuote(
@@ -160,6 +164,17 @@ class QuoteController @Autowired constructor(
             is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
             is Either.Right -> ResponseEntity.status(200).body(QuoteDto.fromQuote(quoteOrError.b))
         }
+    }
+
+    @PostMapping("/bundle")
+    fun quoteBundle(@RequestBody @Valid request: QuoteBundleRequestDto): QuoteBundleResponseDto {
+
+        val cost = bundleQuotesService.bundleQuotes(
+            memberId = null,
+            ids = request.quoteIds
+        )
+
+        return QuoteBundleResponseDto.from(cost)
     }
 
     @PostMapping("/{completeQuoteId}/sign")

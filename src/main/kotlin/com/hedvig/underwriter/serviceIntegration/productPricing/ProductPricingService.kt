@@ -25,7 +25,9 @@ interface ProductPricingService {
 
     fun calculateInsuranceCost(price: Money, memberId: String): InsuranceCost
 
-    fun calculateBundleInsuranceCost(request: CalculateBundleInsuranceCostRequest, memberId: String): InsuranceCost
+    fun calculateBundleInsuranceCost(request: CalculateBundleInsuranceCostRequest): InsuranceCost
+
+    fun calculateBundleInsuranceCostForMember(request: CalculateBundleInsuranceCostRequest, memberId: String): InsuranceCost
 
     fun createContractsFromQuotes(
         quotes: List<Quote>,

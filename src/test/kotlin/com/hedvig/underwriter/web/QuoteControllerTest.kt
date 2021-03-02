@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
@@ -44,6 +45,9 @@ internal class QuoteControllerTest {
 
     @MockkBean
     lateinit var memberService: MemberService
+
+    @MockkBean
+    lateinit var bundleQuotesService: BundleQuotesService
 
     val createQuoteRequestJson = """
         {
