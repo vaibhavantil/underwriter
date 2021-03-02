@@ -16,6 +16,8 @@ import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.getOldProductType
+import com.hedvig.underwriter.util.toStockholmInstant
+import com.hedvig.underwriter.web.dtos.ExternalQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import java.time.Instant
 import java.time.LocalDate
@@ -95,6 +97,55 @@ data class QuoteRequest(
                 originatingProductId = quoteRequestDto.originatingProductId,
                 startDate = quoteRequestDto.startDate,
                 dataCollectionId = quoteRequestDto.dataCollectionId,
+                phoneNumber = null
+            )
+        }
+
+        fun from(quoteRequestDto: ExternalQuoteRequestDto): QuoteRequest {
+            require(
+                quoteRequestDto.swedishApartmentData != null ||
+                quoteRequestDto.swedishHouseData != null ||
+                quoteRequestDto.norwegianHomeContentsData != null ||
+                quoteRequestDto.norwegianTravelData != null ||
+                quoteRequestDto.danishHomeContentsData != null ||
+                quoteRequestDto.danishAccidentData != null ||
+                quoteRequestDto.danishTravelData != null
+            ) {
+                "Missing minimal quote related data"
+            }
+
+            return QuoteRequest(
+                firstName = quoteRequestDto.firstName,
+                lastName = quoteRequestDto.lastName,
+                email = null,
+                currentInsurer = null,
+                birthDate = quoteRequestDto.birthDate,
+                ssn = quoteRequestDto.ssn,
+                quotingPartner = null,
+                incompleteQuoteData = when {
+                    quoteRequestDto.swedishApartmentData != null -> quoteRequestDto.swedishApartmentData
+                    quoteRequestDto.swedishHouseData != null -> quoteRequestDto.swedishHouseData
+                    quoteRequestDto.norwegianHomeContentsData != null -> quoteRequestDto.norwegianHomeContentsData
+                    quoteRequestDto.norwegianTravelData != null -> quoteRequestDto.norwegianTravelData
+                    quoteRequestDto.danishHomeContentsData != null -> quoteRequestDto.danishHomeContentsData
+                    quoteRequestDto.danishAccidentData != null -> quoteRequestDto.danishAccidentData
+                    quoteRequestDto.danishTravelData != null -> quoteRequestDto.danishTravelData
+                    else -> throw IllegalStateException()
+                },
+                productType = when {
+                    quoteRequestDto.swedishApartmentData != null -> ProductType.APARTMENT
+                    quoteRequestDto.swedishHouseData != null -> ProductType.HOUSE
+                    quoteRequestDto.norwegianHomeContentsData != null -> ProductType.HOME_CONTENT
+                    quoteRequestDto.norwegianTravelData != null -> ProductType.TRAVEL
+                    quoteRequestDto.danishHomeContentsData != null -> ProductType.HOME_CONTENT
+                    quoteRequestDto.danishAccidentData != null -> ProductType.ACCIDENT
+                    quoteRequestDto.danishTravelData != null -> ProductType.TRAVEL
+                    else -> throw IllegalStateException()
+                },
+                memberId = quoteRequestDto.memberId,
+                originatingProductId = null,
+                startDate = quoteRequestDto.startDate.atStartOfDay().toStockholmInstant(),
+                dataCollectionId = null,
                 phoneNumber = null
             )
         }
