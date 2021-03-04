@@ -13,6 +13,8 @@ FROM dependencies AS build
 
 # Copy application source and build it
 COPY src/main src/main
+# A plugin in the pom.xml file requires maven to be executed inside a git repo
+COPY .git .git
 # Git repo needed for git hook plugin
 RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml
 

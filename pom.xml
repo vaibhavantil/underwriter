@@ -482,7 +482,6 @@
                     <execution>
                         <goals>
                             <!-- Sets git config specified under configuration > gitConfig. -->
-                            <goal>initialize</goal>
                             <goal>configure</goal>
                             <goal>install</goal>
                         </goals>
