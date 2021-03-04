@@ -55,7 +55,7 @@ data class QuoteDto(
                 id = quote.id,
                 createdAt = quote.createdAt,
                 price = quote.price,
-                currency = quote.currency,
+                currency = quote.currencyWithFallbackOnMarket,
                 productType = quote.productType,
                 state = quote.state,
                 initiatedFrom = quote.initiatedFrom,
