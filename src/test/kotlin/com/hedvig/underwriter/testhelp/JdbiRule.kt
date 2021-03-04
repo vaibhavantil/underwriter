@@ -31,6 +31,7 @@ class JdbiRule : ExternalResource() {
 
     override fun before() {
         try {
+            println("Current user is = ${System.getProperty("user.name")}")
             val dbName = RandomStringUtils.randomAlphabetic(12).toLowerCase(Locale.ENGLISH)
 
             val conn = embeddedPostgres.getDatabase("postgres", "").connection
