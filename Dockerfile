@@ -27,7 +27,15 @@ FROM scratch AS test
 FROM build AS integration_test
 COPY src/test src/test
 RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
+
+RUN yum -y install python3 \
+    python3-pip \
+    shadow-utils \
+    util-linux
+RUN adduser underwriter
+USER underwriter
 ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
+
 ENTRYPOINT mvn test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml
 
 
