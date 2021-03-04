@@ -26,6 +26,7 @@ FROM scratch AS test
 ##### Integration test stage #####
 FROM build AS integration_test
 COPY src/test src/test
+RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
 ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
 ENTRYPOINT mvn test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml
 
