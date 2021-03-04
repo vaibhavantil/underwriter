@@ -36,7 +36,7 @@ RUN adduser underwriter
 USER underwriter
 ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
 
-ENTRYPOINT mvn test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml
+ENTRYPOINT ["mvn", "verify", "-f", "/usr/app/pom.xml", "-s", "/usr/share/maven/ref/settings-docker.xml"]
 
 
 ##### Assemble stage #####
