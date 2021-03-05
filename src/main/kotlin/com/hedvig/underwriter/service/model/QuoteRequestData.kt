@@ -14,7 +14,7 @@ import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.ExtraBuildingRequestDto
-import com.hedvig.underwriter.util.Pii
+import com.hedvig.underwriter.util.Masked
 import java.util.UUID
 
 sealed class QuoteRequestData {
@@ -22,7 +22,7 @@ sealed class QuoteRequestData {
     abstract fun createQuoteData(quoteRequest: QuoteRequest): QuoteData
 
     data class SwedishHouse(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val city: String?,
         val livingSpace: Int?,
@@ -57,7 +57,7 @@ sealed class QuoteRequestData {
     }
 
     data class SwedishApartment(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val city: String?,
         val livingSpace: Int?,
@@ -83,7 +83,7 @@ sealed class QuoteRequestData {
     }
 
     data class NorwegianHomeContents(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val city: String?,
         val coInsured: Int?,
@@ -129,7 +129,7 @@ sealed class QuoteRequestData {
     }
 
     data class DanishHomeContents(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
@@ -155,7 +155,7 @@ sealed class QuoteRequestData {
     }
 
     data class DanishAccident(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
         @field:JsonProperty("student")
@@ -177,7 +177,7 @@ sealed class QuoteRequestData {
     }
 
     data class DanishTravel(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val coInsured: Int?,
         @field:JsonProperty("student")

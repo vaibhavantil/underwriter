@@ -1,13 +1,13 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.underwriter.util.Pii
+import com.hedvig.underwriter.util.Masked
 
 sealed class QuoteDetails {
 
     abstract val typeOfContract: ContractAgreementType
 
     data class SwedishApartmentQuoteDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val householdSize: Int,
         val livingSpace: Int,
@@ -23,7 +23,7 @@ sealed class QuoteDetails {
     }
 
     data class SwedishHouseQuoteDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val householdSize: Int,
         val livingSpace: Int,
@@ -38,7 +38,7 @@ sealed class QuoteDetails {
     }
 
     data class NorwegianHomeContentsDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val coInsured: Int,
         val livingSpace: Int,
@@ -74,7 +74,7 @@ sealed class QuoteDetails {
     }
 
     data class DanishHomeContentsDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val coInsured: Int,
         val livingSpace: Int,
@@ -99,7 +99,7 @@ sealed class QuoteDetails {
     }
 
     data class DanishAccidentDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val coInsured: Int,
         val isStudent: Boolean
@@ -112,7 +112,7 @@ sealed class QuoteDetails {
     }
 
     data class DanishTravelDetails(
-        @Pii val street: String,
+        @Masked val street: String,
         val zipCode: String,
         val coInsured: Int,
         val isStudent: Boolean

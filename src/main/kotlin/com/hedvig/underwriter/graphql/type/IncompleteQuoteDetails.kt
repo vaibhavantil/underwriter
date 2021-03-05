@@ -1,10 +1,10 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.underwriter.util.Pii
+import com.hedvig.underwriter.util.Masked
 
 sealed class IncompleteQuoteDetails {
     data class IncompleteApartmentQuoteDetails(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val householdSize: Int?,
         val livingSpace: Int?,
@@ -12,7 +12,7 @@ sealed class IncompleteQuoteDetails {
     ) : IncompleteQuoteDetails()
 
     data class IncompleteHouseQuoteDetails(
-        @Pii val street: String?,
+        @Masked val street: String?,
         val zipCode: String?,
         val householdSize: Int?,
         val livingSpace: Int?,

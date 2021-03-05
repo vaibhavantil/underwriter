@@ -23,7 +23,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.toNonPiiString
+import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
@@ -40,7 +40,7 @@ class Mutation @Autowired constructor(
 
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
 
-        logger.info("Create quote: ${createQuoteInput.toNonPiiString()}")
+        logger.info("Create quote: ${createQuoteInput.toMaskedString()}")
 
         val input = when {
             createQuoteInput.apartment != null || createQuoteInput.house != null ||
@@ -86,7 +86,7 @@ class Mutation @Autowired constructor(
 
     fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
 
-        logger.info("Edit quote: ${input.toNonPiiString()}")
+        logger.info("Edit quote: ${input.toMaskedString()}")
 
         return responseForEditedQuote(
             quoteService.updateQuote(
@@ -99,7 +99,7 @@ class Mutation @Autowired constructor(
 
     fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment): CreateQuoteResult {
 
-        logger.info("Remove current insurance: ${input.toNonPiiString()}")
+        logger.info("Remove current insurance: ${input.toMaskedString()}")
 
         return responseForEditedQuote(
             quoteService.removeCurrentInsurerFromQuote(input.id),
@@ -109,7 +109,7 @@ class Mutation @Autowired constructor(
 
     fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment): CreateQuoteResult {
 
-        logger.info("Remove current insurance: ${input.toNonPiiString()}")
+        logger.info("Remove current insurance: ${input.toMaskedString()}")
 
         return responseForEditedQuote(
             quoteService.removeStartDateFromQuote(input.id),
@@ -119,7 +119,7 @@ class Mutation @Autowired constructor(
 
     fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) {
 
-        logger.info("Sign quotes: ${input.toNonPiiString()}")
+        logger.info("Sign quotes: ${input.toMaskedString()}")
 
         signService.startSigningQuotes(
             input.quoteIds,

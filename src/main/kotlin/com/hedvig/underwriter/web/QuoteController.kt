@@ -12,7 +12,7 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.toNonPiiString
+import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -57,7 +57,7 @@ class QuoteController @Autowired constructor(
         httpServletRequest: HttpServletRequest
     ): ResponseEntity<out Any> {
 
-        logger.info("Create quote. Request: ${requestDto.toNonPiiString()}")
+        logger.info("Create quote. Request: ${requestDto.toMaskedString()}")
 
         val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(requestDto)
 
@@ -87,7 +87,7 @@ class QuoteController @Autowired constructor(
         @RequestBody quoteRequest: QuoteRequestFromAgreementDto
     ): ResponseEntity<out Any> {
 
-        logger.info("Create quote from agreement. Request: ${quoteRequest.toNonPiiString()}")
+        logger.info("Create quote from agreement. Request: ${quoteRequest.toMaskedString()}")
 
         return quoteService.createQuoteFromAgreement(
             agreementId = quoteRequest.agreementId,
@@ -104,7 +104,7 @@ class QuoteController @Autowired constructor(
         @RequestBody request: QuoteForNewContractRequestDto
     ): ResponseEntity<out Any> {
 
-        logger.info("Create quote from contract. Request: ${request.toNonPiiString()}")
+        logger.info("Create quote from contract. Request: ${request.toMaskedString()}")
 
         return quoteService.createQuoteForNewContractFromHope(
             quoteRequest = QuoteRequest.from(request.quoteRequestDto),
@@ -151,7 +151,7 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
-        logger.info("Update quote. quoteId=$id, request: ${quoteRequestDto.toNonPiiString()}, underwritingGuidelinesBypassedBy=$underwritingGuidelinesBypassedBy")
+        logger.info("Update quote. quoteId=$id, request: ${quoteRequestDto.toMaskedString()}, underwritingGuidelinesBypassedBy=$underwritingGuidelinesBypassedBy")
 
         val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(quoteRequestDto)
 
@@ -167,7 +167,7 @@ class QuoteController @Autowired constructor(
         @Valid @PathVariable completeQuoteId: UUID,
         @RequestBody body: SignQuoteRequest
     ): ResponseEntity<Any> {
-        logger.info("Sign quote. Request: ${body.toNonPiiString()}, completeQuoteId=$completeQuoteId")
+        logger.info("Sign quote. Request: ${body.toMaskedString()}, completeQuoteId=$completeQuoteId")
 
         return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
@@ -180,7 +180,7 @@ class QuoteController @Autowired constructor(
         @Valid @PathVariable completeQuoteId: UUID,
         @RequestBody request: SignQuoteFromHopeRequest
     ): ResponseEntity<Any> {
-        logger.info("Sign quote from Hope. Request: ${request.toNonPiiString()}, completeQuoteId=$completeQuoteId")
+        logger.info("Sign quote from Hope. Request: ${request.toMaskedString()}, completeQuoteId=$completeQuoteId")
 
         return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
@@ -193,7 +193,7 @@ class QuoteController @Autowired constructor(
         @Valid @RequestBody request: AddAgreementFromQuoteRequest,
         @RequestHeader("Authorization") token: String?
     ): ResponseEntity<Any> {
-        logger.info("Add agreement to contract. Request: ${request.toNonPiiString()}")
+        logger.info("Add agreement to contract. Request: ${request.toMaskedString()}")
 
         val result = quoteService.addAgreementFromQuote(request, token)
 

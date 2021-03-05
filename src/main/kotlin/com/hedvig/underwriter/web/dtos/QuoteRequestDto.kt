@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Pii
+import com.hedvig.underwriter.util.Masked
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
 data class QuoteRequestDto(
-    @Pii val firstName: String?,
-    @Pii val lastName: String?,
-    @Pii val email: String?,
+    @Masked val firstName: String?,
+    @Masked val lastName: String?,
+    @Masked val email: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
-    @Pii val ssn: String?,
+    @Masked val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType? = ProductType.UNKNOWN,
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

@@ -13,7 +13,7 @@ import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.toNonPiiString
+import com.hedvig.underwriter.util.toMaskedString
 import graphql.schema.DataFetchingEnvironment
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -46,7 +46,7 @@ class Query @Autowired constructor(
 
     fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
 
-        logger.info("Get quote bundle: memberId=${env.getToken()}, request: ${input.toNonPiiString()}")
+        logger.info("Get quote bundle: memberId=${env.getToken()}, request: ${input.toMaskedString()}")
 
         if (input.ids.isEmpty()) {
             throw EmptyBundleQueryException()

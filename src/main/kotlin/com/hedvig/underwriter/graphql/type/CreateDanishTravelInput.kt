@@ -1,10 +1,10 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Pii
+import com.hedvig.underwriter.util.Masked
 
 class CreateDanishTravelInput(
-    @Pii val street: String,
+    @Masked val street: String,
     val zipCode: String,
     val coInsured: Int,
     @get:JvmName("getIsStudent")

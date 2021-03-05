@@ -29,7 +29,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.toNonPiiString
+import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -208,7 +208,7 @@ class SignServiceImpl(
 
         val quotes = quoteRepository.find(quoteId)
 
-        logger.info("Fetched quote from db: ${quotes.toNonPiiString()}")
+        logger.info("Fetched quote from db: ${quotes.toMaskedString()}")
 
         val response = quotes
             .toOption()
@@ -229,7 +229,7 @@ class SignServiceImpl(
                 )
             }
 
-        logger.info("Quote in db after signing: ${quoteRepository.find(quoteId).toNonPiiString()}")
+        logger.info("Quote in db after signing: ${quoteRepository.find(quoteId).toMaskedString()}")
 
         return response
     }
@@ -280,7 +280,7 @@ class SignServiceImpl(
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
 
-        logger.info("Sign quote from hope. Quote from db: ${quote.toNonPiiString()}")
+        logger.info("Sign quote from hope. Quote from db: ${quote.toMaskedString()}")
 
         assertAgreementIdIsNull(quote)
 

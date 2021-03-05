@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import org.junit.Test
 import java.math.BigDecimal
 
-class PiiTest {
+class MaskedTest {
 
     @Test
     fun testPlainPojo() {
@@ -19,7 +19,7 @@ class PiiTest {
 
         val o = Data("sdf", 123, true, 12.345, null)
 
-        assertThat(o.toNonPiiString()).isEqualTo(o.toString())
+        assertThat(o.toMaskedString()).isEqualTo(o.toString())
     }
 
     @Test
@@ -34,7 +34,7 @@ class PiiTest {
 
         val o = listOf(Data("sdf", 123, true, 12.345, null), Data("asfd", 54, true, 7.345, "a"))
 
-        assertThat(o.toNonPiiString()).isEqualTo(o.toString())
+        assertThat(o.toMaskedString()).isEqualTo(o.toString())
     }
 
     @Test
@@ -49,7 +49,7 @@ class PiiTest {
 
         val o = setOf(Data("sdf", 123, true, 12.345, null), Data("asfd", 54, true, 7.345, "a"))
 
-        assertThat(o.toNonPiiString()).isEqualTo(o.toString())
+        assertThat(o.toMaskedString()).isEqualTo(o.toString())
     }
 
     @Test
@@ -64,7 +64,9 @@ class PiiTest {
 
         val o = mapOf(1 to Data("sdf", 123, true, 12.345, null), 3 to Data("asfd", 54, true, 7.345, "a"))
 
-        assertThat(o.toNonPiiString()).isEqualTo(o.toString())
+        assertThat(o.toMaskedString()).isEqualTo(o.toString())
+
+        assertThat((o as Any).toMaskedString()).isEqualTo(o.toString())
     }
 
     @Test
@@ -88,14 +90,14 @@ class PiiTest {
 
         val o = Data("sdf", 123, true, 12.345, null, NestedData("asdds", 134, false, 34.121, "asda"))
 
-        assertThat(o.toNonPiiString()).isEqualTo(o.toString())
+        assertThat(o.toMaskedString()).isEqualTo(o.toString())
     }
 
     @Test
-    fun testPlainPojoWithPii() {
+    fun testPlainPojoWithMasked() {
         data class Data(
-            @Pii val a: String,
-            @Pii val b: Int,
+            @Masked val a: String,
+            @Masked val b: Int,
             val c: Boolean,
             val d: Double,
             val e: String?
@@ -103,14 +105,14 @@ class PiiTest {
 
         val o = Data("sdf", 123, true, 12.345, null)
 
-        assertThat(o.toNonPiiString()).isEqualTo("Data(a=***, b=***, c=true, d=12.345, e=null)")
+        assertThat(o.toMaskedString()).isEqualTo("Data(a=***, b=***, c=true, d=12.345, e=null)")
     }
 
     @Test
-    fun testNestedPojoWithPii() {
+    fun testNestedPojoWithMasked() {
         data class NestedData(
-            @Pii val a: String,
-            @Pii val b: Int,
+            @Masked val a: String,
+            @Masked val b: Int,
             val c: Boolean,
             val d: Double,
             val e: String?
@@ -119,22 +121,22 @@ class PiiTest {
         data class Data(
             val a: String,
             val b: Int,
-            @Pii val c: Boolean,
-            @Pii val d: Double,
-            @Pii val e: String?,
+            @Masked val c: Boolean,
+            @Masked val d: Double,
+            @Masked val e: String?,
             val f: NestedData
         )
 
         val o = Data("sdf", 123, true, 12.345, null, NestedData("asdds", 134, false, 34.121, "asda"))
 
-        assertThat(o.toNonPiiString()).isEqualTo("Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda))")
+        assertThat(o.toMaskedString()).isEqualTo("Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda))")
     }
 
     @Test
     fun testMapWithNestedPojoWithPii() {
         data class NestedData(
-            @Pii val a: String,
-            @Pii val b: Int,
+            @Masked val a: String,
+            @Masked val b: Int,
             val c: Boolean,
             val d: Double,
             val e: String?
@@ -143,15 +145,58 @@ class PiiTest {
         data class Data(
             val a: String,
             val b: Int,
-            @Pii val c: Boolean,
-            @Pii val d: Double,
-            @Pii val e: String?,
+            @Masked val c: Boolean,
+            @Masked val d: Double,
+            @Masked val e: String?,
             val f: NestedData
         )
 
         val o = mapOf(1 to Data("sdf", 123, true, 12.345, null, NestedData("asdds", 134, false, 34.121, "asda")), 2 to null)
 
-        assertThat(o.toNonPiiString()).isEqualTo("{1=Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda)), 2=null}")
+        assertThat(o.toMaskedString()).isEqualTo("{1=Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda)), 2=null}")
+    }
+
+    @Test
+    fun testNestedPojoMapWithListsAndMaps() {
+        data class Item(
+            @Masked val a: String,
+            val b: String
+        )
+
+        data class Data(
+            val a: List<*>,
+            val b: Map<String, *>,
+            val c: Item
+        )
+
+        val o = mapOf(
+            1 to Data(
+                a = listOf("1", 1, 2.0, Item("masked", "banan")),
+                b = mapOf("1" to 1, "2" to Item("masked", "citron")),
+                c = Item("masked", "banan")
+            ),
+            2 to "sadf")
+
+        assertThat(o.toMaskedString()).isEqualTo(o.toString().replace("masked", "***"))
+    }
+
+    @Test
+    fun testInheritance() {
+        open class Parent(
+            @Masked val a: String,
+            val b: String
+        )
+
+        class Child(
+            a: String,
+            b: String,
+            @Masked val c: String,
+            val d: String
+        ) : Parent(a, b)
+
+        val a = Child("masked", "2", "masked", "4")
+
+        assertThat(a.toMaskedString()).isEqualTo("Child(c=***, d=4, a=***, b=2)")
     }
 
     @Test
@@ -159,22 +204,22 @@ class PiiTest {
 
         val a: String? = null
 
-        assertThat(a.toNonPiiString()).isEqualTo("null")
+        assertThat(a.toMaskedString()).isEqualTo("null")
     }
 
     @Test
     fun testKotlinBuildIns() {
 
         val a = "dafadf"
-        assertThat(a.toNonPiiString()).isEqualTo(a)
+        assertThat(a.toMaskedString()).isEqualTo(a)
 
         val b = 123.341
-        assertThat(b.toNonPiiString()).isEqualTo(b.toString())
+        assertThat(b.toMaskedString()).isEqualTo(b.toString())
 
         val c = false
-        assertThat(c.toNonPiiString()).isEqualTo(c.toString())
+        assertThat(c.toMaskedString()).isEqualTo(c.toString())
 
         val d = BigDecimal(12)
-        assertThat(d.toNonPiiString()).isEqualTo(d.toString())
+        assertThat(d.toMaskedString()).isEqualTo(d.toString())
     }
 }
