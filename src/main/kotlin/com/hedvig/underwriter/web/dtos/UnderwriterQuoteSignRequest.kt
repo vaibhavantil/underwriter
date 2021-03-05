@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.web.dtos
 
+import com.hedvig.underwriter.util.Pii
+
 data class UnderwriterQuoteSignRequest(
-    val ssn: String
+    @Pii val ssn: String
 )

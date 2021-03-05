@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
+import com.hedvig.underwriter.util.Pii
 import org.jdbi.v3.json.Json
 import java.time.LocalDate
 import java.util.UUID
@@ -26,13 +27,13 @@ sealed class QuoteData {
 
 data class SwedishHouseData(
     override val id: UUID,
-    override val ssn: String? = null,
+    @Pii override val ssn: String? = null,
     override val birthDate: LocalDate? = null,
-    override val firstName: String? = null,
-    override val lastName: String? = null,
-    override val email: String? = null,
-    override val phoneNumber: String? = null,
-    override val street: String? = null,
+    @Pii override val firstName: String? = null,
+    @Pii override val lastName: String? = null,
+    @Pii override val email: String? = null,
+    @Pii override val phoneNumber: String? = null,
+    @Pii override val street: String? = null,
     override val zipCode: String? = null,
     override val city: String? = null,
     var livingSpace: Int? = null,
@@ -63,13 +64,13 @@ data class SwedishHouseData(
 
 data class SwedishApartmentData(
     override val id: UUID,
-    override val ssn: String? = null,
+    @Pii override val ssn: String? = null,
     override val birthDate: LocalDate? = null,
-    override val firstName: String? = null,
-    override val lastName: String? = null,
-    override val email: String? = null,
+    @Pii override val firstName: String? = null,
+    @Pii override val lastName: String? = null,
+    @Pii override val email: String? = null,
     override val phoneNumber: String? = null,
-    override val street: String? = null,
+    @Pii override val street: String? = null,
     override val city: String? = null,
     override val zipCode: String? = null,
     override val householdSize: Int? = null,
@@ -97,13 +98,13 @@ data class SwedishApartmentData(
 
 data class NorwegianHomeContentsData(
     override val id: UUID,
-    override val ssn: String? = null,
+    @Pii override val ssn: String? = null,
     override val birthDate: LocalDate,
-    override val firstName: String?,
-    override val lastName: String?,
-    override val email: String?,
-    override val phoneNumber: String? = null,
-    override val street: String,
+    @Pii override val firstName: String?,
+    @Pii override val lastName: String?,
+    @Pii override val email: String?,
+    @Pii override val phoneNumber: String? = null,
+    @Pii override val street: String,
     override val city: String?,
     override val zipCode: String,
     val livingSpace: Int,
@@ -133,12 +134,12 @@ data class NorwegianHomeContentsData(
 
 data class NorwegianTravelData(
     override val id: UUID,
-    override val ssn: String? = null,
+    @Pii override val ssn: String? = null,
     override val birthDate: LocalDate,
-    override val firstName: String?,
-    override val lastName: String?,
-    override val email: String? = null,
-    override val phoneNumber: String? = null,
+    @Pii override val firstName: String?,
+    @Pii override val lastName: String?,
+    @Pii override val email: String? = null,
+    @Pii override val phoneNumber: String? = null,
     val coInsured: Int,
     @get:JvmName("getIsYouth")
     val isYouth: Boolean,
@@ -164,13 +165,13 @@ data class NorwegianTravelData(
 
 data class DanishHomeContentsData(
     override val id: UUID,
-    override val ssn: String?,
+    @Pii override val ssn: String?,
     override val birthDate: LocalDate,
-    override val firstName: String,
-    override val lastName: String,
-    override val email: String?,
-    override val phoneNumber: String? = null,
-    override val street: String,
+    @Pii override val firstName: String,
+    @Pii override val lastName: String,
+    @Pii override val email: String?,
+    @Pii override val phoneNumber: String? = null,
+    @Pii override val street: String,
     override val zipCode: String,
     val livingSpace: Int,
     val coInsured: Int,
@@ -197,12 +198,12 @@ data class DanishHomeContentsData(
 
 data class DanishAccidentData(
     override val id: UUID,
-    override val ssn: String?,
+    @Pii override val ssn: String?,
     override val birthDate: LocalDate,
-    override val firstName: String,
-    override val lastName: String,
-    override val email: String?,
-    override val phoneNumber: String? = null,
+    @Pii override val firstName: String,
+    @Pii override val lastName: String,
+    @Pii override val email: String?,
+    @Pii override val phoneNumber: String? = null,
     override val street: String,
     override val zipCode: String,
     val coInsured: Int,
@@ -228,13 +229,13 @@ data class DanishAccidentData(
 
 data class DanishTravelData(
     override val id: UUID,
-    override val ssn: String?,
+    @Pii override val ssn: String?,
     override val birthDate: LocalDate,
-    override val firstName: String,
-    override val lastName: String,
-    override val email: String?,
-    override val phoneNumber: String? = null,
-    override val street: String,
+    @Pii override val firstName: String,
+    @Pii override val lastName: String,
+    @Pii override val email: String?,
+    @Pii override val phoneNumber: String? = null,
+    @Pii override val street: String,
     override val zipCode: String,
     val coInsured: Int,
     @get:JvmName("getIsStudent")

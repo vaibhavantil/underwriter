@@ -2,9 +2,10 @@ package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.extensions.toExtraBuilding
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.util.Pii
 
 data class EditSwedishHouseInput(
-    val street: String?,
+    @Pii val street: String?,
     val zipCode: String?,
     val householdSize: Int?,
     val livingSpace: Int?,

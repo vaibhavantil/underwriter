@@ -12,6 +12,8 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
+import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.util.toNonPiiString
 import graphql.schema.DataFetchingEnvironment
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -25,15 +27,26 @@ class Query @Autowired constructor(
     private val quoteMapper: QuoteMapper
 ) : GraphQLQueryResolver {
 
-    fun quote(id: UUID, env: DataFetchingEnvironment) = quoteService.getQuote(id)?.let { quote ->
-        quote.toResult(env)
-    } ?: throw QuoteNotFoundQueryException("No quote with id '$id' was found!")
+    fun quote(id: UUID, env: DataFetchingEnvironment) {
 
-    fun lastQuoteOfMember(env: DataFetchingEnvironment) =
+        logger.info("Get quote: $id")
+
+        quoteService.getQuote(id)?.let { quote ->
+            quote.toResult(env)
+        } ?: throw QuoteNotFoundQueryException("No quote with id '$id' was found!")
+    }
+
+    fun lastQuoteOfMember(env: DataFetchingEnvironment) {
+
+        logger.info("Get last quote for member")
+
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
             ?: throw QuoteNotFoundQueryException("No quote found for memberId: ${env.getToken()}")
+    }
 
     fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
+
+        logger.info("Get quote bundle: ${input.toNonPiiString()}")
 
         if (input.ids.isEmpty()) {
             throw EmptyBundleQueryException()
@@ -46,8 +59,12 @@ class Query @Autowired constructor(
         )
     }
 
-    fun signMethodForQuotes(input: List<UUID>): SignMethod =
-        signService.getSignMethodFromQuotes(input).toGraphQL()
+    fun signMethodForQuotes(input: List<UUID>): SignMethod {
+
+        logger.info("Get sign method for quotes: $input")
+
+        return signService.getSignMethodFromQuotes(input).toGraphQL()
+    }
 
     private fun Quote.toResult(env: DataFetchingEnvironment) = quoteMapper.mapToQuoteResult(
         this,

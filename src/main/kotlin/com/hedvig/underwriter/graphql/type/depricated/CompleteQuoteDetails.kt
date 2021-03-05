@@ -2,11 +2,12 @@ package com.hedvig.underwriter.graphql.type.depricated
 
 import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
+import com.hedvig.underwriter.util.Pii
 
 @Deprecated("Use QuoteDetails")
 sealed class CompleteQuoteDetails {
     data class CompleteApartmentQuoteDetails(
-        val street: String,
+        @Pii val street: String,
         val zipCode: String,
         val householdSize: Int,
         val livingSpace: Int,
@@ -14,7 +15,7 @@ sealed class CompleteQuoteDetails {
     ) : CompleteQuoteDetails()
 
     data class CompleteHouseQuoteDetails(
-        val street: String,
+        @Pii val street: String,
         val zipCode: String,
         val householdSize: Int,
         val livingSpace: Int,

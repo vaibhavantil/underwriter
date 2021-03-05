@@ -8,18 +8,19 @@ import com.hedvig.underwriter.model.birthDateFromDanishSsn
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.util.Pii
 import com.hedvig.underwriter.util.toStockholmInstant
 import java.time.LocalDate
 import java.util.UUID
 
 data class EditQuoteInput(
     val id: UUID,
-    val firstName: String?,
-    val lastName: String?,
-    val email: String?,
-    val phoneNumber: String?,
+    @Pii val firstName: String?,
+    @Pii val lastName: String?,
+    @Pii val email: String?,
+    @Pii val phoneNumber: String?,
     val currentInsurer: String?,
-    val ssn: String?,
+    @Pii val ssn: String?,
     val birthDate: LocalDate?,
     val startDate: LocalDate?,
     @Deprecated("Use swedishApartment")

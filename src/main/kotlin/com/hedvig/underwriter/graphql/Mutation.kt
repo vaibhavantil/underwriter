@@ -22,6 +22,8 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
+import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.util.toNonPiiString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment
@@ -37,6 +39,9 @@ class Mutation @Autowired constructor(
 ) : GraphQLMutationResolver {
 
     fun createQuote(createQuoteInput: CreateQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
+
+        logger.info("Create quote: ${createQuoteInput.toNonPiiString()}")
+
         val input = when {
             createQuoteInput.apartment != null || createQuoteInput.house != null ||
                 createQuoteInput.swedishApartment != null || createQuoteInput.swedishHouse != null -> {
@@ -79,28 +84,43 @@ class Mutation @Autowired constructor(
         }
     }
 
-    fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult =
-        responseForEditedQuote(
+    fun editQuote(input: EditQuoteInput, env: DataFetchingEnvironment): CreateQuoteResult {
+
+        logger.info("Edit quote: ${input.toNonPiiString()}")
+
+        return responseForEditedQuote(
             quoteService.updateQuote(
                 input.toQuoteRequest(memberId = env.getTokenOrNull()),
                 input.id
             ),
             env
         )
+    }
 
-    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment): CreateQuoteResult =
-        responseForEditedQuote(
+    fun removeCurrentInsurer(input: RemoveCurrentInsurerInput, env: DataFetchingEnvironment): CreateQuoteResult {
+
+        logger.info("Remove current insurance: ${input.toNonPiiString()}")
+
+        return responseForEditedQuote(
             quoteService.removeCurrentInsurerFromQuote(input.id),
             env
         )
+    }
 
-    fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment): CreateQuoteResult =
-        responseForEditedQuote(
+    fun removeStartDate(input: RemoveStartDateInput, env: DataFetchingEnvironment): CreateQuoteResult {
+
+        logger.info("Remove current insurance: ${input.toNonPiiString()}")
+
+        return responseForEditedQuote(
             quoteService.removeStartDateFromQuote(input.id),
             env
         )
+    }
 
-    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) =
+    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) {
+
+        logger.info("Sign quotes: ${input.toNonPiiString()}")
+
         signService.startSigningQuotes(
             input.quoteIds,
             env.getToken(),
@@ -108,6 +128,7 @@ class Mutation @Autowired constructor(
             input.successUrl,
             input.failUrl
         )
+    }
 
     private fun responseForEditedQuote(
         errorOrQuote: Either<ErrorResponseDto, Quote>,
