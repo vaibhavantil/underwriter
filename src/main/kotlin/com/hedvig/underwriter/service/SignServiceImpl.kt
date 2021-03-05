@@ -256,7 +256,7 @@ class SignServiceImpl(
             }
             val memberId = memberService.createMember()
 
-            logger.info("Created member: $memberId")
+            logger.info("Created member: memberId=$memberId")
 
             val ssn = quote.data.ssn!!
             memberService.updateMemberSsn(

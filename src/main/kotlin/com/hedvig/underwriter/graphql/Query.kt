@@ -29,7 +29,7 @@ class Query @Autowired constructor(
 
     fun quote(id: UUID, env: DataFetchingEnvironment) {
 
-        logger.info("Get quote: $id")
+        logger.info("Get quote for quoteId=$id")
 
         quoteService.getQuote(id)?.let { quote ->
             quote.toResult(env)
@@ -38,7 +38,7 @@ class Query @Autowired constructor(
 
     fun lastQuoteOfMember(env: DataFetchingEnvironment) {
 
-        logger.info("Get last quote for member")
+        logger.info("Get last quote for memberId=${env.getToken()}")
 
         quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
             ?: throw QuoteNotFoundQueryException("No quote found for memberId: ${env.getToken()}")
@@ -46,7 +46,7 @@ class Query @Autowired constructor(
 
     fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
 
-        logger.info("Get quote bundle: ${input.toNonPiiString()}")
+        logger.info("Get quote bundle: memberId=${env.getToken()}, request: ${input.toNonPiiString()}")
 
         if (input.ids.isEmpty()) {
             throw EmptyBundleQueryException()
@@ -61,7 +61,7 @@ class Query @Autowired constructor(
 
     fun signMethodForQuotes(input: List<UUID>): SignMethod {
 
-        logger.info("Get sign method for quotes: $input")
+        logger.info("Get sign method for quotes: quoteIds=$input")
 
         return signService.getSignMethodFromQuotes(input).toGraphQL()
     }
