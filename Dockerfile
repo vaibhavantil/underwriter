@@ -29,18 +29,13 @@ RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml
 
 
 ##### Test stage #####
-FROM scratch AS test
-# No-op, this service only has integration tests
-
-##### Integration test stage #####
-FROM build AS integration_test
+FROM build AS test
 COPY bin bin
 COPY src/test src/test
-RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
-
 RUN chown -R underwriter .
 
-ENTRYPOINT ["su", "underwriter", "-c", "mvn integration-test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml"]
+# Tests must be run as custom user because of EmbeddedPostgres
+RUN su underwriter -c 'mvn test -s /usr/share/maven/ref/settings-docker.xml'
 
 
 ##### Assemble stage #####
