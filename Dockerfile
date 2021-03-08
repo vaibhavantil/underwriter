@@ -1,4 +1,3 @@
-
 ##### Dependencies stage #####
 FROM maven:3.6.3-amazoncorretto-11 AS dependencies
 WORKDIR /usr/app
@@ -16,6 +15,7 @@ RUN mvn dependency:go-offline -s /usr/share/maven/ref/settings-docker.xml
 # This is the maven repo in /usr/share/maven/ref/settings-docker.xml
 # has to be readable by 'underwriter'
 RUN chown -R underwriter /usr/share/maven/ref/repository
+
 
 ##### Build stage #####
 FROM dependencies AS build
