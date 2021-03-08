@@ -14,7 +14,7 @@ FROM dependencies AS build
 # Copy application source and build it
 COPY src/main src/main
 # A plugin in the pom.xml file requires maven to be executed inside a git repo
-COPY .git .git
+# COPY .git .git
 # Git repo needed for git hook plugin
 RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml
 
@@ -25,18 +25,24 @@ FROM scratch AS test
 
 ##### Integration test stage #####
 FROM build AS integration_test
-COPY src/test src/test
-RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
 
+# Set up the user running the tests (needed for embedded postgres)
 RUN yum -y install python3 \
     python3-pip \
     shadow-utils \
     util-linux
 RUN adduser underwriter
-USER underwriter
-ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
+RUN chown -R underwriter .
+# This is the maven repo in /usr/share/maven/ref/settings-docker.xml
+# has to be readable by 'underwriter'
+RUN chown -R underwriter /usr/share/maven/ref/repository
 
-ENTRYPOINT ["mvn", "integration-test", "-f", "/usr/app/pom.xml", "-s", "/usr/share/maven/ref/settings-docker.xml"]
+COPY bin bin
+COPY src/test src/test
+RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
+
+ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
+ENTRYPOINT ["su", "underwriter", "-c", "mvn integration-test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml"]
 
 
 ##### Assemble stage #####
