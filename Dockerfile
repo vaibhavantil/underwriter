@@ -32,7 +32,6 @@ RUN yum -y install python3 \
     shadow-utils \
     util-linux
 RUN adduser underwriter
-RUN chown -R underwriter .
 # This is the maven repo in /usr/share/maven/ref/settings-docker.xml
 # has to be readable by 'underwriter'
 RUN chown -R underwriter /usr/share/maven/ref/repository
@@ -41,7 +40,8 @@ COPY bin bin
 COPY src/test src/test
 RUN mvn test-compile -s /usr/share/maven/ref/settings-docker.xml
 
-ENV POSTGRES_URL=jdbc:postgresql://test_db:5432
+RUN chown -R underwriter .
+
 ENTRYPOINT ["su", "underwriter", "-c", "mvn integration-test -f /usr/app/pom.xml -s /usr/share/maven/ref/settings-docker.xml"]
 
 
