@@ -7,6 +7,7 @@ import com.hedvig.resolver.LocaleResolver
 import com.hedvig.underwriter.graphql.type.QuoteBundle
 import com.hedvig.underwriter.graphql.type.QuoteBundleInputInput
 import com.hedvig.underwriter.graphql.type.QuoteMapper
+import com.hedvig.underwriter.graphql.type.QuoteResult
 import com.hedvig.underwriter.graphql.type.SignMethod
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
@@ -27,20 +28,20 @@ class Query @Autowired constructor(
     private val quoteMapper: QuoteMapper
 ) : GraphQLQueryResolver {
 
-    fun quote(id: UUID, env: DataFetchingEnvironment) {
+    fun quote(id: UUID, env: DataFetchingEnvironment): QuoteResult {
 
         logger.info("Get quote for quoteId=$id")
 
-        quoteService.getQuote(id)?.let { quote ->
+        return quoteService.getQuote(id)?.let { quote ->
             quote.toResult(env)
         } ?: throw QuoteNotFoundQueryException("No quote with id '$id' was found!")
     }
 
-    fun lastQuoteOfMember(env: DataFetchingEnvironment) {
+    fun lastQuoteOfMember(env: DataFetchingEnvironment): QuoteResult {
 
         logger.info("Get last quote for memberId=${env.getToken()}")
 
-        quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
+        return quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
             ?: throw QuoteNotFoundQueryException("No quote found for memberId: ${env.getToken()}")
     }
 

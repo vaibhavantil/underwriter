@@ -22,6 +22,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
+import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
@@ -117,11 +118,11 @@ class Mutation @Autowired constructor(
         )
     }
 
-    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment) {
+    fun signQuotes(input: SignQuotesInput, env: DataFetchingEnvironment): StartSignResponse {
 
         logger.info("Sign quotes: ${input.toMaskedString()}")
 
-        signService.startSigningQuotes(
+        return signService.startSigningQuotes(
             input.quoteIds,
             env.getToken(),
             env.getEndUserIp(),

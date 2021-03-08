@@ -181,6 +181,18 @@ class MaskedTest {
     }
 
     @Test
+    fun testDowncastedPojoMapWithMaskedVals() {
+        data class Data(
+            @Masked val a: String
+        )
+
+        val o = mapOf(1 to Data("masked"))
+
+        assertThat(o.toMaskedString()).isEqualTo("{1=Data(a=***)}")
+        assertThat((o as Any).toMaskedString()).isEqualTo("{1=Data(a=***)}")
+    }
+
+    @Test
     fun testInheritance() {
         open class Parent(
             @Masked val a: String,

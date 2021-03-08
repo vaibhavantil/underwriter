@@ -10,7 +10,8 @@ annotation class Masked()
 fun Any?.toMaskedString(): String = when (this) {
     is Collection<*> -> this.toMaskedString()
     is Map<*, *> -> this.toMaskedString()
-    else -> if (this == null) "null" else reflectionToString(this)
+    null -> "null"
+    else -> reflectionToString(this)
 }
 
 fun Collection<*>?.toMaskedString(): String =
