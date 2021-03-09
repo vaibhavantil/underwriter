@@ -12,6 +12,7 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -55,6 +56,9 @@ class QuoteController @Autowired constructor(
         @Valid @RequestBody requestDto: QuoteRequestDto,
         httpServletRequest: HttpServletRequest
     ): ResponseEntity<out Any> {
+
+        logger.info("Create quote. Request: ${requestDto.toMaskedString()}")
+
         val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(requestDto)
 
         val quoteInitiatedFrom = when {
@@ -63,6 +67,8 @@ class QuoteController @Autowired constructor(
             requestDto.originatingProductId != null -> QuoteInitiatedFrom.HOPE
             else -> QuoteInitiatedFrom.RAPIO
         }
+
+        logger.info("Initiated from $quoteInitiatedFrom")
 
         return quoteService.createQuote(
             houseOrApartmentIncompleteQuoteDto,
@@ -80,6 +86,9 @@ class QuoteController @Autowired constructor(
     fun createQuoteFromAgreement(
         @RequestBody quoteRequest: QuoteRequestFromAgreementDto
     ): ResponseEntity<out Any> {
+
+        logger.info("Create quote from agreement. Request: ${quoteRequest.toMaskedString()}")
+
         return quoteService.createQuoteFromAgreement(
             agreementId = quoteRequest.agreementId,
             memberId = quoteRequest.memberId,
@@ -94,6 +103,9 @@ class QuoteController @Autowired constructor(
     fun createQuoteFromAgreement(
         @RequestBody request: QuoteForNewContractRequestDto
     ): ResponseEntity<out Any> {
+
+        logger.info("Create quote from contract. Request: ${request.toMaskedString()}")
+
         return quoteService.createQuoteForNewContractFromHope(
             quoteRequest = QuoteRequest.from(request.quoteRequestDto),
             underwritingGuidelinesBypassedBy = request.underwritingGuidelinesBypassedBy
@@ -123,6 +135,8 @@ class QuoteController @Autowired constructor(
 
     @GetMapping("/{id}")
     fun getQuote(@PathVariable id: UUID): ResponseEntity<Quote> {
+        logger.info("Get quote for quoteId=$id")
+
         val optionalQuote = quoteService.getQuote(id) ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(optionalQuote)
@@ -137,6 +151,8 @@ class QuoteController @Autowired constructor(
         @RequestParam("underwritingGuidelinesBypassedBy")
         underwritingGuidelinesBypassedBy: String?
     ): ResponseEntity<Any> {
+        logger.info("Update quote. quoteId=$id, request: ${quoteRequestDto.toMaskedString()}, underwritingGuidelinesBypassedBy=$underwritingGuidelinesBypassedBy")
+
         val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(quoteRequestDto)
 
         return when (val quoteOrError =
@@ -151,6 +167,8 @@ class QuoteController @Autowired constructor(
         @Valid @PathVariable completeQuoteId: UUID,
         @RequestBody body: SignQuoteRequest
     ): ResponseEntity<Any> {
+        logger.info("Sign quote. Request: ${body.toMaskedString()}, completeQuoteId=$completeQuoteId")
+
         return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -162,6 +180,8 @@ class QuoteController @Autowired constructor(
         @Valid @PathVariable completeQuoteId: UUID,
         @RequestBody request: SignQuoteFromHopeRequest
     ): ResponseEntity<Any> {
+        logger.info("Sign quote from Hope. Request: ${request.toMaskedString()}, completeQuoteId=$completeQuoteId")
+
         return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
@@ -173,6 +193,8 @@ class QuoteController @Autowired constructor(
         @Valid @RequestBody request: AddAgreementFromQuoteRequest,
         @RequestHeader("Authorization") token: String?
     ): ResponseEntity<Any> {
+        logger.info("Add agreement to contract. Request: ${request.toMaskedString()}")
+
         val result = quoteService.addAgreementFromQuote(request, token)
 
         return when (result) {
@@ -184,30 +206,39 @@ class QuoteController @Autowired constructor(
 
     @GetMapping("/members/{memberId}/latestQuote")
     fun getLatestQuoteFromMemberId(@PathVariable memberId: String): ResponseEntity<QuoteDto> {
+        logger.info("Get last quote for member: memberId=$memberId")
+
         val quote = quoteService.getLatestQuoteForMemberId(memberId) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(QuoteDto.fromQuote(quote))
     }
 
     @GetMapping("/members/{memberId}")
     fun getAllQuotesFromMemberId(@PathVariable memberId: String): ResponseEntity<List<QuoteDto>> {
+        logger.info("Get all quotes for member: memberId=$memberId")
+
         return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
     }
 
     @Deprecated("Should start sign session from `/_/v1/signSession` and complete it there")
     @PostMapping("/member/{memberId}/signed")
     fun memberSigned(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
+        logger.info("Member signed (deprecated): memberId=$memberId")
+
         signService.memberSigned(memberId, signRequest)
         return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/{id}/expire")
     fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote> {
+        logger.info("Expire invalid quote: quoteId=$id")
+
         val quote = quoteService.expireQuote(id) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(quote)
     }
 
     @GetMapping("/contracts/{contractId}")
     fun getContractById(@PathVariable contractId: UUID): ResponseEntity<Any> {
+        logger.info("Get contract: contractId=$contractId")
         val quote = quoteService.getQuoteByContractId(contractId = contractId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ErrorQuoteResponseDto(
@@ -221,6 +252,7 @@ class QuoteController @Autowired constructor(
 
     @GetMapping("/members/{memberId}/latestQuote/marketInfo")
     fun getMarketInfoFromLatestQuote(@PathVariable memberId: String): ResponseEntity<MarketInfo> {
+        logger.info("Get market from last quote for member: memberId=$memberId")
         val market = quoteService.getMarketFromLatestQuote(memberId)
         return ResponseEntity.ok(MarketInfo(market = market))
     }

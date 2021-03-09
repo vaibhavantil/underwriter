@@ -2,6 +2,7 @@ package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.depricated.CompleteQuoteDetails
+import com.hedvig.underwriter.util.Masked
 import java.time.LocalDate
 import java.util.UUID
 
@@ -9,10 +10,10 @@ sealed class QuoteResult {
 
     data class CompleteQuote(
         val id: UUID,
-        val firstName: String,
-        val lastName: String,
+        @Masked val firstName: String,
+        @Masked val lastName: String,
         val currentInsurer: CurrentInsurer?,
-        val ssn: String?,
+        @Masked val ssn: String?,
         val birthDate: LocalDate,
         val price: MonetaryAmountV2,
         val insuranceCost: InsuranceCost,
@@ -22,7 +23,7 @@ sealed class QuoteResult {
         val startDate: LocalDate?,
         val expiresAt: LocalDate,
         val email: String?,
-        val phoneNumber: String?,
+        @Masked val phoneNumber: String?,
         val dataCollectionId: UUID?
     ) : QuoteResult(), CreateQuoteResult {
         val typeOfContract: ContractAgreementType
@@ -32,13 +33,13 @@ sealed class QuoteResult {
     @Deprecated("Incomplete is deprecated")
     data class IncompleteQuote(
         val id: UUID,
-        val firstName: String?,
-        val lastName: String?,
+        @Masked val firstName: String?,
+        @Masked val lastName: String?,
         val birthDate: LocalDate?,
         val currentInsurer: CurrentInsurer?,
         val details: IncompleteQuoteDetails?,
         val startDate: LocalDate?,
-        val email: String?,
+        @Masked val email: String?,
         val dataCollectionId: UUID?
     ) : QuoteResult()
 }

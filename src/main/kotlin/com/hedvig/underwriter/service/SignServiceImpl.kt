@@ -29,6 +29,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -203,24 +204,35 @@ class SignServiceImpl(
     override fun signQuote(
         quoteId: UUID,
         body: SignQuoteRequest
-    ): Either<ErrorResponseDto, SignedQuoteResponseDto> = quoteRepository.find(quoteId)
-        .toOption()
-        .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
-        .map { updateNameFromRequest(it, body) }
-        .map { updateEmailFromRequest(it, body) }
-        .map { updateSsnFromRequest(it, body) }
-        .map { updateStartTimeFromRequest(it, body) }
-        .map(::assertAgreementIdIsNull)
-        .map(::assertSsnIsNotNull)
-        .flatMap { createMemberMaybe(it) }
-        .flatMap {
-            signQuoteWithMemberId(
-                it,
-                true,
-                SignRequest("", "", ""),
-                body.email
-            )
-        }
+    ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
+
+        val quotes = quoteRepository.find(quoteId)
+
+        logger.info("Fetched quote from db: ${quotes.toMaskedString()}")
+
+        val response = quotes
+            .toOption()
+            .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
+            .map { updateNameFromRequest(it, body) }
+            .map { updateEmailFromRequest(it, body) }
+            .map { updateSsnFromRequest(it, body) }
+            .map { updateStartTimeFromRequest(it, body) }
+            .map(::assertAgreementIdIsNull)
+            .map(::assertSsnIsNotNull)
+            .flatMap { createMemberMaybe(it) }
+            .flatMap {
+                signQuoteWithMemberId(
+                    it,
+                    true,
+                    SignRequest("", "", ""),
+                    body.email
+                )
+            }
+
+        logger.info("Quote in db after signing: ${quoteRepository.find(quoteId).toMaskedString()}")
+
+        return response
+    }
 
     private fun createMemberMaybe(
         quote: Quote
@@ -244,6 +256,8 @@ class SignServiceImpl(
             }
             val memberId = memberService.createMember()
 
+            logger.info("Created member: memberId=$memberId")
+
             val ssn = quote.data.ssn!!
             memberService.updateMemberSsn(
                 memberId.toLong(),
@@ -265,6 +279,8 @@ class SignServiceImpl(
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
         val quote = quoteRepository.find(completeQuoteId)
             ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+
+        logger.info("Sign quote from hope. Quote from db: ${quote.toMaskedString()}")
 
         assertAgreementIdIsNull(quote)
 

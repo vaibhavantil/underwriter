@@ -8,17 +8,18 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.util.Masked
 import com.hedvig.underwriter.util.toStockholmInstant
 import java.time.LocalDate
 import java.util.UUID
 
 data class CreateQuoteInput(
     val id: UUID,
-    val firstName: String,
-    val lastName: String,
-    val email: String?,
+    @Masked val firstName: String,
+    @Masked val lastName: String,
+    @Masked val email: String?,
     val currentInsurer: String?,
-    val ssn: String?,
+    @Masked val ssn: String?,
     val birthDate: LocalDate?,
     val startDate: LocalDate?,
     @Deprecated("Use swedishApartment")
@@ -33,7 +34,7 @@ data class CreateQuoteInput(
     val danishAccident: CreateDanishAccidentInput?,
     val danishTravel: CreateDanishTravelInput?,
     val dataCollectionId: UUID?,
-    val phoneNumber: String?
+    @Masked val phoneNumber: String?
 ) {
     fun toQuoteRequest(
         quotingPartner: Partner? = null,

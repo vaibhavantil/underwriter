@@ -1,9 +1,10 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.util.Masked
 
 data class CreateSwedishApartmentInput(
-    val street: String,
+    @Masked val street: String,
     val zipCode: String,
     val householdSize: Int,
     val livingSpace: Int,

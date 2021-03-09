@@ -1,14 +1,15 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.util.Masked
 import java.time.LocalDate
 
 data class ExternalQuoteRequestDto(
     val memberId: String,
-    val firstName: String,
-    val lastName: String,
+    @Masked val firstName: String,
+    @Masked val lastName: String,
     val birthDate: LocalDate,
-    val ssn: String,
+    @Masked val ssn: String,
     val startDate: LocalDate,
     val swedishHouseData: QuoteRequestData.SwedishHouse?,
     val swedishApartmentData: QuoteRequestData.SwedishApartment?,
