@@ -30,7 +30,7 @@ COPY src/test src/test
 RUN chown -R underwriter .
 
 # Tests must be run as custom user because of EmbeddedPostgres
-RUN su underwriter -c 'mvn test -s /usr/share/maven/ref/settings-docker.xml'
+RUN su underwriter -c 'mvn test -s /usr/share/maven/ref/settings-docker.xml -P no-git-hooks'
 
 
 ##### Assemble stage #####
