@@ -480,6 +480,7 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>ktlint-install-githook</id>
                         <goals>
                             <!-- Sets git config specified under configuration > gitConfig. -->
                             <goal>configure</goal>
@@ -512,6 +513,24 @@
                                 <goals>
                                     <goal>report</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>no-git-hooks</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.rudikershaw.gitbuildhook</groupId>
+                        <artifactId>git-build-hook-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>ktlint-install-githook</id>
+                                <phase>none</phase>
                             </execution>
                         </executions>
                     </plugin>
