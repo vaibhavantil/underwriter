@@ -1,10 +1,11 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.util.Masked
 import com.hedvig.underwriter.model.NorwegianHomeContentsType as InternalNorwegianHomeContentsType
 
 data class EditNorwegianHomeContentsInput(
-    val street: String?,
+    @Masked val street: String?,
     val zipCode: String?,
     val coInsured: Int?,
     val livingSpace: Int?,
