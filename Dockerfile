@@ -20,7 +20,7 @@ RUN chown -R underwriter /usr/share/maven/ref/repository
 ##### Build stage #####
 FROM dependencies AS build
 COPY src/main src/main
-RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml
+RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml -P no-git-hooks
 
 
 ##### Test stage #####
