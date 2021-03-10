@@ -11,7 +11,8 @@ data class CreateDanishHomeContentsInput(
     val livingSpace: Int,
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
-    val type: DanishHomeContentsType
+    val type: DanishHomeContentsType,
+    val bbrId: String?
 ) {
     fun toQuoteRequestData() =
         QuoteRequestData.DanishHomeContents(
@@ -23,6 +24,7 @@ data class CreateDanishHomeContentsInput(
             subType = when (this.type) {
                 DanishHomeContentsType.OWN -> InternalDanishHomeContentsType.OWN
                 DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
-            }
+            },
+            bbrId = bbrId
         )
 }

@@ -10,7 +10,8 @@ data class EditDanishHomeContentsInput(
     val coInsured: Int?,
     val livingSpace: Int?,
     val isStudent: Boolean?,
-    val type: DanishHomeContentsType?
+    val type: DanishHomeContentsType?,
+    val bbrId: String?
 ) {
     fun toQuoteRequestDataDto() =
         QuoteRequestData.DanishHomeContents(
@@ -23,6 +24,7 @@ data class EditDanishHomeContentsInput(
                 DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
                 null -> null
             },
-            isStudent = this.isStudent
+            isStudent = this.isStudent,
+            bbrId = this.bbrId
         )
 }

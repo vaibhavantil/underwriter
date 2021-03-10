@@ -113,7 +113,8 @@ sealed class QuoteSchema {
         @get:JsonProperty("isStudent")
         @param:JsonProperty("isStudent")
         @JsonSchema(title = "Is Student")
-        val isStudent: Boolean
+        val isStudent: Boolean,
+        val bbrId: String?
     ) : QuoteSchema()
 
     data class DanishAccident(

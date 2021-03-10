@@ -239,7 +239,7 @@ interface QuoteDao {
                 city,
                 zip_code,
                 living_space,
-                co_insured ,
+                co_insured,
                 type,
                 is_youth
             )
@@ -328,7 +328,8 @@ interface QuoteDao {
                 living_space,
                 co_insured,                
                 is_student,                
-                type                
+                type,
+                bbrId
             )
             VALUES
             (
@@ -344,7 +345,8 @@ interface QuoteDao {
                 :livingSpace,
                 :coInsured,
                 :isStudent,
-                :type
+                :type,
+                :bbrId
             )
             RETURNING *
     """

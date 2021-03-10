@@ -92,7 +92,9 @@ fun Agreement.toQuoteRequestData() = when (this) {
         subType = when (this.lineOfBusiness) {
             DanishHomeContentLineOfBusiness.RENT, DanishHomeContentLineOfBusiness.STUDENT_RENT -> DanishHomeContentsType.RENT
             DanishHomeContentLineOfBusiness.OWN, DanishHomeContentLineOfBusiness.STUDENT_OWN -> DanishHomeContentsType.OWN
-        }
+        },
+//        what to do here -> we don't store on the agreement, so if we change quote via h.ope this will muck up pricing... or shall we add the autocomplete in hope?
+        bbrId = null
     )
     is Agreement.DanishAccident -> QuoteRequestData.DanishAccident(
         street = this.address.street,

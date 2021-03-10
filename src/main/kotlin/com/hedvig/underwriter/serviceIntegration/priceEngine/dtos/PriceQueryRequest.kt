@@ -2,9 +2,12 @@ package com.hedvig.underwriter.serviceIntegration.priceEngine.dtos
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.hedvig.productPricingObjects.enums.DanishHomeContentLineOfBusiness
 import com.hedvig.productPricingObjects.enums.NorwegianHomeContentLineOfBusiness
 import com.hedvig.productPricingObjects.enums.NorwegianTravelLineOfBusiness
 import com.hedvig.productPricingObjects.enums.SwedishApartmentLineOfBusiness
+import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -20,7 +23,8 @@ import java.util.UUID
     JsonSubTypes.Type(value = PriceQueryRequest.NorwegianHomeContent::class, name = "NorwegianHomeContent"),
     JsonSubTypes.Type(value = PriceQueryRequest.NorwegianTravel::class, name = "NorwegianTravel"),
     JsonSubTypes.Type(value = PriceQueryRequest.SwedishApartment::class, name = "SwedishApartment"),
-    JsonSubTypes.Type(value = PriceQueryRequest.SwedishHouse::class, name = "SwedishHouse")
+    JsonSubTypes.Type(value = PriceQueryRequest.SwedishHouse::class, name = "SwedishHouse"),
+    JsonSubTypes.Type(value = PriceQueryRequest.DanishHomeContent::class, name = "DanishHomeContent")
 )
 sealed class PriceQueryRequest {
     abstract val holderMemberId: String?
@@ -128,6 +132,32 @@ sealed class PriceQueryRequest {
                 },
                 isSubleted = data.isSubleted!!,
                 dataCollectionId = dataCollectionId
+            )
+        }
+    }
+
+    data class DanishHomeContent(
+        override val holderMemberId: String?,
+        override val quoteId: UUID?,
+        override val holderBirthDate: LocalDate,
+        override val numberCoInsured: Int,
+        val lineOfBusiness: DanishHomeContentLineOfBusiness,
+        val bbrId: String?
+    ) : PriceQueryRequest() {
+        companion object {
+            fun from(quoteId: UUID, memberId: String?, data: DanishHomeContentsData) = DanishHomeContent(
+                holderMemberId = memberId,
+                quoteId = quoteId,
+                holderBirthDate = data.birthDate,
+                numberCoInsured = data.coInsured,
+                lineOfBusiness = when {
+                    data.type == DanishHomeContentsType.RENT && data.isStudent -> DanishHomeContentLineOfBusiness.STUDENT_RENT
+                    data.type == DanishHomeContentsType.OWN && data.isStudent -> DanishHomeContentLineOfBusiness.STUDENT_OWN
+                    data.type == DanishHomeContentsType.RENT && !data.isStudent -> DanishHomeContentLineOfBusiness.RENT
+                    data.type == DanishHomeContentsType.OWN && !data.isStudent -> DanishHomeContentLineOfBusiness.OWN
+                    else -> throw Exception("Unknown type")
+                },
+                bbrId = data.bbrId
             )
         }
     }

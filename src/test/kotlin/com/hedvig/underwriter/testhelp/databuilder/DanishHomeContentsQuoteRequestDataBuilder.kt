@@ -17,6 +17,7 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
         livingSpace = livingSpace,
         coInsured = coInsured,
         isStudent = isStudent,
-        subType = subType
+        subType = subType,
+        bbrId = "1234"
     )
 }

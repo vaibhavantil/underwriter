@@ -628,7 +628,8 @@ class QuoteRepositoryImplTest {
                 coInsured = 1,
                 email = "em@i.l",
                 isStudent = false,
-                type = DanishHomeContentsType.RENT
+                type = DanishHomeContentsType.RENT,
+                bbrId = "321"
             ),
             breachedUnderwritingGuidelines = null,
             currentInsurer = null
@@ -639,7 +640,8 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED,
             data = (quote.data as DanishHomeContentsData).copy(
                 firstName = "John",
-                lastName = "Watson"
+                lastName = "Watson",
+                bbrId = "123"
             ),
             memberId = "123456"
         )
@@ -667,7 +669,8 @@ class QuoteRepositoryImplTest {
                 coInsured = 1,
                 email = "em@i.l",
                 isStudent = false,
-                type = DanishHomeContentsType.RENT
+                type = DanishHomeContentsType.RENT,
+                bbrId = "1232"
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,

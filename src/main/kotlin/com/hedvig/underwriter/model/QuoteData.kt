@@ -179,7 +179,8 @@ data class DanishHomeContentsData(
     val isStudent: Boolean,
     val type: DanishHomeContentsType,
     @JsonIgnore
-    val internalId: Int? = null
+    val internalId: Int? = null,
+    val bbrId: String? = null
 ) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
     // Should probably be removed from AddressData

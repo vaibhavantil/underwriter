@@ -112,8 +112,10 @@ class UnderwriterImpl(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
             ).price
             is DanishHomeContentsData -> {
-                // TODO: fix when pricing is in place
-                Money.of(9999, "DKK")
+//                do we need the dataCollectionId or is this just for Sweden?
+                priceEngineService.queryDanishHomeContentPrice(
+                    PriceQueryRequest.DanishHomeContent.from(quote.id, quote.memberId, quote.data)
+                ).price
             }
             is DanishAccidentData -> {
                 // TODO: fix when pricing is in place
