@@ -193,11 +193,11 @@ class QuoteMapper(
         is DanishHomeContentsData -> QuoteSchema.DanishHomeContent(
             street = quote.data.street,
             zipCode = quote.data.zipCode,
+            bbrId = quote.data.bbrId,
             livingSpace = quote.data.livingSpace,
             numberCoInsured = quote.data.coInsured,
             isStudent = quote.data.isStudent,
-            lineOfBusiness = quote.data.type,
-            bbrId = quote.data.bbrId
+            lineOfBusiness = quote.data.type
         )
         is DanishAccidentData -> QuoteSchema.DanishAccident(
             street = quote.data.street,
@@ -362,14 +362,14 @@ class QuoteMapper(
             QuoteDetails.DanishHomeContentsDetails(
                 street = it.street,
                 zipCode = it.zipCode,
+                bbrId = it.bbrId,
                 coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
                 isStudent = it.isStudent,
                 type = when (it.type) {
                     DanishHomeContentsType.RENT -> ExternalDanishHomeContentsType.RENT
                     DanishHomeContentsType.OWN -> ExternalDanishHomeContentsType.OWN
-                },
-                bbrId = it.bbrId
+                }
             )
         } ?: quote.danishAccident?.let {
             QuoteDetails.DanishAccidentDetails(

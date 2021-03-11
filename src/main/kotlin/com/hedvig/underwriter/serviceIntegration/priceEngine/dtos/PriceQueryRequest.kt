@@ -2,12 +2,10 @@ package com.hedvig.underwriter.serviceIntegration.priceEngine.dtos
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.hedvig.productPricingObjects.enums.DanishHomeContentLineOfBusiness
 import com.hedvig.productPricingObjects.enums.NorwegianHomeContentLineOfBusiness
 import com.hedvig.productPricingObjects.enums.NorwegianTravelLineOfBusiness
 import com.hedvig.productPricingObjects.enums.SwedishApartmentLineOfBusiness
 import com.hedvig.underwriter.model.DanishHomeContentsData
-import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData

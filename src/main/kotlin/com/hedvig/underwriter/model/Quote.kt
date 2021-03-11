@@ -316,6 +316,7 @@ data class Quote(
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email,
                     phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber,
+//                    check here
                     bbrId = (quoteRequest.incompleteQuoteData as DanishHomeContents).bbrId ?: data.bbrId
                 )
                 is DanishAccidentData -> data.copy(
@@ -451,11 +452,11 @@ data class Quote(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
+                        bbrId = requestData.bbrId ?: newQuoteData.bbrId,
                         livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
                         isStudent = requestData.isStudent ?: newQuoteData.isStudent,
-                        type = requestData.subType ?: newQuoteData.type,
-                        bbrId = requestData.bbrId ?: newQuoteData.bbrId
+                        type = requestData.subType ?: newQuoteData.type
                     )
                 )
             }

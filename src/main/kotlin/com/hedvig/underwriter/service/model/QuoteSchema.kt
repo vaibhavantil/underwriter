@@ -106,6 +106,8 @@ sealed class QuoteSchema {
         val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
+        @JsonSchema(title = "BbrId", required = false)
+        val bbrId: String?,
         @JsonSchema(title = "Living Space", required = true, min = 0.0)
         val livingSpace: Int,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
@@ -113,8 +115,7 @@ sealed class QuoteSchema {
         @get:JsonProperty("isStudent")
         @param:JsonProperty("isStudent")
         @JsonSchema(title = "Is Student")
-        val isStudent: Boolean,
-        val bbrId: String?
+        val isStudent: Boolean
     ) : QuoteSchema()
 
     data class DanishAccident(

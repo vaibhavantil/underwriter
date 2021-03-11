@@ -131,12 +131,12 @@ sealed class QuoteRequestData {
     data class DanishHomeContents(
         @Masked val street: String?,
         val zipCode: String?,
+        val bbrId: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
         @field:JsonProperty("student")
         val isStudent: Boolean?,
-        val subType: DanishHomeContentsType?,
-        val bbrId: String?
+        val subType: DanishHomeContentsType?
     ) : QuoteRequestData() {
         override fun createQuoteData(quoteRequest: QuoteRequest): QuoteData = DanishHomeContentsData(
             id = UUID.randomUUID(),
@@ -148,11 +148,11 @@ sealed class QuoteRequestData {
             phoneNumber = quoteRequest.phoneNumber,
             street = this.street!!,
             zipCode = this.zipCode!!,
+            bbrId = this.bbrId,
             coInsured = this.coInsured!!,
             livingSpace = this.livingSpace!!,
             isStudent = this.isStudent!!,
-            type = this.subType!!,
-            bbrId = this.bbrId
+            type = this.subType!!
         )
     }
 
@@ -247,11 +247,11 @@ sealed class QuoteRequestData {
             is QuoteSchema.DanishHomeContent -> DanishHomeContents(
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
+                bbrId = quoteSchema.bbrId,
                 livingSpace = quoteSchema.livingSpace,
                 coInsured = quoteSchema.numberCoInsured,
                 isStudent = quoteSchema.isStudent,
-                subType = quoteSchema.lineOfBusiness,
-                bbrId = quoteSchema.bbrId
+                subType = quoteSchema.lineOfBusiness
             )
             is QuoteSchema.DanishAccident -> DanishAccident(
                 street = quoteSchema.street,

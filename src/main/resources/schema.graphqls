@@ -62,11 +62,11 @@ input CreateNorwegianTravelInput {
 input CreateDanishHomeContentsInput {
     street: String!
     zipCode: String!
+    bbrId: String
     livingSpace: Int!
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
-    bbrId: String
 }
 
 input CreateDanishAccidentInput {
@@ -201,11 +201,11 @@ input EditNorwegianHomeContentsInput {
 input EditDanishHomeContentsInput {
     street: String
     zipCode: String
+    bbrId: String
     coInsured: Int
     livingSpace: Int
     isStudent: Boolean
     type: DanishHomeContentsType
-    bbrId: String
 }
 
 input EditDanishAccidentInput {
@@ -515,11 +515,11 @@ type NorwegianTravelDetails {
 type DanishHomeContentsDetails {
     street: String!
     zipCode: String!
+    bbrId: String
     livingSpace: Int!
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
-    bbrId: String
 }
 
 type DanishAccidentDetails {

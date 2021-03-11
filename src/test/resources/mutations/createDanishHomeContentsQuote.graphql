@@ -9,10 +9,10 @@ mutation {
             street: "Kungsgatan 2"
             livingSpace: 30
             zipCode: "1234"
+            bbrId: "123"
             coInsured: 0
             isStudent: false
             type: RENT
-            bbrId: "123"
         }
     }) {
         ... on UnderwritingLimitsHit {
@@ -71,11 +71,11 @@ mutation {
                     coInsured
                     street
                     zipCode
+                    bbrId
                     livingSpace
                     coInsured
                     isStudent
                     danishHomeContentType: type
-                    bbrId
                 }
             }
         }

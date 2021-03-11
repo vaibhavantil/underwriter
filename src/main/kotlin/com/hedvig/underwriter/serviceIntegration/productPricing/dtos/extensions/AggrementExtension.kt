@@ -83,6 +83,8 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.DanishHomeContent -> QuoteRequestData.DanishHomeContents(
         street = this.address.street,
         zipCode = this.address.postalCode,
+        //        need to add the autocomplete in hope
+        bbrId = null,
         coInsured = this.numberCoInsured,
         livingSpace = this.squareMeters.toInt(),
         isStudent = when (this.lineOfBusiness) {
@@ -92,9 +94,7 @@ fun Agreement.toQuoteRequestData() = when (this) {
         subType = when (this.lineOfBusiness) {
             DanishHomeContentLineOfBusiness.RENT, DanishHomeContentLineOfBusiness.STUDENT_RENT -> DanishHomeContentsType.RENT
             DanishHomeContentLineOfBusiness.OWN, DanishHomeContentLineOfBusiness.STUDENT_OWN -> DanishHomeContentsType.OWN
-        },
-//        what to do here -> we don't store on the agreement, so if we change quote via h.ope this will muck up pricing... or shall we add the autocomplete in hope?
-        bbrId = null
+        }
     )
     is Agreement.DanishAccident -> QuoteRequestData.DanishAccident(
         street = this.address.street,

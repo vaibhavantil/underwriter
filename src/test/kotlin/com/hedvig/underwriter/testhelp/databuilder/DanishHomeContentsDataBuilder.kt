@@ -16,11 +16,11 @@ data class DanishHomeContentsDataBuilder(
     val phoneNumber: String? = null,
     val street: String = "",
     val zipCode: String = "",
+    val bbrId: String? = "1234",
     val coInsured: Int = 3,
     val livingSpace: Int = 25,
     val isStudent: Boolean = false,
-    val type: DanishHomeContentsType = DanishHomeContentsType.RENT,
-    val bbrId: String? = "1234"
+    val type: DanishHomeContentsType = DanishHomeContentsType.RENT
 ) : DataBuilder<QuoteData> {
 
     override fun build() = DanishHomeContentsData(
@@ -33,10 +33,10 @@ data class DanishHomeContentsDataBuilder(
         phoneNumber = phoneNumber,
         street = street,
         zipCode = zipCode,
+        bbrId = bbrId,
         livingSpace = livingSpace,
         coInsured = coInsured,
         isStudent = isStudent,
-        type = type,
-        bbrId = bbrId
+        type = type
     )
 }

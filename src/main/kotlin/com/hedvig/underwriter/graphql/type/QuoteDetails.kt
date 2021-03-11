@@ -76,11 +76,11 @@ sealed class QuoteDetails {
     data class DanishHomeContentsDetails(
         @Masked val street: String,
         val zipCode: String,
+        val bbrId: String?,
         val coInsured: Int,
         val livingSpace: Int,
         val isStudent: Boolean,
-        val type: DanishHomeContentsType,
-        val bbrId: String?
+        val type: DanishHomeContentsType
     ) : QuoteDetails() {
         override val typeOfContract: ContractAgreementType
             get() = when (type) {

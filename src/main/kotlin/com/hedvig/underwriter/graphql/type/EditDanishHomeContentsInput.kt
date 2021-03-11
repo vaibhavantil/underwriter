@@ -7,16 +7,17 @@ import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHome
 data class EditDanishHomeContentsInput(
     @Masked val street: String?,
     val zipCode: String?,
+    val bbrId: String?,
     val coInsured: Int?,
     val livingSpace: Int?,
     val isStudent: Boolean?,
-    val type: DanishHomeContentsType?,
-    val bbrId: String?
+    val type: DanishHomeContentsType?
 ) {
     fun toQuoteRequestDataDto() =
         QuoteRequestData.DanishHomeContents(
             street = this.street,
             zipCode = this.zipCode,
+            bbrId = this.bbrId,
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
             subType = when (this.type) {
@@ -24,7 +25,6 @@ data class EditDanishHomeContentsInput(
                 DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
                 null -> null
             },
-            isStudent = this.isStudent,
-            bbrId = this.bbrId
+            isStudent = this.isStudent
         )
 }

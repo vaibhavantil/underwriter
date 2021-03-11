@@ -6,7 +6,7 @@ interface AddressData {
     val city: String?
 }
 
-interface DanishHomeContentAddressData: AddressData {
+interface DanishHomeContentAddressData : AddressData {
     override val street: String?
     override val zipCode: String?
     override val city: String?
