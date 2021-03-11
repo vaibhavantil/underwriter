@@ -52,7 +52,7 @@ class BundleQueryIsolationTest {
             QuoteMapper(localizationService)
             )
 
-        every { bundleQuoteService.bundleQuotes(any(), any(), any()) } throws RuntimeException("Should not get here")
+        every { bundleQuoteService.bundleQuotes(any(), any()) } throws RuntimeException("Should not get here")
         every { dataFetchingEnvironment.getToken() } returns "1337"
         every { dataFetchingEnvironment.getAcceptLanguage() } returns "sv-SE"
 

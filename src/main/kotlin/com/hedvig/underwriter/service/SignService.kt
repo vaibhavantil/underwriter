@@ -6,7 +6,8 @@ import com.hedvig.underwriter.service.model.SignMethod
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
-import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.SignQuotesRequestDto
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import java.util.UUID
@@ -25,10 +26,14 @@ interface SignService {
         completeSignSessionData: CompleteSignSessionData
     )
 
-    fun signQuote(
+    fun signQuoteFromRapio(
         quoteId: UUID,
-        body: SignQuoteRequest
+        request: SignQuoteRequestDto
     ): Either<ErrorResponseDto, SignedQuoteResponseDto>
+
+    fun signQuotesFromRapio(
+        request: SignQuotesRequestDto
+    ): List<SignedQuoteResponseDto>
 
     fun signQuoteFromHope(
         completeQuoteId: UUID,

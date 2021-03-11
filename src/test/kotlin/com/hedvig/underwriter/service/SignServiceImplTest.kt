@@ -35,10 +35,11 @@ import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishHouseDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.quote
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
-import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -102,6 +103,7 @@ class SignServiceImplTest {
 
         cut = SignServiceImpl(
             quoteService,
+            mockk(),
             quoteRepository,
             memberService,
             productPricingService,
@@ -119,7 +121,7 @@ class SignServiceImplTest {
             attributedTo = Partner.COMPRICER
         }
 
-        every { quoteRepository.find(any()) } returns quote
+        every { quoteRepository.findQuotes(any()) } returns listOf(quote)
         every { quoteRepository.update(any(), any()) } returnsArgument 0
 
         every { memberService.createMember() } returns "1234"
@@ -140,7 +142,7 @@ class SignServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), null, LocalDate.now(), "null"))
+        cut.signQuoteFromRapio(quoteId, SignQuoteRequestDto(Name("", ""), null, LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(ofType(Quote::class)) }
     }
 
@@ -149,7 +151,7 @@ class SignServiceImplTest {
         val quoteId = UUID.randomUUID()
         val quote = quote { attributedTo = Partner.HEDVIG }
 
-        every { quoteRepository.find(any()) } returns quote
+        every { quoteRepository.findQuotes(any()) } returns listOf(quote)
         every { quoteRepository.update(any(), any()) } returnsArgument 0
 
         every { memberService.createMember() } returns "1234"
@@ -169,7 +171,7 @@ class SignServiceImplTest {
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1234, true))
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
-        cut.signQuote(quoteId, SignQuoteRequest(Name("", ""), null, LocalDate.now(), "null"))
+        cut.signQuoteFromRapio(quoteId, SignQuoteRequestDto(Name("", ""), null, LocalDate.now(), "null"))
         verify { customerIO.postSignUpdate(any()) }
     }
 

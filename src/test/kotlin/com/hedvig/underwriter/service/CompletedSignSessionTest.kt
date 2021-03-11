@@ -32,6 +32,7 @@ class CompletedSignSessionTest {
 
     private lateinit var signSessionRepository: SignSessionRepository
     private lateinit var quoteService: QuoteService
+    private lateinit var bundleQuoteService: BundleQuotesService
     private lateinit var productPricingService: ProductPricingService
     private lateinit var quoteRepository: QuoteRepository
     private lateinit var memberService: MemberService
@@ -46,11 +47,13 @@ class CompletedSignSessionTest {
         signSessionRepository = SignSessionRepositoryImpl(jdbiRule.jdbi)
         quoteRepository = QuoteRepositoryImpl(jdbi = jdbiRule.jdbi)
         quoteService = mockk()
+        bundleQuoteService = mockk()
         productPricingService = mockk()
         memberService = mockk()
         signStrategyService = mockk()
         sut = SignServiceImpl(
             quoteService,
+            bundleQuoteService,
             quoteRepository,
             memberService,
             productPricingService,

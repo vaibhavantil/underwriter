@@ -2,9 +2,9 @@ package com.hedvig.underwriter.service
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
-import com.hedvig.underwriter.graphql.type.QuoteMapper
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
@@ -16,6 +16,7 @@ import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
@@ -23,7 +24,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import java.math.BigDecimal
-import java.util.Locale
 import java.util.UUID
 
 @RunWith(MockitoJUnitRunner::class)
@@ -38,15 +38,12 @@ class BundleQuoteServiceImplTest {
     @MockK
     lateinit var localizationService: LocalizationService
 
-    private lateinit var quoteMapper: QuoteMapper
-
     private lateinit var cut: BundleQuotesServiceImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        quoteMapper = QuoteMapper(localizationService)
-        cut = BundleQuotesServiceImpl(quoteService, productPricingService, quoteMapper)
+        cut = BundleQuotesServiceImpl(quoteService, productPricingService, SignStrategyService(mockk(), mockk(), mockk()))
     }
 
     @Test
@@ -73,7 +70,7 @@ class BundleQuoteServiceImplTest {
         } returns listOf(quote1, quote2)
 
         every {
-            productPricingService.calculateBundleInsuranceCost(
+            productPricingService.calculateBundleInsuranceCostForMember(
                 capture(requestCaptureMutableList),
                 any()
             )
@@ -88,7 +85,7 @@ class BundleQuoteServiceImplTest {
             localizationService.getTranslation(any(), any())
         } returns ""
 
-        cut.bundleQuotes("1337", ids, Locale("sv", "SE"))
+        cut.bundleQuotes("1337", ids)
 
         assertThat(requestCaptureMutableList.first()).isEqualTo(
             CalculateBundleInsuranceCostRequest(
@@ -130,7 +127,7 @@ class BundleQuoteServiceImplTest {
         } returns listOf(quote1, quote2)
 
         every {
-            productPricingService.calculateBundleInsuranceCost(
+            productPricingService.calculateBundleInsuranceCostForMember(
                 capture(requestCaptureMutableList),
                 any()
             )
@@ -145,7 +142,7 @@ class BundleQuoteServiceImplTest {
             localizationService.getTranslation(any(), any())
         } returns ""
 
-        cut.bundleQuotes("1337", ids, Locale("sv", "SE"))
+        cut.bundleQuotes("1337", ids)
 
         assertThat(requestCaptureMutableList.first()).isEqualTo(
             CalculateBundleInsuranceCostRequest(
@@ -181,7 +178,7 @@ class BundleQuoteServiceImplTest {
         } returns listOf(quote)
 
         every {
-            productPricingService.calculateBundleInsuranceCost(
+            productPricingService.calculateBundleInsuranceCostForMember(
                 capture(requestCaptureMutableList),
                 any()
             )
@@ -196,7 +193,7 @@ class BundleQuoteServiceImplTest {
             localizationService.getTranslation(any(), any())
         } returns ""
 
-        cut.bundleQuotes("1337", listOf(id), Locale("sv", "SE"))
+        cut.bundleQuotes("1337", listOf(id))
 
         assertThat(requestCaptureMutableList.first()).isEqualTo(
             CalculateBundleInsuranceCostRequest(
@@ -228,7 +225,7 @@ class BundleQuoteServiceImplTest {
         } returns listOf(quote)
 
         every {
-            productPricingService.calculateBundleInsuranceCost(
+            productPricingService.calculateBundleInsuranceCostForMember(
                 capture(requestCaptureMutableList),
                 any()
             )
@@ -243,7 +240,7 @@ class BundleQuoteServiceImplTest {
             localizationService.getTranslation(any(), any())
         } returns ""
 
-        cut.bundleQuotes("1337", listOf(id), Locale("sv", "SE"))
+        cut.bundleQuotes("1337", listOf(id))
 
         assertThat(requestCaptureMutableList.first()).isEqualTo(
             CalculateBundleInsuranceCostRequest(
