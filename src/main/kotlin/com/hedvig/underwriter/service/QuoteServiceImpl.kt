@@ -280,7 +280,7 @@ class QuoteServiceImpl(
 
         val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
         if (quoteNotSignableErrorDto != null) {
-            Either.left(quoteNotSignableErrorDto)
+            return Either.left(quoteNotSignableErrorDto)
         }
 
         val response = productPricingService.addAgreementFromQuote(

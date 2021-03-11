@@ -3,6 +3,7 @@ package com.hedvig.underwriter.service.quotesSignDataStrategies
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Quote
@@ -31,20 +32,31 @@ class SignStrategyService(
             return StartSignErrors.quotesCanNotBeBundled
         }
 
-        when {
-            quotes.areSwedishQuotes() -> {
+        val error = validateBundling(quotes)
+
+        if (error != null) {
+            return error
+        }
+
+        return strategy.first().startSign(quotes, signData)
+    }
+
+    fun validateBundling(quotes: List<Quote>): StartSignResponse.FailedToStartSign? {
+
+        when (quotes.safelyMarket()) {
+            Market.SWEDEN -> {
                 if (quotes.size > 1) {
-                    logger.error("Can not start signing swedish quotes [Quotes: $quotes]")
+                    logger.error("Can not bundle swedish quotes [Quotes: $quotes]")
                     return StartSignErrors.quotesCanNotBeBundled
                 }
             }
-            quotes.areNorwegianQuotes() -> {
+            Market.NORWAY -> {
                 if (quotes.size > 1 && !quotes.areTwoValidNorwegianQuotes()) {
                     logger.error("Norwegian quotes is not valid [Quotes: $quotes]")
                     return StartSignErrors.quotesCanNotBeBundled
                 }
             }
-            quotes.areDanishQuotes() -> {
+            Market.DENMARK -> {
                 when {
                     quotes.size == 1 -> {
                         if (quotes[0].data !is DanishHomeContentsData) {
@@ -60,13 +72,8 @@ class SignStrategyService(
                     }
                 }
             }
-            else -> {
-                logger.error("Quotes are not apart of the same market [Quotes: $quotes]")
-                return StartSignErrors.quotesCanNotBeBundled
-            }
         }
-
-        return strategy.first().startSign(quotes, signData)
+        return null
     }
 
     private fun List<Quote>.getStrategiesFromQuotes() = this.map {
@@ -80,9 +87,6 @@ class SignStrategyService(
             is DanishTravelData -> redirectSignStrategy
         }
     }.toSet()
-
-    private fun List<Quote>.areSwedishQuotes() =
-        this.all { it.data is SwedishApartmentData || it.data is SwedishHouseData }
 
     private fun List<Quote>.areTwoValidNorwegianQuotes(): Boolean =
         this.size == 2 &&
@@ -117,20 +121,5 @@ class SignStrategyService(
         }
 
         return strategy.first().getSignMethod(quotes)
-    }
-}
-
-fun List<Quote>.areNorwegianQuotes(): Boolean {
-    return this.all { quote ->
-        quote.data is NorwegianHomeContentsData ||
-            quote.data is NorwegianTravelData
-    }
-}
-
-fun List<Quote>.areDanishQuotes(): Boolean {
-    return this.all { quote ->
-        quote.data is DanishHomeContentsData ||
-            quote.data is DanishAccidentData ||
-            quote.data is DanishTravelData
     }
 }

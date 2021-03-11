@@ -9,6 +9,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
+import com.hedvig.underwriter.service.exceptions.ErrorException
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
@@ -25,8 +26,10 @@ import com.hedvig.underwriter.web.dtos.QuoteForNewContractRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
-import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.SignQuotesRequestDto
 import com.hedvig.underwriter.web.dtos.SignRequest
+import com.hedvig.underwriter.web.dtos.SignedQuotesResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -177,16 +180,44 @@ class QuoteController @Autowired constructor(
         return QuoteBundleResponseDto.from(cost)
     }
 
+    @Deprecated("Use /{completeQuoteId}/signFromRapio")
     @PostMapping("/{completeQuoteId}/sign")
-    fun signCompleteQuote(
+    fun signQuoteFromRapioDeprecated(
         @Valid @PathVariable completeQuoteId: UUID,
-        @RequestBody body: SignQuoteRequest
+        @RequestBody request: SignQuoteRequestDto
     ): ResponseEntity<Any> {
-        logger.info("Sign quote. Request: ${body.toMaskedString()}, completeQuoteId=$completeQuoteId")
+        logger.info("Sign quote. Request: ${request.toMaskedString()}, completeQuoteId=$completeQuoteId")
 
-        return when (val errorOrQuote = signService.signQuote(completeQuoteId, body)) {
+        return when (val errorOrQuote = signService.signQuoteFromRapio(completeQuoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
+        }
+    }
+
+    @PostMapping("/{completeQuoteId}/signFromRapio")
+    fun signQuoteFromRapio(
+        @Valid @PathVariable completeQuoteId: UUID,
+        @RequestBody request: SignQuoteRequestDto
+    ): ResponseEntity<Any> {
+        return when (val errorOrQuote = signService.signQuoteFromRapio(completeQuoteId, request)) {
+            is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
+            is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
+        }
+    }
+
+    @PostMapping("/bundle/signFromRapio")
+    fun signQuotesFromRapio(
+        @RequestBody request: SignQuotesRequestDto
+    ): ResponseEntity<Any> {
+        return try {
+
+            require(request.quoteIds.size > 1) { "Not a bundle" }
+
+            val response = signService.signQuotesFromRapio(request)
+
+            ResponseEntity.status(200).body(SignedQuotesResponseDto.from(response))
+        } catch (e: ErrorException) {
+            ResponseEntity.status(422).body(ErrorResponseDto.from(e))
         }
     }
 

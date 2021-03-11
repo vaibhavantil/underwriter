@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.service.quotesSignDataStrategies
 
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.SignSessionRepository
 import com.hedvig.underwriter.service.model.SignMethod
@@ -35,9 +36,9 @@ class RedirectSignStrategy(
         } ?: StartSignErrors.emptyRedirectUrlFromBankId(response.errorMessages!!.joinToString(", "))
     }
 
-    override fun getSignMethod(quotes: List<Quote>): SignMethod = when {
-        quotes.areNorwegianQuotes() -> SignMethod.NORWEGIAN_BANK_ID
-        quotes.areDanishQuotes() -> SignMethod.DANISH_BANK_ID
+    override fun getSignMethod(quotes: List<Quote>): SignMethod = when (quotes.safelyMarket()) {
+        Market.NORWAY -> SignMethod.NORWEGIAN_BANK_ID
+        Market.DENMARK -> SignMethod.DANISH_BANK_ID
         else -> throw RuntimeException("quotes are not valid while getting the sign method [Quotes: $quotes]")
     }
 
@@ -47,8 +48,8 @@ class RedirectSignStrategy(
         successUrl: String,
         failUrl: String
     ): UnderwriterStartSignSessionResponse.BankIdRedirect {
-        return when {
-            quotes.areNorwegianQuotes() -> memberService.startRedirectBankIdSign(
+        return when (quotes.safelyMarket()) {
+            Market.NORWAY -> memberService.startRedirectBankIdSign(
                 quotes.safelyGetMemberId(),
                 signSessionId,
                 NationalIdentification(
@@ -59,7 +60,7 @@ class RedirectSignStrategy(
                 failUrl,
                 RedirectCountry.NORWAY
             )
-            quotes.areDanishQuotes() -> memberService.startRedirectBankIdSign(
+            Market.DENMARK -> memberService.startRedirectBankIdSign(
                 quotes.safelyGetMemberId(),
                 signSessionId,
                 NationalIdentification(
@@ -78,9 +79,9 @@ class RedirectSignStrategy(
         quotes: List<Quote>,
         redirectUrl: String
     ): StartSignResponse {
-        return when {
-            quotes.areNorwegianQuotes() -> StartSignResponse.NorwegianBankIdSession(redirectUrl)
-            quotes.areDanishQuotes() -> StartSignResponse.DanishBankIdSession(redirectUrl)
+        return when (quotes.safelyMarket()) {
+            Market.NORWAY -> StartSignResponse.NorwegianBankIdSession(redirectUrl)
+            Market.DENMARK -> StartSignResponse.DanishBankIdSession(redirectUrl)
             else -> throw IllegalStateException("quotes are not valid while getting the redirect response [Quotes: $quotes]")
         }
     }

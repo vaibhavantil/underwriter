@@ -4,6 +4,7 @@ import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
 import com.hedvig.underwriter.model.ApartmentProductSubType
+import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundleInsuranceCostRequest
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.CalculateBundledPriceDto
@@ -15,6 +16,7 @@ import com.hedvig.underwriter.testhelp.databuilder.quote
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.javamoney.moneta.Money
 import org.junit.Before
@@ -41,7 +43,7 @@ class BundleQuoteServiceImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-        cut = BundleQuotesServiceImpl(quoteService, productPricingService)
+        cut = BundleQuotesServiceImpl(quoteService, productPricingService, SignStrategyService(mockk(), mockk(), mockk()))
     }
 
     @Test

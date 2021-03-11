@@ -173,6 +173,8 @@ class Mutation @Autowired constructor(
             throw IllegalStateException("Member has not existing signed insurance [Error Message: ${errorResponse.errorMessage}]")
         ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED ->
             throw IllegalStateException("MemberId is not provided [Error Message: ${errorResponse.errorMessage}]")
+        ErrorCodes.INVALID_BUNDLING ->
+            throw IllegalStateException("Unsupported bundling [Error Message: ${errorResponse.errorMessage}]")
     }
 
     private fun addCenturyToSwedishSSN(ssn: String): String {

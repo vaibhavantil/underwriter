@@ -25,6 +25,9 @@ private fun reflectionToString(obj: Any): String {
     if (!obj.javaClass.packageName.startsWith("com.hedvig"))
         return obj.toString()
 
+    if (obj.javaClass.isEnum())
+        return obj.toString()
+
     val s = LinkedList<String>()
     var clazz: Class<in Any>? = obj.javaClass
 
