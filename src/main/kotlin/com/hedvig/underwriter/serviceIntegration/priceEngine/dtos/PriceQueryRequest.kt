@@ -141,7 +141,8 @@ sealed class PriceQueryRequest {
         override val quoteId: UUID?,
         override val holderBirthDate: LocalDate,
         override val numberCoInsured: Int,
-        val lineOfBusiness: DanishHomeContentLineOfBusiness,
+        val postalCode: String,
+        val squareMeters: Int,
         val bbrId: String?
     ) : PriceQueryRequest() {
         companion object {
@@ -150,14 +151,9 @@ sealed class PriceQueryRequest {
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
-                lineOfBusiness = when {
-                    data.type == DanishHomeContentsType.RENT && data.isStudent -> DanishHomeContentLineOfBusiness.STUDENT_RENT
-                    data.type == DanishHomeContentsType.OWN && data.isStudent -> DanishHomeContentLineOfBusiness.STUDENT_OWN
-                    data.type == DanishHomeContentsType.RENT && !data.isStudent -> DanishHomeContentLineOfBusiness.RENT
-                    data.type == DanishHomeContentsType.OWN && !data.isStudent -> DanishHomeContentLineOfBusiness.OWN
-                    else -> throw Exception("Unknown type")
-                },
-                bbrId = data.bbrId
+                bbrId = data.bbrId,
+                postalCode = data.zipCode,
+                squareMeters = data.livingSpace
             )
         }
     }

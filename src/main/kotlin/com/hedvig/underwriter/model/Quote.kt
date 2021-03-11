@@ -454,7 +454,8 @@ data class Quote(
                         livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
                         isStudent = requestData.isStudent ?: newQuoteData.isStudent,
-                        type = requestData.subType ?: newQuoteData.type
+                        type = requestData.subType ?: newQuoteData.type,
+                        bbrId = requestData.bbrId ?: newQuoteData.bbrId
                     )
                 )
             }

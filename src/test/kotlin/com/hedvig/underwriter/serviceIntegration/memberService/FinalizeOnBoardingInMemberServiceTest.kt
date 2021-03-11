@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.FinalizeOnBoardingRequest
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.quote
@@ -50,6 +51,29 @@ internal class FinalizeOnBoardingInMemberServiceTest {
         val quote = quote {
             memberId = "1337"
             data = NorwegianTravelDataBuilder(
+                phoneNumber = "123456",
+                email = "someemail@hotmail.com"
+            )
+        }
+
+        cut.finalizeOnboarding(quote, "someemail@hotmail.com")
+
+        assertThat(x.captured.email).isEqualTo("someemail@hotmail.com")
+        assertThat(x.captured.phoneNumber).isEqualTo("123456")
+    }
+
+    @Test
+    fun `finalizeOnBoarding works for DanishHomeContent`() {
+
+        val client = mockk<MemberServiceClient>()
+        val cut = MemberServiceImpl(client, ObjectMapper())
+
+        val x = slot<FinalizeOnBoardingRequest>()
+        every { client.finalizeOnBoarding(any(), capture(x)) } returns ResponseEntity.ok("")
+
+        val quote = quote {
+            memberId = "1337"
+            data = DanishHomeContentsDataBuilder(
                 phoneNumber = "123456",
                 email = "someemail@hotmail.com"
             )

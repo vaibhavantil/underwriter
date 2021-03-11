@@ -19,7 +19,8 @@ data class DanishHomeContentsDataBuilder(
     val coInsured: Int = 3,
     val livingSpace: Int = 25,
     val isStudent: Boolean = false,
-    val type: DanishHomeContentsType = DanishHomeContentsType.RENT
+    val type: DanishHomeContentsType = DanishHomeContentsType.RENT,
+    val bbrId: String? = "1234"
 ) : DataBuilder<QuoteData> {
 
     override fun build() = DanishHomeContentsData(
@@ -35,6 +36,7 @@ data class DanishHomeContentsDataBuilder(
         livingSpace = livingSpace,
         coInsured = coInsured,
         isStudent = isStudent,
-        type = type
+        type = type,
+        bbrId = bbrId
     )
 }

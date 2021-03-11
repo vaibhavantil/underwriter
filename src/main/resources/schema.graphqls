@@ -519,6 +519,7 @@ type DanishHomeContentsDetails {
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
+    bbrId: String
 }
 
 type DanishAccidentDetails {

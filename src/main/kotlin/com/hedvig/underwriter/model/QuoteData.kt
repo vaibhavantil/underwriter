@@ -173,15 +173,15 @@ data class DanishHomeContentsData(
     @Masked override val phoneNumber: String? = null,
     @Masked override val street: String,
     override val zipCode: String,
+    override val bbrId: String? = null,
     val livingSpace: Int,
     val coInsured: Int,
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     val type: DanishHomeContentsType,
     @JsonIgnore
-    val internalId: Int? = null,
-    val bbrId: String? = null
-) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
+    val internalId: Int? = null
+) : QuoteData(), DanishHomeContentAddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
     // Should probably be removed from AddressData
     override val city: String? = null

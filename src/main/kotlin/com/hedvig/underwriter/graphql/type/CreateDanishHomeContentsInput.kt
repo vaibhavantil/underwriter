@@ -25,6 +25,6 @@ data class CreateDanishHomeContentsInput(
                 DanishHomeContentsType.OWN -> InternalDanishHomeContentsType.OWN
                 DanishHomeContentsType.RENT -> InternalDanishHomeContentsType.RENT
             },
-            bbrId = bbrId
+            bbrId = this.bbrId
         )
 }

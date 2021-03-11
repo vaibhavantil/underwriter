@@ -76,6 +76,7 @@ mutation {
                     coInsured
                     isStudent
                     danishHomeContentType: type
+                    bbrId
                 }
             }
         }

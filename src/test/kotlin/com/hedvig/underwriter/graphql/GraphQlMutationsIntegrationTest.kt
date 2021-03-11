@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 @RunWith(SpringRunner::class)
@@ -340,22 +341,23 @@ internal class GraphQlMutationsIntegrationTest {
     @Test
     fun createSuccessfulDanishHomeContentsQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        /* TODO: Should be verified when price engine is in plce
+
         every {
             priceEngineService.queryDanishHomeContentPrice(
                 PriceQueryRequest.DanishHomeContent(
                     holderMemberId = "123",
-                    quoteId = UUID.fromString("00000000-0000-0000-0000-000000000007"),
-                    holderBirthDate = "2112611416".birthDateFromDanishSsn(),
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+                    holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
-                    postalCode = "12345",
-                    squareMeters = 30
+                    postalCode = "1234",
+                    squareMeters = 30,
+                    bbrId = "123"
                 )
             )
         } returns
             PriceQueryResponse(
                 UUID.randomUUID(),
-                Money.of(BigDecimal.ONE, "NOK")
+                Money.of(BigDecimal.ONE, "DKK")
             )
 
         every {
@@ -368,7 +370,7 @@ internal class GraphQlMutationsIntegrationTest {
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
                 null
-            )*/
+            )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -388,6 +390,7 @@ internal class GraphQlMutationsIntegrationTest {
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
         assert(createQuote["quoteDetails"]["isStudent"].booleanValue() == false)
         assert(createQuote["quoteDetails"]["danishHomeContentType"].textValue() == "RENT")
+        assert(createQuote["quoteDetails"]["bbrId"].textValue() == "123")
     }
 
     @Test
