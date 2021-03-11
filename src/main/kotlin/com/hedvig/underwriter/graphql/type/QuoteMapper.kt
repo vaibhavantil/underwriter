@@ -368,7 +368,8 @@ class QuoteMapper(
                 type = when (it.type) {
                     DanishHomeContentsType.RENT -> ExternalDanishHomeContentsType.RENT
                     DanishHomeContentsType.OWN -> ExternalDanishHomeContentsType.OWN
-                }
+                },
+                bbrId = it.bbrId
             )
         } ?: quote.danishAccident?.let {
             QuoteDetails.DanishAccidentDetails(

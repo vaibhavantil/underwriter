@@ -66,6 +66,7 @@ input CreateDanishHomeContentsInput {
     coInsured: Int!
     isStudent: Boolean!
     type: DanishHomeContentsType!
+    bbrId: String
 }
 
 input CreateDanishAccidentInput {
@@ -204,6 +205,7 @@ input EditDanishHomeContentsInput {
     livingSpace: Int
     isStudent: Boolean
     type: DanishHomeContentsType
+    bbrId: String
 }
 
 input EditDanishAccidentInput {

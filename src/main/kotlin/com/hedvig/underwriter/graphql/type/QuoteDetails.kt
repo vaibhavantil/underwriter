@@ -79,7 +79,8 @@ sealed class QuoteDetails {
         val coInsured: Int,
         val livingSpace: Int,
         val isStudent: Boolean,
-        val type: DanishHomeContentsType
+        val type: DanishHomeContentsType,
+        val bbrId: String?
     ) : QuoteDetails() {
         override val typeOfContract: ContractAgreementType
             get() = when (type) {
