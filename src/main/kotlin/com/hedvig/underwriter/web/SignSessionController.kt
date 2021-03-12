@@ -2,6 +2,7 @@ package com.hedvig.underwriter.web
 
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
+import com.hedvig.underwriter.util.logging.LogCall
 import com.hedvig.underwriter.web.dtos.SignRequest
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +21,7 @@ class SignSessionController @Autowired constructor(
 ) {
 
     @PostMapping("/swedishBankid/{sessionId}/completed")
+    @LogCall
     fun swedishQuoteWasSigned(
         @PathVariable sessionId: UUID,
         @RequestBody requestBody: SignRequest
@@ -34,6 +36,7 @@ class SignSessionController @Autowired constructor(
     }
 
     @PostMapping("/{sessionId}/completed")
+    @LogCall
     fun signSessionComplete(
         @PathVariable sessionId: UUID
     ) {

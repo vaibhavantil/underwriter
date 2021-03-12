@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.graphql.type
 
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 
 sealed class IncompleteQuoteDetails {
     data class IncompleteApartmentQuoteDetails(

@@ -13,8 +13,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
-import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.toMaskedString
+import com.hedvig.underwriter.util.logging.LogCall
 import graphql.schema.DataFetchingEnvironment
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -28,26 +27,23 @@ class Query @Autowired constructor(
     private val quoteMapper: QuoteMapper
 ) : GraphQLQueryResolver {
 
+    @LogCall
     fun quote(id: UUID, env: DataFetchingEnvironment): QuoteResult {
-
-        logger.info("Get quote for quoteId=$id")
 
         return quoteService.getQuote(id)?.let { quote ->
             quote.toResult(env)
         } ?: throw QuoteNotFoundQueryException("No quote with id '$id' was found!")
     }
 
+    @LogCall
     fun lastQuoteOfMember(env: DataFetchingEnvironment): QuoteResult {
-
-        logger.info("Get last quote for memberId=${env.getToken()}")
 
         return quoteService.getLatestQuoteForMemberId(env.getToken())?.toResult(env)
             ?: throw QuoteNotFoundQueryException("No quote found for memberId: ${env.getToken()}")
     }
 
+    @LogCall
     fun quoteBundle(input: QuoteBundleInputInput, env: DataFetchingEnvironment): QuoteBundle {
-
-        logger.info("Get quote bundle: memberId=${env.getToken()}, request: ${input.toMaskedString()}")
 
         if (input.ids.isEmpty()) {
             throw EmptyBundleQueryException()
@@ -69,10 +65,8 @@ class Query @Autowired constructor(
         )
     }
 
+    @LogCall
     fun signMethodForQuotes(input: List<UUID>): SignMethod {
-
-        logger.info("Get sign method for quotes: quoteIds=$input")
-
         return signService.getSignMethodFromQuotes(input).toGraphQL()
     }
 
