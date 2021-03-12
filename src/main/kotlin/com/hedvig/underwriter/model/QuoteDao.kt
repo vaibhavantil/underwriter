@@ -329,7 +329,7 @@ interface QuoteDao {
                 co_insured,                
                 is_student,                
                 type,
-                bbrId
+                bbr_id
             )
             VALUES
             (
