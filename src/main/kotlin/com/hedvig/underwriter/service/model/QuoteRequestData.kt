@@ -131,7 +131,7 @@ sealed class QuoteRequestData {
     data class DanishHomeContents(
         @Masked val street: String?,
         val zipCode: String?,
-        val bbrId: String?,
+        @Masked val bbrId: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
         @field:JsonProperty("student")
