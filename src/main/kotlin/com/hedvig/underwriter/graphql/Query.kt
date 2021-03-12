@@ -53,10 +53,19 @@ class Query @Autowired constructor(
             throw EmptyBundleQueryException()
         }
 
-        return bundleQuotesService.bundleQuotes(
+        val bundle = bundleQuotesService.bundleQuotes(
             env.getToken(),
-            input.ids,
-            LocaleResolver.resolveLocale(env.getAcceptLanguage())
+            input.ids
+        )
+
+        return QuoteBundle(
+            quotes = bundle.quotes.map {
+                quoteMapper.mapToBundleQuote(
+                    it,
+                    LocaleResolver.resolveLocale(env.getAcceptLanguage())
+                )
+            },
+            bundleCost = bundle.cost
         )
     }
 

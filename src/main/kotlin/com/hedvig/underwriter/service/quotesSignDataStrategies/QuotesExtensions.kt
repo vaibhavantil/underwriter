@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.service.quotesSignDataStrategies
 
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -34,4 +35,14 @@ fun List<Quote>.safelyNationality(): Nationality {
     }
 
     return nationality
+}
+
+fun List<Quote>.safelyMarket(): Market {
+    val market = this.firstOrNull()?.market ?: throw RuntimeException("Cannot get market from empty list")
+
+    if (this.any { it.market != market }) {
+        throw RuntimeException("Quotes belong to different markets: $this")
+    }
+
+    return market
 }

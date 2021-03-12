@@ -17,7 +17,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Cr
 import com.hedvig.underwriter.testhelp.JdbiRule
 import com.hedvig.underwriter.testhelp.databuilder.quote
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
-import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignRequest
 import io.mockk.every
 import io.mockk.mockk
@@ -60,6 +60,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
 
         val signServiceImpl = SignServiceImpl(
             mockk(),
+            mockk(),
             quoteRepository,
             mockk(),
             productPricingService,
@@ -95,6 +96,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
 
         val signServiceImpl = SignServiceImpl(
             mockk(),
+            mockk(),
             quoteRepository,
             memberService,
             productPricingService,
@@ -110,9 +112,9 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
         )
         every { memberService.signQuote(any(), any()) } returns Right(UnderwriterQuoteSignResponse(1L, true))
 
-        signServiceImpl.signQuote(
+        signServiceImpl.signQuoteFromRapio(
             quoteId,
-            SignQuoteRequest(
+            SignQuoteRequestDto(
                 Name("Mr Test", "Tester"), null, LocalDate.of(2020, 1, 1), "a@email.com"
             )
         )
@@ -135,6 +137,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
         )
 
         val signServiceImpl = SignServiceImpl(
+            mockk(),
             mockk(),
             quoteRepository,
             memberService,

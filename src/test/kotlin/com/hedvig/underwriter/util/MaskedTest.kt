@@ -2,6 +2,7 @@ package com.hedvig.underwriter.util
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.hedvig.underwriter.model.ProductType
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -106,6 +107,17 @@ class MaskedTest {
         val o = Data("sdf", 123, true, 12.345, null)
 
         assertThat(o.toMaskedString()).isEqualTo("Data(a=***, b=***, c=true, d=12.345, e=null)")
+    }
+
+    @Test
+    fun testPlainPojoWithEnum() {
+        data class Data(
+            val a: ProductType
+        )
+
+        val o = Data(ProductType.HOME_CONTENT)
+
+        assertThat(o.toMaskedString()).isEqualTo("Data(a=HOME_CONTENT)")
     }
 
     @Test

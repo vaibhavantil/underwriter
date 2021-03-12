@@ -43,10 +43,15 @@ class ProductPricingServiceImpl @Autowired constructor(
         productPricingClient.calculateInsuranceCost(CalculateInsuranceCostRequest(price), memberId).body!!
 
     override fun calculateBundleInsuranceCost(
+        request: CalculateBundleInsuranceCostRequest
+    ): InsuranceCost =
+        productPricingClient.calculateBundleInsuranceCost(request).body!!
+
+    override fun calculateBundleInsuranceCostForMember(
         request: CalculateBundleInsuranceCostRequest,
         memberId: String
     ): InsuranceCost =
-        productPricingClient.calculateBundleInsuranceCost(request, memberId).body!!
+        productPricingClient.calculateBundleInsuranceCostForMember(request, memberId).body!!
 
     override fun createContractsFromQuotes(
         quotes: List<Quote>,

@@ -3,9 +3,10 @@ package com.hedvig.underwriter.service
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
-import arrow.core.toOption
+import arrow.core.getOrHandle
+import com.hedvig.underwriter.model.AddressData
+import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Quote
-import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.QuoteRepository
 import com.hedvig.underwriter.model.QuoteState
 import com.hedvig.underwriter.model.SignSessionRepository
@@ -14,6 +15,8 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssn
+import com.hedvig.underwriter.model.ssnMaybe
+import com.hedvig.underwriter.service.exceptions.ErrorException
 import com.hedvig.underwriter.service.exceptions.QuoteNotFoundException
 import com.hedvig.underwriter.service.model.CompleteSignSessionData
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
@@ -33,12 +36,14 @@ import com.hedvig.underwriter.util.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
-import com.hedvig.underwriter.web.dtos.SignQuoteRequest
+import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
+import com.hedvig.underwriter.web.dtos.SignQuotesRequestDto
 import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.UnderwriterQuoteSignRequest
 import feign.FeignException
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -46,6 +51,7 @@ import java.util.UUID
 @Service
 class SignServiceImpl(
     val quoteService: QuoteService,
+    val bundleQuotesService: BundleQuotesService,
     // FIXME: SignService should only use quoteService in my opinion, but I'm not up for doing that refactor now.
     val quoteRepository: QuoteRepository,
     val memberService: MemberService,
@@ -201,76 +207,169 @@ class SignServiceImpl(
         return quote
     }
 
-    override fun signQuote(
+    override fun signQuoteFromRapio(
         quoteId: UUID,
-        body: SignQuoteRequest
+        request: SignQuoteRequestDto
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
 
-        val quotes = quoteRepository.find(quoteId)
+        return try {
+            val response = signQuotesFromRapio(
+                SignQuotesRequestDto(
+                    listOf(quoteId),
+                    request.name,
+                    request.ssn,
+                    request.startDate,
+                    request.email,
+                    null,
+                    null
+                )
+            )
+
+            Either.right(response[0])
+        } catch (e: ErrorException) {
+            Either.left(ErrorResponseDto.from(e))
+        }
+    }
+
+    override fun signQuotesFromRapio(
+        request: SignQuotesRequestDto
+    ): List<SignedQuoteResponseDto> {
+
+        var quotes = quoteRepository.findQuotes(request.quoteIds)
 
         logger.info("Fetched quote from db: ${quotes.toMaskedString()}")
 
-        val response = quotes
-            .toOption()
-            .toEither { ErrorResponseDto(ErrorCodes.NO_SUCH_QUOTE, "No such quote $quoteId") }
-            .map { updateNameFromRequest(it, body) }
-            .map { updateEmailFromRequest(it, body) }
-            .map { updateSsnFromRequest(it, body) }
-            .map { updateStartTimeFromRequest(it, body) }
-            .map(::assertAgreementIdIsNull)
-            .map(::assertSsnIsNotNull)
-            .flatMap { createMemberMaybe(it) }
-            .flatMap {
-                signQuoteWithMemberId(
-                    it,
-                    true,
-                    SignRequest("", "", ""),
-                    body.email
-                )
-            }
+        if (quotes.isEmpty() || quotes.size != request.quoteIds.size) {
+            throw ErrorException(ErrorCodes.NO_SUCH_QUOTE, "No or not all quotes found for ids: ${request.quoteIds})")
+        }
 
-        logger.info("Quote in db after signing: ${quoteRepository.find(quoteId).toMaskedString()}")
+        quotes = quotes
+            .map { updateNameFromRequest(it, request.name) }
+            .map { updateEmailFromRequest(it, request.email) }
+            .map { updateSsnFromRequest(it, request.ssn) }
+            .map { updateStartTimeFromRequest(it, request.startDate) }
+
+        validateQuotesToSign(quotes)
+        validateBundlePrice(quotes, request.price, request.currency)
+
+        val memberId = getCreateMember(quotes)
+
+        quotes = quotes
+            .map { it.copy(memberId = memberId) }
+            .map { quoteRepository.update(it) }
+
+        val response = quotes
+            .map { signQuoteWithMemberId(it, true, SignRequest()) }
+            .map { it.getOrHandle { throw RuntimeException("Failed to sign quote, unknown reason") } }
+            .toList()
+
+        logger.info("Quote in db after signing: ${quoteRepository.findQuotes(request.quoteIds).toMaskedString()}")
 
         return response
     }
 
-    private fun createMemberMaybe(
-        quote: Quote
-    ): Either<ErrorResponseDto, Quote> {
-        if (quote.memberId == null) {
-            require(quote.data is PersonPolicyHolder<*>)
+    private fun validateQuotesToSign(quotes: List<Quote>) {
 
-            val quoteNotSignableErrorDto = assertQuoteIsNotSignedOrExpired(quote)
-            if (quoteNotSignableErrorDto != null) {
-                return Either.left(quoteNotSignableErrorDto)
-            }
-            val memberAlreadySigned = checkIfMemberHasSignedInsurance(quote)
-
-            if (memberAlreadySigned) {
-                return Either.Left(
-                    ErrorResponseDto(
-                        ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE,
-                        "quote is already signed"
-                    )
-                )
-            }
-            val memberId = memberService.createMember()
-
-            logger.info("Created member: memberId=$memberId")
-
-            val ssn = quote.data.ssn!!
-            memberService.updateMemberSsn(
-                memberId.toLong(),
-                UpdateSsnRequest(
-                    ssn = ssn,
-                    nationality = Nationality.fromQuote(quote)
-                )
-            )
-
-            return Either.Right(quoteRepository.update(quote.copy(memberId = memberId)))
-        } else {
-            return Either.Right(quote)
+        val memberIds = quotes.mapNotNull { it.memberId }.toSet()
+        if (memberIds.size > 1) {
+            throw ErrorException(ErrorCodes.INVALID_STATE, "Quotes must belong to same member: $memberIds")
         }
+        if (memberIds.size == 1) {
+            val memberId = memberIds.first()
+            if (quotes.any { it.memberId != memberId }) {
+                throw ErrorException(ErrorCodes.MEMBER_ID_IS_NOT_PROVIDED, "Member id not sat in all quotes ")
+            }
+        }
+
+        val markets = quotes.map { it.market }.toSet()
+        if (markets.size != 1) {
+            throw ErrorException(ErrorCodes.INVALID_STATE, "Quotes must belong to same market: $markets")
+        }
+
+        quotes.map {
+            with(it) {
+
+                if (ssnMaybe == null || ssn.isEmpty()) {
+                    throw ErrorException(ErrorCodes.INVALID_STATE, "Cannot sign quote $id, no ssn")
+                }
+                if (price == null) {
+                    throw ErrorException(ErrorCodes.INVALID_STATE, "Cannot sign quote $id, it has no price")
+                }
+                if (agreementId != null) {
+                    throw ErrorException(
+                        ErrorCodes.INVALID_STATE,
+                        "Cannot sign quote $id, there is a signed product id $agreementId already"
+                    )
+                }
+                if (state == QuoteState.EXPIRED) {
+                    throw ErrorException(ErrorCodes.MEMBER_QUOTE_HAS_EXPIRED, "Cannot sign quote $id, it has expired")
+                }
+                if (state == QuoteState.SIGNED) {
+                    throw ErrorException(ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE, "Quote $id is already signed")
+                }
+                if (data !is PersonPolicyHolder<*>) {
+                    throw ErrorException(ErrorCodes.INVALID_STATE, "Quote type is not supported: ${data::class.java}")
+                }
+            }
+        }
+    }
+
+    private fun validateBundlePrice(quotes: List<Quote>, price: BigDecimal?, currency: String?) {
+
+        if (quotes.size < 2) {
+            return
+        }
+
+        signStrategyService.validateBundling(quotes)
+            ?.let { throw ErrorException(ErrorCodes.INVALID_BUNDLING, it.toString()) }
+
+        if (price != null && currency != null) {
+            val bundlePrice = bundleQuotesService.bundleQuotes(null, quotes.map { it.id }.toList()).cost.monthlyNet
+
+            if (BigDecimal(bundlePrice.amount).compareTo(price) != 0 || bundlePrice.currency != currency) {
+                throw ErrorException(
+                    ErrorCodes.INVALID_BUNDLING,
+                    "Supplied quote bundle price ($price $currency) does not match current $bundlePrice"
+                )
+            }
+        }
+    }
+
+    private fun getCreateMember(quotes: List<Quote>): String {
+
+        val ssn = quotes.first().ssn
+        val email = quotes.first().email
+
+        // Get existing memberId if any from quotes
+        var memberId = quotes.mapNotNull { it.memberId }.firstOrNull()
+
+        if (memberId != null) {
+            logger.info("Existing member $memberId")
+            return memberId
+        }
+
+        // Does this member already exist?
+        val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(ssn).ssnAlreadySignedMember
+
+        if (memberAlreadySigned) {
+            throw ErrorException(ErrorCodes.MEMBER_HAS_EXISTING_INSURANCE, "Member already have signed quote(s)")
+        }
+
+        memberId = memberService.createMember()
+        logger.info("New member created: $memberId")
+
+        memberService.updateMemberSsn(
+            memberId.toLong(),
+            UpdateSsnRequest(
+                ssn = ssn,
+                nationality = Nationality.fromQuote(quotes.first())
+            )
+        )
+
+        val quoteWithAddress = quotes.filter { it.data is AddressData }.firstOrNull() ?: quotes.first()
+        memberService.finalizeOnboarding(quoteWithAddress.copy(memberId = memberId), email!!)
+
+        return memberId
     }
 
     override fun signQuoteFromHope(
@@ -314,8 +413,7 @@ class SignServiceImpl(
         return signQuoteWithMemberId(
             updatedQuote,
             false,
-            SignRequest("", "", ""),
-            (quote.data as PersonPolicyHolder<*>).email!!
+            SignRequest()
         )
     }
 
@@ -330,7 +428,7 @@ class SignServiceImpl(
 
     override fun memberSigned(memberId: String, signedRequest: SignRequest) {
         quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, false, signedRequest, null)
+            signQuoteWithMemberId(quote, false, signedRequest)
         } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
     }
 
@@ -342,13 +440,11 @@ class SignServiceImpl(
     private fun signQuoteWithMemberId(
         quote: Quote,
         shouldCompleteSignInMemberService: Boolean,
-        signedRequest: SignRequest,
-        email: String?
+        signedRequest: SignRequest
     ): Either<Nothing, SignedQuoteResponseDto> {
         return Right(quote)
             .map { checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }; it }
             .map { checkNotNull(it.price) { "Quote must have a price to sign! Quote id: ${it.id}" }; it }
-            .map { finalizeQuoteFromRapio(it, email) }
             .map { createContractsForQuote(it, signedRequest) }
             .flatMap {
                 redeemAndSignQuoteAndPostToCustomerio(
@@ -369,16 +465,6 @@ class SignServiceImpl(
             quote.copy(agreementId = result.agreementId, contractId = result.contractId)
         )
     }
-
-    private fun finalizeQuoteFromRapio(quote: Quote, email: String?): Quote {
-        if (quote.initiatedFrom == QuoteInitiatedFrom.RAPIO) {
-            email?.let {
-                memberService.finalizeOnboarding(quote, it)
-            }
-                ?: throw IllegalArgumentException("Must have an email when signing from rapio!")
-        }
-        return quote
-    }
 }
 
 private fun bundlePersonalInfoMatching(quotes: List<Quote>): Boolean = quotes.windowed(2).all { (left, right) ->
@@ -396,21 +482,14 @@ private fun assertAgreementIdIsNull(quote: Quote): Quote {
     return quote
 }
 
-private fun assertSsnIsNotNull(quote: Quote): Quote {
-    if (quote.ssn.isEmpty()) {
-        throw RuntimeException("No ssn")
-    }
-    return quote
-}
-
 private fun updateStartTimeFromRequest(
     quote: Quote,
-    body: SignQuoteRequest
+    startDate: LocalDate?
 ): Quote {
     return when {
-        body.startDate != null -> {
+        startDate != null -> {
             quote.copy(
-                startDate = body.startDate
+                startDate = startDate
             )
         }
         else -> quote.copy(startDate = null)
@@ -419,10 +498,10 @@ private fun updateStartTimeFromRequest(
 
 private fun updateNameFromRequest(
     quote: Quote,
-    body: SignQuoteRequest
+    name: Name?
 ): Quote {
-    return if (body.name != null && quote.data is PersonPolicyHolder<*>) {
-        quote.copy(data = quote.data.updateName(firstName = body.name.firstName, lastName = body.name.lastName))
+    return if (name?.firstName != null && quote.data is PersonPolicyHolder<*>) {
+        quote.copy(data = quote.data.updateName(firstName = name.firstName, lastName = name.lastName))
     } else {
         quote
     }
@@ -430,28 +509,28 @@ private fun updateNameFromRequest(
 
 private fun updateSsnFromRequest(
     quote: Quote,
-    body: SignQuoteRequest
+    ssn: String?
 ): Quote {
 
-    if (body.ssn == null || body.ssn.isBlank() || quote.data !is PersonPolicyHolder<*>) {
+    if (ssn.isNullOrBlank() || quote.data !is PersonPolicyHolder<*>) {
         return quote
     }
 
     // Cannot override existing ssn with a different one
-    if (quote.data.ssn != null && quote.data.ssn == body.ssn) {
+    if (quote.data.ssn != null && quote.data.ssn != ssn) {
         throw IllegalArgumentException("Invalid ssn, does not match existing ssn in quote")
     }
 
-    return quote.copy(data = quote.data.updateSsn(ssn = body.ssn))
+    return quote.copy(data = quote.data.updateSsn(ssn = ssn))
 }
 
 private fun updateEmailFromRequest(
     quote: Quote,
-    body: SignQuoteRequest
+    email: String
 ): Quote {
 
     return if (quote.data is PersonPolicyHolder<*>) {
-        quote.copy(data = quote.data.updateEmail(email = body.email))
+        quote.copy(data = quote.data.updateEmail(email = email))
     } else {
         quote
     }

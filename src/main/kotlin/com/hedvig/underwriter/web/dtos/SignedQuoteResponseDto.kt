@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.UUID
 
 data class SignedQuoteResponseDto(
-    val id: UUID,
+    val id: UUID, // contractId
     val memberId: String,
     val signedAt: Instant,
     val market: Market
