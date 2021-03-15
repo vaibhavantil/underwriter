@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 
 data class EditDanishAccidentInput(
     @Masked val street: String?,

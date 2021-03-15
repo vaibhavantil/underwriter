@@ -16,6 +16,7 @@ import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.getOldProductType
+import com.hedvig.underwriter.util.logging.Masked
 import com.hedvig.underwriter.util.toStockholmInstant
 import com.hedvig.underwriter.web.dtos.ExternalQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
@@ -25,13 +26,13 @@ import java.time.ZoneId
 import java.util.UUID
 
 data class QuoteRequest(
-    val firstName: String?,
-    val lastName: String?,
+    @Masked val firstName: String?,
+    @Masked val lastName: String?,
     val email: String?,
-    val phoneNumber: String?,
+    @Masked val phoneNumber: String?,
     val currentInsurer: String?,
     val birthDate: LocalDate?,
-    val ssn: String?,
+    @Masked val ssn: String?,
     val quotingPartner: Partner?,
     val productType: ProductType? = null,
     @field:JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")

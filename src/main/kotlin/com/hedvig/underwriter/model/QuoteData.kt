@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 import org.jdbi.v3.json.Json
 import java.time.LocalDate
 import java.util.UUID

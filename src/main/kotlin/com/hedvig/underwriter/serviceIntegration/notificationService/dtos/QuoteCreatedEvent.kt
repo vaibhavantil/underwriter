@@ -1,17 +1,18 @@
 package com.hedvig.underwriter.serviceIntegration.notificationService.dtos
 
+import com.hedvig.underwriter.util.logging.Masked
 import java.math.BigDecimal
 import java.util.UUID
 
 data class QuoteCreatedEvent(
     val memberId: String,
     val quoteId: UUID,
-    val firstName: String,
-    val lastName: String,
-    val street: String?,
+    @Masked val firstName: String,
+    @Masked val lastName: String,
+    @Masked val street: String?,
     val postalCode: String?,
-    val email: String,
-    val ssn: String?,
+    @Masked val email: String,
+    @Masked val ssn: String?,
     val initiatedFrom: String,
     val attributedTo: String,
     val productType: String,
