@@ -33,7 +33,7 @@ class UnderwriterImplValidateAndCompleteQuoteTest {
     }
 
     @Test
-    fun `SuccessShouldSkipAfter followed by FailsShouldNotSkipAfter and FailsShouldSkipAfter and FailsShouldSkipAfter should return FailsShouldNotSkipAfter and FailsShouldSkipAfter`() {
+    fun `SuccessShouldSkipAfter followed by FailsShouldNotSkipAfter and FailsShouldSkipAfter should return FailsShouldNotSkipAfter and FailsShouldSkipAfter`() {
         every { quoteStrategyService.getAllGuidelines(someQuote) } returns setOf(
             SuccessShouldSkipAfter,
             FailsShouldNotSkipAfter,
