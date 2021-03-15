@@ -127,5 +127,3 @@ object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
         false
     }
 }
-
-

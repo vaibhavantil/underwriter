@@ -14,6 +14,8 @@ import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsCoIns
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelAgeNotMoreThan30Years
 import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelCoInsuredNotMoreThan0
+import com.hedvig.underwriter.service.guidelines.PersonalDebt
+import com.hedvig.underwriter.service.guidelines.SocialSecurityNumberFormat
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeAtLeast1
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeNotMoreThan6
 import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceAtLeast1Sqm
@@ -165,6 +167,32 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Right)
+    }
+
+    @Test
+    fun underwritingGuidelineHitInvalidSwedishSsn() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), metrics)
+        val quoteRequest = SwedishApartmentQuoteRequestBuilder(ssn = "invalid", birthDate = LocalDate.of(1912, 12, 12)).build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(listOf(SocialSecurityNumberFormat.breachedGuideline))
+        verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitPersonalDebtCheckSwedishQuote() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), metrics)
+        val quoteRequest = SwedishApartmentQuoteRequestBuilder().build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf("RED")
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(listOf(PersonalDebt(debtChecker).breachedGuideline))
+        verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
     }
 
     @Test
