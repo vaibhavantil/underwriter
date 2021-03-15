@@ -315,9 +315,7 @@ data class Quote(
                     firstName = quoteRequest.firstName ?: data.firstName,
                     lastName = quoteRequest.lastName ?: data.lastName,
                     email = quoteRequest.email ?: data.email,
-                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber,
-//                    check here
-                    bbrId = (quoteRequest.incompleteQuoteData as DanishHomeContents).bbrId ?: data.bbrId
+                    phoneNumber = quoteRequest.phoneNumber ?: data.phoneNumber
                 )
                 is DanishAccidentData -> data.copy(
                     ssn = quoteRequest.ssn ?: data.ssn,

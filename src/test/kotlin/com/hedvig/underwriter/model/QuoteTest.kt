@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.model.QuoteRequest
+import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
 import org.assertj.core.api.Assertions.assertThat
@@ -158,5 +159,112 @@ class QuoteTest {
     fun `gets birth date from Norwegian SSN`() {
         val birthDate = "23077421475".birthDateFromDanishSsn()
         assertThat(birthDate).isEqualTo(LocalDate.of(1974, 7, 23))
+    }
+
+    @Test
+    fun updatesQuoteButKeepsPreviousBbrIdIfHasNotChanged() {
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            data = DanishHomeContentsData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "201212121212",
+                street = "221 Baker street",
+                zipCode = "1121",
+                livingSpace = 33,
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                type = DanishHomeContentsType.RENT,
+                bbrId = "1232"
+            ),
+            productType = ProductType.HOME_CONTENT,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            attributedTo = Partner.HEDVIG,
+            state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
+            price = BigDecimal.valueOf(100)
+        )
+        val updatedQuote = quote.update(
+            QuoteRequest(
+                firstName = null,
+                lastName = null,
+                email = null,
+                phoneNumber = null,
+                productType = null,
+                ssn = "201212121212",
+                currentInsurer = null,
+                incompleteQuoteData = null,
+                originatingProductId = null,
+                quotingPartner = null,
+                birthDate = null,
+                memberId = null,
+                startDate = null,
+                dataCollectionId = null
+            )
+        )
+        assertThat(updatedQuote.id).isEqualTo(quote.id)
+        assertThat((updatedQuote.data as DanishHomeContentsData).ssn).isEqualTo("201212121212")
+        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("1232")
+    }
+
+    @Test
+    fun updatesQuoteButKeepsPreviousBbrIdIfHasBeenUpdated() {
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            data = DanishHomeContentsData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "201212121212",
+                street = "221 Baker street",
+                zipCode = "1121",
+                livingSpace = 33,
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                type = DanishHomeContentsType.RENT,
+                bbrId = "1232"
+            ),
+            productType = ProductType.HOME_CONTENT,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            attributedTo = Partner.HEDVIG,
+            state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
+            price = BigDecimal.valueOf(100)
+        )
+        val updatedQuote = quote.update(
+            QuoteRequest(
+                firstName = null,
+                lastName = null,
+                email = null,
+                phoneNumber = null,
+                productType = null,
+                ssn = null,
+                currentInsurer = null,
+                incompleteQuoteData = QuoteRequestData.DanishHomeContents(
+                    bbrId = "5455",
+                    street = null,
+                    zipCode = null,
+                    coInsured = null,
+                    isStudent = null,
+                    livingSpace = null,
+                    subType = null
+                ),
+                originatingProductId = null,
+                quotingPartner = null,
+                birthDate = null,
+                memberId = null,
+                startDate = null,
+                dataCollectionId = null
+            )
+        )
+        assertThat(updatedQuote.id).isEqualTo(quote.id)
+        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("5455")
     }
 }
