@@ -30,6 +30,7 @@ import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import org.springframework.stereotype.Service
+import java.lang.IllegalArgumentException
 import java.util.UUID
 
 @Service
@@ -162,7 +163,7 @@ class QuoteServiceImpl(
     }
 
     override fun getMarketFromLatestQuote(memberId: String): Market {
-        return getLatestQuoteForMemberId(memberId)!!.market
+        return getLatestQuoteForMemberId(memberId)?.market ?: throw IllegalArgumentException("Member $memberId has no quotes")
     }
 
     override fun createQuoteFromAgreement(
