@@ -17,7 +17,6 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequ
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentsQuoteRequestBuilder
-import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import io.mockk.every
 import io.mockk.mockk
