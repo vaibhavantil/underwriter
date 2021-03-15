@@ -90,9 +90,7 @@ object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = false
 
-    override val validate = { data: QuoteData ->
-        true
-    }
+    override val validate : (QuoteData)-> Boolean = { true }
 }
 
 object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
@@ -101,9 +99,7 @@ object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override val validate = { data: QuoteData ->
-        true
-    }
+    override val validate : (QuoteData)-> Boolean = { true }
 }
 
 object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
@@ -112,9 +108,7 @@ object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override val validate = { data: QuoteData ->
-        false
-    }
+    override val validate : (QuoteData)-> Boolean = { false }
 }
 
 object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
@@ -123,7 +117,5 @@ object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = false
 
-    override val validate = { data: QuoteData ->
-        false
-    }
+    override val validate : (QuoteData)-> Boolean = { false }
 }
