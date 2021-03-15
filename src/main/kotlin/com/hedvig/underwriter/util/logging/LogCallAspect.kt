@@ -23,7 +23,7 @@ class LogCallAspect {
             throw throwable
         }
         val duration = System.currentTimeMillis() - start
-        logger.info("Finished executing: $signature, returned: '$result', duration: $duration ms")
+        logger.info("Finished executing: $signature, returned: '${result.toMaskedString()}', duration: $duration ms")
         return result
     }
 
