@@ -1,6 +1,8 @@
 package com.hedvig.underwriter.model
 
+import com.hedvig.underwriter.util.logging.Masked
+
 data class Name(
-    val firstName: String,
-    val lastName: String
+    @Masked val firstName: String,
+    @Masked val lastName: String
 )

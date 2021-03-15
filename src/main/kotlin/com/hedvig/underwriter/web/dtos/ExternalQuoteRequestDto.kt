@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.web.dtos
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 import java.time.LocalDate
 
 data class ExternalQuoteRequestDto(

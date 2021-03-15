@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.util
+package com.hedvig.underwriter.util.logging
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -141,7 +141,7 @@ class MaskedTest {
 
         val o = Data("sdf", 123, true, 12.345, null, NestedData("asdds", 134, false, 34.121, "asda"))
 
-        assertThat(o.toMaskedString()).isEqualTo("Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda))")
+        assertThat(o.toMaskedString()).isEqualTo("Data(a=sdf, b=123, c=***, d=***, e=null, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda))")
     }
 
     @Test
@@ -165,7 +165,7 @@ class MaskedTest {
 
         val o = mapOf(1 to Data("sdf", 123, true, 12.345, null, NestedData("asdds", 134, false, 34.121, "asda")), 2 to null)
 
-        assertThat(o.toMaskedString()).isEqualTo("{1=Data(a=sdf, b=123, c=***, d=***, e=***, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda)), 2=null}")
+        assertThat(o.toMaskedString()).isEqualTo("{1=Data(a=sdf, b=123, c=***, d=***, e=null, f=NestedData(a=***, b=***, c=false, d=34.121, e=asda)), 2=null}")
     }
 
     @Test

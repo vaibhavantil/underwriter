@@ -1,4 +1,4 @@
-package com.hedvig.underwriter.util
+package com.hedvig.underwriter.util.logging
 
 import java.lang.reflect.Modifier
 import java.util.LinkedList
@@ -37,10 +37,11 @@ private fun reflectionToString(obj: Any): String {
 
             prop.isAccessible = true
 
+            val value = prop.get(obj)
             val masked = prop.getAnnotation(Masked::class.java)
-            val value = if (masked != null) "***" else prop.get(obj)?.toMaskedString()
+            val maskedString = if (masked != null && value != null) "***" else value?.toMaskedString()
 
-            s += "${prop.name}=" + value
+            s += "${prop.name}=" + maskedString
         }
         clazz = clazz.superclass
     }

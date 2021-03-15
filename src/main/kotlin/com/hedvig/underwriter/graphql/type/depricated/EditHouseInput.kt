@@ -3,7 +3,7 @@ package com.hedvig.underwriter.graphql.type.depricated
 import com.hedvig.underwriter.extensions.toExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 
 @Deprecated("Use EditSwedishHouseInput")
 data class EditHouseInput(

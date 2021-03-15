@@ -1,12 +1,14 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
+import com.hedvig.underwriter.util.logging.Masked
+
 data class UpdateContactInformationRequest(
     var memberId: String,
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val phoneNumber: String,
+    @Masked val firstName: String,
+    @Masked val lastName: String,
+    @Masked val email: String,
+    @Masked val phoneNumber: String,
     val addressMemberService: AddressMemberService,
-    val ssn: String
+    @Masked val ssn: String
 
 )
