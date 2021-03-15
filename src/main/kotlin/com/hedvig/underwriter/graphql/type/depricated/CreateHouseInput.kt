@@ -3,10 +3,11 @@ package com.hedvig.underwriter.graphql.type.depricated
 import com.hedvig.underwriter.extensions.toExtraBuilding
 import com.hedvig.underwriter.graphql.type.ExtraBuildingInput
 import com.hedvig.underwriter.service.model.QuoteRequestData
+import com.hedvig.underwriter.util.logging.Masked
 
 @Deprecated("Use CreateSwedishHouseInput")
 data class CreateHouseInput(
-    val street: String,
+    @Masked val street: String,
     val zipCode: String,
     val householdSize: Int,
     val livingSpace: Int,

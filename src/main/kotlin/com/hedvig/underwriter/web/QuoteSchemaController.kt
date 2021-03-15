@@ -7,6 +7,7 @@ import com.hedvig.underwriter.service.QuoteSchemaService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteSchema
+import com.hedvig.underwriter.util.logging.LogCall
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import org.springframework.http.ResponseEntity
@@ -26,6 +27,7 @@ class QuoteSchemaController(
     val quoteService: QuoteService
 ) {
     @GetMapping("{quoteId}")
+    @LogCall
     fun getSchemaByQuoteId(@PathVariable quoteId: UUID): Any {
         return quoteSchemaService.getSchemaByQuoteId(quoteId) ?: return ResponseEntity.status(404).body(
             ErrorResponseDto(
@@ -36,6 +38,7 @@ class QuoteSchemaController(
     }
 
     @GetMapping("{quoteId}/data")
+    @LogCall
     fun getSchemaDataByQuoteId(@PathVariable quoteId: UUID): Any {
         return quoteSchemaService.getSchemaDataByQuoteId(quoteId) ?: return ResponseEntity.status(404).body(
             ErrorResponseDto(
@@ -46,11 +49,13 @@ class QuoteSchemaController(
     }
 
     @GetMapping("contract/{contractType}")
+    @LogCall
     fun getSchemaByContractType(@PathVariable contractType: ContractType): JsonNode {
         return quoteSchemaService.getSchemaByContractType(contractType)
     }
 
     @PostMapping("{quoteId}/update")
+    @LogCall
     fun updateQuoteBySchemaData(
         @PathVariable quoteId: UUID,
         @RequestBody body: QuoteSchema,
@@ -74,6 +79,7 @@ class QuoteSchemaController(
     }
 
     @PostMapping("/{memberId}/create")
+    @LogCall
     fun createQuoteForMemberBySchemaData(
         @PathVariable memberId: String,
         @RequestBody body: QuoteSchema,

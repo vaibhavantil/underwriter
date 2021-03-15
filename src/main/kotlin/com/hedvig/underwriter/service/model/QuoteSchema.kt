@@ -9,6 +9,7 @@ import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.ExtraBuildingType
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
+import com.hedvig.underwriter.util.logging.Masked
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "id")
@@ -26,7 +27,7 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Line Of Business", required = true)
         val lineOfBusiness: ApartmentProductSubType,
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 5, maxLength = 5)
         val zipCode: String,
         @JsonSchema(title = "City", required = false)
@@ -39,7 +40,7 @@ sealed class QuoteSchema {
 
     data class SwedishHouse(
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 5, maxLength = 5)
         val zipCode: String,
         @JsonSchema(title = "City", required = false)
@@ -75,7 +76,7 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Line Of Business", required = true)
         val lineOfBusiness: NorwegianHomeContentsType,
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
         @JsonSchema(title = "City", required = false)
@@ -103,7 +104,7 @@ sealed class QuoteSchema {
         @JsonSchema(title = "Line Of Business", required = true)
         val lineOfBusiness: DanishHomeContentsType,
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
         @JsonSchema(title = "BbrId", required = false)
@@ -120,7 +121,7 @@ sealed class QuoteSchema {
 
     data class DanishAccident(
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)
@@ -133,7 +134,7 @@ sealed class QuoteSchema {
 
     data class DanishTravel(
         @JsonSchema(title = "Street", required = true)
-        val street: String,
+        @Masked val street: String,
         @JsonSchema(title = "Zip Code", required = true, minLength = 4, maxLength = 4)
         val zipCode: String,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)

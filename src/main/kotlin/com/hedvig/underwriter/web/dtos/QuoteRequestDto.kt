@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.model.Partner
 import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID

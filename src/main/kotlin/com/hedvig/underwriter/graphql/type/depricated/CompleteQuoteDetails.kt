@@ -2,7 +2,7 @@ package com.hedvig.underwriter.graphql.type.depricated
 
 import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.graphql.type.ExtraBuilding
-import com.hedvig.underwriter.util.Masked
+import com.hedvig.underwriter.util.logging.Masked
 
 @Deprecated("Use QuoteDetails")
 sealed class CompleteQuoteDetails {
