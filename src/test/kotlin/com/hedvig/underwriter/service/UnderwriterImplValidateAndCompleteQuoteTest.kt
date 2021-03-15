@@ -84,7 +84,7 @@ class UnderwriterImplValidateAndCompleteQuoteTest {
     }
 }
 
-object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
+private object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
@@ -93,7 +93,7 @@ object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val validate : (QuoteData)-> Boolean = { true }
 }
 
-object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
+private object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
     override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
@@ -102,7 +102,7 @@ object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
     override val validate : (QuoteData)-> Boolean = { true }
 }
 
-object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
+private object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
     override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
@@ -111,7 +111,7 @@ object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
     override val validate : (QuoteData)-> Boolean = { false }
 }
 
-object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
+private object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
