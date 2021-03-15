@@ -450,7 +450,8 @@ data class Quote(
                     data = newQuoteData.copy(
                         street = requestData.street ?: newQuoteData.street,
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
-                        bbrId = requestData.bbrId ?: newQuoteData.bbrId,
+                        bbrId = requestData.bbrId ?:
+                        if (requestData.street == null && requestData.zipCode == null) newQuoteData.bbrId else null,
                         livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
                         isStudent = requestData.isStudent ?: newQuoteData.isStudent,

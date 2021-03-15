@@ -83,7 +83,6 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.DanishHomeContent -> QuoteRequestData.DanishHomeContents(
         street = this.address.street,
         zipCode = this.address.postalCode,
-        //        need to add the autocomplete in hope
         bbrId = null,
         coInsured = this.numberCoInsured,
         livingSpace = this.squareMeters.toInt(),

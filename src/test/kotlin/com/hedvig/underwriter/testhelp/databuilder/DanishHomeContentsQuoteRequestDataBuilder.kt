@@ -21,4 +21,13 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
         isStudent = isStudent,
         subType = subType
     )
+    fun build(newStreet: String?, newZipCode: String?, newBbrId: String?) = QuoteRequestData.DanishHomeContents(
+        street = newStreet,
+        zipCode = newZipCode,
+        bbrId = newBbrId,
+        livingSpace = livingSpace,
+        coInsured = coInsured,
+        isStudent = isStudent,
+        subType = subType
+    )
 }

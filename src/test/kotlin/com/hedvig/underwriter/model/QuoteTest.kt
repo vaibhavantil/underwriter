@@ -1,9 +1,11 @@
 package com.hedvig.underwriter.model
 
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.service.model.QuoteRequestData
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishApartment
 import com.hedvig.underwriter.service.model.QuoteRequestData.SwedishHouse
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestDataBuilder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.math.BigDecimal
@@ -166,21 +168,7 @@ class QuoteTest {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            data = DanishHomeContentsData(
-                firstName = "Sherlock",
-                lastName = "Holmes",
-                birthDate = LocalDate.of(1912, 12, 12),
-                ssn = "201212121212",
-                street = "221 Baker street",
-                zipCode = "1121",
-                livingSpace = 33,
-                id = UUID.randomUUID(),
-                coInsured = 1,
-                email = "em@i.l",
-                isStudent = false,
-                type = DanishHomeContentsType.RENT,
-                bbrId = "1232"
-            ),
+            data = DanishHomeContentsDataBuilder().build(),
             productType = ProductType.HOME_CONTENT,
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
@@ -188,27 +176,14 @@ class QuoteTest {
             breachedUnderwritingGuidelines = null,
             price = BigDecimal.valueOf(100)
         )
+
+        val danishHomeContentsQuoteData = DanishHomeContentsQuoteRequestDataBuilder().build()
         val updatedQuote = quote.update(
-            QuoteRequest(
-                firstName = null,
-                lastName = null,
-                email = null,
-                phoneNumber = null,
-                productType = null,
-                ssn = "201212121212",
-                currentInsurer = null,
-                incompleteQuoteData = null,
-                originatingProductId = null,
-                quotingPartner = null,
-                birthDate = null,
-                memberId = null,
-                startDate = null,
-                dataCollectionId = null
-            )
+            DanishHomeContentsQuoteRequestBuilder().build(danishHomeContentsQuoteData, "201212121212")
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as DanishHomeContentsData).ssn).isEqualTo("201212121212")
-        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("1232")
+        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo((quote.data as DanishHomeContentsData).bbrId)
     }
 
     @Test
@@ -216,21 +191,7 @@ class QuoteTest {
         val quote = Quote(
             id = UUID.randomUUID(),
             createdAt = Instant.now(),
-            data = DanishHomeContentsData(
-                firstName = "Sherlock",
-                lastName = "Holmes",
-                birthDate = LocalDate.of(1912, 12, 12),
-                ssn = "201212121212",
-                street = "221 Baker street",
-                zipCode = "1121",
-                livingSpace = 33,
-                id = UUID.randomUUID(),
-                coInsured = 1,
-                email = "em@i.l",
-                isStudent = false,
-                type = DanishHomeContentsType.RENT,
-                bbrId = "1232"
-            ),
+            data = DanishHomeContentsDataBuilder().build(),
             productType = ProductType.HOME_CONTENT,
             initiatedFrom = QuoteInitiatedFrom.HOPE,
             attributedTo = Partner.HEDVIG,
@@ -238,33 +199,71 @@ class QuoteTest {
             breachedUnderwritingGuidelines = null,
             price = BigDecimal.valueOf(100)
         )
+
+        val danishHomeContentsQuoteData = DanishHomeContentsQuoteRequestDataBuilder().build(
+            newStreet = null,
+            newZipCode = null,
+            newBbrId = "5455"
+        )
         val updatedQuote = quote.update(
-            QuoteRequest(
-                firstName = null,
-                lastName = null,
-                email = null,
-                phoneNumber = null,
-                productType = null,
-                ssn = null,
-                currentInsurer = null,
-                incompleteQuoteData = QuoteRequestData.DanishHomeContents(
-                    bbrId = "5455",
-                    street = null,
-                    zipCode = null,
-                    coInsured = null,
-                    isStudent = null,
-                    livingSpace = null,
-                    subType = null
-                ),
-                originatingProductId = null,
-                quotingPartner = null,
-                birthDate = null,
-                memberId = null,
-                startDate = null,
-                dataCollectionId = null
-            )
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("5455")
+    }
+
+    @Test
+    fun `if city or street is changed when editing quote but brrId is not updated (before we have autocomplete implemented) set bbrId to null but use zipCode from previous quote`() {
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            data = DanishHomeContentsDataBuilder().build(),
+            productType = ProductType.HOME_CONTENT,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            attributedTo = Partner.HEDVIG,
+            state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
+            price = BigDecimal.valueOf(100)
+        )
+
+        val danishHomeContentsQuoteData = DanishHomeContentsQuoteRequestDataBuilder().build(
+            newStreet = "new street",
+            newZipCode = null,
+            newBbrId = null
+        )
+        val updatedQuote = quote.update(
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
+        )
+        assertThat(updatedQuote.id).isEqualTo(quote.id)
+        assertThat((updatedQuote.data as DanishHomeContentsData).zipCode).isEqualTo((quote.data as DanishHomeContentsData).zipCode)
+        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isNull()
+    }
+
+    @Test
+    fun `if city or street is changed when editing quote and brrId is updated (before we have autocomplete implemented) use updated bbrId`() {
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = Instant.now(),
+            data = DanishHomeContentsDataBuilder().build(),
+            productType = ProductType.HOME_CONTENT,
+            initiatedFrom = QuoteInitiatedFrom.HOPE,
+            attributedTo = Partner.HEDVIG,
+            state = QuoteState.QUOTED,
+            breachedUnderwritingGuidelines = null,
+            price = BigDecimal.valueOf(100)
+        )
+
+        val danishHomeContentsQuoteData = DanishHomeContentsQuoteRequestDataBuilder().build(
+            newStreet = "new street",
+            newZipCode = "newZip",
+            newBbrId = "6554"
+        )
+        val updatedQuote = quote.update(
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
+        )
+        assertThat(updatedQuote.id).isEqualTo(quote.id)
+        assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("6554")
+        assertThat((updatedQuote.data as DanishHomeContentsData).street).isEqualTo("new street")
+        assertThat((updatedQuote.data as DanishHomeContentsData).zipCode).isEqualTo("newZip")
     }
 }

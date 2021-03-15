@@ -40,4 +40,21 @@ data class DanishHomeContentsQuoteRequestBuilder(
         startDate = startDate,
         dataCollectionId = dataCollectionId
     )
+
+    fun build(homeContentsData: QuoteRequestData.DanishHomeContents?, ssn: String?): QuoteRequest = QuoteRequest(
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        phoneNumber = null,
+        currentInsurer = currentInsurer,
+        birthDate = birthDate,
+        ssn = ssn,
+        quotingPartner = quotingPartner,
+        productType = productType,
+        incompleteQuoteData = homeContentsData ?: data.build(),
+        memberId = memberId,
+        originatingProductId = originatingProductId,
+        startDate = startDate,
+        dataCollectionId = dataCollectionId
+    )
 }
