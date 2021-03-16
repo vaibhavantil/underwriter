@@ -143,13 +143,13 @@ class UnderwriterImpl(
     ): MutableList<BreachedGuidelineCode> {
         val guidelineErrors = mutableListOf<BreachedGuidelineCode>()
 
-        listOfRules.forEach {
-            val error = it.invokeValidate(data)
+        for (rule in listOfRules) {
+            val error = rule.invokeValidate(data)
             if (error != null) {
                 guidelineErrors.add(error)
-            }
-            if (it.skipAfter) {
-                return@forEach
+                if (rule.skipAfter) {
+                    break
+                }
             }
         }
         return guidelineErrors

@@ -6,6 +6,7 @@ import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.model.QuoteRequestData
 import java.time.Instant
+import java.time.LocalDate
 import java.util.UUID
 
 data class SwedishApartmentQuoteRequestBuilder(
@@ -22,7 +23,8 @@ data class SwedishApartmentQuoteRequestBuilder(
     val dataCollectionId: UUID? = null,
     val currentInsurer: String? = null,
     val data: DataBuilder<QuoteRequestData.SwedishApartment> = SwedishApartmentQuoteRequestDataBuilder(),
-    val productType: ProductType? = ProductType.APARTMENT
+    val productType: ProductType? = ProductType.APARTMENT,
+    val birthDate: LocalDate? = ssn.birthDateFromSwedishSsn()
 ) : DataBuilder<QuoteRequest> {
     override fun build(): QuoteRequest = QuoteRequest(
         firstName = firstName,
@@ -30,7 +32,7 @@ data class SwedishApartmentQuoteRequestBuilder(
         email = email,
         phoneNumber = phoneNumber,
         currentInsurer = currentInsurer,
-        birthDate = ssn.birthDateFromSwedishSsn(),
+        birthDate = birthDate,
         ssn = ssn,
         quotingPartner = quotingPartner,
         productType = productType,
