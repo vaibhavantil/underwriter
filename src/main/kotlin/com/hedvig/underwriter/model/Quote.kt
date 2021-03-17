@@ -452,6 +452,9 @@ data class Quote(
                         zipCode = requestData.zipCode ?: newQuoteData.zipCode,
                         bbrId = requestData.bbrId ?:
                         if (requestData.street == null && requestData.zipCode == null) newQuoteData.bbrId else null,
+                        apartmentNumber = requestData.apartmentNumber,
+                        floor = requestData.floor,
+//                        city = requestData.city,
                         livingSpace = requestData.livingSpace ?: newQuoteData.livingSpace,
                         coInsured = requestData.coInsured ?: newQuoteData.coInsured,
                         isStudent = requestData.isStudent ?: newQuoteData.isStudent,

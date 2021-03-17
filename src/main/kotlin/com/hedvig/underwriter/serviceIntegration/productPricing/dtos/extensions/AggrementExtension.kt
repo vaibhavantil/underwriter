@@ -84,6 +84,10 @@ fun Agreement.toQuoteRequestData() = when (this) {
         street = this.address.street,
         zipCode = this.address.postalCode,
         bbrId = null,
+//        TODO: remove hard coded values!
+        apartmentNumber = "1",
+        floor = 3,
+        city = this.address.city,
         coInsured = this.numberCoInsured,
         livingSpace = this.squareMeters.toInt(),
         isStudent = when (this.lineOfBusiness) {

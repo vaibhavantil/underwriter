@@ -7,7 +7,10 @@ import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHome
 data class CreateDanishHomeContentsInput(
     @Masked val street: String,
     val zipCode: String,
+    val city: String?,
     @Masked val bbrId: String?,
+    @Masked val apartmentNumber: String?,
+    val floor: Int?,
     val coInsured: Int,
     val livingSpace: Int,
     @get:JvmName("getIsStudent")
@@ -19,6 +22,9 @@ data class CreateDanishHomeContentsInput(
             street = this.street,
             zipCode = this.zipCode,
             bbrId = this.bbrId,
+            apartmentNumber = this.apartmentNumber,
+            floor = this.floor,
+            city = this.city,
             livingSpace = this.livingSpace,
             coInsured = this.coInsured,
             isStudent = this.isStudent,

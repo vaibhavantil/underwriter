@@ -172,6 +172,8 @@ data class DanishHomeContentsData(
     @Masked override val email: String?,
     @Masked override val phoneNumber: String? = null,
     @Masked override val street: String,
+    @Masked override val apartmentNumber: String?,
+    override val floor: Int?,
     override val zipCode: String,
     override val bbrId: String? = null,
     val livingSpace: Int,
@@ -181,7 +183,7 @@ data class DanishHomeContentsData(
     val type: DanishHomeContentsType,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), DanishHomeContentAddressData, PersonPolicyHolder<DanishHomeContentsData> {
+) : QuoteData(), DanishHomeContentsAddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
     // Should probably be removed from AddressData
     override val city: String? = null

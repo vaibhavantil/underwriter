@@ -197,7 +197,10 @@ class QuoteMapper(
             livingSpace = quote.data.livingSpace,
             numberCoInsured = quote.data.coInsured,
             isStudent = quote.data.isStudent,
-            lineOfBusiness = quote.data.type
+            lineOfBusiness = quote.data.type,
+            apartmentNumber = quote.data.apartmentNumber,
+            floor = quote.data.floor,
+            city = quote.data.city
         )
         is DanishAccidentData -> QuoteSchema.DanishAccident(
             street = quote.data.street,

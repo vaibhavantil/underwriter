@@ -329,7 +329,9 @@ interface QuoteDao {
                 co_insured,                
                 is_student,                
                 type,
-                bbr_id
+                bbr_id,
+                apartment_number,
+                floor
             )
             VALUES
             (
@@ -346,7 +348,9 @@ interface QuoteDao {
                 :coInsured,
                 :isStudent,
                 :type,
-                :bbrId
+                :bbrId,
+                :apartmentNumber,
+                :floor
             )
             RETURNING *
     """

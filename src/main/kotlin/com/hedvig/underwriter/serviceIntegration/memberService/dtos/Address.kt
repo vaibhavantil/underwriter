@@ -1,5 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
+import com.hedvig.underwriter.model.DanishHomeContentsAddressData
 import com.hedvig.underwriter.util.logging.Masked
 
 class Address(
@@ -8,4 +9,15 @@ class Address(
     val zipCode: String,
     val apartmentNo: String,
     val floor: Int
-)
+) {
+    companion object {
+        fun from(danishHomeContentsAddressData: DanishHomeContentsAddressData) = Address(
+            street = danishHomeContentsAddressData.street!!,
+            city = danishHomeContentsAddressData.city ?: "",
+            zipCode = danishHomeContentsAddressData.zipCode!!,
+            apartmentNo = danishHomeContentsAddressData.apartmentNumber ?: "",
+            floor = danishHomeContentsAddressData.floor ?: 0
+        )
+    }
+}
+

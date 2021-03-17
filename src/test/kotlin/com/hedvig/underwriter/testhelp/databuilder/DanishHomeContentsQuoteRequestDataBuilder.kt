@@ -7,6 +7,9 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
     val street: String = "",
     val zipCode: String = "",
     val bbrId: String? = "1234",
+    val buildingNumber: String? = "14",
+    val floor: Int? = 3,
+    val city: String? = "test postal code name",
     val coInsured: Int = 3,
     val livingSpace: Int = 2,
     val isStudent: Boolean = false,
@@ -19,7 +22,10 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
         livingSpace = livingSpace,
         coInsured = coInsured,
         isStudent = isStudent,
-        subType = subType
+        subType = subType,
+        apartmentNumber = buildingNumber,
+        floor = floor,
+        city = city
     )
     fun build(newStreet: String?, newZipCode: String?, newBbrId: String?) = QuoteRequestData.DanishHomeContents(
         street = newStreet,
@@ -28,6 +34,9 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
         livingSpace = livingSpace,
         coInsured = coInsured,
         isStudent = isStudent,
-        subType = subType
+        subType = subType,
+        apartmentNumber = buildingNumber,
+        floor = floor,
+        city = city
     )
 }
