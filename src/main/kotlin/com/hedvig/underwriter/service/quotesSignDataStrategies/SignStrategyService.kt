@@ -28,7 +28,7 @@ class SignStrategyService(
             return StartSignErrors.noQuotes
         }
 
-        if (strategy.size > 1) {
+        if (strategy.size > 1 || quotes.markets.size > 1) {
             return StartSignErrors.quotesCanNotBeBundled
         }
 

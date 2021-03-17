@@ -46,3 +46,6 @@ fun List<Quote>.safelyMarket(): Market {
 
     return market
 }
+
+val List<Quote>.markets: Set<Market>
+    get() = this.map { it.market }.toSet()
