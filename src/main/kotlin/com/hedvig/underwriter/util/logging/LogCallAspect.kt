@@ -12,7 +12,7 @@ class LogCallAspect {
 
     @Suppress("TooGenericExceptionCaught")
     @Around("@annotation(com.hedvig.underwriter.util.logging.LogCall)")
-    fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any {
+    fun logExecutionTime(joinPoint: ProceedingJoinPoint): Any? {
         val start = System.currentTimeMillis()
         val signature = joinPoint.signature.toShortString()
         val result = try {
