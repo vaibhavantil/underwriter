@@ -81,10 +81,10 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> simpleSignStrategy
+            is NorwegianTravelData,
             is DanishHomeContentsData,
             is DanishAccidentData,
-            is DanishTravelData -> redirectSignStrategy
+            is DanishTravelData -> simpleSignStrategy
         }
     }.toSet()
 
