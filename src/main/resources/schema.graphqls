@@ -583,11 +583,11 @@ type SwedishBankIdSession {
 }
 
 type NorwegianBankIdSession {
-    redirectUrl: String
+    redirectUrl: String @deprecated(reason: "This type i not in use any more")
 }
 
 type DanishBankIdSession {
-    redirectUrl: String
+    redirectUrl: String @deprecated(reason: "This type i not in use any more")
 }
 
 type SimpleSignSession {

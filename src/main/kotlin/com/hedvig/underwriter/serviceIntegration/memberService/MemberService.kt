@@ -7,7 +7,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlre
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -42,15 +41,6 @@ interface MemberService {
         ipAddress: String,
         isSwitching: Boolean
     ): UnderwriterStartSignSessionResponse.SwedishBankId
-
-    fun startRedirectBankIdSign(
-        memberId: Long,
-        underwriterSessionReference: UUID,
-        nationalIdentification: NationalIdentification,
-        successUrl: String,
-        failUrl: String,
-        redirectCountry: RedirectCountry
-    ): UnderwriterStartSignSessionResponse.BankIdRedirect
 
     fun startSimpleSign(
         memberId: Long,

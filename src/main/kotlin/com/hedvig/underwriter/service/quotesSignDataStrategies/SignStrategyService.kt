@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 @Service
 class SignStrategyService(
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
-    private val redirectSignStrategy: RedirectSignStrategy,
     private val simpleSignStrategy: SimpleSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {

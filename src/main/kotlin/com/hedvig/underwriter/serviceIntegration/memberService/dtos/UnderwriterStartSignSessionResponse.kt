@@ -10,10 +10,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "SwedishBankId"
     ),
     JsonSubTypes.Type(
-        value = UnderwriterStartSignSessionResponse.BankIdRedirect::class,
-        name = "BankIdRedirect"
-    ),
-    JsonSubTypes.Type(
         value = UnderwriterStartSignSessionResponse.SimpleSign::class,
         name = "SimpleSign"
     )
@@ -25,12 +21,6 @@ sealed class UnderwriterStartSignSessionResponse {
     data class SwedishBankId(
         val autoStartToken: String?,
         override val internalErrorMessage: String? = null
-    ) : UnderwriterStartSignSessionResponse()
-
-    data class BankIdRedirect(
-        val redirectUrl: String?,
-        override val internalErrorMessage: String? = null,
-        val errorMessages: List<RedirectAuthenticationResponseError>? = null
     ) : UnderwriterStartSignSessionResponse()
 
     data class SimpleSign(
