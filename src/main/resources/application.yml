@@ -3,8 +3,6 @@ management.endpoints.web.exposure.include: '*'
 logging.level.com.hedvig: INFO
 
 spring:
-  application:
-    name: underwriter
   main:
     allow-bean-definition-overriding: true
   datasource:
