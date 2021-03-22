@@ -8,7 +8,7 @@ import com.hedvig.underwriter.model.ProductType
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.model.birthDateFromSwedishSsn
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.underwriter.util.toStockholmInstant
 import java.time.LocalDate
 import java.util.UUID

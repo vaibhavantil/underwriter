@@ -16,7 +16,7 @@ import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.ssnMaybe
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.InternalMember
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.getOldProductType
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.underwriter.util.toStockholmInstant
 import com.hedvig.underwriter.web.dtos.ExternalQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.QuoteRequestDto
