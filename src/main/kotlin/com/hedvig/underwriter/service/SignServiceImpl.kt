@@ -32,7 +32,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
-import com.hedvig.underwriter.util.logging.toMaskedString
+import com.hedvig.libs.logging.masking.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest

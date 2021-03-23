@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.model
 
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 
 data class Name(
     @Masked val firstName: String,
