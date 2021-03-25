@@ -13,7 +13,7 @@ import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.service.BundleQuotesService
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
-import com.hedvig.underwriter.util.logging.LogCall
+import com.hedvig.libs.logging.calls.LogCall
 import graphql.schema.DataFetchingEnvironment
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

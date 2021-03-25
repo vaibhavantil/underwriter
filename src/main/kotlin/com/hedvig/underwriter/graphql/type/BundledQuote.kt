@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import java.time.LocalDate
 import java.util.UUID
 

@@ -6,7 +6,7 @@ import com.hedvig.graphql.commons.extensions.isIOS
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.model.QuoteRequest
-import com.hedvig.underwriter.util.logging.LogCall
+import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.underwriter.web.dtos.ExternalQuoteRequestDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

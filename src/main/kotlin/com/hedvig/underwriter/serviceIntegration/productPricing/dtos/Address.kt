@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.productPricing.dtos
 
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import com.neovisionaries.i18n.CountryCode
 
 data class Address(
