@@ -11,7 +11,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlre
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
@@ -101,26 +100,6 @@ class MemberServiceImpl @Autowired constructor(
         )
         val response = client.startSign(memberId, request).body
         require(response is UnderwriterStartSignSessionResponse.SwedishBankId)
-        return response
-    }
-
-    override fun startRedirectBankIdSign(
-        memberId: Long,
-        underwriterSessionReference: UUID,
-        nationalIdentification: NationalIdentification,
-        successUrl: String,
-        failUrl: String,
-        redirectCountry: RedirectCountry
-    ): UnderwriterStartSignSessionResponse.BankIdRedirect {
-        val request = UnderwriterStartSignSessionRequest.BankIdRedirect(
-            underwriterSessionReference,
-            nationalIdentification,
-            successUrl,
-            failUrl,
-            redirectCountry
-        )
-        val response = client.startSign(memberId, request).body
-        require(response is UnderwriterStartSignSessionResponse.BankIdRedirect)
         return response
     }
 

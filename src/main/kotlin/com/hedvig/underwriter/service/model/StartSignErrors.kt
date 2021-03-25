@@ -60,12 +60,6 @@ object StartSignErrors {
             "EMPTY_LIST_OF_QUOTES"
         )
 
-    fun emptyRedirectUrlFromBankId(message: String) =
-        StartSignResponse.FailedToStartSign(
-            message,
-            "EMPTY_REDIRECT_URL_FROM_BANK_ID"
-        )
-
     fun failedToStartSimpleSign(message: String) =
         StartSignResponse.FailedToStartSign(
             message,

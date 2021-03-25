@@ -8,10 +8,12 @@ sealed class StartSignResponse {
         val autoStartToken: String
     ) : StartSignResponse()
 
+    @Deprecated("Not in use anymore")
     data class NorwegianBankIdSession(
         val redirectUrl: String
     ) : StartSignResponse()
 
+    @Deprecated("Not in use anymore")
     data class DanishBankIdSession(
         val redirectUrl: String
     ) : StartSignResponse()
