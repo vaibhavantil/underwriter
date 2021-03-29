@@ -17,6 +17,8 @@ class UnderwriterImplValidateAndCompleteQuoteTest {
     val cut = UnderwriterImpl(
         mockk(relaxed = true),
         quoteStrategyService,
+        mockk(relaxed = true),
+        mockk(relaxed = true),
         mockk(relaxed = true)
     )
 

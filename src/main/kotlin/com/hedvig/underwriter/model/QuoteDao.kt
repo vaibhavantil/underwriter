@@ -130,6 +130,90 @@ interface QuoteDao {
 
     @SqlQuery(
         """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_apartment_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_apartment_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsBySwedishApartmentDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_house_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_house_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsBySwedishHouseDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_norwegian_home_contents_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_norwegian_home_contents_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsByNorwegianHomeContentsDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_home_contents_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_home_contents_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsByDanishHomeContentsDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_accident_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_accident_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsByDanishAccidentDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_travel_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_travel_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+    """
+    )
+    fun findQuoteIdsByDanishTravelDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
             SELECT
             DISTINCT ON (qr.master_quote_id)
 
