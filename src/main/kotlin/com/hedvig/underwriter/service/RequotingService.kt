@@ -55,7 +55,7 @@ class RequotingService(
         }
 
         // Get all existing quotes user's address
-        var quotes = quoteRepository.findQuotesByAddress(data.street!!, data.zipCode!!, quote.data::class)
+        var quotes = quoteRepository.findQuotesByAddress(data.street!!, data.zipCode!!, quote.data)
 
         if (quotes.isEmpty()) {
             return false

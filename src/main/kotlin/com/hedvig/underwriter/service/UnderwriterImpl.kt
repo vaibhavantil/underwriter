@@ -43,7 +43,7 @@ class UnderwriterImpl(
     private val breachedGuidelinesCounter: BreachedGuidelinesCounter
 ) : Underwriter {
 
-    @Value("\${features.block-requoting}")
+    @Value("\${features.block-requoting:false}")
     private var blockRequoting: Boolean = false
 
     override fun createQuote(

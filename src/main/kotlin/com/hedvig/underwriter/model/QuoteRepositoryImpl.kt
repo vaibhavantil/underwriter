@@ -5,10 +5,8 @@ import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.inTransactionUnchecked
 import org.jdbi.v3.sqlobject.kotlin.attach
 import org.springframework.stereotype.Component
-import java.lang.IllegalArgumentException
 import java.time.Instant
 import java.util.UUID
-import kotlin.reflect.KClass
 
 @Component
 class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
@@ -148,22 +146,25 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         }
     }
 
-    override fun findQuotesByAddress(street: String, zipCode: String, type: KClass<*>): List<Quote> = jdbi.inTransaction<List<Quote>, RuntimeException> { h ->
-        val dao = h.attach<QuoteDao>()
+    override fun findQuotesByAddress(street: String, zipCode: String, type: QuoteData): List<Quote> {
+        return jdbi.inTransaction<List<Quote>, RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+            val quoteDatas =
+                when (type) {
+                    is SwedishApartmentData -> dao.findQuoteIdsBySwedishApartmentDataAddress(street, zipCode)
+                    is SwedishHouseData -> dao.findQuoteIdsBySwedishHouseDataAddress(street, zipCode)
+                    is NorwegianHomeContentsData -> dao.findQuoteIdsByNorwegianHomeContentsDataAddress(
+                        street,
+                        zipCode
+                    )
+                    is NorwegianTravelData -> emptyList()
+                    is DanishHomeContentsData -> dao.findQuoteIdsByDanishHomeContentsDataAddress(street, zipCode)
+                    is DanishAccidentData -> dao.findQuoteIdsByDanishAccidentDataAddress(street, zipCode)
+                    is DanishTravelData -> dao.findQuoteIdsByDanishTravelDataAddress(street, zipCode)
+                }
 
-        val quoteDatas =
-            when (type) {
-                SwedishApartmentData::class -> dao.findQuoteIdsBySwedishApartmentDataAddress(street, zipCode)
-                SwedishHouseData::class -> dao.findQuoteIdsBySwedishHouseDataAddress(street, zipCode)
-                NorwegianHomeContentsData::class -> dao.findQuoteIdsByNorwegianHomeContentsDataAddress(street, zipCode)
-                NorwegianTravelData::class -> emptyList()
-                DanishHomeContentsData::class -> dao.findQuoteIdsByDanishHomeContentsDataAddress(street, zipCode)
-                DanishAccidentData::class -> dao.findQuoteIdsByDanishAccidentDataAddress(street, zipCode)
-                DanishTravelData::class -> dao.findQuoteIdsByDanishTravelDataAddress(street, zipCode)
-                else -> throw IllegalArgumentException("Not supported")
-            }
-
-        findQuotes(quoteDatas, h)
+            findQuotes(quoteDatas, h)
+        }
     }
 
     private fun update(updatedQuote: Quote, timestamp: Instant, h: Handle) {
