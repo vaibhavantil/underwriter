@@ -60,6 +60,9 @@ graphql:
   servlet:
     exception-handlers-enabled: true
 
+features:
+  block-requoting: true
+
 ---
 spring:
   profiles: test, development
@@ -68,6 +71,3 @@ spring:
 
 hedvig:
   notification-service.url: http://localhost:4087
-
-features:
-  block-requoting: true
