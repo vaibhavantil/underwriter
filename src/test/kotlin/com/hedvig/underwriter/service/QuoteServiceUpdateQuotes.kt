@@ -26,7 +26,7 @@ class QuoteServiceUpdateQuotes {
 
         val quoteStrategyService = mockk<QuoteStrategyService>(relaxed = true)
         val cut = QuoteServiceImpl(
-            UnderwriterImpl(priceEngine, quoteStrategyService, mockk(relaxed = true)),
+            UnderwriterImpl(priceEngine, quoteStrategyService, mockk(relaxed = true), mockk(), mockk()),
             mockk(relaxed = true),
             mockk(relaxed = true),
             quoteRepository,

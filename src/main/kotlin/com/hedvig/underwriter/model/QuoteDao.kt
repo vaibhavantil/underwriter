@@ -67,7 +67,7 @@ interface QuoteDao {
                 :signFromHopeTriggeredBy
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("id")
     fun insert(@BindBean quote: DatabaseQuoteRevision, @Bind timestamp: Instant): DatabaseQuoteRevision
@@ -127,6 +127,90 @@ interface QuoteDao {
 
     @SqlQuery("""SELECT * FROM quote_revision_apartment_data WHERE internal_id = :id""")
     fun findApartmentQuoteData(@Bind id: Int): SwedishApartmentData?
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_apartment_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_apartment_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsBySwedishApartmentDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_house_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_house_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsBySwedishHouseDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_norwegian_home_contents_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_norwegian_home_contents_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsByNorwegianHomeContentsDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_home_contents_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_home_contents_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsByDanishHomeContentsDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_accident_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_accident_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsByDanishAccidentDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
+
+    @SqlQuery(
+        """
+            SELECT DISTINCT
+            qr.master_quote_id
+            FROM quote_revision_danish_travel_data qrd
+            INNER JOIN quote_revisions qr
+            ON qrd.internal_id = qr.quote_danish_travel_data_id
+            WHERE 
+            qrd.street = :street
+            AND qrd.zip_code = :zipCode
+        """
+    )
+    fun findQuoteIdsByDanishTravelDataAddress(@Bind street: String, @Bind zipCode: String): List<UUID>
 
     @SqlQuery(
         """
@@ -212,15 +296,15 @@ interface QuoteDao {
                 :floor
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: SwedishHouseData): SwedishHouseData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_house_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_house_data WHERE internal_id = :id
+        """
     )
     fun findHouseQuoteData(@Bind id: Int): SwedishHouseData?
 
@@ -261,15 +345,15 @@ interface QuoteDao {
                 :isYouth
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: NorwegianHomeContentsData): NorwegianHomeContentsData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_norwegian_home_contents_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_norwegian_home_contents_data WHERE internal_id = :id
+        """
     )
     fun findNorwegianHomeContentsQuoteData(@Bind id: Int): NorwegianHomeContentsData?
 
@@ -300,15 +384,15 @@ interface QuoteDao {
                 :isYouth
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: NorwegianTravelData): NorwegianTravelData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_norwegian_travel_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_norwegian_travel_data WHERE internal_id = :id
+        """
     )
     fun findNorwegianTravelQuoteData(@Bind id: Int): NorwegianTravelData?
 
@@ -347,15 +431,15 @@ interface QuoteDao {
                 :type
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: DanishHomeContentsData): DanishHomeContentsData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_danish_home_contents_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_danish_home_contents_data WHERE internal_id = :id
+        """
     )
     fun findDanishHomeContentsQuoteData(@Bind id: Int): DanishHomeContentsData?
 
@@ -390,15 +474,15 @@ interface QuoteDao {
                 :isStudent
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: DanishAccidentData): DanishAccidentData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_danish_accident_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_danish_accident_data WHERE internal_id = :id
+        """
     )
     fun findDanishAccidentQuoteData(@Bind id: Int): DanishAccidentData?
 
@@ -433,22 +517,22 @@ interface QuoteDao {
                 :isStudent
             )
             RETURNING *
-    """
+        """
     )
     @GetGeneratedKeys("internal_id")
     fun insert(@BindBean data: DanishTravelData): DanishTravelData
 
     @SqlQuery(
         """
-        SELECT * FROM quote_revision_danish_travel_data WHERE internal_id = :id
-    """
+            SELECT * FROM quote_revision_danish_travel_data WHERE internal_id = :id
+        """
     )
     fun findDanishTravelQuoteData(@Bind id: Int): DanishTravelData?
 
     @SqlUpdate(
         """
-        INSERT INTO master_quotes (id, initiated_from, created_at) VALUES (:quoteId, :initiatedFrom, :createdAt)
-    """
+            INSERT INTO master_quotes (id, initiated_from, created_at) VALUES (:quoteId, :initiatedFrom, :createdAt)
+        """
     )
     fun insertMasterQuote(
         @Bind quoteId: UUID,
@@ -458,7 +542,7 @@ interface QuoteDao {
 
     @SqlQuery(
         """
-        SELECT
+            SELECT
             DISTINCT ON (qr.master_quote_id)
 
             qr.*, 
@@ -473,7 +557,7 @@ interface QuoteDao {
             --remove the _agreement_id check_ below once this is fixed.
             WHERE (qr.contract_id = :contractId OR qr.agreement_id = :contractId) AND qr.originating_product_id IS NULL
             ORDER BY qr.master_quote_id ASC, qr.id DESC
-    """
+        """
     )
     fun findByContractId(@Bind contractId: UUID): DatabaseQuoteRevision?
 }

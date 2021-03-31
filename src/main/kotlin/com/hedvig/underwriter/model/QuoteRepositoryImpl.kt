@@ -146,6 +146,27 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         }
     }
 
+    override fun findQuotesByAddress(street: String, zipCode: String, type: QuoteData): List<Quote> {
+        return jdbi.inTransaction<List<Quote>, RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+            val quoteDatas =
+                when (type) {
+                    is SwedishApartmentData -> dao.findQuoteIdsBySwedishApartmentDataAddress(street, zipCode)
+                    is SwedishHouseData -> dao.findQuoteIdsBySwedishHouseDataAddress(street, zipCode)
+                    is NorwegianHomeContentsData -> dao.findQuoteIdsByNorwegianHomeContentsDataAddress(
+                        street,
+                        zipCode
+                    )
+                    is NorwegianTravelData -> emptyList()
+                    is DanishHomeContentsData -> dao.findQuoteIdsByDanishHomeContentsDataAddress(street, zipCode)
+                    is DanishAccidentData -> dao.findQuoteIdsByDanishAccidentDataAddress(street, zipCode)
+                    is DanishTravelData -> dao.findQuoteIdsByDanishTravelDataAddress(street, zipCode)
+                }
+
+            findQuotes(quoteDatas, h)
+        }
+    }
+
     private fun update(updatedQuote: Quote, timestamp: Instant, h: Handle) {
         val dao = h.attach<QuoteDao>()
         val quoteData: QuoteData = when (updatedQuote.data) {

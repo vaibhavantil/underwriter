@@ -4,5 +4,11 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  profiles:
+    active: development
+
 graphcms.project: Underwriter
 graphcms.url: empty
+
+features:
+  block-requoting: true
