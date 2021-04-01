@@ -2,10 +2,10 @@
 FROM maven:3.6.3-amazoncorretto-11 AS dependencies
 WORKDIR /usr/app
 
-ARG GITHUB_USERNAME
+ARG GITHUB_USER
 ARG GITHUB_TOKEN
 
-ENV MAVEN_OPTS="-Dmaven.repo.local=/usr/share/maven/ref/repository -DGITHUB_USERNAME=$GITHUB_USERNAME -DGITHUB_TOKEN=$GITHUB_TOKEN"
+ENV MAVEN_OPTS="-Dmaven.repo.local=/usr/share/maven/ref/repository -DGITHUB_USERNAME=$GITHUB_USER -DGITHUB_TOKEN=$GITHUB_TOKEN"
 
 # Set up the user runninqg the tests (needed for embedded postgres)
 RUN yum -y install python3 \
