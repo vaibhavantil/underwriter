@@ -8,7 +8,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
-data class DanishHomeContentsQuoteRequestBuilder(
+data class DanishTravelQuoteRequestBuilder(
     val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
     val firstName: String = "",
     val lastName: String = "",
@@ -21,7 +21,7 @@ data class DanishHomeContentsQuoteRequestBuilder(
     val startDate: Instant? = Instant.now(),
     val dataCollectionId: UUID? = null,
     val currentInsurer: String? = null,
-    val data: DataBuilder<QuoteRequestData.DanishHomeContents> = DanishHomeContentsQuoteRequestDataBuilder(),
+    val data: DataBuilder<QuoteRequestData.DanishTravel> = DanishTravelQuoteRequestDataBuilder(),
     val productType: ProductType? = ProductType.APARTMENT
 ) : DataBuilder<QuoteRequest> {
     override fun build(): QuoteRequest = QuoteRequest(
