@@ -5,7 +5,7 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 object StartSignErrors {
 
     val memberIsAlreadySigned = StartSignResponse.FailedToStartSign(
-        "provided member id is already signed",
+        "An error occurred: Unable to sign member",
         "MEMBER_IS_ALREADY_SIGNED"
     )
 
