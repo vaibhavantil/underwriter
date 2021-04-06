@@ -24,7 +24,6 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResp
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import com.ninjasquad.springmockk.MockkBean
-import com.ninjasquad.springmockk.isMock
 import io.mockk.every
 import io.mockk.verify
 import org.javamoney.moneta.Money

@@ -78,7 +78,7 @@ sealed class QuoteDetails {
         val apartment: String?,
         val floor: String?,
         val zipCode: String,
-        val city: String,
+        val city: String?,
         @Masked val bbrId: String?,
         val coInsured: Int,
         val livingSpace: Int,

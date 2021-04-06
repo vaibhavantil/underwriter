@@ -183,6 +183,5 @@ internal class QuoteControllerTest {
 
     @Test
     fun `creates DanishHomeContentQuote`() {
-
     }
 }

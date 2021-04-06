@@ -75,6 +75,7 @@ mutation {
                     street
                     apartment
                     floor
+                    city
                     zipCode
                     bbrId
                     livingSpace

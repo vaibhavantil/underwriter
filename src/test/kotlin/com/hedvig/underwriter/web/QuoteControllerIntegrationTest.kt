@@ -8,7 +8,6 @@ import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.QuoteService
-import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
@@ -18,7 +17,6 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
-import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
@@ -37,7 +35,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import java.util.UUID
-import javax.money.MonetaryAmount
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -127,14 +124,14 @@ class QuoteControllerIntegrationTest {
 
     @Test
     fun `will this work`() {
-        val homeContentsData =  DanishHomeContentsQuoteRequestDataBuilder().build(
+        val homeContentsData = DanishHomeContentsQuoteRequestDataBuilder().build(
             newStreet = "test street",
             newApartment = "4"
         )
 
         val quoteRequest = DanishHomeContentsQuoteRequestBuilder().build(homeContentsData)
 
-        every { priceEngineService.queryDanishHomeContentPrice(any() ) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(999, "SEK"))
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(999, "SEK"))
 
         quoteService.createQuote(
             quoteRequest = quoteRequest,

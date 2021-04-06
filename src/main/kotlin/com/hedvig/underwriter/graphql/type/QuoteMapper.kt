@@ -367,6 +367,7 @@ class QuoteMapper(
                 apartment = it.apartment,
                 floor = it.floor,
                 zipCode = it.zipCode,
+                city = it.city,
                 bbrId = it.bbrId,
                 coInsured = it.coInsured,
                 livingSpace = it.livingSpace,
