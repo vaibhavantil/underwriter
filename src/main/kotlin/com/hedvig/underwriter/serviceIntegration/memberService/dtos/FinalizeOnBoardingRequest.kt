@@ -33,8 +33,8 @@ class FinalizeOnBoardingRequest(
                         street = addressInsurance.street!!,
                         city = addressInsurance.city ?: "",
                         zipCode = addressInsurance.zipCode!!,
-                        apartmentNo = if(addressInsurance is DanishHomeContentAddressData) addressInsurance.apartment ?: "" else "",
-                        floor = if(addressInsurance is DanishHomeContentAddressData) addressInsurance.floor?.toInt() ?: 0 else 0
+                        apartmentNo = if (addressInsurance is DanishHomeContentAddressData) addressInsurance.apartment ?: "" else "",
+                        floor = if (addressInsurance is DanishHomeContentAddressData) addressInsurance.floor?.toInt() ?: 0 else 0
                     )
                 }
 
