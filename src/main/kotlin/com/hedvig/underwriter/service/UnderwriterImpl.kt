@@ -165,7 +165,7 @@ class UnderwriterImpl(
         val guidelineErrors = mutableListOf<BreachedGuidelineCode>()
 
         for (rule in listOfRules) {
-            val error = rule.invokeValidate(data)
+            val error = rule.validate(data)
             if (error != null) {
                 guidelineErrors.add(error)
                 if (rule.skipAfter) {

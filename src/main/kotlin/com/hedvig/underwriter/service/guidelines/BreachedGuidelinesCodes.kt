@@ -3,6 +3,8 @@ package com.hedvig.underwriter.service.guidelines
 typealias BreachedGuidelineCode = String
 
 object BreachedGuidelinesCodes {
+    val OK = null
+
     const val INVALID_SSN = "INVALID_SSN"
     const val INVALID_SSN_LENGTH = "INVALID_SSN_LENGTH"
     const val SSN_DOES_NOT_MATCH_BIRTH_DATE = "SSN_DOES_NOT_MATCH_BIRTH_DATE"

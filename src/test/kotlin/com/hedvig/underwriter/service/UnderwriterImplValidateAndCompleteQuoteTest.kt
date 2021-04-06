@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.testhelp.databuilder.QB
 import io.mockk.every
@@ -87,37 +88,43 @@ class UnderwriterImplValidateAndCompleteQuoteTest {
 }
 
 private object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
-    override val breachedGuideline = this::class.simpleName!!
+    val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
         get() = false
 
-    override val validate: (QuoteData) -> Boolean = { true }
+    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+        return breachedGuideline
+    }
 }
 
 private object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
-    override val breachedGuideline = this::class.simpleName!!
+    val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
         get() = true
 
-    override val validate: (QuoteData) -> Boolean = { true }
+    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+        return breachedGuideline
+    }
 }
 
 private object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
-    override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
         get() = true
 
-    override val validate: (QuoteData) -> Boolean = { false }
+    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+        return null
+    }
 }
 
 private object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
-    override val breachedGuideline = this::class.simpleName!!
 
     override val skipAfter: Boolean
         get() = false
 
-    override val validate: (QuoteData) -> Boolean = { false }
+    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+        return null
+    }
 }
