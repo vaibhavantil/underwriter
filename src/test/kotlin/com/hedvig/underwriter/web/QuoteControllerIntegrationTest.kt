@@ -3,8 +3,10 @@ package com.hedvig.underwriter.web
 import arrow.core.Right
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.DebtChecker
 import com.hedvig.underwriter.service.QuoteService
@@ -20,6 +22,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Cr
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
+import com.hedvig.underwriter.util.logging.Masked
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify
@@ -123,10 +126,12 @@ class QuoteControllerIntegrationTest {
     }
 
     @Test
-    fun `will this work`() {
+    fun `creates, saves and retrieves danish home content quote properly`() {
         val homeContentsData = DanishHomeContentsQuoteRequestDataBuilder().build(
             newStreet = "test street",
-            newApartment = "4"
+            newApartment = "4",
+            newZipCode = "123",
+            newBbrId = "12345"
         )
 
         val quoteRequest = DanishHomeContentsQuoteRequestBuilder().build(homeContentsData)
@@ -139,7 +144,15 @@ class QuoteControllerIntegrationTest {
             underwritingGuidelinesBypassedBy = null,
             updateMemberService = false
         )
-
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).livingSpace).isEqualTo(2)
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).coInsured).isEqualTo(3)
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).isStudent).isEqualTo(false)
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).type).isEqualTo(DanishHomeContentsType.RENT)
         assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).street).isEqualTo("test street")
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).apartment).isEqualTo("4")
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).zipCode).isEqualTo("123")
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).city).isEqualTo("city")
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).floor).isEqualTo("2")
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).bbrId).isEqualTo("12345")
     }
 }
