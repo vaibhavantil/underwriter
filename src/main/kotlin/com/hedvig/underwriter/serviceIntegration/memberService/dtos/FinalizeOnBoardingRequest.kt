@@ -8,6 +8,7 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.phoneNumber
 import com.hedvig.underwriter.model.ssnMaybe
+import java.lang.NumberFormatException
 import java.time.LocalDate
 
 class FinalizeOnBoardingRequest(
@@ -34,7 +35,7 @@ class FinalizeOnBoardingRequest(
                         city = addressInsurance.city ?: "",
                         zipCode = addressInsurance.zipCode!!,
                         apartmentNo = if (addressInsurance is DanishHomeContentAddressData) addressInsurance.apartment ?: "" else "",
-                        floor = if (addressInsurance is DanishHomeContentAddressData) addressInsurance.floor?.toInt() ?: 0 else 0
+                        floor = if (addressInsurance is DanishHomeContentAddressData) getFloorAsIntegerFromString(addressInsurance.floor) else 0
                     )
                 }
 
@@ -48,6 +49,16 @@ class FinalizeOnBoardingRequest(
                 address = address,
                 birthDate = quote.birthDate
             )
+        }
+
+        private fun getFloorAsIntegerFromString(floor: String?): Int {
+            if(floor == null) return 0
+
+            return try {
+                floor.toInt()
+            } catch (exception: NumberFormatException) {
+                0
+            }
         }
     }
 }
