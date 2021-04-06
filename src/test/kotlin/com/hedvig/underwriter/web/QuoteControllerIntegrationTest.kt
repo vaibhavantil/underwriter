@@ -3,7 +3,6 @@ package com.hedvig.underwriter.web
 import arrow.core.Right
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishHomeContentsType
@@ -22,7 +21,6 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.Cr
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
-import com.hedvig.underwriter.util.logging.Masked
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import io.mockk.verify

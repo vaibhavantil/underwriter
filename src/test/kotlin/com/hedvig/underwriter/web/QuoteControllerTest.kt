@@ -180,8 +180,4 @@ internal class QuoteControllerTest {
             )
             .andExpect(status().is4xxClientError)
     }
-
-    @Test
-    fun `creates DanishHomeContentQuote`() {
-    }
 }
