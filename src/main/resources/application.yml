@@ -63,6 +63,9 @@ graphql:
   servlet:
     exception-handlers-enabled: true
 
+features:
+  block-requoting: false
+
 ---
 spring:
   profiles: test, development
