@@ -75,7 +75,9 @@ internal class FinalizeOnBoardingInMemberServiceTest {
             memberId = "1337"
             data = DanishHomeContentsDataBuilder(
                 phoneNumber = "123456",
-                email = "someemail@hotmail.com"
+                email = "someemail@hotmail.com",
+                floor = "5",
+                apartment = "2 th"
             )
         }
 
@@ -83,5 +85,7 @@ internal class FinalizeOnBoardingInMemberServiceTest {
 
         assertThat(x.captured.email).isEqualTo("someemail@hotmail.com")
         assertThat(x.captured.phoneNumber).isEqualTo("123456")
+        assertThat(x.captured.address?.floor).isEqualTo(5)
+        assertThat(x.captured.address?.apartmentNo).isEqualTo("2 th")
     }
 }

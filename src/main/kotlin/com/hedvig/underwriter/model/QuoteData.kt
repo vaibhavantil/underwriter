@@ -173,7 +173,7 @@ data class DanishHomeContentsData(
     @Masked override val phoneNumber: String? = null,
     @Masked override val street: String,
     override val zipCode: String,
-    override val bbrId: String? = null,
+    @Masked override val bbrId: String? = null,
     override val city: String?,
     override val apartment: String?,
     override val floor: String?,
