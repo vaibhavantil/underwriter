@@ -83,6 +83,11 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.DanishHomeContent -> QuoteRequestData.DanishHomeContents(
         street = this.address.street,
         zipCode = this.address.postalCode,
+        city = this.address.city,
+        apartment = null,
+        floor = null,
+//        apartment = this.address.apartment,
+//        floor = this.address.floor,
         bbrId = null,
         coInsured = this.numberCoInsured,
         livingSpace = this.squareMeters.toInt(),

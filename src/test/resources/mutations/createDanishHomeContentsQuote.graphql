@@ -8,6 +8,9 @@ mutation {
         danishHomeContents: {
             street: "Kungsgatan 2"
             livingSpace: 30
+            apartment: "1"
+            floor: "4"
+            city: "testCity"
             zipCode: "1234"
             bbrId: "123"
             coInsured: 0
@@ -70,6 +73,8 @@ mutation {
                 ... on DanishHomeContentsDetails {
                     coInsured
                     street
+                    apartment
+                    floor
                     zipCode
                     bbrId
                     livingSpace

@@ -206,7 +206,7 @@ class QuoteTest {
             newBbrId = "5455"
         )
         val updatedQuote = quote.update(
-            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData)
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("5455")
@@ -228,11 +228,10 @@ class QuoteTest {
 
         val danishHomeContentsQuoteData = DanishHomeContentsQuoteRequestDataBuilder().build(
             newStreet = "new street",
-            newZipCode = null,
             newBbrId = null
         )
         val updatedQuote = quote.update(
-            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData)
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as DanishHomeContentsData).zipCode).isEqualTo((quote.data as DanishHomeContentsData).zipCode)
@@ -259,7 +258,7 @@ class QuoteTest {
             newBbrId = "6554"
         )
         val updatedQuote = quote.update(
-            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData, ssn = null)
+            DanishHomeContentsQuoteRequestBuilder().build(homeContentsData = danishHomeContentsQuoteData)
         )
         assertThat(updatedQuote.id).isEqualTo(quote.id)
         assertThat((updatedQuote.data as DanishHomeContentsData).bbrId).isEqualTo("6554")

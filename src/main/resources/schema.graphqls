@@ -63,6 +63,9 @@ input CreateDanishHomeContentsInput {
     street: String!
     zipCode: String!
     bbrId: String
+    apartment: String
+    floor: String
+    city: String
     livingSpace: Int!
     coInsured: Int!
     isStudent: Boolean!
@@ -200,6 +203,8 @@ input EditNorwegianHomeContentsInput {
 
 input EditDanishHomeContentsInput {
     street: String
+    apartment: String
+    floor: String
     zipCode: String
     bbrId: String
     coInsured: Int
@@ -515,6 +520,8 @@ type NorwegianTravelDetails {
 type DanishHomeContentsDetails {
     street: String!
     zipCode: String!
+    apartment: String
+    floor: String
     bbrId: String
     livingSpace: Int!
     coInsured: Int!

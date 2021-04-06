@@ -149,6 +149,7 @@ sealed class PriceQueryRequest {
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
+
                 bbrId = data.bbrId,
                 postalCode = data.zipCode,
                 squareMeters = data.livingSpace

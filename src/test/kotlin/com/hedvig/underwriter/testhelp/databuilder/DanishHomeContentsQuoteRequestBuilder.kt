@@ -12,11 +12,11 @@ data class DanishHomeContentsQuoteRequestBuilder(
     val id: UUID = UUID.fromString("ab5924e4-0c72-11ea-a337-4865ee119be4"),
     val firstName: String = "",
     val lastName: String = "",
-    val ssn: String? = "28026400734",
+    val ssn: String? = "2802640073",
     val birthDate: LocalDate = LocalDate.of(1964, 2, 28),
     val email: String = "em@i.l",
     val quotingPartner: Partner = Partner.HEDVIG,
-    val memberId: String? = null,
+    val memberId: String? = "123",
     val originatingProductId: UUID? = null,
     val startDate: Instant? = Instant.now(),
     val dataCollectionId: UUID? = null,
@@ -41,14 +41,14 @@ data class DanishHomeContentsQuoteRequestBuilder(
         dataCollectionId = dataCollectionId
     )
 
-    fun build(homeContentsData: QuoteRequestData.DanishHomeContents?, ssn: String?): QuoteRequest = QuoteRequest(
+    fun build(homeContentsData: QuoteRequestData.DanishHomeContents?, newSsn: String? = null): QuoteRequest = QuoteRequest(
         firstName = firstName,
         lastName = lastName,
         email = email,
         phoneNumber = null,
         currentInsurer = currentInsurer,
         birthDate = birthDate,
-        ssn = ssn,
+        ssn = newSsn ?: ssn,
         quotingPartner = quotingPartner,
         productType = productType,
         incompleteQuoteData = homeContentsData ?: data.build(),

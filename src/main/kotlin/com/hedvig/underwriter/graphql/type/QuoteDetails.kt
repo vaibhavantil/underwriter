@@ -75,7 +75,10 @@ sealed class QuoteDetails {
 
     data class DanishHomeContentsDetails(
         @Masked val street: String,
+        val apartment: String?,
+        val floor: String?,
         val zipCode: String,
+        val city: String,
         @Masked val bbrId: String?,
         val coInsured: Int,
         val livingSpace: Int,

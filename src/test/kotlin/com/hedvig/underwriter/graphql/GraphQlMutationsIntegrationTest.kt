@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.graphql
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
@@ -22,6 +24,7 @@ import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResp
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.testhelp.databuilder.SwedishApartmentQuoteRequestBuilder
 import com.ninjasquad.springmockk.MockkBean
+import com.ninjasquad.springmockk.isMock
 import io.mockk.every
 import io.mockk.verify
 import org.javamoney.moneta.Money
@@ -384,7 +387,9 @@ internal class GraphQlMutationsIntegrationTest {
         assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
-        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["apartment"].textValue()).isEqualTo("1")
+        assertThat(createQuote["quoteDetails"]["floor"].textValue()).isEqualTo("4")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)

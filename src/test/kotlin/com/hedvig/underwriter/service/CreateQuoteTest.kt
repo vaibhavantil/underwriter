@@ -71,7 +71,7 @@ class CreateQuoteTest {
         )
         every { quoteRepository.insert(any(), any()) } returns Unit
 
-        val result = cut.createQuote(request, UUID.randomUUID(), QuoteInitiatedFrom.ANDROID, null, true)
+        val result = cut.createQuote(request, UUID.randomUUID(), QuoteInitiatedFrom.ANDROID, null, false)
         assertThat(result).isInstanceOf(Either.Right.right().javaClass)
 
         verify(exactly = 1) {
