@@ -52,7 +52,7 @@ class FinalizeOnBoardingRequest(
         }
 
         private fun getFloorAsIntegerFromString(floor: String?): Int {
-            if(floor == null) return 0
+            if (floor == null) return 0
 
             return try {
                 floor.toInt()
