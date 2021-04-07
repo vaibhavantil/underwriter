@@ -114,7 +114,7 @@ sealed class QuoteSchema {
         @JsonSchema(title = "City", required = false)
         val city: String?,
         @JsonSchema(title = "BbrId", required = false)
-        val bbrId: String?,
+        @Masked val bbrId: String?,
         @JsonSchema(title = "Living Space", required = true, min = 0.0)
         val livingSpace: Int,
         @JsonSchema(title = "Number Co-Insured", required = true, min = 0.0)

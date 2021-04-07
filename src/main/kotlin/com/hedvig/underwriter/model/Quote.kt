@@ -446,8 +446,11 @@ data class Quote(
                     else -> throw IllegalTypeChangeOnQuote(newQuote.data, requestData)
                 }
 
-                val addressInfoHasNotChanged = requestData.street == null && requestData.zipCode == null &&
-                    requestData.apartment == null && requestData.floor == null
+                val addressInfoHasNotChanged =
+                    requestData.street == null &&
+                    requestData.zipCode == null &&
+                    requestData.apartment == null &&
+                    requestData.floor == null
 
                 newQuote.copy(
                     data = newQuoteData.copy(
