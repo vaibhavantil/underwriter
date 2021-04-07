@@ -8,7 +8,6 @@ import com.hedvig.underwriter.model.firstName
 import com.hedvig.underwriter.model.lastName
 import com.hedvig.underwriter.model.phoneNumber
 import com.hedvig.underwriter.model.ssnMaybe
-import java.lang.NumberFormatException
 import java.time.LocalDate
 
 class FinalizeOnBoardingRequest(
