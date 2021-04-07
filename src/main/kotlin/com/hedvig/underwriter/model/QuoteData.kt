@@ -188,10 +188,11 @@ data class DanishHomeContentsData(
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
     override fun updateSsn(ssn: String) =
-        if (ssn.isValidDanishSsn())
+        if (ssn.isValidDanishSsn()) {
             this.copy(ssn = ssn)
-        else
+        } else {
             throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -223,10 +224,11 @@ data class DanishAccidentData(
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
     override fun updateSsn(ssn: String) =
-        if (ssn.isValidDanishSsn())
+        if (ssn.isValidDanishSsn()) {
             this.copy(ssn = ssn)
-        else
+        } else {
             throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -258,10 +260,11 @@ data class DanishTravelData(
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
     override fun updateSsn(ssn: String) =
-        if (ssn.isValidDanishSsn())
+        if (ssn.isValidDanishSsn()) {
             this.copy(ssn = ssn)
-        else
+        } else {
             throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {

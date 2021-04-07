@@ -23,7 +23,7 @@ object SwedishApartmentGuidelines {
 
 object SwedishApartmentHouseHoldGuideline : BaseGuideline<SwedishApartmentData> {
 
-    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode {
         if (data.householdSize!! < 1) {
             return TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
         }
@@ -42,7 +42,7 @@ object SwedishApartmentHouseHoldGuideline : BaseGuideline<SwedishApartmentData> 
 
 object SwedishApartmentLivingSpaceGuideline : BaseGuideline<SwedishApartmentData> {
 
-    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode {
         if (data.livingSpace!! < 1) {
             return TOO_SMALL_LIVING_SPACE
         }
@@ -61,7 +61,7 @@ object SwedishApartmentLivingSpaceGuideline : BaseGuideline<SwedishApartmentData
 
 object SwedishStudentApartmentAgeNotMoreThan30Years : BaseGuideline<SwedishApartmentData> {
 
-    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishApartmentData): BreachedGuidelineCode {
         if (data.isStudent && data.ssn!!.birthDateFromSwedishSsn().until(LocalDate.now(), ChronoUnit.YEARS) > 30) {
             return STUDENT_OVERAGE
         }

@@ -22,7 +22,7 @@ object DanishAgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
         if ((data as PersonPolicyHolder<*>).age() < 18) {
             return UNDERAGE
         }
@@ -33,7 +33,7 @@ object DanishAgeRestrictionGuideline : BaseGuideline<QuoteData> {
 
 object DanishSsnIsValid : BaseGuideline<QuoteData> {
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
 
         val ssn = (data as PersonPolicyHolder<*>).ssn
 
@@ -47,7 +47,7 @@ object DanishSsnIsValid : BaseGuideline<QuoteData> {
 
 object DanishSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
 
         val ssn = (data as PersonPolicyHolder<*>).ssn
         val birthdate = data.birthDate

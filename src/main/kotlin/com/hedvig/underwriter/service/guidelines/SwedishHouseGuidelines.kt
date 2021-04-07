@@ -28,7 +28,7 @@ object SwedishHouseGuidelines {
 
 object SwedishHouseHouseholdSizeGuideline : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.householdSize!! < 1) {
             return TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE
         }
@@ -43,7 +43,7 @@ object SwedishHouseHouseholdSizeGuideline : SwedishHouseGuideline {
 
 object SwedishHouseLivingSpaceGuideline : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.livingSpace!! < 1) {
             return TOO_SMALL_LIVING_SPACE
         }
@@ -58,7 +58,7 @@ object SwedishHouseLivingSpaceGuideline : SwedishHouseGuideline {
 
 object SwedishHouseYearOfConstruction : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.yearOfConstruction!! < 1925) {
             return TOO_EARLY_YEAR_OF_CONSTRUCTION
         }
@@ -69,7 +69,7 @@ object SwedishHouseYearOfConstruction : SwedishHouseGuideline {
 
 object SwedishHouseNumberOfBathrooms : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.numberOfBathrooms!! > 2) {
             return TOO_MANY_BATHROOMS
         }
@@ -80,7 +80,7 @@ object SwedishHouseNumberOfBathrooms : SwedishHouseGuideline {
 
 object SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.extraBuildings!!.filter { building -> building.area > 6 }.size > 4) {
             return TOO_MANY_EXTRA_BUILDINGS
         }
@@ -91,7 +91,7 @@ object SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm : SwedishHouseGuidel
 
 object SwedishHouseExtraBuildingsSizeNotOverThan75Sqm : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.extraBuildings!!.any { building -> building.area > 75 }) {
             return TOO_BIG_EXTRA_BUILDING_SIZE
         }
@@ -102,7 +102,7 @@ object SwedishHouseExtraBuildingsSizeNotOverThan75Sqm : SwedishHouseGuideline {
 
 object SwedishHouseExtraBuildingsSizeAtLeast1Sqm : SwedishHouseGuideline {
 
-    override fun validate(data: SwedishHouseData): BreachedGuidelineCode? {
+    override fun validate(data: SwedishHouseData): BreachedGuidelineCode {
         if (data.extraBuildings!!.any { building -> building.area < 1 }) {
             return TOO_SMALL_EXTRA_BUILDING_SIZE
         }

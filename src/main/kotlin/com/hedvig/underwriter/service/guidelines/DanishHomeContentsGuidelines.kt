@@ -18,7 +18,7 @@ object DanishHomeContentsGuidelines {
 }
 
 object DanishHomeContentCoInsuredGuideline : BaseGuideline<DanishHomeContentsData> {
-    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode? {
+    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode {
         if (data.coInsured < 0) {
             return NEGATIVE_NUMBER_OF_CO_INSURED
         }
@@ -36,7 +36,7 @@ object DanishHomeContentCoInsuredGuideline : BaseGuideline<DanishHomeContentsDat
 }
 
 object DanishHomeContentLivingSpaceGuideline : BaseGuideline<DanishHomeContentsData> {
-    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode? {
+    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode {
         if (data.livingSpace < 5) {
             return TOO_SMALL_LIVING_SPACE
         }
@@ -57,7 +57,7 @@ object DanishHomeContentLivingSpaceGuideline : BaseGuideline<DanishHomeContentsD
 
 object DanisHomeContentStudentAgeGuideline : BaseGuideline<DanishHomeContentsData> {
 
-    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode? {
+    override fun validate(data: DanishHomeContentsData): BreachedGuidelineCode {
 
         if (data.isStudent && data.age() !in 18..30) {
             return STUDENT_OVERAGE

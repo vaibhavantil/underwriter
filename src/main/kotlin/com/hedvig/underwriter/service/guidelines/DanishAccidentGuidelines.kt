@@ -14,7 +14,7 @@ object DanishAccidentGuidelines {
 }
 
 object DanishAccidentCoInsuredGuideline : BaseGuideline<DanishAccidentData> {
-    override fun validate(data: DanishAccidentData): BreachedGuidelineCode? {
+    override fun validate(data: DanishAccidentData): BreachedGuidelineCode {
         if (data.coInsured < 0) {
             return NEGATIVE_NUMBER_OF_CO_INSURED
         }
@@ -33,7 +33,7 @@ object DanishAccidentCoInsuredGuideline : BaseGuideline<DanishAccidentData> {
 
 object DanisAccidentStudentAgeGuideline : BaseGuideline<DanishAccidentData> {
 
-    override fun validate(data: DanishAccidentData): BreachedGuidelineCode? {
+    override fun validate(data: DanishAccidentData): BreachedGuidelineCode {
 
         if (data.isStudent && data.age() !in 18..30) {
             return STUDENT_OVERAGE

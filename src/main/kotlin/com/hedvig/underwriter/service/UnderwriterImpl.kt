@@ -16,6 +16,7 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.OK
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
@@ -166,7 +167,7 @@ class UnderwriterImpl(
 
         for (rule in listOfRules) {
             val error = rule.validate(data)
-            if (error != null) {
+            if (error != OK) {
                 guidelineErrors.add(error)
                 if (rule.skipAfter) {
                     break

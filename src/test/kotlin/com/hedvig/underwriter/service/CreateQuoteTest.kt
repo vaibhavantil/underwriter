@@ -60,7 +60,7 @@ class CreateQuoteTest {
                 val breachedGuideline: BreachedGuidelineCode
                     get() = "errorcode"
 
-                override fun validate(data: QuoteData): BreachedGuidelineCode? {
+                override fun validate(data: QuoteData): BreachedGuidelineCode {
                     return breachedGuideline
                 }
             }

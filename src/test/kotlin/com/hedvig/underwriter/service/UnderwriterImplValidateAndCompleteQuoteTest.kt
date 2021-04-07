@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.OK
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.testhelp.databuilder.QB
 import io.mockk.every
@@ -93,7 +94,7 @@ private object FailsShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = false
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
         return breachedGuideline
     }
 }
@@ -104,7 +105,7 @@ private object FailsShouldSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
         return breachedGuideline
     }
 }
@@ -114,8 +115,8 @@ private object SuccessShouldSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
-        return null
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        return OK
     }
 }
 
@@ -124,7 +125,7 @@ private object SuccessShouldNotSkipAfter : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = false
 
-    override fun validate(data: QuoteData): BreachedGuidelineCode? {
-        return null
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        return OK
     }
 }

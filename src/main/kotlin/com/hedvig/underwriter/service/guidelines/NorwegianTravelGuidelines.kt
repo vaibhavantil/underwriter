@@ -16,7 +16,7 @@ object NorwegianTravelGuidelines {
 
 object NorwegianTravelCoInsuredGuideline : BaseGuideline<NorwegianTravelData> {
 
-    override fun validate(data: NorwegianTravelData): BreachedGuidelineCode? {
+    override fun validate(data: NorwegianTravelData): BreachedGuidelineCode {
         if (data.coInsured < 0) {
             return NEGATIVE_NUMBER_OF_CO_INSURED
         }
@@ -35,7 +35,7 @@ object NorwegianTravelCoInsuredGuideline : BaseGuideline<NorwegianTravelData> {
 
 object NorwegianYouthTravelAgeNotMoreThan30Years : BaseGuideline<NorwegianTravelData> {
 
-    override fun validate(data: NorwegianTravelData): BreachedGuidelineCode? {
+    override fun validate(data: NorwegianTravelData): BreachedGuidelineCode {
         if (data.isYouth && data.age() > 30) {
             return YOUTH_OVERAGE
         }
