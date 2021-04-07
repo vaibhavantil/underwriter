@@ -11,6 +11,7 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
@@ -351,9 +352,15 @@ internal class GraphQlMutationsIntegrationTest {
                     quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
                     holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
-                    postalCode = "1234",
+                    zipCode = "1234",
                     squareMeters = 30,
-                    bbrId = "123"
+                    bbrId = "123",
+                    apartment = "1",
+                    floor = "4",
+                    street = "Kungsgatan 2",
+                    city = "testCity",
+                    student = false,
+                    subType = DanishHomeContentsType.RENT
                 )
             )
         } returns

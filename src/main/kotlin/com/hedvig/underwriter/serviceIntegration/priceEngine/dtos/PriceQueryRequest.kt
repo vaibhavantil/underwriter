@@ -6,6 +6,7 @@ import com.hedvig.productPricingObjects.enums.NorwegianHomeContentLineOfBusiness
 import com.hedvig.productPricingObjects.enums.NorwegianTravelLineOfBusiness
 import com.hedvig.productPricingObjects.enums.SwedishApartmentLineOfBusiness
 import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.SwedishApartmentData
@@ -139,9 +140,15 @@ sealed class PriceQueryRequest {
         override val quoteId: UUID?,
         override val holderBirthDate: LocalDate,
         override val numberCoInsured: Int,
-        val postalCode: String,
         val squareMeters: Int,
-        val bbrId: String?
+        val bbrId: String?,
+        val zipCode: String,
+        val street: String,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
+        val student: Boolean,
+        val subType: DanishHomeContentsType
     ) : PriceQueryRequest() {
         companion object {
             fun from(quoteId: UUID, memberId: String?, data: DanishHomeContentsData) = DanishHomeContent(
@@ -149,9 +156,14 @@ sealed class PriceQueryRequest {
                 quoteId = quoteId,
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
-
                 bbrId = data.bbrId,
-                postalCode = data.zipCode,
+                zipCode = data.zipCode,
+                street = data.street,
+                apartment = data.apartment,
+                floor = data.floor,
+                city = data.city,
+                student = data.isStudent,
+                subType = data.type,
                 squareMeters = data.livingSpace
             )
         }
