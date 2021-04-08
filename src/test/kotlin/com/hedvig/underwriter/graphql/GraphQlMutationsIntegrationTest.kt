@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.graphql
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
@@ -9,6 +11,7 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
@@ -349,9 +352,15 @@ internal class GraphQlMutationsIntegrationTest {
                     quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
                     holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
-                    postalCode = "1234",
+                    zipCode = "1234",
                     squareMeters = 30,
-                    bbrId = "123"
+                    bbrId = "123",
+                    apartment = "1",
+                    floor = "4",
+                    street = "Kungsgatan 2",
+                    city = "testCity",
+                    student = false,
+                    subType = DanishHomeContentsType.RENT
                 )
             )
         } returns
@@ -384,7 +393,9 @@ internal class GraphQlMutationsIntegrationTest {
         assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
-        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["apartment"].textValue()).isEqualTo("1")
+        assertThat(createQuote["quoteDetails"]["floor"].textValue()).isEqualTo("4")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)

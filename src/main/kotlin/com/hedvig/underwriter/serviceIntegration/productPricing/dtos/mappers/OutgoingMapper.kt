@@ -126,42 +126,54 @@ class OutgoingMapper {
                 postalCode = data.zipCode!!,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.SE
+                country = CountryCode.SE,
+                floor = null,
+                apartment = null
             )
             is SwedishHouseData -> Address(
                 street = data.street!!,
                 postalCode = data.zipCode!!,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.SE
+                country = CountryCode.SE,
+                floor = null,
+                apartment = null
             )
             is NorwegianHomeContentsData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.NO
+                country = CountryCode.NO,
+                floor = null,
+                apartment = null
             )
             is DanishHomeContentsData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.DK
+                country = CountryCode.DK,
+                floor = data.floor,
+                apartment = data.apartment
             )
             is DanishAccidentData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.DK
+                country = CountryCode.DK,
+                floor = null,
+                apartment = null
             )
             is DanishTravelData -> Address(
                 street = data.street,
                 postalCode = data.zipCode,
                 city = data.city,
                 coLine = null,
-                country = CountryCode.DK
+                country = CountryCode.DK,
+                floor = null,
+                apartment = null
             )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
         }
