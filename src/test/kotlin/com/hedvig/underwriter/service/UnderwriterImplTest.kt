@@ -4,38 +4,16 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.ApartmentProductSubType
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
-import com.hedvig.underwriter.service.guidelines.AgeRestrictionGuideline
-import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm
-import com.hedvig.underwriter.service.guidelines.NorwegianHomeContentscoInsuredNotMoreThan5
-import com.hedvig.underwriter.service.guidelines.NorwegianSsnNotMatchesBirthDate
-import com.hedvig.underwriter.service.guidelines.NorwegianTravelCoInsuredNotMoreThan5
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsAgeNotMoreThan30Years
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsCoInsuredNotMoreThan0
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelAgeNotMoreThan30Years
-import com.hedvig.underwriter.service.guidelines.NorwegianYouthTravelCoInsuredNotMoreThan0
-import com.hedvig.underwriter.service.guidelines.PersonalDebt
-import com.hedvig.underwriter.service.guidelines.SocialSecurityNumberFormat
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeAtLeast1
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentHouseHoldSizeNotMoreThan6
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishApartmentLivingSpaceNotMoreThan250Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseExtraBuildingsSizeNotOverThan75Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeAtLeast1
-import com.hedvig.underwriter.service.guidelines.SwedishHouseHouseholdSizeNotMoreThan6
-import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceAtLeast1Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseLivingSpaceNotMoreThan250Sqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfBathrooms
-import com.hedvig.underwriter.service.guidelines.SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm
-import com.hedvig.underwriter.service.guidelines.SwedishHouseYearOfConstruction
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentAgeNotMoreThan30Years
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentHouseholdSizeNotMoreThan2
-import com.hedvig.underwriter.service.guidelines.SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
+import com.hedvig.underwriter.testhelp.databuilder.DanishAccidentQuoteRequestBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishAccidentQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishHomeContentsQuoteRequestDataBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishTravelQuoteRequestBuilder
+import com.hedvig.underwriter.testhelp.databuilder.DanishTravelQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentsQuoteRequestBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianHomeContentsQuoteRequestDataBuilder
 import com.hedvig.underwriter.testhelp.databuilder.NorwegianTravelQuoteRequestBuilder
@@ -178,7 +156,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a.second).isEqualTo(listOf(SocialSecurityNumberFormat.breachedGuideline))
+        assertThat(result.a.second).isEqualTo(listOf(BreachedGuidelinesCodes.INVALID_SSN_LENGTH))
         verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
     }
 
@@ -191,7 +169,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a.second).isEqualTo(listOf(PersonalDebt(debtChecker).breachedGuideline))
+        assertThat(result.a.second).isEqualTo(listOf(BreachedGuidelinesCodes.DEBT_CHECK))
         verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
     }
 
@@ -204,7 +182,7 @@ class UnderwriterImplTest {
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a.second).isEqualTo(listOf(AgeRestrictionGuideline.breachedGuideline))
+        assertThat(result.a.second).isEqualTo(listOf(BreachedGuidelinesCodes.UNDERAGE))
         verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
     }
 
@@ -224,8 +202,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeAtLeast1.breachedGuideline,
-                SwedishApartmentLivingSpaceAtLeast1Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
             )
         )
         verify(exactly = 2) { metrics.increment(Market.SWEDEN, any()) }
@@ -247,8 +225,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeNotMoreThan6.breachedGuideline,
-                SwedishApartmentLivingSpaceNotMoreThan250Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
             )
         )
         verify(exactly = 2) { metrics.increment(Market.SWEDEN, any()) }
@@ -272,8 +250,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishApartmentHouseHoldSizeAtLeast1.breachedGuideline,
-                SwedishApartmentLivingSpaceAtLeast1Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
             )
         )
         verify(exactly = 2) { metrics.increment(Market.SWEDEN, any()) }
@@ -297,9 +275,9 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishStudentApartmentHouseholdSizeNotMoreThan2.breachedGuideline,
-                SwedishStudentApartmentLivingSpaceNotMoreThan50Sqm.breachedGuideline,
-                SwedishStudentApartmentAgeNotMoreThan30Years.breachedGuideline
+                BreachedGuidelinesCodes.STUDENT_TOO_BIG_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.STUDENT_TOO_MUCH_LIVING_SPACE,
+                BreachedGuidelinesCodes.STUDENT_OVERAGE
             )
         )
         verify(exactly = 3) { metrics.increment(Market.SWEDEN, any()) }
@@ -323,10 +301,10 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishHouseHouseholdSizeAtLeast1.breachedGuideline,
-                SwedishHouseLivingSpaceAtLeast1Sqm.breachedGuideline,
-                SwedishHouseYearOfConstruction.breachedGuideline,
-                SwedishHouseExtraBuildingsSizeAtLeast1Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_SMALL_NUMBER_OF_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE,
+                BreachedGuidelinesCodes.TOO_EARLY_YEAR_OF_CONSTRUCTION,
+                BreachedGuidelinesCodes.TOO_SMALL_EXTRA_BUILDING_SIZE
             )
         )
         verify(exactly = 4) { metrics.increment(Market.SWEDEN, any()) }
@@ -354,11 +332,11 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                SwedishHouseHouseholdSizeNotMoreThan6.breachedGuideline,
-                SwedishHouseLivingSpaceNotMoreThan250Sqm.breachedGuideline,
-                SwedishHouseNumberOfBathrooms.breachedGuideline,
-                SwedishHouseNumberOfExtraBuildingsWithAreaOverSixSqm.breachedGuideline,
-                SwedishHouseExtraBuildingsSizeNotOverThan75Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_HOUSE_HOLD_SIZE,
+                BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE,
+                BreachedGuidelinesCodes.TOO_MANY_BATHROOMS,
+                BreachedGuidelinesCodes.TOO_MANY_EXTRA_BUILDINGS,
+                BreachedGuidelinesCodes.TOO_BIG_EXTRA_BUILDING_SIZE
             )
         )
         verify(exactly = 5) { metrics.increment(Market.SWEDEN, any()) }
@@ -394,7 +372,7 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianSsnNotMatchesBirthDate.breachedGuideline
+                BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
             )
         )
         verify(exactly = 1) { metrics.increment(Market.NORWAY, any()) }
@@ -444,8 +422,8 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianHomeContentscoInsuredNotMoreThan5.breachedGuideline,
-                NorwegianHomeContentsLivingSpaceNotMoreThan250Sqm.breachedGuideline
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
             )
         )
         verify(exactly = 2) { metrics.increment(Market.NORWAY, any()) }
@@ -468,9 +446,9 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianYouthHomeContentsLivingSpaceNotMoreThan50Sqm.breachedGuideline,
-                NorwegianYouthHomeContentsAgeNotMoreThan30Years.breachedGuideline,
-                NorwegianYouthHomeContentsCoInsuredNotMoreThan0.breachedGuideline
+                BreachedGuidelinesCodes.YOUTH_TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.YOUTH_TOO_MUCH_LIVING_SPACE,
+                BreachedGuidelinesCodes.YOUTH_OVERAGE
             )
         )
         verify(exactly = 3) { metrics.increment(Market.NORWAY, any()) }
@@ -489,7 +467,7 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianTravelCoInsuredNotMoreThan5.breachedGuideline
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED
             )
         )
         verify(exactly = 1) { metrics.increment(Market.NORWAY, any()) }
@@ -510,12 +488,28 @@ class UnderwriterImplTest {
         require(result is Either.Left)
         assertThat(result.a.second).isEqualTo(
             listOf(
-                NorwegianSsnNotMatchesBirthDate.breachedGuideline,
-                NorwegianYouthTravelAgeNotMoreThan30Years.breachedGuideline,
-                NorwegianYouthTravelCoInsuredNotMoreThan0.breachedGuideline
+                BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE,
+                BreachedGuidelinesCodes.YOUTH_TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.YOUTH_OVERAGE
             )
         )
         verify(exactly = 3) { metrics.increment(Market.NORWAY, any()) }
+    }
+
+    @Test
+    fun `on breached guideline verify increment counter`() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = NorwegianTravelQuoteRequestBuilder(
+            birthDate = LocalDate.now().minusYears(31).minusDays(1),
+            data = NorwegianTravelQuoteRequestDataBuilder(
+                coInsured = 1
+            )
+        ).build()
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).hasSize(1)
+        verify(exactly = 1) { metrics.increment(Market.NORWAY, BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE) }
     }
 
     @Test
@@ -536,18 +530,332 @@ class UnderwriterImplTest {
     }
 
     @Test
-    fun `on breached guideline verify increment counter`() {
+    fun underwritingGuidelineHitWhenDanishSsnNotMatch() {
         val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
-        val quoteRequest = NorwegianTravelQuoteRequestBuilder(
-            birthDate = LocalDate.now().minusYears(31).minusDays(1),
-            data = NorwegianTravelQuoteRequestDataBuilder(
-                coInsured = 1
-            )
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            ssn = "0411357627",
+            birthDate = LocalDate.of(1964, 11, 4)
         ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
 
         val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
         require(result is Either.Left)
-        assertThat(result.a.second).hasSize(1)
-        verify(exactly = 1) { metrics.increment(Market.NORWAY, NorwegianSsnNotMatchesBirthDate.breachedGuideline) }
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishUnderage() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            ssn = "1110137970",
+            birthDate = LocalDate.of(2013, 1, 11)
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.UNDERAGE
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishInvalidSsn() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            ssn = "0411357626",
+            birthDate = LocalDate.of(1935, 11, 4)
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.INVALID_SSN
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentCoInsuredToLow() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                coInsured = -1
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.NEGATIVE_NUMBER_OF_CO_INSURED
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentStudentCoInsuredAndAgeTooHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                isStudent = true,
+                coInsured = 2
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.STUDENT_OVERAGE
+            )
+        )
+        verify(exactly = 2) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentCoInsuredRegularToHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                coInsured = 7
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentLivingSpaceTooLow() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                livingSpace = 4
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_SMALL_LIVING_SPACE
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentStudentLivingSpaceAndAgeTooHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                isStudent = true,
+                livingSpace = 101
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.STUDENT_TOO_MUCH_LIVING_SPACE,
+                BreachedGuidelinesCodes.STUDENT_OVERAGE
+            )
+        )
+        verify(exactly = 2) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishHomeContentLivingSpaceRegularTooHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
+            data = DanishHomeContentsQuoteRequestDataBuilder(
+                livingSpace = 251
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishHomeContentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishAccidentStudentCoInsuredAndAgeToHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishAccidentQuoteRequestBuilder(
+            data = DanishAccidentQuoteRequestDataBuilder(
+                isStudent = true,
+                coInsured = 2
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishAccidentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.STUDENT_OVERAGE
+            )
+        )
+        verify(exactly = 2) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishRegularAccidentCoInsuredTooHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishAccidentQuoteRequestBuilder(
+            data = DanishAccidentQuoteRequestDataBuilder(
+                coInsured = 7
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishAccidentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishTravelStudentCoInsuredAndAgeToHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishTravelQuoteRequestBuilder(
+            data = DanishTravelQuoteRequestDataBuilder(
+                isStudent = true,
+                coInsured = 2
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishAccidentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED,
+                BreachedGuidelinesCodes.STUDENT_OVERAGE
+            )
+        )
+        verify(exactly = 2) { metrics.increment(Market.DENMARK, any()) }
+    }
+
+    @Test
+    fun underwritingGuidelineHitWhenDanishRegularTravelCoInsuredTooHigh() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = DanishTravelQuoteRequestBuilder(
+            data = DanishTravelQuoteRequestDataBuilder(
+                coInsured = 7
+            )
+        ).build()
+
+        /* TODO: This should be verified once price engine is in place
+        every { priceEngineService.queryDanishAccidentPrice(any()) } returns PriceQueryResponse(
+            UUID.randomUUID(),
+            Money.of(0, "DKK")
+        )*/
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_HIGH_NUMBER_OF_CO_INSURED
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.DENMARK, any()) }
     }
 }

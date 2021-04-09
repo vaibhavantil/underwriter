@@ -2,8 +2,12 @@ package com.hedvig.underwriter.service.guidelines
 
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.DebtChecker
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.DEBT_CHECK
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.INVALID_SSN_LENGTH
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.OK
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.SSN_DOES_NOT_MATCH_BIRTH_DATE
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.UNDERAGE
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
 import java.time.LocalDate
 
@@ -11,14 +15,13 @@ class SwedishPersonalGuidelines(debtChecker: DebtChecker) {
     val setOfRules = setOf(
         SocialSecurityNumberFormat,
         SocialSecurityDate,
-        AgeRestrictionGuideline,
-        PersonalDebt(debtChecker),
+        SwedishAgeRestrictionGuideline,
+        SwedishPersonalDebt(debtChecker),
         SocialSecurityNumberMatchesBirthDate
     )
 }
 
 object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
-    override val breachedGuideline = INVALID_SSN_LENGTH
 
     override val skipAfter: Boolean
         get() = true
@@ -29,21 +32,29 @@ object SocialSecurityNumberFormat : BaseGuideline<QuoteData> {
             ""
         ).length
 
-    override val validate = { data: QuoteData ->
-        getSSNLength(data) != 12
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        if (getSSNLength(data) != 12) {
+            return INVALID_SSN_LENGTH
+        }
+        return OK
     }
 }
 
 object SocialSecurityNumberMatchesBirthDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = SSN_DOES_NOT_MATCH_BIRTH_DATE
 
-    override val validate = { data: QuoteData ->
-        !LocalDate.parse(getPossibleDateFromSSN(data)).isEqual((data as PersonPolicyHolder<*>).birthDate)
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+
+        val birthdate = (data as PersonPolicyHolder<*>).birthDate
+        val ssnBirthdate = LocalDate.parse(getPossibleDateFromSSN(data))
+
+        if (ssnBirthdate != birthdate) {
+            return SSN_DOES_NOT_MATCH_BIRTH_DATE
+        }
+        return OK
     }
 }
 
 object SocialSecurityDate : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuidelinesCodes.INVALID_SSN
 
     override
     val skipAfter: Boolean
@@ -57,23 +68,27 @@ object SocialSecurityDate : BaseGuideline<QuoteData> {
         }
     }
 
-    override
-    val validate = { data: QuoteData ->
-        !tryParse(getPossibleDateFromSSN(data))
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        if (!tryParse(getPossibleDateFromSSN(data))) {
+            return INVALID_SSN
+        }
+        return OK
     }
 }
 
-object AgeRestrictionGuideline : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuidelinesCodes.UNDERAGE
-
+object SwedishAgeRestrictionGuideline : BaseGuideline<QuoteData> {
     override val skipAfter: Boolean
         get() = true
 
-    override val validate = { data: QuoteData -> (data as PersonPolicyHolder<*>).age() < 18 }
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        if ((data as PersonPolicyHolder<*>).age() < 18) {
+            return UNDERAGE
+        }
+        return OK
+    }
 }
 
-class PersonalDebt(private val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
-    override val breachedGuideline = BreachedGuidelinesCodes.DEBT_CHECK
+class SwedishPersonalDebt(private val debtChecker: DebtChecker) : BaseGuideline<QuoteData> {
 
     override val skipAfter: Boolean
         get() = true
@@ -81,19 +96,19 @@ class PersonalDebt(private val debtChecker: DebtChecker) : BaseGuideline<QuoteDa
     private fun debtCheck(data: QuoteData): List<String> =
         debtChecker.passesDebtCheck(data as PersonPolicyHolder<*>)
 
-    override val validate = { data: QuoteData -> debtCheck(data).isNotEmpty() }
-
-    companion object {
-        const val ERROR_MESSAGE = "fails debt check"
+    override fun validate(data: QuoteData): BreachedGuidelineCode {
+        if (debtCheck(data).isNotEmpty()) {
+            return DEBT_CHECK
+        }
+        return OK
     }
 }
 
 private fun getPossibleDateFromSSN(data: QuoteData): String {
     var trimmedInput = (data as PersonPolicyHolder<*>).ssn!!.trim()
-    trimmedInput = trimmedInput.substring(0, 4) + "-" + trimmedInput.substring(
-        4,
-        6
-    ) + "-" + trimmedInput.substring(6, 8)
+    trimmedInput = trimmedInput.substring(0, 4) + "-" +
+        trimmedInput.substring(4, 6) + "-" +
+        trimmedInput.substring(6, 8)
 
     return trimmedInput
 }

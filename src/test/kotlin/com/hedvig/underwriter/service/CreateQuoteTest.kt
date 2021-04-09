@@ -57,10 +57,12 @@ class CreateQuoteTest {
 
         every { strategyService.getAllGuidelines(any()) } returns setOf(
             object : BaseGuideline<QuoteData> {
-                override val breachedGuideline: BreachedGuidelineCode
+                val breachedGuideline: BreachedGuidelineCode
                     get() = "errorcode"
-                override val validate: (QuoteData) -> Boolean
-                    get() = { true }
+
+                override fun validate(data: QuoteData): BreachedGuidelineCode {
+                    return breachedGuideline
+                }
             }
         )
 

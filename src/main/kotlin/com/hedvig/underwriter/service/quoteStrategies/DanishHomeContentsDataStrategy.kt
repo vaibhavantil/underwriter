@@ -6,6 +6,8 @@ import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
+import com.hedvig.underwriter.service.guidelines.DanishHomeContentsGuidelines
+import com.hedvig.underwriter.service.guidelines.DanishPersonGuidelines
 import com.hedvig.underwriter.serviceIntegration.notificationService.dtos.QuoteCreatedEvent
 import com.hedvig.underwriter.serviceIntegration.notificationService.quoteCreatedEvent
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -36,10 +38,10 @@ class DanishHomeContentsDataStrategy(productPricingService: ProductPricingServic
     }
 
     override fun getPersonalGuidelines(data: QuoteData): Set<BaseGuideline<QuoteData>> {
-        return setOf()
+        return DanishPersonGuidelines.setOfRules
     }
 
     override fun getProductRules(data: QuoteData): Set<BaseGuideline<QuoteData>> {
-        return setOf()
+        return DanishHomeContentsGuidelines.setOfRules.map { toTypedGuideline(it) }.toSet()
     }
 }
