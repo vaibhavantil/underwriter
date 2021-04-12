@@ -72,6 +72,7 @@ mutation {
                 ... on DanishHomeContentsDetails {
                     coInsured
                     zipCode
+                    bbrId
                     livingSpace
                     coInsured
                     isStudent

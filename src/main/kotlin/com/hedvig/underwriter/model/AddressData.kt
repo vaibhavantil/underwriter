@@ -5,3 +5,9 @@ interface AddressData {
     val zipCode: String?
     val city: String?
 }
+
+interface DanishHomeContentAddressData : AddressData {
+    val bbrId: String?
+    val apartment: String?
+    val floor: String?
+}

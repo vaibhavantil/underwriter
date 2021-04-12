@@ -28,4 +28,8 @@ class PriceEngineServiceImpl(
     ): PriceQueryResponse {
         return priceEngineClient.queryPrice(query)
     }
+
+    override fun queryDanishHomeContentPrice(query: PriceQueryRequest.DanishHomeContent): PriceQueryResponse {
+        return priceEngineClient.queryPrice(query)
+    }
 }

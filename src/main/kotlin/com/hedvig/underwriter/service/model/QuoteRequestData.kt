@@ -131,8 +131,12 @@ sealed class QuoteRequestData {
     data class DanishHomeContents(
         @Masked val street: String?,
         val zipCode: String?,
+        @Masked val bbrId: String?,
         val coInsured: Int?,
         val livingSpace: Int?,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
         @field:JsonProperty("student")
         val isStudent: Boolean?,
         val subType: DanishHomeContentsType?
@@ -147,6 +151,10 @@ sealed class QuoteRequestData {
             phoneNumber = quoteRequest.phoneNumber,
             street = this.street!!,
             zipCode = this.zipCode!!,
+            bbrId = this.bbrId,
+            apartment = this.apartment,
+            floor = this.floor,
+            city = this.city,
             coInsured = this.coInsured!!,
             livingSpace = this.livingSpace!!,
             isStudent = this.isStudent!!,
@@ -245,6 +253,10 @@ sealed class QuoteRequestData {
             is QuoteSchema.DanishHomeContent -> DanishHomeContents(
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                apartment = quoteSchema.apartment,
+                floor = quoteSchema.floor,
+                bbrId = quoteSchema.bbrId,
                 livingSpace = quoteSchema.livingSpace,
                 coInsured = quoteSchema.numberCoInsured,
                 isStudent = quoteSchema.isStudent,

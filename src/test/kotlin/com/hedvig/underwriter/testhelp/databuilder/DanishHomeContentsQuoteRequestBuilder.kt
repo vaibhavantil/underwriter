@@ -16,7 +16,7 @@ data class DanishHomeContentsQuoteRequestBuilder(
     val birthDate: LocalDate = LocalDate.of(1935, 11, 4),
     val email: String = "em@i.l",
     val quotingPartner: Partner = Partner.HEDVIG,
-    val memberId: String? = null,
+    val memberId: String? = "123",
     val originatingProductId: UUID? = null,
     val startDate: Instant? = Instant.now(),
     val dataCollectionId: UUID? = null,
@@ -35,6 +35,23 @@ data class DanishHomeContentsQuoteRequestBuilder(
         quotingPartner = quotingPartner,
         productType = productType,
         incompleteQuoteData = data.build(),
+        memberId = memberId,
+        originatingProductId = originatingProductId,
+        startDate = startDate,
+        dataCollectionId = dataCollectionId
+    )
+
+    fun build(homeContentsData: QuoteRequestData.DanishHomeContents?, newSsn: String? = null): QuoteRequest = QuoteRequest(
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        phoneNumber = null,
+        currentInsurer = currentInsurer,
+        birthDate = birthDate,
+        ssn = newSsn ?: ssn,
+        quotingPartner = quotingPartner,
+        productType = productType,
+        incompleteQuoteData = homeContentsData ?: data.build(),
         memberId = memberId,
         originatingProductId = originatingProductId,
         startDate = startDate,

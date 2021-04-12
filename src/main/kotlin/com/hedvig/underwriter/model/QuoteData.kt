@@ -173,6 +173,10 @@ data class DanishHomeContentsData(
     @Masked override val phoneNumber: String? = null,
     @Masked override val street: String,
     override val zipCode: String,
+    @Masked override val bbrId: String? = null,
+    override val city: String?,
+    override val apartment: String?,
+    override val floor: String?,
     val livingSpace: Int,
     val coInsured: Int,
     @get:JvmName("getIsStudent")
@@ -180,10 +184,7 @@ data class DanishHomeContentsData(
     val type: DanishHomeContentsType,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), AddressData, PersonPolicyHolder<DanishHomeContentsData> {
-
-    // Should probably be removed from AddressData
-    override val city: String? = null
+) : QuoteData(), DanishHomeContentAddressData, PersonPolicyHolder<DanishHomeContentsData> {
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
@@ -199,7 +200,7 @@ data class DanishHomeContentsData(
             firstName, lastName, coInsured -> false
             else -> true
         }
-}
+    }
 
 data class DanishAccidentData(
     override val id: UUID,

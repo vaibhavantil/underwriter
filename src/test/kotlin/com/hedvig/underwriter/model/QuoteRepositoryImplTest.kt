@@ -622,13 +622,17 @@ class QuoteRepositoryImplTest {
                 birthDate = LocalDate.of(1912, 12, 12),
                 ssn = "1212121212",
                 street = "221 Baker street",
+                apartment = "3",
+                city = "testCity",
+                floor = "1",
                 zipCode = "1121",
                 livingSpace = 33,
                 id = UUID.randomUUID(),
                 coInsured = 1,
                 email = "em@i.l",
                 isStudent = false,
-                type = DanishHomeContentsType.RENT
+                type = DanishHomeContentsType.RENT,
+                bbrId = "321"
             ),
             breachedUnderwritingGuidelines = null,
             currentInsurer = null
@@ -639,7 +643,10 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED,
             data = (quote.data as DanishHomeContentsData).copy(
                 firstName = "John",
-                lastName = "Watson"
+                lastName = "Watson",
+                bbrId = "123",
+                street = "221 Baker street",
+                city = "testCity"
             ),
             memberId = "123456"
         )
@@ -661,13 +668,17 @@ class QuoteRepositoryImplTest {
                 birthDate = LocalDate.of(1912, 12, 12),
                 ssn = "1212121212",
                 street = "221 Baker street",
+                apartment = "5",
+                city = "city",
+                floor = "2",
                 zipCode = "1121",
                 livingSpace = 33,
                 id = UUID.randomUUID(),
                 coInsured = 1,
                 email = "em@i.l",
                 isStudent = false,
-                type = DanishHomeContentsType.RENT
+                type = DanishHomeContentsType.RENT,
+                bbrId = "1232"
             ),
             initiatedFrom = QuoteInitiatedFrom.APP,
             attributedTo = Partner.HEDVIG,

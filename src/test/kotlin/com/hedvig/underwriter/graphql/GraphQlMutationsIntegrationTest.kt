@@ -1,5 +1,7 @@
 package com.hedvig.underwriter.graphql
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.graphql.spring.boot.test.GraphQLTestTemplate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
@@ -9,6 +11,7 @@ import com.hedvig.underwriter.graphql.type.CreateNorwegianTravelInput
 import com.hedvig.underwriter.graphql.type.CreateQuoteInput
 import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.localization.LocalizationService
+import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.model.birthDateFromNorwegianSsn
 import com.hedvig.underwriter.service.DebtChecker
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit4.SpringRunner
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 @RunWith(SpringRunner::class)
@@ -340,22 +344,29 @@ internal class GraphQlMutationsIntegrationTest {
     @Test
     fun createSuccessfulDanishHomeContentsQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
-        /* TODO: Should be verified when price engine is in plce
+
         every {
             priceEngineService.queryDanishHomeContentPrice(
                 PriceQueryRequest.DanishHomeContent(
                     holderMemberId = "123",
-                    quoteId = UUID.fromString("00000000-0000-0000-0000-000000000007"),
-                    holderBirthDate = "2112611416".birthDateFromDanishSsn(),
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+                    holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
-                    postalCode = "12345",
-                    squareMeters = 30
+                    zipCode = "1234",
+                    squareMeters = 30,
+                    bbrId = "123",
+                    apartment = "1",
+                    floor = "4",
+                    street = "Kungsgatan 2",
+                    city = "testCity",
+                    student = false,
+                    subType = DanishHomeContentsType.RENT
                 )
             )
         } returns
             PriceQueryResponse(
                 UUID.randomUUID(),
-                Money.of(BigDecimal.ONE, "NOK")
+                Money.of(BigDecimal.ONE, "DKK")
             )
 
         every {
@@ -368,7 +379,7 @@ internal class GraphQlMutationsIntegrationTest {
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
                 MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
                 null
-            )*/
+            )
 
         graphQLTestTemplate.addHeader("hedvig.token", "123")
 
@@ -382,12 +393,15 @@ internal class GraphQlMutationsIntegrationTest {
         assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
-        assert(createQuote["quoteDetails"]["street"].textValue() == "Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["apartment"].textValue()).isEqualTo("1")
+        assertThat(createQuote["quoteDetails"]["floor"].textValue()).isEqualTo("4")
         assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
         assert(createQuote["quoteDetails"]["livingSpace"].intValue() == 30)
         assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
         assert(createQuote["quoteDetails"]["isStudent"].booleanValue() == false)
         assert(createQuote["quoteDetails"]["danishHomeContentType"].textValue() == "RENT")
+        assert(createQuote["quoteDetails"]["bbrId"].textValue() == "123")
     }
 
     @Test

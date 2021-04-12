@@ -1,6 +1,7 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
 import com.hedvig.underwriter.model.AddressData
+import com.hedvig.underwriter.model.DanishHomeContentAddressData
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.birthDate
 import com.hedvig.underwriter.model.firstName
@@ -26,15 +27,16 @@ class FinalizeOnBoardingRequest(
             email: String
         ): FinalizeOnBoardingRequest {
             val addressInsurance = quote.data as? AddressData
+
             val address = addressInsurance?.let {
-                Address(
-                    street = it.street!!,
-                    city = it.city ?: "",
-                    zipCode = it.zipCode!!,
-                    apartmentNo = "",
-                    floor = 0
-                )
-            }
+                    Address(
+                        street = addressInsurance.street!!,
+                        city = addressInsurance.city ?: "",
+                        zipCode = addressInsurance.zipCode!!,
+                        apartmentNo = (addressInsurance as? DanishHomeContentAddressData)?.apartment ?: "",
+                        floor = (addressInsurance as? DanishHomeContentAddressData)?.floor?.toIntOrNull() ?: 0
+                    )
+                }
 
             return FinalizeOnBoardingRequest(
                 memberId = quote.memberId!!,
