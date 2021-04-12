@@ -7,7 +7,7 @@ import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHome
 data class EditDanishHomeContentsInput(
     @Masked val street: String?,
     val zipCode: String?,
-    val bbrId: String?,
+    @Masked val bbrId: String?,
     val apartment: String?,
     val floor: String?,
     val city: String?,
