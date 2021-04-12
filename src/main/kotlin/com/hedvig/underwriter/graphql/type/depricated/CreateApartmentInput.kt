@@ -2,7 +2,7 @@ package com.hedvig.underwriter.graphql.type.depricated
 
 import com.hedvig.underwriter.graphql.type.ApartmentType
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 
 @Deprecated("Use CreateSwedishApartmentInput")
 data class CreateApartmentInput(

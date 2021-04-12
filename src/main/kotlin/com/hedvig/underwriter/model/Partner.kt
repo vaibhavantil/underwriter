@@ -5,5 +5,7 @@ enum class Partner(val campaignCode: String? = null) {
     INSPLANET("f89051cb43"),
     COMPRICER("8a2fcb2a11"),
     INSURLEY("eib7soo9va"),
-    KEYSOLUTIONS("l8wyjvFfx5")
+    KEYSOLUTIONS("l8wyjvFfx5"),
+    SPIFF,
+    TJENSTETORGET
 }

@@ -30,10 +30,10 @@ class CreateQuoteTest {
     val strategyService = mockk<QuoteStrategyService>()
     val priceEngineService = mockk<PriceEngineService>()
     val quoteRepository = mockk<QuoteRepository>()
-    val metrics = mockk<Metrics>(relaxed = true)
+    val metrics = mockk<UnderwriterImpl.BreachedGuidelinesCounter>(relaxed = true)
 
     val cut = QuoteServiceImpl(
-        UnderwriterImpl(priceEngineService, strategyService, metrics),
+        UnderwriterImpl(priceEngineService, strategyService, mockk(relaxed = true), mockk(), metrics),
         mockk(),
         mockk(),
         quoteRepository,
@@ -89,10 +89,12 @@ class CreateQuoteTest {
 
         every { strategyService.getAllGuidelines(any()) } returns setOf(
             object : BaseGuideline<QuoteData> {
-                override val breachedGuideline: BreachedGuidelineCode
+                val breachedGuideline: BreachedGuidelineCode
                     get() = "errorcode"
-                override val validate: (QuoteData) -> Boolean
-                    get() = { true }
+
+                override fun validate(data: QuoteData): BreachedGuidelineCode {
+                    return breachedGuideline
+                }
             }
         )
 

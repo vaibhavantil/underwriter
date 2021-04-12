@@ -36,9 +36,12 @@ val Quote.ssnMaybe
     get() = (data as? PersonPolicyHolder<*>)?.ssn
 
 val Quote.birthDate
+    get() = birthDateMaybe
+        ?: throw RuntimeException("No birthDate on Quote! $this")
+
+val Quote.birthDateMaybe
     get() = (data as? PersonPolicyHolder<*>)?.birthDate
         ?: recoverBirthDateFromSSN()
-        ?: throw RuntimeException("No birthDate on Quote! $this")
 
 val Quote.email
     get() = (data as? PersonPolicyHolder<*>)?.email
@@ -120,6 +123,20 @@ fun String.isValidNorwegianSsn(): Boolean {
 
     return isValidCheckSum(FIRST_BIRTH_CONTROL_SEQUENCE, ssnAsArray) &&
         isValidCheckSum(SECOND_BIRTH_CONTROL_SEQUENCE, ssnAsArray)
+}
+
+fun String.isValidDanishSsn(): Boolean {
+    this.toLongOrNull() ?: return false
+
+    if (this.length != 10) {
+        return false
+    }
+
+    // DDMMYY-SSSS: 4x1 + 3x2 + 2x3 + 7x4 + 6x5 + 5x6 + 4x7 + 3x8 + 2x9 + x10 ≡ 0 (mod 11)
+    val coefficients = intArrayOf(4, 3, 2, 7, 6, 5, 4, 3, 2, 1)
+    val ssnAsArray = this.map { Character.getNumericValue(it) }.toIntArray()
+
+    return isValidCheckSum(coefficients, ssnAsArray)
 }
 
 private fun isValidCheckSum(

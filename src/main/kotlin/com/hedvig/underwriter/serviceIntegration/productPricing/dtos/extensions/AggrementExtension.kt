@@ -25,10 +25,10 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.SwedishApartment -> QuoteRequestData.SwedishApartment(
         street = this.address.street,
         zipCode = this.address.postalCode,
+        city = this.address.city,
         livingSpace = this.squareMeters.toInt(),
         householdSize = this.numberCoInsured + 1,
         subType = ApartmentProductSubType.valueOf(this.lineOfBusiness.name),
-        city = null,
         floor = null
     )
     is Agreement.SwedishHouse -> QuoteRequestData.SwedishHouse(
@@ -50,7 +50,7 @@ fun Agreement.toQuoteRequestData() = when (this) {
         street = this.address.street,
         zipCode = this.address.postalCode,
         livingSpace = this.squareMeters.toInt(),
-        city = null,
+        city = this.address.city,
         coInsured = this.numberCoInsured,
         subType = when (this.lineOfBusiness) {
             NorwegianHomeContentLineOfBusiness.OWN,

@@ -20,12 +20,10 @@ import org.junit.jupiter.api.Test
 class SignStrategyServiceTest {
 
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy = mockk(relaxed = true)
-    private val redirectSignStrategy: RedirectSignStrategy = mockk(relaxed = true)
     private val simpleSignStrategy: SimpleSignStrategy = mockk(relaxed = true)
 
     private val cut = SignStrategyService(
         swedishBankIdSignStrategy,
-        redirectSignStrategy,
         simpleSignStrategy
     )
 
@@ -199,7 +197,7 @@ class SignStrategyServiceTest {
     }
 
     @Test
-    fun `start sign of danish quotes calls redirectSignStrategy startSign`() {
+    fun `start sign of danish quotes calls simpleSignStrategy startSign`() {
         cut.startSign(
             listOf(
                 quote {
@@ -215,6 +213,6 @@ class SignStrategyServiceTest {
             createSignData()
         )
 
-        verify(exactly = 1) { redirectSignStrategy.startSign(any(), any()) }
+        verify(exactly = 1) { simpleSignStrategy.startSign(any(), any()) }
     }
 }

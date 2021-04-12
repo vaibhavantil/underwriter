@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.hedvig.underwriter.service.model.PersonPolicyHolder
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import org.jdbi.v3.json.Json
 import java.time.LocalDate
 import java.util.UUID
@@ -188,7 +188,12 @@ data class DanishHomeContentsData(
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
-    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
+    override fun updateSsn(ssn: String) =
+        if (ssn.isValidDanishSsn()) {
+            this.copy(ssn = ssn)
+        } else {
+            throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -219,7 +224,12 @@ data class DanishAccidentData(
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
-    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
+    override fun updateSsn(ssn: String) =
+        if (ssn.isValidDanishSsn()) {
+            this.copy(ssn = ssn)
+        } else {
+            throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {
@@ -250,7 +260,12 @@ data class DanishTravelData(
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
-    override fun updateSsn(ssn: String) = this.copy(ssn = ssn)
+    override fun updateSsn(ssn: String) =
+        if (ssn.isValidDanishSsn()) {
+            this.copy(ssn = ssn)
+        } else {
+            throw IllegalArgumentException("Invalid SSN")
+        }
 
     override val isComplete: Boolean
         get() = when (null) {

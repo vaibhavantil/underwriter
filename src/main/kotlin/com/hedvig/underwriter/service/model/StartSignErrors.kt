@@ -5,7 +5,7 @@ import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 object StartSignErrors {
 
     val memberIsAlreadySigned = StartSignResponse.FailedToStartSign(
-        "provided member id is already signed",
+        "An error occurred: Unable to sign member",
         "MEMBER_IS_ALREADY_SIGNED"
     )
 
@@ -58,12 +58,6 @@ object StartSignErrors {
         StartSignResponse.FailedToStartSign(
             "Quotes can not be empty",
             "EMPTY_LIST_OF_QUOTES"
-        )
-
-    fun emptyRedirectUrlFromBankId(message: String) =
-        StartSignResponse.FailedToStartSign(
-            message,
-            "EMPTY_REDIRECT_URL_FROM_BANK_ID"
         )
 
     fun failedToStartSimpleSign(message: String) =

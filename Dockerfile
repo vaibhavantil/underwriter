@@ -2,7 +2,12 @@
 FROM maven:3.6.3-amazoncorretto-11 AS dependencies
 WORKDIR /usr/app
 
-# Set up the user running the tests (needed for embedded postgres)
+ARG GITHUB_USER
+ARG GITHUB_TOKEN
+
+ENV MAVEN_OPTS="-Dmaven.repo.local=/usr/share/maven/ref/repository -DGITHUB_USERNAME=$GITHUB_USER -DGITHUB_TOKEN=$GITHUB_TOKEN"
+
+# Set up the user runninqg the tests (needed for embedded postgres)
 RUN yum -y install python3 \
     python3-pip \
     shadow-utils \
@@ -11,7 +16,8 @@ RUN adduser underwriter
 
 # Resolve dependencies and cache them
 COPY pom.xml .
-RUN mvn dependency:go-offline -s /usr/share/maven/ref/settings-docker.xml
+COPY settings-ci.xml .
+RUN mvn dependency:go-offline -s settings-ci.xml
 # This is the maven repo in /usr/share/maven/ref/settings-docker.xml
 # has to be readable by 'underwriter'
 RUN chown -R underwriter /usr/share/maven/ref/repository
@@ -20,7 +26,7 @@ RUN chown -R underwriter /usr/share/maven/ref/repository
 ##### Build stage #####
 FROM dependencies AS build
 COPY src/main src/main
-RUN mvn clean package -s /usr/share/maven/ref/settings-docker.xml -P no-git-hooks
+RUN mvn clean package -P no-git-hooks
 
 
 ##### Test stage #####
@@ -30,7 +36,7 @@ COPY src/test src/test
 RUN chown -R underwriter .
 
 # Tests must be run as custom user because of EmbeddedPostgres
-RUN su underwriter -c 'mvn test -s /usr/share/maven/ref/settings-docker.xml -P no-git-hooks'
+RUN su underwriter -c 'mvn test -P no-git-hooks'
 
 
 ##### Assemble stage #####

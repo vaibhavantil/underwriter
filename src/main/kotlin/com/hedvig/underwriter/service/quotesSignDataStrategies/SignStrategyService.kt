@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service
 @Service
 class SignStrategyService(
     private val swedishBankIdSignStrategy: SwedishBankIdSignStrategy,
-    private val redirectSignStrategy: RedirectSignStrategy,
     private val simpleSignStrategy: SimpleSignStrategy
 ) : SignStrategy {
     override fun startSign(quotes: List<Quote>, signData: SignData): StartSignResponse {
@@ -28,7 +27,7 @@ class SignStrategyService(
             return StartSignErrors.noQuotes
         }
 
-        if (strategy.size > 1) {
+        if (strategy.size > 1 || quotes.markets.size > 1) {
             return StartSignErrors.quotesCanNotBeBundled
         }
 
@@ -81,10 +80,10 @@ class SignStrategyService(
             is SwedishHouseData,
             is SwedishApartmentData -> swedishBankIdSignStrategy
             is NorwegianHomeContentsData,
-            is NorwegianTravelData -> simpleSignStrategy
+            is NorwegianTravelData,
             is DanishHomeContentsData,
             is DanishAccidentData,
-            is DanishTravelData -> redirectSignStrategy
+            is DanishTravelData -> simpleSignStrategy
         }
     }.toSet()
 

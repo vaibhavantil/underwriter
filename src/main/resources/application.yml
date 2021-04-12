@@ -54,11 +54,21 @@ hedvig:
 
 ---
 spring:
+  profiles: production
+
+features:
+  block-requoting: true
+
+---
+spring:
   profiles: staging
 
 graphql:
   servlet:
     exception-handlers-enabled: true
+
+features:
+  block-requoting: false
 
 ---
 spring:

@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
 import com.hedvig.underwriter.model.Partner
@@ -15,13 +16,20 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
+import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.OK
 import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
+import com.hedvig.underwriter.util.MetricsCounter
+import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.toStockholmLocalDate
+import io.micrometer.core.instrument.MeterRegistry
 import org.javamoney.moneta.Money
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
+import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
@@ -31,8 +39,13 @@ import javax.money.MonetaryAmount
 class UnderwriterImpl(
     private val priceEngineService: PriceEngineService,
     private val quoteStrategyService: QuoteStrategyService,
-    private val metrics: Metrics
+    private val requotingService: RequotingService,
+    private val blockedByTypeCounter: BlockedByTypeCounter,
+    private val breachedGuidelinesCounter: BreachedGuidelinesCounter
 ) : Underwriter {
+
+    @Value("\${features.block-requoting:false}")
+    private var blockRequoting: Boolean = false
 
     override fun createQuote(
         quoteRequest: QuoteRequest,
@@ -59,6 +72,15 @@ class UnderwriterImpl(
             dataCollectionId = quoteRequest.dataCollectionId,
             underwritingGuidelinesBypassedBy = underwritingGuidelinesBypassedBy
         )
+
+        // Do customer have an active agreement for this already?
+        if (requotingService.blockDueToExistingAgreement(quote)) {
+            blockedByTypeCounter.increment(quote)
+            if (blockRequoting) {
+                logger.info("Cannot create quote, customer already have an active agreement")
+                throw IllegalStateException("Creation of quote is blocked")
+            }
+        }
 
         return validateAndCompleteQuote(quote, underwritingGuidelinesBypassedBy)
     }
@@ -134,7 +156,7 @@ class UnderwriterImpl(
         val guidelines = quoteStrategyService.getAllGuidelines(data)
         errors.addAll(runRules(data.data, guidelines))
         errors.forEach {
-            metrics.increment(data.market, it)
+            breachedGuidelinesCounter.increment(data.market, it)
         }
         return errors
     }
@@ -145,15 +167,29 @@ class UnderwriterImpl(
     ): MutableList<BreachedGuidelineCode> {
         val guidelineErrors = mutableListOf<BreachedGuidelineCode>()
 
-        listOfRules.forEach {
-            val error = it.invokeValidate(data)
-            if (error != null) {
+        for (rule in listOfRules) {
+            val error = rule.validate(data)
+            if (error != OK) {
                 guidelineErrors.add(error)
-            }
-            if (it.skipAfter) {
-                return@forEach
+                if (rule.skipAfter) {
+                    break
+                }
             }
         }
         return guidelineErrors
+    }
+
+    @Component
+    class BlockedByTypeCounter(override val registry: MeterRegistry) : MetricsCounter(registry, "requoting.blocked_by_type") {
+        fun increment(quote: Quote) {
+            super.increment("type", quote.data::class.simpleName, "initiated_from", quote.initiatedFrom.name)
+        }
+    }
+
+    @Component
+    class BreachedGuidelinesCounter(override val registry: MeterRegistry) : MetricsCounter(registry, "breached.underwriting.guidelines") {
+        fun increment(market: Market, breachedGuidelineCode: String) {
+            super.increment("market", market.name, "breachedGuideline", breachedGuidelineCode)
+        }
     }
 }

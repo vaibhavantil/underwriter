@@ -10,8 +10,8 @@ data class DanishHomeContentsQuoteRequestDataBuilder(
     val city: String? = "city",
     val apartment: String? = "3",
     val floor: String? = "2",
-    val coInsured: Int = 3,
-    val livingSpace: Int = 2,
+    val coInsured: Int = 1,
+    val livingSpace: Int = 100,
     val isStudent: Boolean = false,
     val subType: DanishHomeContentsType = DanishHomeContentsType.RENT
 ) : DataBuilder<QuoteRequestData.DanishHomeContents> {

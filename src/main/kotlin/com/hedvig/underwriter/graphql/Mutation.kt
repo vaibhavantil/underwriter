@@ -23,7 +23,7 @@ import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.QuoteService
 import com.hedvig.underwriter.service.SignService
 import com.hedvig.underwriter.service.model.StartSignResponse
-import com.hedvig.underwriter.util.logging.LogCall
+import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import graphql.schema.DataFetchingEnvironment

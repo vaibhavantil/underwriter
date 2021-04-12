@@ -1,7 +1,7 @@
 package com.hedvig.underwriter.graphql.type
 
 import com.hedvig.underwriter.service.model.QuoteRequestData
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 import com.hedvig.underwriter.model.DanishHomeContentsType as InternalDanishHomeContentsType
 
 data class CreateDanishHomeContentsInput(

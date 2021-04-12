@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.serviceIntegration.memberService.dtos
 
-import com.hedvig.underwriter.util.logging.Masked
+import com.hedvig.libs.logging.masking.Masked
 
 data class UpdateContactInformationRequest(
     var memberId: String,

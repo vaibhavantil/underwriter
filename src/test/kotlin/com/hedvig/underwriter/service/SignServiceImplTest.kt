@@ -12,7 +12,6 @@ import com.hedvig.underwriter.model.email
 import com.hedvig.underwriter.model.ssn
 import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
-import com.hedvig.underwriter.service.quotesSignDataStrategies.RedirectSignStrategy
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SimpleSignStrategy
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
@@ -22,7 +21,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlre
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIdentification
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
-import com.hedvig.underwriter.serviceIntegration.memberService.dtos.RedirectCountry
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
@@ -74,7 +72,6 @@ class SignServiceImplTest {
     private lateinit var signStrategyService: SignStrategyService
 
     private lateinit var swedishBankIdSignStrategy: SwedishBankIdSignStrategy
-    private lateinit var redirectSignStrategy: RedirectSignStrategy
     private lateinit var simpleSignStrategy: SimpleSignStrategy
 
     private lateinit var cut: SignService
@@ -89,16 +86,12 @@ class SignServiceImplTest {
         swedishBankIdSignStrategy = SwedishBankIdSignStrategy(
             signSessionRepository, memberService
         )
-
-        redirectSignStrategy = RedirectSignStrategy(
-            signSessionRepository, memberService
-        )
         simpleSignStrategy = SimpleSignStrategy(
             signSessionRepository, memberService
         )
 
         signStrategyService = SignStrategyService(
-            swedishBankIdSignStrategy, redirectSignStrategy, simpleSignStrategy
+            swedishBankIdSignStrategy, simpleSignStrategy
         )
 
         cut = SignServiceImpl(
@@ -478,24 +471,21 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startRedirectBankIdSign(
+            memberService.startSimpleSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
                 NationalIdentification(
                     quote.ssn,
                     Nationality.DENMARK
-                ),
-                successUrl,
-                failUrl,
-                RedirectCountry.DENMARK
+                )
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
+        } returns UnderwriterStartSignSessionResponse.SimpleSign(
+            successfullyStarted = true
         )
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+        assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class.java)
 
         verify {
             memberService.finalizeOnboarding(quote, quote.email!!)
@@ -528,24 +518,21 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote, quote2, quote3)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startRedirectBankIdSign(
+            memberService.startSimpleSign(
                 quote.memberId!!.toLong(),
                 signSessionReference,
                 NationalIdentification(
                     quote.ssn,
                     Nationality.DENMARK
-                ),
-                successUrl,
-                failUrl,
-                RedirectCountry.DENMARK
+                )
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
+        } returns UnderwriterStartSignSessionResponse.SimpleSign(
+            successfullyStarted = true
         )
 
         val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, successUrl, failUrl)
 
-        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+        assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class.java)
 
         verify {
             memberService.finalizeOnboarding(quote, quote.email!!)
@@ -843,34 +830,6 @@ class SignServiceImplTest {
     }
 
     @Test
-    fun failStartSignDanishQuotesNoTargetUrls() {
-        val memberId = "1337"
-        val quoteIds = listOf(UUID.randomUUID())
-        val quote =
-            quote {
-                id = quoteIds[0]
-                data = DanishHomeContentsDataBuilder()
-                this.memberId = memberId
-            }
-
-        every { memberService.isMemberIdAlreadySignedMemberEntity(any()) } returns IsMemberAlreadySignedResponse(false)
-        every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
-        val result = cut.startSigningQuotes(quoteIds, memberId, ipAddress, null, null)
-
-        assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class.java)
-        assertThat((result as StartSignResponse.FailedToStartSign).errorMessage).isEqualTo(
-            StartSignErrors.targetURLNotProvided.errorMessage
-        )
-        assertThat(result.errorCode).isEqualTo(
-            StartSignErrors.targetURLNotProvided.errorCode
-        )
-
-        verify(inverse = true) {
-            memberService.finalizeOnboarding(any(), any())
-        }
-    }
-
-    @Test
     fun failStartSignIfMemberAlreadySigned() {
         val memberId = "1337"
         every { memberService.isMemberIdAlreadySignedMemberEntity(memberId.toLong()) } returns IsMemberAlreadySignedResponse(
@@ -958,24 +917,21 @@ class SignServiceImplTest {
         every { quoteService.getQuotes(quoteIds) } returns listOf(quote)
         every { signSessionRepository.insert(quoteIds) } returns signSessionReference
         every {
-            memberService.startRedirectBankIdSign(
-                memberId.toLong(),
+            memberService.startSimpleSign(
+                quote.memberId!!.toLong(),
                 signSessionReference,
                 NationalIdentification(
-                    "1212120000",
+                    quote.ssn,
                     Nationality.DENMARK
-                ),
-                successUrl,
-                failUrl,
-                RedirectCountry.DENMARK
+                )
             )
-        } returns UnderwriterStartSignSessionResponse.BankIdRedirect(
-            "redirect url"
+        } returns UnderwriterStartSignSessionResponse.SimpleSign(
+            successfullyStarted = true
         )
 
         val result = cut.startSigningQuotes(quoteIds, memberId, null, successUrl, failUrl)
 
-        assertThat(result).isInstanceOf(StartSignResponse.DanishBankIdSession::class.java)
+        assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class.java)
 
         verify {
             memberService.finalizeOnboarding(quote, quote.email!!)

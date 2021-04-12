@@ -142,8 +142,8 @@ class QuoteControllerIntegrationTest {
             underwritingGuidelinesBypassedBy = null,
             updateMemberService = false
         )
-        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).livingSpace).isEqualTo(2)
-        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).coInsured).isEqualTo(3)
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).livingSpace).isEqualTo(100)
+        assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).coInsured).isEqualTo(1)
         assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).isStudent).isEqualTo(false)
         assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).type).isEqualTo(DanishHomeContentsType.RENT)
         assertThat((quoteService.getLatestQuoteForMemberId("123")?.data as DanishHomeContentsData).street).isEqualTo("test street")
