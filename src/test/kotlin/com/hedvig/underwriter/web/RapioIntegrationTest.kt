@@ -1280,8 +1280,8 @@ class RapioIntegrationTest {
     private fun createDanishHomeContentQuote(birthdate: String = "1988-01-01", street: String = "ApStreet", zip: String = "1234", city: String = "ApCity", livingSpace: Int = 122, coInsured: Int = 1, youth: Boolean = false, subType: String = "OWN"): CompleteQuoteResponseDto {
         val request = """
             {
-                "firstName": "firstName",
-                "lastName": "lastName",
+                "firstName": null,
+                "lastName": null,
                 "currentInsurer": null,
                 "birthDate": "$birthdate",
                 "ssn": null,
