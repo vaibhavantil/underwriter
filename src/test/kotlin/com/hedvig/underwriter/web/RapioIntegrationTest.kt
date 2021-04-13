@@ -1239,7 +1239,7 @@ class RapioIntegrationTest {
                 "incompleteQuoteData":{
                     "type":"norwegianTravel",
                     "coInsured":$coInsured,
-                    "student":$youth
+                    "youth":$youth
                 },
                 "shouldComplete":true,
                 "underwritingGuidelinesBypassedBy":null
