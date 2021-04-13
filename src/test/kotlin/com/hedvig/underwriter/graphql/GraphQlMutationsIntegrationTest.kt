@@ -352,7 +352,7 @@ internal class GraphQlMutationsIntegrationTest {
                     quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
                     holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
-                    zipCode = "1234",
+                    postalCode = "1234",
                     squareMeters = 30,
                     bbrId = "123",
                     apartment = "1",
@@ -360,7 +360,7 @@ internal class GraphQlMutationsIntegrationTest {
                     street = "Kungsgatan 2",
                     city = "testCity",
                     student = false,
-                    subType = DanishHomeContentsType.RENT
+                    lineOfBusiness = DanishHomeContentsType.RENT
                 )
             )
         } returns

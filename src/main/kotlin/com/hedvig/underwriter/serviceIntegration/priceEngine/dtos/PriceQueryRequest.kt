@@ -142,13 +142,13 @@ sealed class PriceQueryRequest {
         override val numberCoInsured: Int,
         val squareMeters: Int,
         val bbrId: String?,
-        val zipCode: String,
+        val postalCode: String,
         val street: String,
         val apartment: String?,
         val floor: String?,
         val city: String?,
         val student: Boolean,
-        val subType: DanishHomeContentsType
+        val lineOfBusiness: DanishHomeContentsType
     ) : PriceQueryRequest() {
         companion object {
             fun from(quoteId: UUID, memberId: String?, data: DanishHomeContentsData) = DanishHomeContent(
@@ -157,13 +157,13 @@ sealed class PriceQueryRequest {
                 holderBirthDate = data.birthDate,
                 numberCoInsured = data.coInsured,
                 bbrId = data.bbrId,
-                zipCode = data.zipCode,
+                postalCode = data.zipCode,
                 street = data.street,
                 apartment = data.apartment,
                 floor = data.floor,
                 city = data.city,
                 student = data.isStudent,
-                subType = data.type,
+                lineOfBusiness = data.type,
                 squareMeters = data.livingSpace
             )
         }

@@ -1133,6 +1133,7 @@ class RapioIntegrationTest {
         assertThat(quote.agreementId).isEqualTo(agreementId)
         assertThat(quote.contractId).isEqualTo(contractId)
         assertThat(quote.data).isInstanceOf(DanishHomeContentsData::class.java)
+
         val data = quote.data as DanishHomeContentsData
         assertThat(data.ssn).isEqualTo(ssn)
         assertThat(data.birthDate.toString()).isEqualTo("1988-01-01")
@@ -1143,7 +1144,6 @@ class RapioIntegrationTest {
         assertThat(data.street).isEqualTo("ApStreet")
         assertThat(data.city).isEqualTo("ApCity")
         assertThat(data.zipCode).isEqualTo("1234")
-//        todo: add
         assertThat(data.apartment).isEqualTo("4")
         assertThat(data.floor).isEqualTo("st")
         assertThat(data.livingSpace).isEqualTo(122)
@@ -1182,10 +1182,8 @@ class RapioIntegrationTest {
             assertThat(captured.quoteId).isEqualTo(quoteResponse.id)
             assertThat(captured.holderBirthDate.toString()).isEqualTo("1988-01-01")
             assertThat(captured.numberCoInsured).isEqualTo(1)
-
-//            should make these lineOfBusiness and postalCode
-            assertThat(captured.subType.name).isEqualTo("OWN")
-            assertThat(captured.zipCode).isEqualTo("1234")
+            assertThat(captured.lineOfBusiness.name).isEqualTo("OWN")
+            assertThat(captured.postalCode).isEqualTo("1234")
             assertThat(captured.squareMeters).isEqualTo(122)
             assertThat(captured.floor).isEqualTo("st")
             assertThat(captured.apartment).isEqualTo("4")
