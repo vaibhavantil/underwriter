@@ -148,7 +148,7 @@ sealed class PriceQueryRequest {
         val floor: String?,
         val city: String?,
         val student: Boolean,
-        val lineOfBusiness: DanishHomeContentsType
+        val housingType: DanishHomeContentsType
     ) : PriceQueryRequest() {
         companion object {
             fun from(quoteId: UUID, memberId: String?, data: DanishHomeContentsData) = DanishHomeContent(
@@ -163,7 +163,7 @@ sealed class PriceQueryRequest {
                 floor = data.floor,
                 city = data.city,
                 student = data.isStudent,
-                lineOfBusiness = data.type,
+                housingType = data.type,
                 squareMeters = data.livingSpace
             )
         }

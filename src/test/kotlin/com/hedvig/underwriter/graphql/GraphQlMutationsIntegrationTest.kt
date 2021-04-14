@@ -360,7 +360,7 @@ internal class GraphQlMutationsIntegrationTest {
                     street = "Kungsgatan 2",
                     city = "testCity",
                     student = false,
-                    lineOfBusiness = DanishHomeContentsType.RENT
+                    housingType = DanishHomeContentsType.RENT
                 )
             )
         } returns

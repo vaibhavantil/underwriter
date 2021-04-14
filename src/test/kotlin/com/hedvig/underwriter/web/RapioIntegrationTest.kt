@@ -1182,7 +1182,7 @@ class RapioIntegrationTest {
             assertThat(captured.quoteId).isEqualTo(quoteResponse.id)
             assertThat(captured.holderBirthDate.toString()).isEqualTo("1988-01-01")
             assertThat(captured.numberCoInsured).isEqualTo(1)
-            assertThat(captured.lineOfBusiness.name).isEqualTo("OWN")
+            assertThat(captured.housingType.name).isEqualTo("OWN")
             assertThat(captured.postalCode).isEqualTo("1234")
             assertThat(captured.squareMeters).isEqualTo(122)
             assertThat(captured.floor).isEqualTo("st")
