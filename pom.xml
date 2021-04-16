@@ -29,14 +29,6 @@
 
     <repositories>
         <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-hedvig-hedvig-java</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/hedvig/hedvig-java</url>
-        </repository>
-        <repository>
             <id>github</id>
             <name>Hedvig GitHub Packages</name>
             <url>https://maven.pkg.github.com/HedvigInsurance/libs</url>
@@ -250,7 +242,7 @@
         <dependency>
             <groupId>com.hedvig.graphql.commons</groupId>
             <artifactId>graphql-commons</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java-kickstart</groupId>
@@ -269,7 +261,7 @@
         <dependency>
             <groupId>com.hedvig</groupId>
             <artifactId>lokalise-client</artifactId>
-            <version>1.0.1</version>
+            <version>2.0.1</version>
         </dependency>
 
         <dependency>

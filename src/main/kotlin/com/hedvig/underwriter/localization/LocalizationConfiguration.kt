@@ -1,6 +1,6 @@
 package com.hedvig.underwriter.localization
 
-import com.hedvig.lokalise.client.LokaliseClient
+import com.hedvig.lokalise.repository.LokaliseRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -20,7 +20,7 @@ class LocalizationConfiguration {
         @Value("\${lokalise.projectId}") projectId: String,
         @Value("\${lokalise.apiToken}") apiToken: String
     ): LocalizationService {
-        val client = LokaliseClient(projectId, apiToken)
+        val client = LokaliseRepository(projectId, apiToken)
         return object : LocalizationService {
             override fun getTranslation(key: String, locale: Locale): String? = client.getTranslation(key, locale)
         }
