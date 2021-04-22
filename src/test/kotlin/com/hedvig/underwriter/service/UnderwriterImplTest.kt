@@ -342,7 +342,6 @@ class UnderwriterImplTest {
         verify(exactly = 5) { metrics.increment(Market.SWEDEN, any()) }
     }
 
-
     @Test
     fun underwritingGuidelineHitTOO_MUCH_LIVING_SPACEOnCreatesSwedishHouseQuote() {
         val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
