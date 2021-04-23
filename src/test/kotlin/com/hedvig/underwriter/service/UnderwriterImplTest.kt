@@ -608,7 +608,7 @@ class UnderwriterImplTest {
     fun underwritingGuidelineHitWhenDanishInvalidSsn() {
         val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
         val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
-            ssn = "0411357626",
+            ssn = "04113576261234",
             birthDate = LocalDate.of(1935, 11, 4)
         ).build()
 
