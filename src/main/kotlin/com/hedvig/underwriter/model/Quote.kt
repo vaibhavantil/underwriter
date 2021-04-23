@@ -132,11 +132,7 @@ fun String.isValidDanishSsn(): Boolean {
         return false
     }
 
-    // DDMMYY-SSSS: 4x1 + 3x2 + 2x3 + 7x4 + 6x5 + 5x6 + 4x7 + 3x8 + 2x9 + x10 ≡ 0 (mod 11)
-    val coefficients = intArrayOf(4, 3, 2, 7, 6, 5, 4, 3, 2, 1)
-    val ssnAsArray = this.map { Character.getNumericValue(it) }.toIntArray()
-
-    return isValidCheckSum(coefficients, ssnAsArray)
+    return true
 }
 
 private fun isValidCheckSum(

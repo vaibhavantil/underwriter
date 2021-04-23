@@ -343,6 +343,33 @@ class UnderwriterImplTest {
     }
 
     @Test
+    fun underwritingGuidelineHitTOO_MUCH_LIVING_SPACEOnCreatesSwedishHouseQuote() {
+        val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
+        val quoteRequest = SwedishHouseQuoteRequestBuilder(
+            data = SwedishHouseQuoteRequestDataBuilder(
+                householdSize = 1,
+                numberOfBathrooms = 1,
+                ancillaryArea = 50,
+                livingSpace = 201,
+                extraBuildings = listOf(
+                    SwedishHouseQuoteRequestDataExtraBuildingsBuilder(area = 7).build()
+                )
+            )
+        ).build()
+
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        val result = cut.createQuote(quoteRequest, UUID.randomUUID(), QuoteInitiatedFrom.WEBONBOARDING, null)
+        require(result is Either.Left)
+        assertThat(result.a.second).isEqualTo(
+            listOf(
+                BreachedGuidelinesCodes.TOO_MUCH_LIVING_SPACE
+            )
+        )
+        verify(exactly = 1) { metrics.increment(Market.SWEDEN, any()) }
+    }
+
+    @Test
     fun successfullyCreateNorwegianHomeContentsQuote() {
         val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
         val quoteRequest = NorwegianHomeContentsQuoteRequestBuilder().build()
@@ -581,7 +608,7 @@ class UnderwriterImplTest {
     fun underwritingGuidelineHitWhenDanishInvalidSsn() {
         val cut = UnderwriterImpl(priceEngineService, QuoteStrategyService(debtChecker, mockk()), mockk(relaxed = true), mockk(), metrics)
         val quoteRequest = DanishHomeContentsQuoteRequestBuilder(
-            ssn = "0411357626",
+            ssn = "04113576261234",
             birthDate = LocalDate.of(1935, 11, 4)
         ).build()
 
