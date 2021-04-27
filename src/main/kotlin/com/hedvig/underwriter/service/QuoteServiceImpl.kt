@@ -124,7 +124,7 @@ class QuoteServiceImpl(
             memberService.finalizeOnboarding(quote, quote.email!!)
         }
 
-        if (quote.memberId != null && quote.email != null) {
+        if (quote.memberId != null && quote.email != null && quote.state == QuoteState.QUOTED) {
             try {
                 notificationService.sendQuoteCreatedEvent(quote)
             } catch (exception: Exception) {
