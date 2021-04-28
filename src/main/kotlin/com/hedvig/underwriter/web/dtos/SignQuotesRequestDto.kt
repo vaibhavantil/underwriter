@@ -13,8 +13,7 @@ data class SignQuotesRequestDto(
     val startDate: LocalDate?,
     @Masked val email: String,
     val price: BigDecimal?, // Used for bundle verification
-    val currency: String?,
-    val partnerCampaignCode: String?
+    val currency: String?
 ) {
     companion object {
         fun from(quoteId: UUID, request: SignQuoteRequestDto): SignQuotesRequestDto = SignQuotesRequestDto(
@@ -24,8 +23,7 @@ data class SignQuotesRequestDto(
             startDate = request.startDate,
             email = request.email,
             price = null,
-            currency = null,
-            partnerCampaignCode = request.partnerCampaignCode
+            currency = null
         )
     }
 }
