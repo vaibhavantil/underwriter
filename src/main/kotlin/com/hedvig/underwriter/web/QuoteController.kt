@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import com.hedvig.graphql.commons.extensions.isAndroid
 import com.hedvig.graphql.commons.extensions.isIOS
+import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
 import com.hedvig.underwriter.service.BundleQuotesService
@@ -14,7 +15,6 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.util.logger
-import com.hedvig.libs.logging.calls.LogCall
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -28,30 +28,23 @@ import com.hedvig.underwriter.web.dtos.QuoteRequestFromAgreementDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
 import com.hedvig.underwriter.web.dtos.SignQuotesRequestDto
-import com.hedvig.underwriter.web.dtos.SignRequest
 import com.hedvig.underwriter.web.dtos.SignedQuotesResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
-import javax.validation.constraints.Email
 
 @RestController
-@RequestMapping(
-    "/_/v1/quote", // Deprecated
-    "/_/v1/quotes"
-)
+@RequestMapping("/_/v1/quotes")
 class QuoteController @Autowired constructor(
     val quoteService: QuoteService,
     val memberService: MemberService,
@@ -116,49 +109,12 @@ class QuoteController @Autowired constructor(
         ).getOrHandle { it }
     }
 
-    @PostMapping(
-        path = [
-            "/{incompleteQuoteId}/completeQuote",
-            "/{incompleteQuoteId}/complete"
-        ]
-    )
-    @LogCall
-    fun completeQuote(
-        @Valid @PathVariable incompleteQuoteId: UUID,
-        @Valid
-        @Email
-        @RequestParam("underwritingGuidelinesBypassedBy")
-        underwritingGuidelinesBypassedBy: String?
-    ): ResponseEntity<Any> {
-        return ResponseEntity.status(HttpStatus.GONE)
-            .body(ErrorResponseDto(ErrorCodes.UNKNOWN_ERROR_CODE, "endpoint is deprecated"))
-    }
-
     @GetMapping("/{id}")
     @LogCall
     fun getQuote(@PathVariable id: UUID): ResponseEntity<Quote> {
         val optionalQuote = quoteService.getQuote(id) ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(optionalQuote)
-    }
-
-    @PatchMapping("/{id}")
-    @LogCall
-    fun updateQuoteInfo(
-        @PathVariable id: UUID,
-        @RequestBody @Valid quoteRequestDto: QuoteRequestDto,
-        @Valid
-        @Email
-        @RequestParam("underwritingGuidelinesBypassedBy")
-        underwritingGuidelinesBypassedBy: String?
-    ): ResponseEntity<Any> {
-        val houseOrApartmentIncompleteQuoteDto = QuoteRequest.from(quoteRequestDto)
-
-        return when (val quoteOrError =
-            quoteService.updateQuote(houseOrApartmentIncompleteQuoteDto, id, underwritingGuidelinesBypassedBy)) {
-            is Either.Left -> ResponseEntity.status(422).body(quoteOrError.a)
-            is Either.Right -> ResponseEntity.status(200).body(QuoteDto.fromQuote(quoteOrError.b))
-        }
     }
 
     @PostMapping("/bundle")
@@ -173,26 +129,13 @@ class QuoteController @Autowired constructor(
         return QuoteBundleResponseDto.from(cost)
     }
 
-    @Deprecated("Use /{completeQuoteId}/signFromRapio")
-    @PostMapping("/{completeQuoteId}/sign")
-    @LogCall
-    fun signQuoteFromRapioDeprecated(
-        @Valid @PathVariable completeQuoteId: UUID,
-        @RequestBody request: SignQuoteRequestDto
-    ): ResponseEntity<Any> {
-        return when (val errorOrQuote = signService.signQuoteFromRapio(completeQuoteId, request)) {
-            is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
-            is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
-        }
-    }
-
-    @PostMapping("/{completeQuoteId}/signFromRapio")
+    @PostMapping("/{quoteId}/signFromRapio")
     @LogCall
     fun signQuoteFromRapio(
-        @Valid @PathVariable completeQuoteId: UUID,
+        @Valid @PathVariable quoteId: UUID,
         @RequestBody request: SignQuoteRequestDto
     ): ResponseEntity<Any> {
-        return when (val errorOrQuote = signService.signQuoteFromRapio(completeQuoteId, request)) {
+        return when (val errorOrQuote = signService.signQuoteFromRapio(quoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
@@ -215,13 +158,13 @@ class QuoteController @Autowired constructor(
         }
     }
 
-    @PostMapping("/{completeQuoteId}/signFromHope")
+    @PostMapping("/{quoteId}/signFromHope")
     @LogCall
     fun signQuoteFromHope(
-        @Valid @PathVariable completeQuoteId: UUID,
+        @Valid @PathVariable quoteId: UUID,
         @RequestBody request: SignQuoteFromHopeRequest
     ): ResponseEntity<Any> {
-        return when (val errorOrQuote = signService.signQuoteFromHope(completeQuoteId, request)) {
+        return when (val errorOrQuote = signService.signQuoteFromHope(quoteId, request)) {
             is Either.Left -> ResponseEntity.status(422).body(errorOrQuote.a)
             is Either.Right -> ResponseEntity.status(200).body(errorOrQuote.b)
         }
@@ -253,14 +196,6 @@ class QuoteController @Autowired constructor(
     @LogCall
     fun getAllQuotesFromMemberId(@PathVariable memberId: String): ResponseEntity<List<QuoteDto>> {
         return ResponseEntity.ok(quoteService.getQuotesForMemberId(memberId))
-    }
-
-    @Deprecated("Should start sign session from `/_/v1/signSession` and complete it there")
-    @PostMapping("/member/{memberId}/signed")
-    @LogCall
-    fun memberSignedDeprecated(@PathVariable memberId: String, @RequestBody signRequest: SignRequest): ResponseEntity<Void> {
-        signService.memberSigned(memberId, signRequest)
-        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/{id}/expire")

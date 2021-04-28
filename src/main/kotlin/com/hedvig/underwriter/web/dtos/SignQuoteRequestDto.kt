@@ -8,5 +8,6 @@ data class SignQuoteRequestDto(
     @Masked val name: Name?,
     @Masked val ssn: String?,
     val startDate: LocalDate?,
-    @Masked val email: String
+    @Masked val email: String,
+    val partnerCampaignCode: String?
 )

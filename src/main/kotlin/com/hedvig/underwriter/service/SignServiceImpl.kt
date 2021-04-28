@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.core.getOrHandle
+import com.hedvig.libs.logging.masking.toMaskedString
 import com.hedvig.underwriter.model.AddressData
 import com.hedvig.underwriter.model.Name
 import com.hedvig.underwriter.model.Quote
@@ -32,7 +33,6 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnReq
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
-import com.hedvig.libs.logging.masking.toMaskedString
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -127,15 +127,22 @@ class SignServiceImpl(
         }
         quotes.forEach { quote ->
             val response = createContractResponse.first { quote.id == it.quoteId }
-            redeemAndSignQuoteAndPostToCustomerio(quote, response.agreementId, true, response.contractId)
+            redeemPartnerCampaignMaybeAndSignQuoteAndPostToCustomerIO(
+                quote = quote,
+                agreementId = response.agreementId,
+                shouldCompleteSignInMemberService = true,
+                contractId = response.contractId,
+                partnerCampaignCode = null
+            )
         }
     }
 
-    private fun redeemAndSignQuoteAndPostToCustomerio(
+    private fun redeemPartnerCampaignMaybeAndSignQuoteAndPostToCustomerIO(
         quote: Quote,
         agreementId: UUID,
         shouldCompleteSignInMemberService: Boolean,
-        contractId: UUID
+        contractId: UUID,
+        partnerCampaignCode: String?
     ): Either<Nothing, SignedQuoteResponseDto> {
         val signedAt = Instant.now()
         return Right(
@@ -144,7 +151,7 @@ class SignServiceImpl(
             )
         )
             .map {
-                redeemCampaigns(it)
+                redeemPartnerCampaignMaybe(it, partnerCampaignCode)
             }
             .map {
                 completeInMemberService(it, shouldCompleteSignInMemberService)
@@ -187,22 +194,23 @@ class SignServiceImpl(
         return quote
     }
 
-    private fun redeemCampaigns(
-        quote: Quote
+    private fun redeemPartnerCampaignMaybe(
+        quote: Quote,
+        partnerCampaignCode: String?
     ): Quote {
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
-        quote.attributedTo.campaignCode?.let { campaignCode ->
-            try {
-                productPricingService.redeemCampaign(
-                    RedeemCampaignDto(
-                        quote.memberId,
-                        campaignCode,
-                        LocalDate.now(quote.getTimeZoneId())
-                    )
+
+        val campaignCode = partnerCampaignCode ?: quote.attributedTo.campaignCode ?: return quote
+        try {
+            productPricingService.redeemCampaign(
+                RedeemCampaignDto(
+                    quote.memberId,
+                    campaignCode,
+                    LocalDate.now(quote.getTimeZoneId())
                 )
-            } catch (e: FeignException) {
-                logger.error("Failed to redeem $campaignCode for partner ${quote.attributedTo} with response ${e.message}")
-            }
+            )
+        } catch (e: FeignException) {
+            logger.error("Failed to redeem $campaignCode for partner ${quote.attributedTo} with response ${e.message}")
         }
         return quote
     }
@@ -215,13 +223,14 @@ class SignServiceImpl(
         return try {
             val response = signQuotesFromRapio(
                 SignQuotesRequestDto(
-                    listOf(quoteId),
-                    request.name,
-                    request.ssn,
-                    request.startDate,
-                    request.email,
-                    null,
-                    null
+                    quoteIds = listOf(quoteId),
+                    name = request.name,
+                    ssn = request.ssn,
+                    startDate = request.startDate,
+                    email = request.email,
+                    price = null,
+                    currency = null,
+                    partnerCampaignCode = request.partnerCampaignCode
                 )
             )
 
@@ -259,7 +268,7 @@ class SignServiceImpl(
             .map { quoteRepository.update(it) }
 
         val response = quotes
-            .map { signQuoteWithMemberId(it, true, SignRequest()) }
+            .map { signQuoteWithMemberId(it, true, SignRequest(), request.partnerCampaignCode) }
             .map { it.getOrHandle { throw RuntimeException("Failed to sign quote, unknown reason") } }
             .toList()
 
@@ -340,7 +349,6 @@ class SignServiceImpl(
         val ssn = quotes.first().ssn
         val email = quotes.first().email
 
-        // Get existing memberId if any from quotes
         var memberId = quotes.mapNotNull { it.memberId }.firstOrNull()
 
         if (memberId != null) {
@@ -348,7 +356,6 @@ class SignServiceImpl(
             return memberId
         }
 
-        // Does this member already exist?
         val memberAlreadySigned = memberService.isSsnAlreadySignedMemberEntity(ssn).ssnAlreadySignedMember
 
         if (memberAlreadySigned) {
@@ -366,18 +373,18 @@ class SignServiceImpl(
             )
         )
 
-        val quoteWithAddress = quotes.filter { it.data is AddressData }.firstOrNull() ?: quotes.first()
+        val quoteWithAddress = quotes.firstOrNull { it.data is AddressData } ?: quotes.first()
         memberService.finalizeOnboarding(quoteWithAddress.copy(memberId = memberId), email!!)
 
         return memberId
     }
 
     override fun signQuoteFromHope(
-        completeQuoteId: UUID,
+        quoteId: UUID,
         request: SignQuoteFromHopeRequest
     ): Either<ErrorResponseDto, SignedQuoteResponseDto> {
-        val quote = quoteRepository.find(completeQuoteId)
-            ?: throw QuoteNotFoundException("Quote $completeQuoteId not found when trying to sign")
+        val quote = quoteRepository.find(quoteId)
+            ?: throw QuoteNotFoundException("Quote $quoteId not found when trying to sign")
 
         logger.info("Sign quote from hope. Quote from db: ${quote.toMaskedString()}")
 
@@ -413,7 +420,8 @@ class SignServiceImpl(
         return signQuoteWithMemberId(
             updatedQuote,
             false,
-            SignRequest()
+            SignRequest(),
+            null
         )
     }
 
@@ -426,12 +434,6 @@ class SignServiceImpl(
         }
     }
 
-    override fun memberSigned(memberId: String, signedRequest: SignRequest) {
-        quoteRepository.findLatestOneByMemberId(memberId)?.let { quote ->
-            signQuoteWithMemberId(quote, false, signedRequest)
-        } ?: throw IllegalStateException("Tried to perform member sign with no quote!")
-    }
-
     override fun getSignMethodFromQuotes(quoteIds: List<UUID>): SignMethod {
         val quotes = quoteService.getQuotes(quoteIds)
         return signStrategyService.getSignMethod(quotes)
@@ -440,18 +442,20 @@ class SignServiceImpl(
     private fun signQuoteWithMemberId(
         quote: Quote,
         shouldCompleteSignInMemberService: Boolean,
-        signedRequest: SignRequest
+        signedRequest: SignRequest,
+        partnerCampaignCode: String?
     ): Either<Nothing, SignedQuoteResponseDto> {
         return Right(quote)
             .map { checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }; it }
             .map { checkNotNull(it.price) { "Quote must have a price to sign! Quote id: ${it.id}" }; it }
             .map { createContractsForQuote(it, signedRequest) }
             .flatMap {
-                redeemAndSignQuoteAndPostToCustomerio(
-                    it,
-                    it.agreementId!!,
-                    shouldCompleteSignInMemberService,
-                    it.contractId!!
+                redeemPartnerCampaignMaybeAndSignQuoteAndPostToCustomerIO(
+                    quote = it,
+                    agreementId = it.agreementId!!,
+                    shouldCompleteSignInMemberService = shouldCompleteSignInMemberService,
+                    contractId = it.contractId!!,
+                    partnerCampaignCode = partnerCampaignCode
                 )
             }
     }

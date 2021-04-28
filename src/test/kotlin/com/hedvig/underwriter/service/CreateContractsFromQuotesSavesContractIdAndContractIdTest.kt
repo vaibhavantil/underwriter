@@ -18,7 +18,6 @@ import com.hedvig.underwriter.testhelp.JdbiRule
 import com.hedvig.underwriter.testhelp.databuilder.quote
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
 import com.hedvig.underwriter.web.dtos.SignQuoteRequestDto
-import com.hedvig.underwriter.web.dtos.SignRequest
 import io.mockk.every
 import io.mockk.mockk
 import org.jdbi.v3.jackson2.Jackson2Config
@@ -45,42 +44,6 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
         quoteRepository = QuoteRepositoryImpl(jdbiRule.jdbi)
         productPricingService = mockk()
         memberService = mockk()
-    }
-
-    @Test
-    fun `memberSigned saves contractId`() {
-        val quoteId = UUID.randomUUID()
-        quoteRepository.insert(
-            quote {
-                id = quoteId
-                memberId = "1337"
-                initiatedFrom = QuoteInitiatedFrom.IOS
-            }
-        )
-
-        val signServiceImpl = SignServiceImpl(
-            mockk(),
-            mockk(),
-            quoteRepository,
-            mockk(),
-            productPricingService,
-            mockk(),
-            mockk(),
-            mockk()
-        )
-
-        val contractId = UUID.randomUUID()
-        every { productPricingService.createContractsFromQuotes(any(), any(), any()) } returns listOf(
-            CreateContractResponse(quoteId, UUID.randomUUID(), contractId)
-        )
-
-        signServiceImpl.memberSigned(
-            "1337", SignRequest(
-                "referenceToken", signature = "", oscpResponse = ""
-            )
-        )
-
-        assertThat(quoteRepository.find(quoteId)!!.contractId).isEqualTo(contractId)
     }
 
     @Test
@@ -115,7 +78,11 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
         signServiceImpl.signQuoteFromRapio(
             quoteId,
             SignQuoteRequestDto(
-                Name("Mr Test", "Tester"), null, LocalDate.of(2020, 1, 1), "a@email.com"
+                name = Name("Mr Test", "Tester"),
+                ssn = null,
+                startDate = LocalDate.of(2020, 1, 1),
+                email = "a@email.com",
+                partnerCampaignCode = null
             )
         )
 
