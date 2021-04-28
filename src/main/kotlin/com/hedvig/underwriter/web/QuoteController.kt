@@ -15,6 +15,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.util.logger
 import com.hedvig.libs.logging.calls.LogCall
+import com.hedvig.underwriter.service.NotFoundException
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorQuoteResponseDto
@@ -33,6 +34,7 @@ import com.hedvig.underwriter.web.dtos.SignedQuotesResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -268,6 +270,20 @@ class QuoteController @Autowired constructor(
     fun expireInvalidQuotes(@PathVariable id: UUID): ResponseEntity<Quote> {
         val quote = quoteService.expireQuote(id) ?: return ResponseEntity.noContent().build()
         return ResponseEntity.ok(quote)
+    }
+
+    @DeleteMapping("/{id}")
+    @LogCall
+    fun deleteQuote(@PathVariable id: UUID): ResponseEntity<Void> {
+        try {
+            quoteService.deleteQuote(id)
+
+            return ResponseEntity.noContent().build()
+        } catch (e: NotFoundException) {
+            return ResponseEntity.notFound().build()
+        } catch (e: IllegalStateException) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+        }
     }
 
     @GetMapping("/contracts/{contractId}")

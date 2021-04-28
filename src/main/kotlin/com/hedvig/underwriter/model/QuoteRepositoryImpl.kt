@@ -39,6 +39,16 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return loadQuoteData(databaseQuote, dao)
     }
 
+    override fun findQuoteRevisions(quoteId: UUID): List<Quote> =
+        jdbi.inTransaction<List<Quote>, RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+
+            dao.findRevisions(quoteId)
+                .map { loadQuoteData(it, dao) }
+                .filterNotNull()
+                .toList()
+        }
+
     override fun findQuotes(quoteIds: List<UUID>): List<Quote> =
         jdbi.inTransaction<List<Quote>, RuntimeException> { h -> findQuotes(quoteIds, h) }
 
@@ -112,6 +122,7 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         return Quote(
             id = databaseQuote.masterQuoteId,
             createdAt = databaseQuote.createdAt!!,
+            updatedAt = databaseQuote.timestamp,
             price = databaseQuote.price,
             currency = databaseQuote.currency,
             productType = databaseQuote.productType,
@@ -167,6 +178,14 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         }
     }
 
+    override fun findOldQuotesToDelete(before: Instant): List<Quote> {
+        return jdbi.inTransaction<List<Quote>, RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+            val ids = dao.findOldQuoteIdsToDelete(before)
+            findQuotes(ids, h)
+        }
+    }
+
     private fun update(updatedQuote: Quote, timestamp: Instant, h: Handle) {
         val dao = h.attach<QuoteDao>()
         val quoteData: QuoteData = when (updatedQuote.data) {
@@ -185,4 +204,30 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
         val dao = h.attach<QuoteDao>()
         dao.insert(updatedQuote, timestamp)
     }
+
+    override fun delete(quote: Quote) {
+        jdbi.inTransaction<Unit, RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+            val revs = dao.findRevisions(quote.id)
+
+            dao.deleteQuoteRevisions(quote.id)
+            dao.deleteMasterQuote(quote.id)
+
+            revs.forEach {
+                it.quoteApartmentDataId?.let { dao.deleteApartmentData(it) }
+                it.quoteHouseDataId?.let { dao.deleteHouseData(it) }
+                it.quoteNorwegianHomeContentsDataId?.let { dao.deleteNorwegianHomeContentData(it) }
+                it.quoteNorwegianTravelDataId?.let { dao.deleteNorwegianTravelData(it) }
+                it.quoteDanishAccidentDataId?.let { dao.deleteDanishAccidentData(it) }
+                it.quoteDanishHomeContentsDataId?.let { dao.deleteDanishHomeContentData(it) }
+                it.quoteDanishTravelDataId?.let { dao.deleteDanishTravelData(it) }
+            }
+        }
+    }
+
+    override fun insert(deletedQuote: DeletedQuote) =
+        jdbi.useTransaction<RuntimeException> { h ->
+            val dao = h.attach<QuoteDao>()
+            dao.insert(deletedQuote)
+        }
 }
