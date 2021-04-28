@@ -176,9 +176,7 @@ class QuoteController @Autowired constructor(
         @Valid @RequestBody request: AddAgreementFromQuoteRequest,
         @RequestHeader("Authorization") token: String?
     ): ResponseEntity<Any> {
-        val result = quoteService.addAgreementFromQuote(request, token)
-
-        return when (result) {
+        return when (val result = quoteService.addAgreementFromQuote(request, token)) {
             is Either.Left -> ResponseEntity.status(422).body(result.a)
             is Either.Right -> ResponseEntity.ok(result.b)
             else -> throw IllegalStateException("Result should be either left or right but was ${result::class.java}")

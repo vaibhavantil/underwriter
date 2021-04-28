@@ -140,8 +140,7 @@ class SignServiceImplTest {
                 name = Name(firstName = "", lastName = ""),
                 ssn = null,
                 startDate = LocalDate.now(),
-                email = "null",
-                partnerCampaignCode = null
+                email = "null"
             )
         )
         verify { customerIO.postSignUpdate(ofType(Quote::class)) }
@@ -176,8 +175,7 @@ class SignServiceImplTest {
             name = Name(firstName = "", lastName = ""),
             ssn = null,
             startDate = LocalDate.now(),
-            email = "null",
-            partnerCampaignCode = null
+            email = "null"
         ))
         verify { customerIO.postSignUpdate(any()) }
     }

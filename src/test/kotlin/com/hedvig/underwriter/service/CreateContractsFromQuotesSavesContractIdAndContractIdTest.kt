@@ -81,8 +81,7 @@ class CreateContractsFromQuotesSavesContractIdAndContractIdTest {
                 name = Name("Mr Test", "Tester"),
                 ssn = null,
                 startDate = LocalDate.of(2020, 1, 1),
-                email = "a@email.com",
-                partnerCampaignCode = null
+                email = "a@email.com"
             )
         )
 

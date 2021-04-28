@@ -131,8 +131,7 @@ class SignServiceImpl(
                 quote = quote,
                 agreementId = response.agreementId,
                 shouldCompleteSignInMemberService = true,
-                contractId = response.contractId,
-                partnerCampaignCode = null
+                contractId = response.contractId
             )
         }
     }
@@ -141,8 +140,7 @@ class SignServiceImpl(
         quote: Quote,
         agreementId: UUID,
         shouldCompleteSignInMemberService: Boolean,
-        contractId: UUID,
-        partnerCampaignCode: String?
+        contractId: UUID
     ): Either<Nothing, SignedQuoteResponseDto> {
         val signedAt = Instant.now()
         return Right(
@@ -151,7 +149,7 @@ class SignServiceImpl(
             )
         )
             .map {
-                redeemPartnerCampaignMaybe(it, partnerCampaignCode)
+                redeemPartnerCampaignMaybe(it)
             }
             .map {
                 completeInMemberService(it, shouldCompleteSignInMemberService)
@@ -194,13 +192,10 @@ class SignServiceImpl(
         return quote
     }
 
-    private fun redeemPartnerCampaignMaybe(
-        quote: Quote,
-        partnerCampaignCode: String?
-    ): Quote {
+    private fun redeemPartnerCampaignMaybe(quote: Quote): Quote {
         checkNotNull(quote.memberId) { "Quote must have a member id! Quote id: ${quote.id}" }
 
-        val campaignCode = partnerCampaignCode ?: quote.attributedTo.campaignCode ?: return quote
+        val campaignCode = quote.attributedTo.campaignCode ?: return quote
         try {
             productPricingService.redeemCampaign(
                 RedeemCampaignDto(
@@ -229,8 +224,7 @@ class SignServiceImpl(
                     startDate = request.startDate,
                     email = request.email,
                     price = null,
-                    currency = null,
-                    partnerCampaignCode = request.partnerCampaignCode
+                    currency = null
                 )
             )
 
@@ -268,7 +262,7 @@ class SignServiceImpl(
             .map { quoteRepository.update(it) }
 
         val response = quotes
-            .map { signQuoteWithMemberId(it, true, SignRequest(), request.partnerCampaignCode) }
+            .map { signQuoteWithMemberId(it, true, SignRequest()) }
             .map { it.getOrHandle { throw RuntimeException("Failed to sign quote, unknown reason") } }
             .toList()
 
@@ -418,10 +412,9 @@ class SignServiceImpl(
         val updatedQuote = quote.copy(startDate = request.activationDate, signFromHopeTriggeredBy = request.token)
 
         return signQuoteWithMemberId(
-            updatedQuote,
-            false,
-            SignRequest(),
-            null
+            quote = updatedQuote,
+            shouldCompleteSignInMemberService = false,
+            signedRequest = SignRequest()
         )
     }
 
@@ -442,8 +435,7 @@ class SignServiceImpl(
     private fun signQuoteWithMemberId(
         quote: Quote,
         shouldCompleteSignInMemberService: Boolean,
-        signedRequest: SignRequest,
-        partnerCampaignCode: String?
+        signedRequest: SignRequest
     ): Either<Nothing, SignedQuoteResponseDto> {
         return Right(quote)
             .map { checkNotNull(it.memberId) { "Quote must have a member id! Quote id: ${it.id}" }; it }
@@ -454,8 +446,7 @@ class SignServiceImpl(
                     quote = it,
                     agreementId = it.agreementId!!,
                     shouldCompleteSignInMemberService = shouldCompleteSignInMemberService,
-                    contractId = it.contractId!!,
-                    partnerCampaignCode = partnerCampaignCode
+                    contractId = it.contractId!!
                 )
             }
     }
