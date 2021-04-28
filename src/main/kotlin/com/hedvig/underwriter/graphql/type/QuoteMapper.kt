@@ -392,10 +392,10 @@ class QuoteMapper(
                 isStudent = it.isStudent
             )
         }
-        ?: throw IllegalStateException(
-            "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
-                " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
-        )
+            ?: throw IllegalStateException(
+                "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
+                    " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
+            )
 
     private fun mapCompleteQuoteResult(
         quote: Quote,
@@ -434,10 +434,10 @@ class QuoteMapper(
         } ?: quote.danishTravel?.let {
             CompleteQuoteDetails.UnknownQuoteDetails()
         }
-        ?: throw IllegalStateException(
-            "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
-                " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
-        )
+            ?: throw IllegalStateException(
+                "Trying to create QuoteDetails without `swedishApartment`, `swedishHouse`," +
+                    " `norwegianHomeContents`, `norwegianTravel`, `danishHomeContents`, `danishAccident` or `danishTravel` data"
+            )
 
     private fun extractDisplayName(ebt: ExtraBuildingType, locale: Locale): String =
         localizationService.getTranslation("EXTRA_BUILDING_DISPLAY_NAME_${ebt.name}", locale)

@@ -139,7 +139,7 @@ internal class QuoteSchemaControllerTest {
                 MockMvcResultMatchers.content().json(
                     """
                     {"errorCode":"NO_SUCH_QUOTE","errorMessage":"Quote $QUOTE_ID not found when getting schema","breachedUnderwritingGuidelines":null} 
-                """.trimIndent()
+                    """.trimIndent()
                 )
             )
     }
@@ -177,7 +177,7 @@ internal class QuoteSchemaControllerTest {
                 MockMvcResultMatchers.content().json(
                     """
                     {"errorCode":"NO_SUCH_QUOTE","errorMessage":"Quote $QUOTE_ID not found when getting schema data","breachedUnderwritingGuidelines":null} 
-                """.trimIndent()
+                    """.trimIndent()
                 )
             )
     }
@@ -221,7 +221,7 @@ internal class QuoteSchemaControllerTest {
                 MockMvcResultMatchers.content().json(
                     """
                     {"errorCode":"NO_SUCH_QUOTE","errorMessage":"Quote $QUOTE_ID not found when updating quote via schema data","breachedUnderwritingGuidelines":null} 
-                """.trimIndent()
+                    """.trimIndent()
                 )
             )
     }

@@ -50,7 +50,7 @@ class BundleQueryIsolationTest {
             signService,
             bundleQuoteService,
             QuoteMapper(localizationService)
-            )
+        )
 
         every { bundleQuoteService.bundleQuotes(any(), any()) } throws RuntimeException("Should not get here")
         every { dataFetchingEnvironment.getToken() } returns "1337"

@@ -41,7 +41,8 @@ class QuoteServiceUpdateQuotes {
             breachedUnderwritingGuidelines = listOf("UW_GL_HIT")
         }
         every { priceEngine.querySwedishApartmentPrice(any()) } returns PriceQueryResponse(
-            UUID.randomUUID(), Money.of(12, "SEK"))
+            UUID.randomUUID(), Money.of(12, "SEK")
+        )
 
         every { quoteRepository.update(any(), any()) } returnsArgument 0
 

@@ -461,10 +461,10 @@ data class Quote(
 
                 val addressInfoHasNotChanged =
                     requestData.street == null &&
-                    requestData.zipCode == null &&
-                    requestData.apartment == null &&
-                    requestData.floor == null &&
-                    requestData.city == null
+                        requestData.zipCode == null &&
+                        requestData.apartment == null &&
+                        requestData.floor == null &&
+                        requestData.city == null
 
                 newQuote.copy(
                     data = newQuoteData.copy(

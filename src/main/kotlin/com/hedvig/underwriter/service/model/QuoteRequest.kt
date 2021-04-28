@@ -105,12 +105,12 @@ data class QuoteRequest(
         fun from(quoteRequestDto: ExternalQuoteRequestDto): QuoteRequest {
             require(
                 quoteRequestDto.swedishApartmentData != null ||
-                quoteRequestDto.swedishHouseData != null ||
-                quoteRequestDto.norwegianHomeContentsData != null ||
-                quoteRequestDto.norwegianTravelData != null ||
-                quoteRequestDto.danishHomeContentsData != null ||
-                quoteRequestDto.danishAccidentData != null ||
-                quoteRequestDto.danishTravelData != null
+                    quoteRequestDto.swedishHouseData != null ||
+                    quoteRequestDto.norwegianHomeContentsData != null ||
+                    quoteRequestDto.norwegianTravelData != null ||
+                    quoteRequestDto.danishHomeContentsData != null ||
+                    quoteRequestDto.danishAccidentData != null ||
+                    quoteRequestDto.danishTravelData != null
             ) {
                 "Missing minimal quote related data"
             }

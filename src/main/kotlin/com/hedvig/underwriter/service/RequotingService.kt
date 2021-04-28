@@ -29,7 +29,9 @@ class RequotingService(
                     QuoteInitiatedFrom.ANDROID,
                     QuoteInitiatedFrom.IOS,
                     QuoteInitiatedFrom.RAPIO,
-                    QuoteInitiatedFrom.WEBONBOARDING)) {
+                    QuoteInitiatedFrom.WEBONBOARDING
+                )
+            ) {
                 return false
             }
 

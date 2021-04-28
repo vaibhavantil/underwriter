@@ -39,7 +39,9 @@ class SimpleSignStrategyTest {
             listOf(
                 quote {
                     memberId = "1234"
-                }), createSignData()
+                }
+            ),
+            createSignData()
         )
 
         assertThat(result).isInstanceOf(StartSignResponse.SimpleSignSession::class)
@@ -65,7 +67,9 @@ class SimpleSignStrategyTest {
             listOf(
                 quote {
                     memberId = "1234"
-                }), createSignData()
+                }
+            ),
+            createSignData()
         )
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class)
@@ -92,7 +96,9 @@ class SimpleSignStrategyTest {
             listOf(
                 quote {
                     memberId = "1234"
-                }), createSignData()
+                }
+            ),
+            createSignData()
         )
 
         assertThat(result).isInstanceOf(StartSignResponse.FailedToStartSign::class)

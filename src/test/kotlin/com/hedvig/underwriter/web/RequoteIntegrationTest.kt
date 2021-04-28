@@ -77,67 +77,79 @@ class RequoteIntegrationTest {
     fun `Test re-quoting of SE apartment`() {
 
         // Create a quote
-        with(createSwedishApartmentQuote<String>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<String>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // Create same quote agian, should be ok and then sign it
-        with(createSwedishApartmentQuote<CompleteQuoteResponseDto>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<CompleteQuoteResponseDto>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
 
             signQuote(body!!.id, null)
         }
 
         // Cannot requote a signed quote withsame address and ssn
-        with(createSwedishApartmentQuote<String>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<String>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(500)
             assertThat(body!!).contains("Creation of quote is blocked")
         }
 
         // withanother ssn it should be ok
-        with(createSwedishApartmentQuote<CompleteQuoteResponseDto>(
-            ssn = "190905249801",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<CompleteQuoteResponseDto>(
+                ssn = "190905249801",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // withanother address it should be ok
-        with(createSwedishApartmentQuote<CompleteQuoteResponseDto>(
-            ssn = "199110112399",
-            street = "ApStreet 1",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<CompleteQuoteResponseDto>(
+                ssn = "199110112399",
+                street = "ApStreet 1",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         every { productPricingClient.getAgreement(any()) } returns ResponseEntity.status(200).body(inactiveAgreement)
 
         // It should be ok if not an active agreement
-        with(createSwedishApartmentQuote<String>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishApartmentQuote<String>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
     }
@@ -146,67 +158,79 @@ class RequoteIntegrationTest {
     fun `Test re-quoting of SE house`() {
 
         // Create a quote
-        with(createSwedishHouseQuote<CompleteQuoteResponseDto>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<CompleteQuoteResponseDto>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // Create same quote agian, should be ok and then sign it
-        with(createSwedishHouseQuote<CompleteQuoteResponseDto>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<CompleteQuoteResponseDto>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
 
             signQuote(body!!.id, null)
         }
 
         // Cannot requote a signed quote withsame address and ssn
-        with(createSwedishHouseQuote<String>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<String>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(500)
             assertThat(body!!).contains("Creation of quote is blocked")
         }
 
         // withanother ssn it should be ok
-        with(createSwedishHouseQuote<CompleteQuoteResponseDto>(
-            ssn = "190905249801",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<CompleteQuoteResponseDto>(
+                ssn = "190905249801",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // withanother address it should be ok
-        with(createSwedishHouseQuote<CompleteQuoteResponseDto>(
-            ssn = "199110112399",
-            street = "ApStreet 1",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<CompleteQuoteResponseDto>(
+                ssn = "199110112399",
+                street = "ApStreet 1",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         every { productPricingClient.getAgreement(any()) } returns ResponseEntity.status(200).body(inactiveAgreement)
 
         // It should be ok if not an active agreement
-        with(createSwedishHouseQuote<String>(
-            ssn = "199110112399",
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity"
-        )) {
+        with(
+            createSwedishHouseQuote<String>(
+                ssn = "199110112399",
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
     }
@@ -215,67 +239,79 @@ class RequoteIntegrationTest {
     fun `Test re-quoting of NO home content`() {
 
         // Create a quote
-        with(createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // Create same quote again, should be ok and then sign it
-        with(createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
 
             signQuote(body!!.id, "11077941012")
         }
 
         // Cannot re-quote a signed quote withsame address and birthdate
-        with(createNorwegianHomeContentQuote<String>(
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<String>(
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(500)
             assertThat(body!!).contains("Creation of quote is blocked")
         }
 
         // withanother birth date it should be ok
-        with(createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1971-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1971-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         // withanother address it should be ok
-        with(createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
-            street = "ApStreet 1",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<CompleteQuoteResponseDto>(
+                street = "ApStreet 1",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
 
         every { productPricingClient.getAgreement(any()) } returns ResponseEntity.status(200).body(inactiveAgreement)
 
         // It should be ok if not an active agreement
-        with(createNorwegianHomeContentQuote<String>(
-            street = "ApStreet 1234",
-            zip = "1234",
-            city = "ApCity",
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianHomeContentQuote<String>(
+                street = "ApStreet 1234",
+                zip = "1234",
+                city = "ApCity",
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
     }
@@ -284,18 +320,22 @@ class RequoteIntegrationTest {
     fun `Test re-quoting of NO travel`() {
 
         // Create quote and then sign it
-        with(createNorwegianTravelQuote<CompleteQuoteResponseDto>(
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianTravelQuote<CompleteQuoteResponseDto>(
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
 
             signQuote(body!!.id, "11077941012")
         }
 
         // Can re-quote a signed quote withsame birthdate
-        with(createNorwegianTravelQuote<String>(
-            birthdate = "1970-01-01"
-        )) {
+        with(
+            createNorwegianTravelQuote<String>(
+                birthdate = "1970-01-01"
+            )
+        ) {
             assertThat(statusCode.value()).isEqualTo(200)
         }
     }

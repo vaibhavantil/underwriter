@@ -27,7 +27,8 @@ class SignSessionController @Autowired constructor(
         @RequestBody requestBody: SignRequest
     ) {
         signService.completedSignSession(
-            sessionId, CompleteSignSessionData.SwedishBankIdDataComplete(
+            sessionId,
+            CompleteSignSessionData.SwedishBankIdDataComplete(
                 requestBody.referenceToken,
                 requestBody.signature,
                 requestBody.oscpResponse

@@ -41,8 +41,8 @@ object NorwegianSsnNotMatchesBirthDate : BaseGuideline<QuoteData> {
 
         val valid = ssn.dayMonthAndTwoDigitYearFromDDMMYYSsn().let { dayMonthYear ->
             (birthdate.dayOfMonth == dayMonthYear.first.toInt()) &&
-            (birthdate.monthValue == dayMonthYear.second.toInt()) &&
-            (birthdate.year.toString().substring(2, 4) == dayMonthYear.third)
+                (birthdate.monthValue == dayMonthYear.second.toInt()) &&
+                (birthdate.year.toString().substring(2, 4) == dayMonthYear.third)
         }
 
         if (!valid) {

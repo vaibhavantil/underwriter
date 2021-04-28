@@ -200,7 +200,7 @@ data class DanishHomeContentsData(
             firstName, lastName, coInsured -> false
             else -> true
         }
-    }
+}
 
 data class DanishAccidentData(
     override val id: UUID,

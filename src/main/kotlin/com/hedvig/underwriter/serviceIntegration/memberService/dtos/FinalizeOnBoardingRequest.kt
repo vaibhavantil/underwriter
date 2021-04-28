@@ -29,14 +29,14 @@ class FinalizeOnBoardingRequest(
             val addressInsurance = quote.data as? AddressData
 
             val address = addressInsurance?.let {
-                    Address(
-                        street = addressInsurance.street!!,
-                        city = addressInsurance.city ?: "",
-                        zipCode = addressInsurance.zipCode!!,
-                        apartmentNo = (addressInsurance as? DanishHomeContentAddressData)?.apartment ?: "",
-                        floor = (addressInsurance as? DanishHomeContentAddressData)?.floor?.toIntOrNull() ?: 0
-                    )
-                }
+                Address(
+                    street = addressInsurance.street!!,
+                    city = addressInsurance.city ?: "",
+                    zipCode = addressInsurance.zipCode!!,
+                    apartmentNo = (addressInsurance as? DanishHomeContentAddressData)?.apartment ?: "",
+                    floor = (addressInsurance as? DanishHomeContentAddressData)?.floor?.toIntOrNull() ?: 0
+                )
+            }
 
             return FinalizeOnBoardingRequest(
                 memberId = quote.memberId!!,
