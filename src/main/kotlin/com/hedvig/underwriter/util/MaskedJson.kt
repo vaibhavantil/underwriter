@@ -30,7 +30,7 @@ private class MaskedIntrospector : NopAnnotationIntrospector() {
     }
 }
 
-private class MaskedSerializer : StdSerializer<Any>(Any::class.java) {
+class MaskedSerializer : StdSerializer<Any>(Any::class.java) {
     override fun serialize(value: Any, gen: JsonGenerator, provider: SerializerProvider) {
         gen.writeNull()
     }

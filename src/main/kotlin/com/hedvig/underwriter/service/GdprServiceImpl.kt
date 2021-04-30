@@ -18,35 +18,38 @@ class GdprServiceImpl(
 ) : GdprService {
 
     @Value("\${features.gdpr.retention-days:-1}")
-    private var days: Long = -1
+    private var daysConfig: Long = -1
 
     @Value("\${features.gdpr.dry-run:false}")
-    private var dryRun: Boolean = false
+    private var dryRunConfig: Boolean = false
 
-    override fun clean() {
+    override fun clean(dryRun: Boolean?) {
         try {
-            run()
+            val isDryRun = dryRun ?: this.dryRunConfig
+
+            run(isDryRun)
         } catch (e: Exception) {
             logger.error("Failed to execute cleaning job: $e", e)
         }
     }
 
-    private fun run() {
-        logger.info("Clean out quotes older than $days days")
+    private fun run(dryRun: Boolean) {
 
-        if (days <= 0) {
+        logger.info("Clean out quotes older than $daysConfig days ${if (dryRun) "(DRY-RUN)" else ""}")
+
+        if (daysConfig <= 0) {
             logger.info("Cleaning disabled")
             return
         }
 
-        val quotesToDelete = getQuotesToDelete(days)
+        val quotesToDelete = getQuotesToDelete(daysConfig)
         val membersToDelete = getMembersToDelete(quotesToDelete)
 
         logger.info("Found ${quotesToDelete.size} quote(s) to delete")
         logger.info("Found ${membersToDelete.size} member(s) to delete")
 
-        deleteMembers(membersToDelete)
-        deleteQuotes(quotesToDelete)
+        deleteMembers(membersToDelete, dryRun)
+        deleteQuotes(quotesToDelete, dryRun)
 
         logger.info("Successfully deleted ${quotesToDelete.size} quote(s) and ${membersToDelete.size} member(s)")
     }
@@ -80,7 +83,7 @@ class GdprServiceImpl(
             .map { it.id }
             .all { quotes.contains(it) }
 
-    private fun deleteMembers(memberIds: List<String>) {
+    private fun deleteMembers(memberIds: List<String>, dryRun: Boolean) {
         // Member Service
         // Endpoint not available yet
 
@@ -97,7 +100,7 @@ class GdprServiceImpl(
         }
     }
 
-    private fun deleteQuotes(quotes: List<Quote>) {
+    private fun deleteQuotes(quotes: List<Quote>, dryRun: Boolean) {
         // Lookup Service
         // Endpoint not available yet
 

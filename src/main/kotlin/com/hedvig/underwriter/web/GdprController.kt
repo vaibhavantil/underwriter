@@ -5,6 +5,7 @@ import com.hedvig.underwriter.service.GdprService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -14,9 +15,9 @@ class GdprController(
 ) {
     @PostMapping("/clean")
     @LogCall
-    fun clean(): ResponseEntity<out Any> {
+    fun clean(@RequestParam("dry-run") dryRun: Boolean?): ResponseEntity<out Any> {
 
-        gdprService.clean()
+        gdprService.clean(dryRun)
 
         return ResponseEntity.noContent().build()
     }

@@ -48,6 +48,7 @@ import java.lang.RuntimeException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.Random
 import java.util.UUID
 
 @RunWith(SpringRunner::class)
@@ -160,7 +161,7 @@ class GdprIntegrationTest {
 
         with(quoteClient.createSwedishApartmentQuote(
             ssn = "199110112399",
-            street = "ApStreet 1234",
+            street = "ApStreet 12312",
             zip = "1234",
             city = "ApCity"
         )) {
@@ -211,16 +212,31 @@ class GdprIntegrationTest {
     @Test
     fun `Test cleaning quote with member`() {
 
-        graphQLTestTemplate.addHeader("hedvig.token", "123")
+        val memberId = Random().nextLong().toString()
 
-        val response = graphQLTestTemplate.postMultipart(createMutation(), "{}")
-        assert(response.isOk)
+        val quoteId = createGraphQlQuote(memberId)
 
-        val id = UUID.fromString(response.readTree()["data"]["createQuote"]["id"].asText())
+        assertCleanJob(quoteId)
 
-        assertCleanJob(id)
+        verify(exactly = 1) { notificationServiceClient.deleteMember(memberId) }
 
-        verify(exactly = 1) { notificationServiceClient.deleteMember("123") }
+        // TODO: Add verify checks to member, api gw, lookup services when implemented
+    }
+
+    @Test
+    fun `Test dry-run cleaning job`() {
+
+        val memberId = Random().nextLong().toString()
+        val quoteId = createGraphQlQuote(memberId)
+
+        val nowMinus30d = Instant.now().plus(-30, ChronoUnit.DAYS)
+        updateCreatedAt(quoteId, nowMinus30d)
+
+        gdprClient.clean(true)
+
+        assertQuoteExist(quoteId)
+
+        verify(exactly = 0) { notificationServiceClient.deleteMember(memberId) }
 
         // TODO: Add verify checks to member, api gw, lookup services when implemented
     }
@@ -228,19 +244,15 @@ class GdprIntegrationTest {
     @Test
     fun `Test cleaning quote with member having other quotes`() {
 
-        graphQLTestTemplate.addHeader("hedvig.token", "123")
+        val memberId = Random().nextLong().toString()
 
-        val response1 = graphQLTestTemplate.postMultipart(createMutation(), "{}")
-        val response2 = graphQLTestTemplate.postMultipart(createMutation(), "{}")
-        assert(response1.isOk)
-        assert(response2.isOk)
+        val quoteId1 = createGraphQlQuote(memberId)
+        val quoteId2 = createGraphQlQuote(memberId)
 
-        val id = UUID.fromString(response1.readTree()["data"]["createQuote"]["id"].asText())
-
-        assertCleanJob(id)
+        assertCleanJob(quoteId1)
 
         // Since user has another quote than the quote deleted he/she is not removed in other services
-        verify(exactly = 0) { notificationServiceClient.deleteMember("123") }
+        verify(exactly = 0) { notificationServiceClient.deleteMember(memberId) }
 
         // TODO: Add verify checks to member, api gw, lookup services when implemented
     }
@@ -432,4 +444,14 @@ class GdprIntegrationTest {
                 .bind("createdAt", createdAt)
                 .execute()
         }
+
+    private fun createGraphQlQuote(memberId: String): UUID {
+        graphQLTestTemplate.clearHeaders()
+        graphQLTestTemplate.addHeader("hedvig.token", memberId)
+
+        val response = graphQLTestTemplate.postMultipart(createMutation(), "{}")
+        assert(response.isOk)
+
+        return UUID.fromString(response.readTree()["data"]["createQuote"]["id"].asText())
+    }
 }

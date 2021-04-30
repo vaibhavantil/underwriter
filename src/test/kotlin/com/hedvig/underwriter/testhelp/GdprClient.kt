@@ -12,7 +12,7 @@ class GdprClient {
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
 
-    fun clean(): ResponseEntity<String> {
-        return restTemplate.postForEntity("/_/v1/gdpr/clean")
+    fun clean(dryRun: Boolean = false): ResponseEntity<String> {
+        return restTemplate.postForEntity("/_/v1/gdpr/clean${if (dryRun) "?dry-run=true" else ""}")
     }
 }

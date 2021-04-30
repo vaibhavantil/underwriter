@@ -1,5 +1,5 @@
 package com.hedvig.underwriter.service
 
 interface GdprService {
-    fun clean()
+    fun clean(dryRun: Boolean?)
 }
