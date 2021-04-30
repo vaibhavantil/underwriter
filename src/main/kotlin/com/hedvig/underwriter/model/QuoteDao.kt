@@ -588,15 +588,19 @@ interface QuoteDao {
     @SqlQuery(
         """
             SELECT
-            DISTINCT ON (qr.master_quote_id)
-            mq.id
-            FROM master_quotes mq
-            JOIN quote_revisions qr
-            ON qr.master_quote_id = mq.id 
+                id
+            FROM (
+                SELECT DISTINCT ON (qr.master_quote_id)
+                    mq.id,
+                    qr.agreement_id
+                FROM master_quotes mq
+                JOIN quote_revisions qr ON qr.master_quote_id = mq.id 
+                WHERE 
+                    created_at < :before
+                ORDER BY qr.master_quote_id ASC, qr.id DESC
+            ) a
             WHERE 
-            mq.created_at < :before AND
-            agreement_id is null
-            ORDER BY qr.master_quote_id ASC, qr.id DESC
+                agreement_id is null
         """
     )
     fun findOldQuoteIdsToDelete(@Bind before: Instant): List<UUID>

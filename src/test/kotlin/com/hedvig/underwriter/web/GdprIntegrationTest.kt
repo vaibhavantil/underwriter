@@ -11,8 +11,13 @@ import org.javamoney.moneta.Money
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
+import com.graphql.spring.boot.test.GraphQLTestTemplate
+import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.productPricingObjects.dtos.Agreement
 import com.hedvig.productPricingObjects.enums.AgreementStatus
+import com.hedvig.underwriter.graphql.type.InsuranceCost
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
@@ -27,8 +32,10 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.HelloHedvigR
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.PersonStatusDto
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineClient
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingClient
+import com.hedvig.underwriter.testhelp.GdprClient
 import com.hedvig.underwriter.testhelp.QuoteClient
 import io.mockk.mockk
+import io.mockk.verify
 import org.jdbi.v3.core.Jdbi
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +46,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.context.junit4.SpringRunner
 import java.lang.RuntimeException
 import java.time.Instant
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @RunWith(SpringRunner::class)
@@ -47,6 +56,12 @@ class GdprIntegrationTest {
 
     @Autowired
     private lateinit var quoteClient: QuoteClient
+
+    @Autowired
+    private lateinit var gdprClient: GdprClient
+
+    @Autowired
+    private lateinit var graphQLTestTemplate: GraphQLTestTemplate
 
     @Autowired
     private lateinit var jdbi: Jdbi
@@ -67,6 +82,20 @@ class GdprIntegrationTest {
 
     @Before
     fun setup() {
+
+        // Added this snippet to make sure we do not forget to add cleaning/deletion tests for new types when added
+        val makeSureAllTypesAreTested: (QuoteData) -> Unit = fun (type: QuoteData) {
+            when (type) {
+                is SwedishApartmentData -> "Done"
+                is SwedishHouseData -> "Done"
+                is NorwegianHomeContentsData -> "Done"
+                is NorwegianTravelData -> "Done"
+                is DanishAccidentData -> "Done"
+                is DanishHomeContentsData -> "Done"
+                is DanishTravelData -> "Done"
+            }
+        }
+
         every { memberServiceClient.personStatus(any()) } returns ResponseEntity.status(200).body(PersonStatusDto(Flag.GREEN))
         every { memberServiceClient.checkPersonDebt(any()) } returns ResponseEntity.status(200).body(null)
         every { memberServiceClient.checkIsSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
@@ -76,24 +105,16 @@ class GdprIntegrationTest {
         every { memberServiceClient.finalizeOnBoarding(any(), any()) } returns ResponseEntity.status(200).body("")
         every { productPricingClient.createContract(any(), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()))
         every { productPricingClient.getAgreement(any()) } returns ResponseEntity.status(200).body(activeAgreement)
+        every { productPricingClient.calculateInsuranceCost(any(), any()) } returns ResponseEntity.status(200).body(InsuranceCost(
+            MonetaryAmountV2.Companion.of(11.0, "SEK"),
+            MonetaryAmountV2.Companion.of(12.1, "SEK"),
+            MonetaryAmountV2.Companion.of(12.0, "SEK"),
+            LocalDate.now()))
         every { priceEngineClient.queryPrice(any()) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(12, "NOK"))
     }
 
     @Test
     fun `Test deleting quotes`() {
-
-        // Added this snippet to make sure we do not forget to add tests for new types when added
-        val makeSureAllTypesAreTested: (QuoteData) -> Unit = fun (type: QuoteData) {
-            when (type) {
-                is SwedishApartmentData -> TODO()
-                is SwedishHouseData -> TODO()
-                is NorwegianHomeContentsData -> TODO()
-                is NorwegianTravelData -> TODO()
-                is DanishAccidentData -> TODO()
-                is DanishHomeContentsData -> TODO()
-                is DanishTravelData -> TODO()
-            }
-        }
 
         val seApartmentRsp = quoteClient.createSwedishApartmentQuote()
         val seHouseRsp = quoteClient.createSwedishHouseQuote()
@@ -135,7 +156,7 @@ class GdprIntegrationTest {
     }
 
     @Test
-    fun `Test deleting quote with agreement fails`() {
+    fun `Test that deleting quote with agreement fails`() {
 
         with(quoteClient.createSwedishApartmentQuote(
             ssn = "199110112399",
@@ -155,6 +176,115 @@ class GdprIntegrationTest {
 
             assertThat(response.statusCodeValue).isEqualTo(403)
         }
+    }
+
+    @Test
+    fun `Test quote cleaning job`() {
+
+        val seApartmentRsp = quoteClient.createSwedishApartmentQuote()
+        val seHouseRsp = quoteClient.createSwedishHouseQuote()
+        val noHomeRsp = quoteClient.createNorwegianHomeContentQuote()
+        val noTravelRsp = quoteClient.createNorwegianTravelQuote()
+        val dkHomeRsp = quoteClient.createDanishHomeContentQuote()
+        val dkAccidentRsp = quoteClient.createDanishAccidentQuote()
+        val dkTravelRsp = quoteClient.createDanishTravelQuote()
+
+        assertCleanJob(seApartmentRsp.id)
+        assertCleanJob(seHouseRsp.id)
+        assertCleanJob(noHomeRsp.id)
+        assertCleanJob(noTravelRsp.id)
+        assertCleanJob(dkHomeRsp.id)
+        assertCleanJob(dkAccidentRsp.id)
+        assertCleanJob(dkTravelRsp.id)
+    }
+
+    @Test
+    fun `Test quote cleaning job is not removing quotes with an agreement`() {
+
+        val seApartmentRsp = quoteClient.createSwedishApartmentQuote()
+
+        quoteClient.signQuote(seApartmentRsp.id)
+
+        assertCleanJob(seApartmentRsp.id, false)
+    }
+
+    @Test
+    fun `Test cleaning quote with member`() {
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.postMultipart(createMutation(), "{}")
+        assert(response.isOk)
+
+        val id = UUID.fromString(response.readTree()["data"]["createQuote"]["id"].asText())
+
+        assertCleanJob(id)
+
+        verify(exactly = 1) { notificationServiceClient.deleteMember("123") }
+
+        // TODO: Add verify checks to member, api gw, lookup services when implemented
+    }
+
+    @Test
+    fun `Test cleaning quote with member having other quotes`() {
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response1 = graphQLTestTemplate.postMultipart(createMutation(), "{}")
+        val response2 = graphQLTestTemplate.postMultipart(createMutation(), "{}")
+        assert(response1.isOk)
+        assert(response2.isOk)
+
+        val id = UUID.fromString(response1.readTree()["data"]["createQuote"]["id"].asText())
+
+        assertCleanJob(id)
+
+        // Since user has another quote than the quote deleted he/she is not removed in other services
+        verify(exactly = 0) { notificationServiceClient.deleteMember("123") }
+
+        // TODO: Add verify checks to member, api gw, lookup services when implemented
+    }
+
+    private fun createMutation() =
+        javaClass.getResource("/mutations/createApartmentQuote.graphql")
+            .readText()
+            .replace("00000000-0000-0000-0000-000000000000", UUID.randomUUID().toString())
+
+    private fun assertCleanJob(quoteId: UUID, cleaned: Boolean = true) {
+
+        val now = Instant.now()
+        val nowMinus29d = now.plus(-29, ChronoUnit.DAYS)
+        val nowMinus30d = now.plus(-30, ChronoUnit.DAYS)
+
+        assertQuoteExist(quoteId)
+
+        gdprClient.clean()
+
+        assertQuoteExist(quoteId)
+
+        updateCreatedAt(quoteId, nowMinus29d)
+
+        gdprClient.clean()
+
+        assertQuoteExist(quoteId)
+
+        updateCreatedAt(quoteId, nowMinus30d)
+
+        gdprClient.clean()
+
+        if (cleaned) {
+            assertNoQuoteExist(quoteId)
+        } else {
+            assertQuoteExist(quoteId)
+        }
+    }
+
+    private fun assertNoQuoteExist(id: UUID) {
+        assertThat(quoteClient.getQuote(id)).isNull()
+    }
+
+    private fun assertQuoteExist(id: UUID) {
+        assertThat(quoteClient.getQuote(id)).isNotNull()
     }
 
     private fun getQuoteRevsFromDb(quoteId: UUID): List<QuoteRev> {
@@ -293,5 +423,13 @@ class GdprIntegrationTest {
                 .bind("quoteId", quoteId)
                 .mapTo(DeletedQuote::class.java)
                 .findOnly()
+        }
+
+    private fun updateCreatedAt(quoteId: UUID, createdAt: Instant): Unit =
+        jdbi.withHandle<Unit, RuntimeException> { handle ->
+            handle.createUpdate("UPDATE master_quotes SET created_at = :createdAt WHERE id = :quoteId")
+                .bind("quoteId", quoteId)
+                .bind("createdAt", createdAt)
+                .execute()
         }
 }

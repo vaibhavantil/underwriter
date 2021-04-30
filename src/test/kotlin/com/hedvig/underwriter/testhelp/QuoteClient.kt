@@ -3,6 +3,7 @@ package com.hedvig.underwriter.testhelp
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.SignedQuoteResponseDto
+import org.apache.commons.lang.RandomStringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
@@ -22,7 +23,7 @@ class QuoteClient {
 
     fun createSwedishApartmentQuote(
         ssn: String = "199110112399",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -35,7 +36,7 @@ class QuoteClient {
 
     fun createSwedishApartmentQuoteRaw(
         ssn: String = "199110112399",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -48,7 +49,7 @@ class QuoteClient {
 
     fun createSwedishHouseQuote(
         ssn: String = "199110112399",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -64,7 +65,7 @@ class QuoteClient {
 
     fun createSwedishHouseQuoteRaw(
         ssn: String = "199110112399",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -80,7 +81,7 @@ class QuoteClient {
 
     fun createNorwegianHomeContentQuote(
         birthdate: String = "1944-08-04",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -93,7 +94,7 @@ class QuoteClient {
 
     fun createNorwegianHomeContentQuoteRaw(
         birthdate: String = "1944-08-04",
-        street: String = "ApStreet 1234",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
         zip: String = "12345",
         city: String = "ApCity",
         livingSpace: Int = 111,
@@ -120,11 +121,89 @@ class QuoteClient {
         return createNorwegianTravelQuote<String>(birthdate, coInsured, youth)
     }
 
+    fun createDanishHomeContentQuote(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
+        apartment: String = "1tv",
+        floor: Int = 1,
+        bbrid: String? = null,
+        zip: String = "1234",
+        city: String = "ApCity",
+        livingSpace: Int = 111,
+        coInsured: Int = 1,
+        student: Boolean = false,
+        subType: String = "OWN"
+    ): CompleteQuoteResponseDto {
+        return createDanishHomeContentQuote<CompleteQuoteResponseDto>(birthdate, street, apartment, floor, bbrid, zip, city, livingSpace, coInsured, student, subType).body!!
+    }
+
+    fun createDanishHomeContentQuoteRaw(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
+        apartment: String = "1tv",
+        floor: Int = 1,
+        bbrid: String? = null,
+        zip: String = "1234",
+        city: String = "ApCity",
+        livingSpace: Int = 111,
+        coInsured: Int = 1,
+        student: Boolean = false,
+        subType: String = "OWN"
+    ): ResponseEntity<String> {
+        return createDanishHomeContentQuote<String>(birthdate, street, apartment, floor, bbrid, zip, city, livingSpace, coInsured, student, subType)
+    }
+
+    fun createDanishAccidentQuote(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
+        zip: String = "1234",
+        city: String = "ApCity",
+        coInsured: Int = 1,
+        student: Boolean = false
+    ): CompleteQuoteResponseDto {
+        return createDanishAccidentQuote<CompleteQuoteResponseDto>(birthdate, street, zip, city, coInsured, student).body!!
+    }
+
+    fun createDanishAccidentQuoteRaw(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet 11",
+        zip: String = "1234",
+        city: String = "ApCity",
+        coInsured: Int = 1,
+        student: Boolean = false
+
+    ): ResponseEntity<String> {
+        return createDanishAccidentQuote<String>(birthdate, street, zip, city, coInsured, student)
+    }
+
+    fun createDanishTravelQuote(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
+        zip: String = "1234",
+        city: String = "ApCity",
+        coInsured: Int = 1,
+        student: Boolean = false
+    ): CompleteQuoteResponseDto {
+        return createDanishTravelQuote<CompleteQuoteResponseDto>(birthdate, street, zip, city, coInsured, student).body!!
+    }
+
+    fun createDanishTravelQuoteRaw(
+        birthdate: String = "1944-08-04",
+        street: String = "ApStreet ${RandomStringUtils.randomNumeric(2)}",
+        zip: String = "1234",
+        city: String = "ApCity",
+        coInsured: Int = 1,
+        student: Boolean = false
+
+    ): ResponseEntity<String> {
+        return createDanishTravelQuote<String>(birthdate, street, zip, city, coInsured, student)
+    }
+
     fun signQuote(
         quoteId: UUID,
-        firstName: String,
-        lastName: String,
-        email: String,
+        firstName: String = "Apan",
+        lastName: String = "Apansson",
+        email: String = "apan@apansson.se",
         ssn: String? = null,
         startDate: String? = null
     ): SignedQuoteResponseDto {
@@ -151,7 +230,7 @@ class QuoteClient {
         return restTemplate.exchange("/_/v1/quotes/$quoteId", HttpMethod.DELETE, HttpEntity(null, headers), String::class.java)
     }
 
-    fun getQuote(quoteId: UUID): Quote {
+    fun getQuote(quoteId: UUID): Quote? {
         return restTemplate.getForObject("/_/v1/quotes/$quoteId", Quote::class.java)
     }
 
@@ -160,10 +239,10 @@ class QuoteClient {
         street: String,
         zip: String,
         city: String,
-        livingSpace: Int = 111,
-        coInsured: Int = 1,
-        youth: Boolean = false,
-        subType: String = "OWN"
+        livingSpace: Int,
+        coInsured: Int,
+        youth: Boolean,
+        subType: String
     ): ResponseEntity<T> {
         val request = """
             {
@@ -194,8 +273,8 @@ class QuoteClient {
 
     private inline fun <reified T : Any> createNorwegianTravelQuote(
         birthdate: String,
-        coInsured: Int = 1,
-        youth: Boolean = false
+        coInsured: Int,
+        youth: Boolean
     ): ResponseEntity<T> {
         val request = """
             {
@@ -224,10 +303,10 @@ class QuoteClient {
         street: String,
         zip: String,
         city: String,
-        livingSpace: Int = 111,
-        householdSize: Int = 1,
-        floor: Int = 0,
-        subType: String = "BRF"
+        livingSpace: Int,
+        householdSize: Int,
+        floor: Int,
+        subType: String
     ): ResponseEntity<T> {
         val request = """           
             {
@@ -260,13 +339,13 @@ class QuoteClient {
         street: String,
         zip: String,
         city: String,
-        livingSpace: Int = 111,
-        householdSize: Int = 1,
-        ancillaryArea: Int = 11,
-        yearOfConstruction: Int = 1970,
-        numberOfBathrooms: Int = 1,
-        floor: Int = 0,
-        subleted: Boolean = false
+        livingSpace: Int,
+        householdSize: Int,
+        ancillaryArea: Int,
+        yearOfConstruction: Int,
+        numberOfBathrooms: Int,
+        floor: Int,
+        subleted: Boolean
     ): ResponseEntity<T> {
         val request = """           
             {
@@ -303,50 +382,18 @@ class QuoteClient {
         return postJson("/_/v1/quotes", request)
     }
 
-    fun createDanishHomeContentQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        apartment: String = "1tv",
-        floor: Int = 1,
-        bbrid: String? = null,
-        zip: String = "1234",
-        city: String = "ApCity",
-        livingSpace: Int = 111,
-        coInsured: Int = 1,
-        student: Boolean = false,
-        subType: String = "OWN"
-    ): CompleteQuoteResponseDto {
-        return createDanishHomeContentQuote<CompleteQuoteResponseDto>(birthdate, street, apartment, floor, bbrid, zip, city, livingSpace, coInsured, student, subType).body!!
-    }
-
-    fun createDanishHomeContentQuoteRaw(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        apartment: String = "1tv",
-        floor: Int = 1,
-        bbrid: String? = null,
-        zip: String = "1234",
-        city: String = "ApCity",
-        livingSpace: Int = 111,
-        coInsured: Int = 1,
-        student: Boolean = false,
-        subType: String = "OWN"
-    ): ResponseEntity<String> {
-        return createDanishHomeContentQuote<String>(birthdate, street, apartment, floor, bbrid, zip, city, livingSpace, coInsured, student, subType)
-    }
-
     private inline fun <reified T : Any> createDanishHomeContentQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        apartment: String = "1tv",
-        floor: Int = 1,
+        birthdate: String,
+        street: String,
+        apartment: String,
+        floor: Int,
         bbrid: String? = null,
-        zip: String = "1234",
-        city: String = "ApCity",
-        livingSpace: Int = 111,
-        coInsured: Int = 1,
-        student: Boolean = false,
-        subType: String = "OWN"
+        zip: String,
+        city: String,
+        livingSpace: Int,
+        coInsured: Int,
+        student: Boolean,
+        subType: String
     ): ResponseEntity<T> {
         val request = """
             {
@@ -378,36 +425,13 @@ class QuoteClient {
         return postJson("/_/v1/quotes", request)
     }
 
-    fun createDanishAccidentQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
-    ): CompleteQuoteResponseDto {
-        return createDanishAccidentQuote<CompleteQuoteResponseDto>(birthdate, street, zip, city, coInsured, student).body!!
-    }
-
-    fun createDanishAccidentQuoteRaw(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
-
-    ): ResponseEntity<String> {
-        return createDanishAccidentQuote<String>(birthdate, street, zip, city, coInsured, student)
-    }
-
     private inline fun <reified T : Any> createDanishAccidentQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
+        birthdate: String,
+        street: String,
+        zip: String,
+        city: String,
+        coInsured: Int,
+        student: Boolean
     ): ResponseEntity<T> {
         val request = """
             {
@@ -434,36 +458,13 @@ class QuoteClient {
         return postJson("/_/v1/quotes", request)
     }
 
-    fun createDanishTravelQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
-    ): CompleteQuoteResponseDto {
-        return createDanishTravelQuote<CompleteQuoteResponseDto>(birthdate, street, zip, city, coInsured, student).body!!
-    }
-
-    fun createDanishTravelQuoteRaw(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
-
-    ): ResponseEntity<String> {
-        return createDanishTravelQuote<String>(birthdate, street, zip, city, coInsured, student)
-    }
-
     private inline fun <reified T : Any> createDanishTravelQuote(
-        birthdate: String = "1944-08-04",
-        street: String = "ApStreet 11",
-        zip: String = "1234",
-        city: String = "ApCity",
-        coInsured: Int = 1,
-        student: Boolean = false
+        birthdate: String,
+        street: String,
+        zip: String,
+        city: String,
+        coInsured: Int,
+        student: Boolean
     ): ResponseEntity<T> {
         val request = """
             {

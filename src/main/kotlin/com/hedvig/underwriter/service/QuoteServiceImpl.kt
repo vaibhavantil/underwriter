@@ -216,7 +216,7 @@ class QuoteServiceImpl(
                 .joinToString(" ")
         }
 
-        return this.replace("\"street\":null", "\"street\": $street")
+        return this.replace("\"street\":null", "\"street\": \"$street\"")
     }
 
     override fun createQuoteFromAgreement(
