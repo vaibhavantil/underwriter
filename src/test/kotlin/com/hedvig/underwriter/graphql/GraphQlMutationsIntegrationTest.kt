@@ -412,7 +412,7 @@ internal class GraphQlMutationsIntegrationTest {
             priceEngineService.queryDanishAccidentPrice(
                 PriceQueryRequest.DanishAccident(
                     holderMemberId = "123",
-                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5"),
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae3"),
                     holderBirthDate = LocalDate.of(1961, 12, 21),
                     numberCoInsured = 0,
                     postalCode = "1234",
@@ -451,7 +451,7 @@ internal class GraphQlMutationsIntegrationTest {
         val createQuote = response.readTree()["data"]["createQuote"]
 
         assert(response.isOk)
-        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae5")
+        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae3")
         assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
         assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
         assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
