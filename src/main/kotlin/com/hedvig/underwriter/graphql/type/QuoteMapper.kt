@@ -389,6 +389,10 @@ class QuoteMapper(
             QuoteDetails.DanishAccidentDetails(
                 street = it.street,
                 zipCode = it.zipCode,
+                apartment = it.apartment,
+                floor = it.floor,
+                bbrId = it.bbrId,
+                city = it.city,
                 coInsured = it.coInsured,
                 isStudent = it.isStudent
             )
@@ -396,6 +400,10 @@ class QuoteMapper(
             QuoteDetails.DanishTravelDetails(
                 street = it.street,
                 zipCode = it.zipCode,
+                apartment = it.apartment,
+                floor = it.floor,
+                bbrId = it.bbrId,
+                city = it.city,
                 coInsured = it.coInsured,
                 isStudent = it.isStudent
             )

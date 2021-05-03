@@ -140,8 +140,9 @@ class UnderwriterImpl(
                 ).price
             }
             is DanishAccidentData -> {
-                // TODO: fix when pricing is in place
-                Money.of(6666, "DKK")
+                priceEngineService.queryDanishAccidentPrice(
+                    PriceQueryRequest.DanishAccident.from(quote.id, quote.memberId, quote.data)
+                ).price
             }
             is DanishTravelData -> {
                 // TODO: fix when pricing is in place

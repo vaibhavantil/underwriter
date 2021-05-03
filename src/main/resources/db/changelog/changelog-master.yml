@@ -80,3 +80,6 @@ databaseChangeLog:
   - include:
       file: ./migrations/20210413-1636-make-firstname-last-name-nullable-danish-quotes.sql
       relativeToChangelogFile: true
+  - include:
+      file: ./migrations/20210503-1023-add-address-fields-for-danish-accident-and-travel.sql
+      relativeToChangelogFile: true

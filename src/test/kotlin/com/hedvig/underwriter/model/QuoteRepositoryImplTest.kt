@@ -694,6 +694,176 @@ class QuoteRepositoryImplTest {
     }
 
     @Test
+    fun updatesDanishAccidentQuotes() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.ACCIDENT,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = DanishAccidentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                apartment = "3",
+                city = "testCity",
+                floor = "1",
+                zipCode = "1121",
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                bbrId = "321"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null
+        )
+        quoteDao.insert(quote, timestamp)
+
+        val updatedQuote = quote.copy(
+            state = QuoteState.SIGNED,
+            data = (quote.data as DanishAccidentData).copy(
+                firstName = "John",
+                lastName = "Watson",
+                bbrId = "123",
+                street = "221 Baker street",
+                city = "testCity"
+            ),
+            memberId = "123456"
+        )
+        quoteDao.update(updatedQuote)
+
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun insertsAndFindsOneDanishAccidentQuoteByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            productType = ProductType.ACCIDENT,
+            data = DanishAccidentData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                apartment = "5",
+                city = "city",
+                floor = "2",
+                zipCode = "1121",
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                bbrId = "1232"
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            id = UUID.randomUUID(),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+        )
+        quoteDao.insert(quote, timestamp)
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
+    }
+
+    @Test
+    fun updatesDanishTravelQuotes() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            id = UUID.randomUUID(),
+            createdAt = timestamp,
+            productType = ProductType.TRAVEL,
+            state = QuoteState.QUOTED,
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            data = DanishTravelData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                apartment = "3",
+                city = "testCity",
+                floor = "1",
+                zipCode = "1121",
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                bbrId = "321"
+            ),
+            breachedUnderwritingGuidelines = null,
+            currentInsurer = null
+        )
+        quoteDao.insert(quote, timestamp)
+
+        val updatedQuote = quote.copy(
+            state = QuoteState.SIGNED,
+            data = (quote.data as DanishTravelData).copy(
+                firstName = "John",
+                lastName = "Watson",
+                bbrId = "123",
+                street = "221 Baker street",
+                city = "testCity"
+            ),
+            memberId = "123456"
+        )
+        quoteDao.update(updatedQuote)
+
+        assertQuotesDeepEqualExceptInternalId(updatedQuote, quoteDao.find(quote.id))
+    }
+
+    @Test
+    fun insertsAndFindsOneDanishTravelQuoteByMemberId() {
+        val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
+
+        val timestamp = Instant.now()
+        val quote = Quote(
+            productType = ProductType.TRAVEL,
+            data = DanishTravelData(
+                firstName = "Sherlock",
+                lastName = "Holmes",
+                birthDate = LocalDate.of(1912, 12, 12),
+                ssn = "1212121212",
+                street = "221 Baker street",
+                apartment = "5",
+                city = "city",
+                floor = "2",
+                zipCode = "1121",
+                id = UUID.randomUUID(),
+                coInsured = 1,
+                email = "em@i.l",
+                isStudent = false,
+                bbrId = "1232"
+            ),
+            initiatedFrom = QuoteInitiatedFrom.APP,
+            attributedTo = Partner.HEDVIG,
+            id = UUID.randomUUID(),
+            currentInsurer = null,
+            memberId = "123456",
+            breachedUnderwritingGuidelines = null,
+            createdAt = timestamp,
+            state = QuoteState.INCOMPLETE
+        )
+        quoteDao.insert(quote, timestamp)
+        assertQuotesDeepEqualExceptInternalId(quote, quoteDao.findOneByMemberId(quote.memberId!!))
+    }
+
+    @Test
     fun insertMultipleQuotes_updateQuotes_getLatestRevision_inList() {
         val quoteDao = QuoteRepositoryImpl(jdbiRule.jdbi)
 

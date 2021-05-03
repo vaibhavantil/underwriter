@@ -28,6 +28,7 @@ import assertk.assertions.matchesPredicate
 import com.hedvig.graphql.commons.type.MonetaryAmountV2
 import com.hedvig.productPricingObjects.dtos.AgreementQuote
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
@@ -1226,6 +1227,157 @@ class RapioIntegrationTest {
         }
     }
 
+    @Test
+    fun `Create Danish accident quote and sign it successfully`() {
+
+        val ssn = "0411357627"
+        val memberId = nextLong(Long.MAX_VALUE).toString()
+        val agreementId = UUID.randomUUID()
+        val contractId = UUID.randomUUID()
+        val now = Instant.now()
+        val today = LocalDate.now()
+
+        val msSsnAlreadySignedRequest = slot<String>()
+        val msUpdateSsnRequest1 = slot<Long>()
+        val msUpdateSsnRequest2 = slot<UpdateSsnRequest>()
+        val msSignQuoteRequest1 = slot<Long>()
+        val msSignQuoteRequest2 = slot<UnderwriterQuoteSignRequest>()
+        val msFinalizeOnboardingReques1 = slot<String>()
+        val msFinalizeOnboardingReques2 = slot<FinalizeOnBoardingRequest>()
+        val peQueryPriceRequest = slot<PriceQueryRequest.DanishAccident>()
+        val ppCreateContractRequest = slot<CreateContractsRequest>()
+
+        // Mock clients and capture the outgoing requests for later validation
+        every { memberServiceClient.checkIsSsnAlreadySignedMemberEntity(capture(msSsnAlreadySignedRequest)) } returns IsSsnAlreadySignedMemberResponse(false)
+        every { memberServiceClient.createMember() } returns ResponseEntity.status(200).body(HelloHedvigResponseDto(memberId))
+        every { memberServiceClient.updateMemberSsn(capture(msUpdateSsnRequest1), capture(msUpdateSsnRequest2)) } returns Unit
+        every { memberServiceClient.signQuote(capture(msSignQuoteRequest1), capture(msSignQuoteRequest2)) } returns ResponseEntity.status(200).body(UnderwriterQuoteSignResponse(1L, true))
+        every { memberServiceClient.finalizeOnBoarding(capture(msFinalizeOnboardingReques1), capture(msFinalizeOnboardingReques2)) } returns ResponseEntity.status(200).body("")
+        every { productPricingClient.createContract(capture(ppCreateContractRequest), any()) } returns listOf(CreateContractResponse(UUID.randomUUID(), agreementId, contractId))
+        every { priceEngineClient.queryPrice(capture(peQueryPriceRequest)) } returns PriceQueryResponse(UUID.randomUUID(), Money.of(12, "DKK"))
+
+        // Create quote
+        val quoteResponse = createDanishAccidentQuote()
+
+        // Validate quote response
+        assertThat(quoteResponse.price.toString()).isEqualTo("12")
+        assertThat(quoteResponse.currency).isEqualTo("DKK")
+        assertThat(quoteResponse.validTo.isAfter(now)).isEqualTo(true)
+
+        // Sign quote
+        val signResponse = signQuote(quoteResponse.id, "Apan", "Apansson", ssn, "apan@apansson.se", today.toString())
+
+        // Validate sign response
+        assertThat(signResponse.memberId).isEqualTo(memberId)
+        assertThat(signResponse.market).isEqualTo(Market.DENMARK)
+
+        // Get quote
+        val quote = getQuote(quoteResponse.id)
+
+        // Validate stored quote
+        assertThat(quote.id).isEqualTo(quoteResponse.id)
+        assertThat(quote.createdAt.isAfter(now)).isEqualTo(true)
+        assertThat(quote.price).isEqualTo(quoteResponse.price)
+        assertThat(quote.currency).isEqualTo("DKK")
+        assertThat(quote.productType.name).isEqualTo("ACCIDENT")
+        assertThat(quote.state.name).isEqualTo("SIGNED")
+        assertThat(quote.initiatedFrom.name).isEqualTo("RAPIO")
+        assertThat(quote.attributedTo.name).isEqualTo("HEDVIG")
+        assertThat(quote.startDate).isEqualTo(today)
+        assertThat(quote.validity).isEqualTo(30 * 24 * 60 * 60)
+        assertThat(quote.breachedUnderwritingGuidelines).isNull()
+        assertThat(quote.underwritingGuidelinesBypassedBy).isNull()
+        assertThat(quote.memberId).isEqualTo(memberId)
+        assertThat(quote.agreementId).isEqualTo(agreementId)
+        assertThat(quote.contractId).isEqualTo(contractId)
+        assertThat(quote.data).isInstanceOf(DanishAccidentData::class.java)
+
+        val data = quote.data as DanishAccidentData
+        assertThat(data.ssn).isEqualTo(ssn)
+        assertThat(data.birthDate.toString()).isEqualTo("1988-01-01")
+        assertThat(data.firstName).isEqualTo("Apan")
+        assertThat(data.lastName).isEqualTo("Apansson")
+        assertThat(data.email).isEqualTo("apan@apansson.se")
+        assertThat(data.phoneNumber).isNull()
+        assertThat(data.street).isEqualTo("ApStreet")
+        assertThat(data.city).isEqualTo("ApCity")
+        assertThat(data.zipCode).isEqualTo("1234")
+        assertThat(data.apartment).isEqualTo("4")
+        assertThat(data.floor).isEqualTo("st")
+        assertThat(data.coInsured).isEqualTo(1)
+        assertThat(data.isStudent).isEqualTo(false)
+        assertThat(data.internalId).isNull()
+
+        // Validate requests to Member Service
+        assertThat(msSsnAlreadySignedRequest.captured).isEqualTo(ssn)
+        assertThat(msUpdateSsnRequest1.captured).isEqualTo(memberId.toLong())
+        assertThat(msUpdateSsnRequest2.captured.ssn).isEqualTo(ssn)
+        assertThat(msUpdateSsnRequest2.captured.nationality.name).isEqualTo("DENMARK")
+        assertThat(msSignQuoteRequest1.captured).isEqualTo(memberId.toLong())
+        assertThat(msSignQuoteRequest2.captured.ssn).isEqualTo(ssn)
+        assertThat(msFinalizeOnboardingReques1.captured).isEqualTo(memberId)
+        with(msFinalizeOnboardingReques2) {
+            assertThat(captured.memberId).isEqualTo(memberId)
+            assertThat(captured.ssn).isEqualTo(ssn)
+            assertThat(captured.firstName).isEqualTo("Apan")
+            assertThat(captured.lastName).isEqualTo("Apansson")
+            assertThat(captured.email).isEqualTo("apan@apansson.se")
+            assertThat(captured.phoneNumber).isNull()
+            assertThat(captured.address!!.street).isEqualTo("ApStreet")
+            assertThat(captured.address!!.city).isEqualTo("ApCity")
+            assertThat(captured.address!!.zipCode).isEqualTo("1234")
+            assertThat(captured.address!!.apartmentNo).isEqualTo("4")
+            assertThat(captured.address!!.floor).isEqualTo(0)
+            assertThat(captured.memberId).isEqualTo(memberId)
+            assertThat(captured.birthDate.toString()).isEqualTo("1988-01-01")
+        }
+
+        // Validate request to Price Engine
+        with(peQueryPriceRequest) {
+            assertThat(captured.holderMemberId).isNull()
+            assertThat(captured.quoteId).isEqualTo(quoteResponse.id)
+            assertThat(captured.holderBirthDate.toString()).isEqualTo("1988-01-01")
+            assertThat(captured.numberCoInsured).isEqualTo(1)
+            assertThat(captured.postalCode).isEqualTo("1234")
+            assertThat(captured.floor).isEqualTo("st")
+            assertThat(captured.apartment).isEqualTo("4")
+            assertThat(captured.street).isEqualTo("ApStreet")
+            assertThat(captured.city).isEqualTo("ApCity")
+        }
+
+        // Validate request to Product Pricing Service
+        with(ppCreateContractRequest) {
+            assertThat(captured.memberId).isEqualTo(memberId)
+            assertThat(captured.mandate!!.firstName).isEqualTo("Apan")
+            assertThat(captured.mandate!!.lastName).isEqualTo("Apansson")
+            assertThat(captured.mandate!!.ssn).isEqualTo(ssn)
+            assertThat(captured.mandate!!.referenceToken).isEmpty()
+            assertThat(captured.mandate!!.signature).isEmpty()
+            assertThat(captured.mandate!!.oscpResponse).isEmpty()
+            assertThat(captured.signSource.name).isEqualTo("RAPIO")
+            assertThat(captured.quotes.size).isEqualTo(1)
+
+            val ppQuote = captured.quotes[0] as AgreementQuote.DanishAccidentQuote
+            assertThat(ppQuote.quoteId).isEqualTo(quoteResponse.id)
+            assertThat(ppQuote.fromDate).isEqualTo(today)
+            assertThat(ppQuote.toDate).isNull()
+            assertThat(ppQuote.premium).isEqualTo(quoteResponse.price)
+            assertThat(ppQuote.currency).isEqualTo("DKK")
+            assertThat(ppQuote.currentInsurer).isNull()
+            assertThat(ppQuote.address.city).isEqualTo("ApCity")
+            assertThat(ppQuote.address.postalCode).isEqualTo("1234")
+            assertThat(ppQuote.address.country.name).isEqualTo("DK")
+            assertThat(ppQuote.address.street).isEqualTo("ApStreet")
+            assertThat(ppQuote.address.coLine).isEqualTo(null)
+            assertThat(ppQuote.address.apartment).isEqualTo("4")
+            assertThat(ppQuote.address.floor).isEqualTo("st")
+            assertThat(ppQuote.coInsured.size).isEqualTo(1)
+            assertThat(ppQuote.coInsured[0].firstName).isNull()
+            assertThat(ppQuote.coInsured[0].lastName).isNull()
+            assertThat(ppQuote.coInsured[0].ssn).isNull()
+        }
+    }
+
     private fun createNorwegianTravelQuote(birthdate: String = "1988-01-01", coInsured: Int = 1, youth: Boolean = false): CompleteQuoteResponseDto {
         val request = """
             {
@@ -1296,6 +1448,34 @@ class RapioIntegrationTest {
                     "coInsured": $coInsured,
                     "student": $youth,
                     "subType": "$subType",
+                    "apartment": "4",
+                    "floor": "st"
+                },
+                "shouldComplete": true,
+                "underwritingGuidelinesBypassedBy": null
+            }
+        """.trimIndent()
+
+        return postJson("/_/v1/quotes", request)!!
+    }
+
+    private fun createDanishAccidentQuote(birthdate: String = "1988-01-01", street: String = "ApStreet", zip: String = "1234", city: String = "ApCity", coInsured: Int = 1, youth: Boolean = false): CompleteQuoteResponseDto {
+        val request = """
+            {
+                "firstName": null,
+                "lastName": null,
+                "currentInsurer": null,
+                "birthDate": "$birthdate",
+                "ssn": null,
+                "quotingPartner": "HEDVIG",
+                "productType": "ACCIDENT",
+                "incompleteQuoteData": {
+                    "type": "danishAccident",
+                    "street": "$street",
+                    "zipCode": "$zip",
+                    "city": "$city",
+                    "coInsured": $coInsured,
+                    "student": $youth,
                     "apartment": "4",
                     "floor": "st"
                 },

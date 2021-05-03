@@ -550,6 +550,10 @@ type DanishHomeContentsDetails {
 type DanishAccidentDetails {
     street: String!
     zipCode: String!
+    apartment: String
+    floor: String
+    bbrId: String
+    city: String
     coInsured: Int!
     isStudent: Boolean!
 }
@@ -557,6 +561,10 @@ type DanishAccidentDetails {
 type DanishTravelDetails {
     street: String!
     zipCode: String!
+    apartment: String
+    floor: String
+    bbrId: String
+    city: String
     coInsured: Int!
     isStudent: Boolean!
 }
