@@ -548,7 +548,6 @@ data class Quote(
         return street == null && zipCode == null && apartment == null && floor == null && city == null
     }
 
-
     fun clearBreachedUnderwritingGuidelines(): Quote = this.copy(breachedUnderwritingGuidelines = listOf())
 
     fun recoverBirthDateFromSSN() = when {
