@@ -6,7 +6,10 @@ import arrow.core.Right
 import arrow.core.filterOrOther
 import arrow.core.flatMap
 import arrow.core.toOption
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.hedvig.underwriter.graphql.type.InsuranceCost
+import com.hedvig.underwriter.model.AddressData
+import com.hedvig.underwriter.model.DeletedQuote
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.Quote
 import com.hedvig.underwriter.model.QuoteInitiatedFrom
@@ -24,12 +27,16 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.QuoteDto
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.extensions.toQuoteRequestData
 import com.hedvig.underwriter.util.logger
+import com.hedvig.underwriter.util.toMaskedJsonString
 import com.hedvig.underwriter.web.dtos.AddAgreementFromQuoteRequest
 import com.hedvig.underwriter.web.dtos.BreachedGuideline
 import com.hedvig.underwriter.web.dtos.CompleteQuoteResponseDto
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.lang.IllegalStateException
+import java.time.Instant
 import java.util.UUID
 
 @Service
@@ -41,6 +48,9 @@ class QuoteServiceImpl(
     val notificationService: NotificationService,
     val quoteStrategyService: QuoteStrategyService
 ) : QuoteService {
+
+    @Autowired
+    lateinit var objectMapper: ObjectMapper
 
     override fun updateQuote(
         quoteRequest: QuoteRequest,
@@ -163,6 +173,50 @@ class QuoteServiceImpl(
 
     override fun getMarketFromLatestQuote(memberId: String): Market {
         return getLatestQuoteForMemberId(memberId)!!.market
+    }
+
+    override fun deleteQuote(id: UUID) {
+
+        logger.info("Delete quote $id")
+
+        val quote = quoteRepository.find(id) ?: throw NotFoundException("No quote found")
+
+        if (quote.agreementId != null) {
+            logger.warn("Cannot delete quote since attached to agreement ${quote.agreementId}")
+            throw IllegalStateException("Deleting a quote attached to agreement is not allowed")
+        }
+
+        val revs = quoteRepository.findQuoteRevisions(id)
+
+        val deletedQuote = DeletedQuote(
+            quoteId = quote.id,
+            createdAt = quote.createdAt,
+            deletedAt = Instant.now(),
+            type = quote.data::class.simpleName ?: "-",
+            memberId = quote.memberId,
+            quote = quote.toMaskedJsonString(objectMapper).anonymiseStreetNumber(quote),
+            revs = revs.toMaskedJsonString(objectMapper)
+        )
+
+        logger.info("Saving anonymized quote: $deletedQuote")
+        quoteRepository.insert(deletedQuote)
+
+        quoteRepository.delete(quote)
+    }
+
+    fun String.anonymiseStreetNumber(quote: Quote): String {
+        if (quote.data !is AddressData) {
+            return this
+        }
+
+        val street = quote.data.street?.let {
+            it
+                .split(" ")
+                .filter { it.chars().noneMatch(Character::isDigit) }
+                .joinToString(" ")
+        }
+
+        return this.replace("\"street\":null", "\"street\": \"$street\"")
     }
 
     override fun createQuoteFromAgreement(
@@ -317,3 +371,7 @@ fun assertQuoteIsNotSignedOrExpired(quote: Quote): ErrorResponseDto? {
     }
     return null
 }
+
+class NotFoundException(
+    message: String
+) : RuntimeException(message)

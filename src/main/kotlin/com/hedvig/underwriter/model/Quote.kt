@@ -236,6 +236,7 @@ const val ONE_DAY = 86_400L
 data class Quote(
     val id: UUID,
     val createdAt: Instant,
+    val updatedAt: Instant? = null,
     val price: BigDecimal? = null,
     val currency: String? = null,
     val productType: ProductType = ProductType.UNKNOWN,
@@ -549,4 +550,14 @@ class IllegalTypeChangeOnQuote(
     requestData: QuoteRequestData
 ) : Exception(
     "Illegal to change from type [${quoteData::class}] to [${requestData::class}]. [QuoteData: $quoteData] [QuoteRequestData: $requestData]"
+)
+
+data class DeletedQuote(
+    val quoteId: UUID,
+    val createdAt: Instant,
+    val deletedAt: Instant,
+    val type: String,
+    val memberId: String? = null,
+    val quote: String,
+    val revs: String
 )

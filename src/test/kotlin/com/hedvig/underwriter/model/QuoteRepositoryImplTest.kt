@@ -803,16 +803,18 @@ class QuoteRepositoryImplTest {
         expected: Quote,
         result: Quote?
     ) {
-        expected::class.memberProperties.forEach { prop ->
+        expected::class.memberProperties
+            .filterNot { it.name == "updatedAt" }
+            .forEach { prop ->
             if (prop.name == "data") {
-                prop.javaGetter!!.invoke(expected)::class.memberProperties.forEach { dataProp ->
-                    if (dataProp.name != "internalId") {
-                        assertThat(dataProp.javaGetter!!.invoke(expected.data)).isEqualTo(
-                            dataProp.javaGetter!!.invoke(
-                                result?.data
-                            )
+                prop.javaGetter!!.invoke(expected)::class.memberProperties
+                    .filterNot { it.name == "internalId" }
+                    .forEach { dataProp ->
+                    assertThat(dataProp.javaGetter!!.invoke(expected.data)).isEqualTo(
+                        dataProp.javaGetter!!.invoke(
+                            result?.data
                         )
-                    }
+                    )
                 }
             } else {
                 assertThat(prop.javaGetter!!.invoke(expected)).isEqualTo(prop.javaGetter!!.invoke(result))

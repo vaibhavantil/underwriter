@@ -25,7 +25,6 @@ import com.hedvig.underwriter.service.model.StartSignErrors
 import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignData
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
-import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UpdateSsnRequest
@@ -33,6 +32,7 @@ import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingSe
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.RedeemCampaignDto
 import com.hedvig.underwriter.util.logger
 import com.hedvig.libs.logging.masking.toMaskedString
+import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.web.dtos.ErrorCodes
 import com.hedvig.underwriter.web.dtos.ErrorResponseDto
 import com.hedvig.underwriter.web.dtos.SignQuoteFromHopeRequest
@@ -58,7 +58,7 @@ class SignServiceImpl(
     val productPricingService: ProductPricingService,
     val signSessionRepository: SignSessionRepository,
     val signStrategyService: SignStrategyService,
-    val customerIO: CustomerIO
+    val notificationService: NotificationService
 ) : SignService {
 
     override fun startSigningQuotes(
@@ -163,7 +163,7 @@ class SignServiceImpl(
 
     private fun updateCustomerIO(quote: Quote): Quote {
         try {
-            customerIO.postSignUpdate(quote)
+            notificationService.postSignUpdate(quote)
         } catch (ex: Exception) {
             logger.error(
                 "Something went wrong while posting a signing update to customerIO " +
