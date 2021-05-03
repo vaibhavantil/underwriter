@@ -58,6 +58,7 @@ class UnderwriterImpl(
         val quote = Quote(
             id = id,
             createdAt = now,
+            updatedAt = now,
             productType = quoteRequest.productType!!,
             initiatedFrom = initiatedFrom,
             attributedTo = quoteRequest.quotingPartner

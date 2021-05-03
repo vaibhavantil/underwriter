@@ -58,6 +58,7 @@ interface QuoteService {
     ): Either<ErrorResponseDto, CompleteQuoteResponseDto>
 
     fun expireQuote(id: UUID): Quote?
+    fun deleteQuote(id: UUID)
     fun getQuoteByContractId(contractId: UUID): Quote?
     fun getMarketFromLatestQuote(memberId: String): Market
 }

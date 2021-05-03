@@ -70,6 +70,10 @@ graphql:
 features:
   block-requoting: false
 
+  gdpr:
+    retention-days: 30
+    dry-run: false
+
 ---
 spring:
   profiles: test, development

@@ -75,6 +75,22 @@ interface QuoteDao {
     @SqlQuery(
         """
             SELECT
+            qr.*,
+            mq.created_at,
+            mq.initiated_from
+
+            FROM quote_revisions qr
+            INNER JOIN master_quotes mq
+                ON mq.id = qr.master_quote_id
+            WHERE qr.master_quote_id = :quoteId
+            ORDER BY id
+        """
+    )
+    fun findRevisions(@Bind quoteId: UUID): List<DatabaseQuoteRevision>
+
+    @SqlQuery(
+        """
+            SELECT
             DISTINCT ON (qr.master_quote_id)
 
             qr.*,
@@ -584,4 +600,120 @@ interface QuoteDao {
         """
     )
     fun findByContractId(@Bind contractId: UUID): DatabaseQuoteRevision?
+
+    @SqlQuery(
+        """
+            SELECT
+                id
+            FROM (
+                SELECT DISTINCT ON (qr.master_quote_id)
+                    mq.id,
+                    qr.agreement_id
+                FROM master_quotes mq
+                JOIN quote_revisions qr ON qr.master_quote_id = mq.id 
+                WHERE 
+                    created_at < :before
+                ORDER BY qr.master_quote_id ASC, qr.id DESC
+            ) a
+            WHERE 
+                agreement_id is null
+        """
+    )
+    fun findOldQuoteIdsToDelete(@Bind before: Instant): List<UUID>
+
+    @SqlUpdate(
+        """
+            INSERT INTO deleted_quotes (
+                quote_id,
+                created_at,
+                deleted_at,
+                type,
+                member_id,
+                quote,
+                revs
+            )
+            VALUES (
+                :quoteId,
+                :createdAt,
+                :deletedAt,
+                :type,
+                :memberId,
+                CAST(:quote as jsonb),
+                CAST(:revs as jsonb)
+            )
+        """
+    )
+    fun insert(@BindBean deletedQuote: DeletedQuote)
+
+    @SqlUpdate(
+        """
+            DELETE FROM master_quotes 
+            WHERE id = :id
+        """
+    )
+    fun deleteMasterQuote(@Bind id: UUID)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revisions 
+            WHERE master_quote_id = :masterQuoteId
+        """
+    )
+    fun deleteQuoteRevisions(@Bind masterQuoteId: UUID)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_apartment_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteApartmentData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_house_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteHouseData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_danish_accident_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteDanishAccidentData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_danish_home_contents_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteDanishHomeContentData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_danish_travel_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteDanishTravelData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_norwegian_home_contents_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteNorwegianHomeContentData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+            DELETE FROM quote_revision_norwegian_travel_data 
+            WHERE internal_id = :internalId
+        """
+    )
+    fun deleteNorwegianTravelData(@Bind internalId: Int)
 }

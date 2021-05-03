@@ -12,3 +12,7 @@ graphcms.url: empty
 
 features:
   block-requoting: true
+
+  gdpr:
+    retention-days: 30
+    dry-run: false
