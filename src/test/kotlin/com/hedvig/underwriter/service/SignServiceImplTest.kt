@@ -15,7 +15,6 @@ import com.hedvig.underwriter.service.model.StartSignResponse
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SignStrategyService
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SimpleSignStrategy
 import com.hedvig.underwriter.service.quotesSignDataStrategies.SwedishBankIdSignStrategy
-import com.hedvig.underwriter.serviceIntegration.customerio.CustomerIO
 import com.hedvig.underwriter.serviceIntegration.memberService.MemberService
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsMemberAlreadySignedResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.IsSsnAlreadySignedMemberResponse
@@ -23,6 +22,7 @@ import com.hedvig.underwriter.serviceIntegration.memberService.dtos.NationalIden
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.Nationality
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterQuoteSignResponse
 import com.hedvig.underwriter.serviceIntegration.memberService.dtos.UnderwriterStartSignSessionResponse
+import com.hedvig.underwriter.serviceIntegration.notificationService.NotificationService
 import com.hedvig.underwriter.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.underwriter.serviceIntegration.productPricing.dtos.contract.CreateContractResponse
 import com.hedvig.underwriter.testhelp.databuilder.DanishAccidentDataBuilder
@@ -67,7 +67,7 @@ class SignServiceImplTest {
     lateinit var signSessionRepository: SignSessionRepository
 
     @MockK
-    lateinit var customerIO: CustomerIO
+    lateinit var notificationService: NotificationService
 
     private lateinit var signStrategyService: SignStrategyService
 
@@ -102,7 +102,7 @@ class SignServiceImplTest {
             productPricingService,
             signSessionRepository,
             signStrategyService,
-            customerIO
+            notificationService
         )
     }
 
@@ -136,7 +136,7 @@ class SignServiceImplTest {
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
         cut.signQuoteFromRapio(quoteId, SignQuoteRequestDto(Name("", ""), null, LocalDate.now(), "null"))
-        verify { customerIO.postSignUpdate(ofType(Quote::class)) }
+        verify { notificationService.postSignUpdate(ofType(Quote::class)) }
     }
 
     @Test
@@ -165,7 +165,7 @@ class SignServiceImplTest {
         every { memberService.isSsnAlreadySignedMemberEntity(any()) } returns IsSsnAlreadySignedMemberResponse(false)
 
         cut.signQuoteFromRapio(quoteId, SignQuoteRequestDto(Name("", ""), null, LocalDate.now(), "null"))
-        verify { customerIO.postSignUpdate(any()) }
+        verify { notificationService.postSignUpdate(any()) }
     }
 
     @Test

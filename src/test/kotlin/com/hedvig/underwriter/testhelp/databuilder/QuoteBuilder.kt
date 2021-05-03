@@ -44,6 +44,7 @@ class QB(
     fun build() = Quote(
         id,
         createdAt,
+        null,
         price,
         currency,
         productType,
