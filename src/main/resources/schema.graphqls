@@ -75,6 +75,10 @@ input CreateDanishHomeContentsInput {
 input CreateDanishAccidentInput {
     street: String!
     zipCode: String!
+    bbrId: String
+    apartment: String
+    floor: String
+    city: String
     coInsured: Int!
     isStudent: Boolean!
 }
@@ -82,6 +86,10 @@ input CreateDanishAccidentInput {
 input CreateDanishTravelInput {
     street: String!
     zipCode: String!
+    bbrId: String
+    apartment: String
+    floor: String
+    city: String
     coInsured: Int!
     isStudent: Boolean!
 }
@@ -217,6 +225,10 @@ input EditDanishHomeContentsInput {
 input EditDanishAccidentInput {
     street: String
     zipCode: String
+    apartment: String
+    floor: String
+    city: String
+    bbrId: String
     coInsured: Int
     isStudent: Boolean
 }
@@ -224,6 +236,10 @@ input EditDanishAccidentInput {
 input EditDanishTravelInput {
     street: String
     zipCode: String
+    apartment: String
+    floor: String
+    city: String
+    bbrId: String
     coInsured: Int
     isStudent: Boolean
 }

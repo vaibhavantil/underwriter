@@ -165,6 +165,10 @@ sealed class QuoteRequestData {
     data class DanishAccident(
         @Masked val street: String?,
         val zipCode: String?,
+        @Masked val bbrId: String?,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
         val coInsured: Int?,
         @field:JsonProperty("student")
         val isStudent: Boolean?
@@ -179,6 +183,10 @@ sealed class QuoteRequestData {
             phoneNumber = quoteRequest.phoneNumber,
             street = this.street!!,
             zipCode = this.zipCode!!,
+            bbrId = this.bbrId,
+            apartment = this.apartment,
+            floor = this.floor,
+            city = this.city,
             coInsured = this.coInsured!!,
             isStudent = this.isStudent!!
         )
@@ -187,6 +195,10 @@ sealed class QuoteRequestData {
     data class DanishTravel(
         @Masked val street: String?,
         val zipCode: String?,
+        @Masked val bbrId: String?,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
         val coInsured: Int?,
         @field:JsonProperty("student")
         val isStudent: Boolean?
@@ -201,6 +213,10 @@ sealed class QuoteRequestData {
             phoneNumber = quoteRequest.phoneNumber,
             street = this.street!!,
             zipCode = this.zipCode!!,
+            bbrId = this.bbrId,
+            apartment = this.apartment,
+            floor = this.floor,
+            city = this.city,
             coInsured = this.coInsured!!,
             isStudent = this.isStudent!!
         )
@@ -265,12 +281,20 @@ sealed class QuoteRequestData {
             is QuoteSchema.DanishAccident -> DanishAccident(
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                apartment = quoteSchema.apartment,
+                floor = quoteSchema.floor,
+                bbrId = quoteSchema.bbrId,
                 coInsured = quoteSchema.numberCoInsured,
                 isStudent = quoteSchema.isStudent
             )
             is QuoteSchema.DanishTravel -> DanishTravel(
                 street = quoteSchema.street,
                 zipCode = quoteSchema.zipCode,
+                city = quoteSchema.city,
+                apartment = quoteSchema.apartment,
+                floor = quoteSchema.floor,
+                bbrId = quoteSchema.bbrId,
                 coInsured = quoteSchema.numberCoInsured,
                 isStudent = quoteSchema.isStudent
             )

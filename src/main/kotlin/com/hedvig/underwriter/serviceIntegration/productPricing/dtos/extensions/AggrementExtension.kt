@@ -101,6 +101,10 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.DanishAccident -> QuoteRequestData.DanishAccident(
         street = this.address.street,
         zipCode = this.address.postalCode,
+        city = this.address.city,
+        apartment = this.address.apartment,
+        floor = this.address.floor,
+        bbrId = null,
         coInsured = this.numberCoInsured,
         isStudent = when (this.lineOfBusiness) {
             DanishAccidentLineOfBusiness.REGULAR -> false
@@ -110,6 +114,10 @@ fun Agreement.toQuoteRequestData() = when (this) {
     is Agreement.DanishTravel -> QuoteRequestData.DanishTravel(
         street = this.address.street,
         zipCode = this.address.postalCode,
+        city = this.address.city,
+        apartment = this.address.apartment,
+        floor = this.address.floor,
+        bbrId = null,
         coInsured = this.numberCoInsured,
         isStudent = when (this.lineOfBusiness) {
             DanishTravelLineOfBusiness.REGULAR -> false
