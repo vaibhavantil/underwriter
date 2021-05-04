@@ -480,6 +480,10 @@ interface QuoteDao {
                 phone_number,
                 street,
                 zip_code,
+                apartment,
+                floor,
+                bbr_id,
+                city,
                 co_insured,                
                 is_student      
             )
@@ -494,6 +498,10 @@ interface QuoteDao {
                 :phoneNumber,
                 :street,
                 :zipCode,
+                :apartment,
+                :floor,
+                :bbrId,
+                :city,
                 :coInsured,
                 :isStudent
             )
@@ -523,6 +531,10 @@ interface QuoteDao {
                 phone_number,
                 street,
                 zip_code,
+                bbr_id,
+                apartment,
+                floor,
+                city,
                 co_insured,                
                 is_student      
             )
@@ -537,6 +549,10 @@ interface QuoteDao {
                 :phoneNumber,
                 :street,
                 :zipCode,
+                :bbrId,
+                :apartment,
+                :floor,
+                :city,
                 :coInsured,
                 :isStudent
             )

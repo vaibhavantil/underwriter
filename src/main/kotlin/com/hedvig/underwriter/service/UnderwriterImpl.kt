@@ -25,7 +25,6 @@ import com.hedvig.underwriter.util.MetricsCounter
 import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import io.micrometer.core.instrument.MeterRegistry
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
@@ -141,12 +140,14 @@ class UnderwriterImpl(
                 ).price
             }
             is DanishAccidentData -> {
-                // TODO: fix when pricing is in place
-                Money.of(6666, "DKK")
+                priceEngineService.queryDanishAccidentPrice(
+                    PriceQueryRequest.DanishAccident.from(quote.id, quote.memberId, quote.data)
+                ).price
             }
             is DanishTravelData -> {
-                // TODO: fix when pricing is in place
-                Money.of(3333, "DKK")
+                priceEngineService.queryDanishTravelPrice(
+                    PriceQueryRequest.DanishTravel.from(quote.id, quote.memberId, quote.data)
+                ).price
             }
         }
     }

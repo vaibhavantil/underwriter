@@ -405,6 +405,124 @@ internal class GraphQlMutationsIntegrationTest {
     }
 
     @Test
+    fun createSuccessfulDanishAccidentQuote() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
+            priceEngineService.queryDanishAccidentPrice(
+                PriceQueryRequest.DanishAccident(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae3"),
+                    holderBirthDate = LocalDate.of(1961, 12, 21),
+                    numberCoInsured = 0,
+                    postalCode = "1234",
+                    bbrId = "123",
+                    apartment = "1",
+                    floor = "4",
+                    street = "Kungsgatan 2",
+                    city = "testCity",
+                    student = false
+                )
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "DKK")
+            )
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal(9999), "DKK"), "123"
+            )
+        } returns
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                null
+            )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform(
+            "/mutations/createDanishAccidentQuote.graphql",
+            null
+        )
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae3")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
+        assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["apartment"].textValue()).isEqualTo("1")
+        assertThat(createQuote["quoteDetails"]["floor"].textValue()).isEqualTo("4")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
+        assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["isStudent"].booleanValue() == false)
+        assert(createQuote["quoteDetails"]["bbrId"].textValue() == "123")
+    }
+
+    @Test
+    fun createSuccessfulDanishTravelQuote() {
+        every { debtChecker.passesDebtCheck(any()) } returns listOf()
+
+        every {
+            priceEngineService.queryDanishTravelPrice(
+                PriceQueryRequest.DanishTravel(
+                    holderMemberId = "123",
+                    quoteId = UUID.fromString("2b9e3b30-5c87-11ea-aa95-fbfb43d88ae1"),
+                    holderBirthDate = LocalDate.of(2001, 12, 21),
+                    numberCoInsured = 0,
+                    postalCode = "1234",
+                    bbrId = "123",
+                    apartment = "tv",
+                    floor = "4",
+                    street = "Kungsgatan 2",
+                    city = "testCity",
+                    student = true
+                )
+            )
+        } returns
+            PriceQueryResponse(
+                UUID.randomUUID(),
+                Money.of(BigDecimal.ONE, "DKK")
+            )
+
+        every {
+            productPricingService.calculateInsuranceCost(
+                Money.of(BigDecimal(9999), "DKK"), "123"
+            )
+        } returns
+            InsuranceCost(
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                MonetaryAmountV2.Companion.of(BigDecimal.ONE, "DKK"),
+                null
+            )
+
+        graphQLTestTemplate.addHeader("hedvig.token", "123")
+
+        val response = graphQLTestTemplate.perform(
+            "/mutations/createDanishTravelQuote.graphql",
+            null
+        )
+        val createQuote = response.readTree()["data"]["createQuote"]
+
+        assert(response.isOk)
+        assert(createQuote["id"].textValue() == "2b9e3b30-5c87-11ea-aa95-fbfb43d88ae1")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["amount"].textValue() == "9999.00")
+        assert(createQuote["insuranceCost"]["monthlyGross"]["currency"].textValue() == "DKK")
+        assertThat(createQuote["quoteDetails"]["street"].textValue()).isEqualTo("Kungsgatan 2")
+        assertThat(createQuote["quoteDetails"]["apartment"].textValue()).isEqualTo("tv")
+        assertThat(createQuote["quoteDetails"]["floor"].textValue()).isEqualTo("4")
+        assert(createQuote["quoteDetails"]["zipCode"].textValue() == "1234")
+        assert(createQuote["quoteDetails"]["coInsured"].intValue() == 0)
+        assert(createQuote["quoteDetails"]["isStudent"].booleanValue() == true)
+        assert(createQuote["quoteDetails"]["bbrId"].textValue() == "123")
+    }
+
+    @Test
     fun createQuoteFinalizeOnbaordingInMemberServiceQuote() {
         every { debtChecker.passesDebtCheck(any()) } returns listOf()
         every {

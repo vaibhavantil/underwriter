@@ -105,6 +105,10 @@ sealed class QuoteDetails {
     data class DanishAccidentDetails(
         @Masked val street: String,
         val zipCode: String,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
+        @Masked val bbrId: String?,
         val coInsured: Int,
         val isStudent: Boolean
     ) : QuoteDetails() {
@@ -118,6 +122,10 @@ sealed class QuoteDetails {
     data class DanishTravelDetails(
         @Masked val street: String,
         val zipCode: String,
+        val apartment: String?,
+        val floor: String?,
+        val city: String?,
+        @Masked val bbrId: String?,
         val coInsured: Int,
         val isStudent: Boolean
     ) : QuoteDetails() {

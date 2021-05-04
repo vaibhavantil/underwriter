@@ -15,6 +15,10 @@ data class DanishTravelDataBuilder(
 
     val street: String = "",
     val zipCode: String = "",
+    val bbrId: String? = "1234",
+    val apartment: String? = "3",
+    val floor: String? = "1",
+    val city: String? = "testCity",
     val coInsured: Int = 3,
     val isStudent: Boolean = false
 ) : DataBuilder<QuoteData> {
@@ -28,6 +32,10 @@ data class DanishTravelDataBuilder(
         email = email,
         street = street,
         zipCode = zipCode,
+        apartment = apartment,
+        floor = floor,
+        city = city,
+        bbrId = bbrId,
         coInsured = coInsured,
         isStudent = isStudent
     )

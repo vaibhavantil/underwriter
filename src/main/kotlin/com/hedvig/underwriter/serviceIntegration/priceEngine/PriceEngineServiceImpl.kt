@@ -32,4 +32,12 @@ class PriceEngineServiceImpl(
     override fun queryDanishHomeContentPrice(query: PriceQueryRequest.DanishHomeContent): PriceQueryResponse {
         return priceEngineClient.queryPrice(query)
     }
+
+    override fun queryDanishAccidentPrice(query: PriceQueryRequest.DanishAccident): PriceQueryResponse {
+        return priceEngineClient.queryPrice(query)
+    }
+
+    override fun queryDanishTravelPrice(query: PriceQueryRequest.DanishTravel): PriceQueryResponse {
+        return priceEngineClient.queryPrice(query)
+    }
 }

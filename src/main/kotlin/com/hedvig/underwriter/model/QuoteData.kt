@@ -212,15 +212,16 @@ data class DanishAccidentData(
     @Masked override val phoneNumber: String? = null,
     override val street: String,
     override val zipCode: String,
+    @Masked override val bbrId: String? = null,
+    override val city: String?,
+    override val apartment: String?,
+    override val floor: String?,
     val coInsured: Int,
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), AddressData, PersonPolicyHolder<DanishAccidentData> {
-
-    // Should probably be removed from AddressData
-    override val city: String? = null
+) : QuoteData(), DanishHomeContentAddressData, PersonPolicyHolder<DanishAccidentData> {
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)
@@ -248,15 +249,16 @@ data class DanishTravelData(
     @Masked override val phoneNumber: String? = null,
     @Masked override val street: String,
     override val zipCode: String,
+    @Masked override val bbrId: String? = null,
+    override val city: String?,
+    override val apartment: String?,
+    override val floor: String?,
     val coInsured: Int,
     @get:JvmName("getIsStudent")
     val isStudent: Boolean,
     @JsonIgnore
     val internalId: Int? = null
-) : QuoteData(), AddressData, PersonPolicyHolder<DanishTravelData> {
-
-    // Should probably be removed from AddressData
-    override val city: String? = null
+) : QuoteData(), DanishHomeContentAddressData, PersonPolicyHolder<DanishTravelData> {
 
     override fun updateName(firstName: String, lastName: String) = this.copy(firstName = firstName, lastName = lastName)
     override fun updateEmail(email: String) = this.copy(email = email)

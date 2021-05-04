@@ -163,8 +163,8 @@ class OutgoingMapper {
                 city = data.city,
                 coLine = null,
                 country = CountryCode.DK,
-                floor = null,
-                apartment = null
+                floor = data.floor,
+                apartment = data.apartment
             )
             is DanishTravelData -> Address(
                 street = data.street,
@@ -172,8 +172,8 @@ class OutgoingMapper {
                 city = data.city,
                 coLine = null,
                 country = CountryCode.DK,
-                floor = null,
-                apartment = null
+                floor = data.floor,
+                apartment = data.apartment
             )
             is NorwegianTravelData -> throw RuntimeException("Cannot create AddressDto from NorwegianTravelData (data=$data)")
         }
