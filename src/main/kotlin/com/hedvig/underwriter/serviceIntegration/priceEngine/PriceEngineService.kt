@@ -10,4 +10,5 @@ interface PriceEngineService {
     fun querySwedishHousePrice(query: PriceQueryRequest.SwedishHouse): PriceQueryResponse
     fun queryDanishHomeContentPrice(query: PriceQueryRequest.DanishHomeContent): PriceQueryResponse
     fun queryDanishAccidentPrice(query: PriceQueryRequest.DanishAccident): PriceQueryResponse
+    fun queryDanishTravelPrice(query: PriceQueryRequest.DanishTravel): PriceQueryResponse
 }

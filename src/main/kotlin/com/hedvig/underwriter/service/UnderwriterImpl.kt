@@ -146,8 +146,9 @@ class UnderwriterImpl(
                 ).price
             }
             is DanishTravelData -> {
-                // TODO: fix when pricing is in place
-                Money.of(3333, "DKK")
+                priceEngineService.queryDanishTravelPrice(
+                    PriceQueryRequest.DanishTravel.from(quote.id, quote.memberId, quote.data)
+                ).price
             }
         }
     }
