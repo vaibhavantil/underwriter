@@ -25,7 +25,6 @@ import com.hedvig.underwriter.util.MetricsCounter
 import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.toStockholmLocalDate
 import io.micrometer.core.instrument.MeterRegistry
-import org.javamoney.moneta.Money
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
