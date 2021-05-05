@@ -9,4 +9,5 @@ enum class Partner(val campaignCode: String? = null) {
     AVY,
     SPIFF,
     TJENSTETORGET,
+    FORSIKRINGSPORTALEN,
 }
