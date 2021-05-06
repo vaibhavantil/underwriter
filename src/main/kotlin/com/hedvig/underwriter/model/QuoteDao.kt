@@ -7,7 +7,7 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 interface QuoteDao {
     @SqlUpdate(
@@ -716,4 +716,29 @@ interface QuoteDao {
         """
     )
     fun deleteNorwegianTravelData(@Bind internalId: Int)
+
+    @SqlUpdate(
+        """
+                INSERT INTO quote_line_item (revision_id, type, subType, amount) VALUES(:revisionId, :type, :subType, :amount)
+            """
+    )
+    fun insertLineItem(@BindBean lineItem: LineItem)
+
+    @SqlQuery(
+        """
+                SELECT
+                qli.*
+                FROM quote_line_item qli
+                WHERE qli.revision_id = :revisionId
+            """
+    )
+    fun findLineItems(@Bind revisionId: Int): List<LineItem>
+
+    @SqlUpdate(
+        """
+                DELETE FROM quote_line_item 
+                WHERE revision_id = :revisionId
+            """
+    )
+    fun deleteLineItems(@Bind revisionId: Int)
 }
