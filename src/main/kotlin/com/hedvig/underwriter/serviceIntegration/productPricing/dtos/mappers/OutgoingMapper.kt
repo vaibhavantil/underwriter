@@ -17,6 +17,7 @@ import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishHomeContentsType
 import com.hedvig.underwriter.model.DanishTravelData
 import com.hedvig.underwriter.model.ExtraBuilding
+import com.hedvig.underwriter.model.LineItem
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianHomeContentsType
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -40,7 +41,8 @@ class OutgoingMapper {
                 address = this.toAddress(quote.data),
                 coInsured = List(quote.data.householdSize!! - 1) { CoInsured(null, null, null) },
                 squareMeters = quote.data.livingSpace!!.toLong(),
-                lineOfBusiness = this.toLineOfBusiness(quote.data.subType!!)
+                lineOfBusiness = this.toLineOfBusiness(quote.data.subType!!),
+                lineItems = toLineItems(quote.lineItems)
             )
             is SwedishHouseData -> AgreementQuote.SwedishHouseQuote(
                 quoteId = quote.id,
@@ -60,7 +62,8 @@ class OutgoingMapper {
                         extraBuilding
                     )
                 },
-                isSubleted = quote.data.isSubleted!!
+                isSubleted = quote.data.isSubleted!!,
+                lineItems = toLineItems(quote.lineItems)
             )
             is NorwegianHomeContentsData -> AgreementQuote.NorwegianHomeContentQuote(
                 quoteId = quote.id,
@@ -72,7 +75,8 @@ class OutgoingMapper {
                 address = this.toAddress(quote.data),
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
                 squareMeters = quote.data.livingSpace.toLong(),
-                lineOfBusiness = this.toLineOfBusiness(quote.data.type, quote.data.isYouth)
+                lineOfBusiness = this.toLineOfBusiness(quote.data.type, quote.data.isYouth),
+                lineItems = toLineItems(quote.lineItems)
             )
             is NorwegianTravelData -> AgreementQuote.NorwegianTravelQuote(
                 quoteId = quote.id,
@@ -82,7 +86,8 @@ class OutgoingMapper {
                 currency = quote.currency!!,
                 currentInsurer = quote.currentInsurer,
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
-                lineOfBusiness = this.toLineOfBusiness(quote.data.isYouth)
+                lineOfBusiness = this.toLineOfBusiness(quote.data.isYouth),
+                lineItems = toLineItems(quote.lineItems)
             )
             is DanishHomeContentsData -> AgreementQuote.DanishHomeContentQuote(
                 quoteId = quote.id,
@@ -94,7 +99,8 @@ class OutgoingMapper {
                 address = this.toAddress(quote.data),
                 squareMeters = quote.data.livingSpace.toLong(),
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
-                lineOfBusiness = this.toLineOfBusiness(quote.data.type, quote.data.isStudent)
+                lineOfBusiness = this.toLineOfBusiness(quote.data.type, quote.data.isStudent),
+                lineItems = toLineItems(quote.lineItems)
             )
             is DanishAccidentData -> AgreementQuote.DanishAccidentQuote(
                 quoteId = quote.id,
@@ -105,7 +111,8 @@ class OutgoingMapper {
                 currentInsurer = quote.currentInsurer,
                 address = this.toAddress(quote.data),
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
-                lineOfBusiness = if (quote.data.isStudent) DanishAccidentLineOfBusiness.STUDENT else DanishAccidentLineOfBusiness.REGULAR
+                lineOfBusiness = if (quote.data.isStudent) DanishAccidentLineOfBusiness.STUDENT else DanishAccidentLineOfBusiness.REGULAR,
+                lineItems = toLineItems(quote.lineItems)
             )
             is DanishTravelData -> AgreementQuote.DanishTravelQuote(
                 quoteId = quote.id,
@@ -116,7 +123,8 @@ class OutgoingMapper {
                 currentInsurer = quote.currentInsurer,
                 address = this.toAddress(quote.data),
                 coInsured = List(quote.data.coInsured) { CoInsured(null, null, null) },
-                lineOfBusiness = if (quote.data.isStudent) DanishTravelLineOfBusiness.STUDENT else DanishTravelLineOfBusiness.REGULAR
+                lineOfBusiness = if (quote.data.isStudent) DanishTravelLineOfBusiness.STUDENT else DanishTravelLineOfBusiness.REGULAR,
+                lineItems = toLineItems(quote.lineItems)
             )
         }
 
@@ -207,5 +215,11 @@ class OutgoingMapper {
             DanishHomeContentsType.RENT -> if (isStudent) DanishHomeContentLineOfBusiness.STUDENT_RENT else DanishHomeContentLineOfBusiness.RENT
             DanishHomeContentsType.OWN -> if (isStudent) DanishHomeContentLineOfBusiness.STUDENT_OWN else DanishHomeContentLineOfBusiness.OWN
         }
+
+        private fun toLineItems(lineItems: List<LineItem>): List<com.hedvig.productPricingObjects.dtos.LineItem> {
+            return lineItems.map { com.hedvig.productPricingObjects.dtos.LineItem(it.type, it.subType, it.amount) }
+                .toList()
+        }
+
     }
 }
