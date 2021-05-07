@@ -1,7 +1,20 @@
 package com.hedvig.underwriter.service
 
 import arrow.core.Either
-import com.hedvig.underwriter.model.*
+import com.hedvig.underwriter.model.DanishAccidentData
+import com.hedvig.underwriter.model.DanishHomeContentsData
+import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.LineItem
+import com.hedvig.underwriter.model.Market
+import com.hedvig.underwriter.model.NorwegianHomeContentsData
+import com.hedvig.underwriter.model.NorwegianTravelData
+import com.hedvig.underwriter.model.Partner
+import com.hedvig.underwriter.model.Quote
+import com.hedvig.underwriter.model.QuoteData
+import com.hedvig.underwriter.model.QuoteInitiatedFrom
+import com.hedvig.underwriter.model.QuoteState
+import com.hedvig.underwriter.model.SwedishApartmentData
+import com.hedvig.underwriter.model.SwedishHouseData
 import com.hedvig.underwriter.service.guidelines.BaseGuideline
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelineCode
 import com.hedvig.underwriter.service.guidelines.BreachedGuidelinesCodes.OK
@@ -19,7 +32,7 @@ import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 
 @Service
 class UnderwriterImpl(

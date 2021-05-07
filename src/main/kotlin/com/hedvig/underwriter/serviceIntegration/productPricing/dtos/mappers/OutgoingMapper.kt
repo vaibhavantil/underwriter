@@ -27,6 +27,7 @@ import com.hedvig.underwriter.model.SwedishApartmentData
 import com.hedvig.underwriter.model.SwedishHouseData
 import com.neovisionaries.i18n.CountryCode
 import java.time.LocalDate
+import com.hedvig.productPricingObjects.dtos.LineItem as DtoLineItem
 
 class OutgoingMapper {
     companion object {
@@ -216,7 +217,7 @@ class OutgoingMapper {
             DanishHomeContentsType.OWN -> if (isStudent) DanishHomeContentLineOfBusiness.STUDENT_OWN else DanishHomeContentLineOfBusiness.OWN
         }
 
-        private fun toLineItems(lineItems: List<LineItem>): List<com.hedvig.productPricingObjects.dtos.LineItem> {
+        private fun toLineItems(lineItems: List<LineItem>): List<DtoLineItem> {
             return lineItems.map { com.hedvig.productPricingObjects.dtos.LineItem(it.type, it.subType, it.amount) }
                 .toList()
         }
