@@ -257,7 +257,8 @@ data class Quote(
     val agreementId: UUID? = null,
     val dataCollectionId: UUID? = null,
     val signFromHopeTriggeredBy: String? = null,
-    val contractId: UUID? = null
+    val contractId: UUID? = null,
+    val lineItems: List<LineItem> = emptyList()
 ) {
     val isComplete: Boolean
         get() = when {

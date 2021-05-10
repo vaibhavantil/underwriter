@@ -25,9 +25,12 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is DanishAccidentData -> dao.insert(quote.data)
             is DanishTravelData -> dao.insert(quote.data)
         }
+
         dao.insertMasterQuote(quote.id, quote.initiatedFrom, timestamp)
+
         val databaseQuote = DatabaseQuoteRevision.from(quote.copy(data = quoteData))
-        dao.insert(databaseQuote, timestamp)
+        val revision = dao.insert(databaseQuote, timestamp)
+        quote.lineItems.forEach { dao.insertLineItem(it.copy(revisionId = revision.id)) }
     }
 
     override fun find(quoteId: UUID): Quote? =
@@ -119,6 +122,9 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             )
             else -> throw IllegalStateException("Quote must have details set (but was not). Quote ${databaseQuote.masterQuoteId} with quote revision ${databaseQuote.id}")
         }!!
+
+        val lineItems = dao.findLineItems(databaseQuote.id!!)
+
         return Quote(
             id = databaseQuote.masterQuoteId,
             createdAt = databaseQuote.createdAt!!,
@@ -139,7 +145,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             originatingProductId = databaseQuote.originatingProductId,
             agreementId = databaseQuote.agreementId,
             dataCollectionId = databaseQuote.dataCollectionId,
-            contractId = databaseQuote.contractId
+            contractId = databaseQuote.contractId,
+            lineItems = lineItems
         )
     }
 
@@ -197,7 +204,8 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             is DanishAccidentData -> dao.insert(updatedQuote.data)
             is DanishTravelData -> dao.insert(updatedQuote.data)
         }
-        dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
+        val revision = dao.insert(DatabaseQuoteRevision.from(updatedQuote.copy(data = quoteData)), timestamp)
+        updatedQuote.lineItems.forEach { dao.insertLineItem(it.copy(revisionId = revision.id)) }
     }
 
     private fun update(updatedQuote: DatabaseQuoteRevision, timestamp: Instant, h: Handle) {
@@ -210,9 +218,11 @@ class QuoteRepositoryImpl(private val jdbi: Jdbi) : QuoteRepository {
             val dao = h.attach<QuoteDao>()
             val revs = dao.findRevisions(quote.id)
 
+            // Delete the line-items before the revisions, due to the FK
+            revs.forEach { it.id?.let { dao.deleteLineItems(it) } }
+
             dao.deleteQuoteRevisions(quote.id)
             dao.deleteMasterQuote(quote.id)
-
             revs.forEach {
                 it.quoteApartmentDataId?.let { dao.deleteApartmentData(it) }
                 it.quoteHouseDataId?.let { dao.deleteHouseData(it) }

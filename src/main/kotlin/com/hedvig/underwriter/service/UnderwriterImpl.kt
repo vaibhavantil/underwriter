@@ -4,6 +4,7 @@ import arrow.core.Either
 import com.hedvig.underwriter.model.DanishAccidentData
 import com.hedvig.underwriter.model.DanishHomeContentsData
 import com.hedvig.underwriter.model.DanishTravelData
+import com.hedvig.underwriter.model.LineItem
 import com.hedvig.underwriter.model.Market
 import com.hedvig.underwriter.model.NorwegianHomeContentsData
 import com.hedvig.underwriter.model.NorwegianTravelData
@@ -21,6 +22,7 @@ import com.hedvig.underwriter.service.model.QuoteRequest
 import com.hedvig.underwriter.service.quoteStrategies.QuoteStrategyService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.PriceEngineService
 import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryRequest
+import com.hedvig.underwriter.serviceIntegration.priceEngine.dtos.PriceQueryResponse
 import com.hedvig.underwriter.util.MetricsCounter
 import com.hedvig.underwriter.util.logger
 import com.hedvig.underwriter.util.toStockholmLocalDate
@@ -28,11 +30,9 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
-import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
-import javax.money.MonetaryAmount
 
 @Service
 class UnderwriterImpl(
@@ -111,43 +111,50 @@ class UnderwriterImpl(
     }
 
     private fun complete(quote: Quote): Quote {
-        val price = getPriceRetrievedFromProductPricing(quote)
+        val priceQueryResponse = getPriceRetrievedFromProductPricing(quote)
         return quote.copy(
-            price = price.number.numberValueExact(BigDecimal::class.java),
-            currency = price.currency.currencyCode,
+            price = priceQueryResponse.price.number.numberValueExact(BigDecimal::class.java),
+            currency = priceQueryResponse.price.currency.currencyCode,
+            lineItems = priceQueryResponse.lineItems?.map {
+                LineItem(
+                    type = it.type,
+                    subType = it.subType,
+                    amount = it.amount
+                )
+            }?.toList() ?: emptyList(),
             state = QuoteState.QUOTED
         )
     }
 
-    private fun getPriceRetrievedFromProductPricing(quote: Quote): MonetaryAmount {
+    private fun getPriceRetrievedFromProductPricing(quote: Quote): PriceQueryResponse {
         return when (quote.data) {
             is SwedishApartmentData -> priceEngineService.querySwedishApartmentPrice(
                 PriceQueryRequest.SwedishApartment.from(quote.id, quote.memberId, quote.data, quote.dataCollectionId)
-            ).price
+            )
             is SwedishHouseData -> priceEngineService.querySwedishHousePrice(
                 PriceQueryRequest.SwedishHouse.from(quote.id, quote.memberId, quote.data, quote.dataCollectionId)
-            ).price
+            )
             is NorwegianHomeContentsData -> priceEngineService.queryNorwegianHomeContentPrice(
                 PriceQueryRequest.NorwegianHomeContent.from(quote.id, quote.memberId, quote.data)
-            ).price
+            )
             is NorwegianTravelData -> priceEngineService.queryNorwegianTravelPrice(
                 PriceQueryRequest.NorwegianTravel.from(quote.id, quote.memberId, quote.data)
-            ).price
+            )
             is DanishHomeContentsData -> {
 //                do we need the dataCollectionId or is this just for Sweden?
                 priceEngineService.queryDanishHomeContentPrice(
                     PriceQueryRequest.DanishHomeContent.from(quote.id, quote.memberId, quote.data)
-                ).price
+                )
             }
             is DanishAccidentData -> {
                 priceEngineService.queryDanishAccidentPrice(
                     PriceQueryRequest.DanishAccident.from(quote.id, quote.memberId, quote.data)
-                ).price
+                )
             }
             is DanishTravelData -> {
                 priceEngineService.queryDanishTravelPrice(
                     PriceQueryRequest.DanishTravel.from(quote.id, quote.memberId, quote.data)
-                ).price
+                )
             }
         }
     }
@@ -182,14 +189,16 @@ class UnderwriterImpl(
     }
 
     @Component
-    class BlockedByTypeCounter(override val registry: MeterRegistry) : MetricsCounter(registry, "requoting.blocked_by_type") {
+    class BlockedByTypeCounter(override val registry: MeterRegistry) :
+        MetricsCounter(registry, "requoting.blocked_by_type") {
         fun increment(quote: Quote) {
             super.increment("type", quote.data::class.simpleName, "initiated_from", quote.initiatedFrom.name)
         }
     }
 
     @Component
-    class BreachedGuidelinesCounter(override val registry: MeterRegistry) : MetricsCounter(registry, "breached.underwriting.guidelines") {
+    class BreachedGuidelinesCounter(override val registry: MeterRegistry) :
+        MetricsCounter(registry, "breached.underwriting.guidelines") {
         fun increment(market: Market, breachedGuidelineCode: String) {
             super.increment("market", market.name, "breachedGuideline", breachedGuidelineCode)
         }

@@ -53,7 +53,11 @@ class QuoteRepositoryImplTest {
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
             agreementId = UUID.randomUUID(),
-            contractId = UUID.randomUUID()
+            contractId = UUID.randomUUID(),
+            lineItems = listOf(
+                LineItem(type = "PREMIUM", subType = "premium", amount = 66.6.toBigDecimal()),
+                LineItem(type = "TAX", subType = "se_tax_moms", amount = 77.7.toBigDecimal())
+            )
         )
         quoteDao.insert(quote, timestamp)
         assertQuotesDeepEqualExceptInternalId(quote, quoteDao.find(quote.id))
@@ -84,7 +88,8 @@ class QuoteRepositoryImplTest {
                 subType = ApartmentProductSubType.BRF
             ),
             breachedUnderwritingGuidelines = null,
-            currentInsurer = null
+            currentInsurer = null,
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 66.6.toBigDecimal()))
         )
         quoteDao.insert(quote, timestamp)
         val updatedQuote = quote.copy(
@@ -96,7 +101,9 @@ class QuoteRepositoryImplTest {
             state = QuoteState.SIGNED,
             originatingProductId = UUID.randomUUID(),
             agreementId = UUID.randomUUID(),
-            contractId = UUID.randomUUID()
+            contractId = UUID.randomUUID(),
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 77.7.toBigDecimal()))
+
         )
         quoteDao.update(updatedQuote)
 
@@ -892,7 +899,8 @@ class QuoteRepositoryImplTest {
             memberId = "123456",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            agreementId = UUID.randomUUID()
+            agreementId = UUID.randomUUID(),
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 11.11.toBigDecimal()))
         )
         val quote2Id = UUID.randomUUID()
         val quote2 = Quote(
@@ -918,7 +926,8 @@ class QuoteRepositoryImplTest {
             memberId = "1337",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            agreementId = UUID.randomUUID()
+            agreementId = UUID.randomUUID(),
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 22.22.toBigDecimal()))
         )
 
         val quote3Id = UUID.randomUUID()
@@ -945,17 +954,26 @@ class QuoteRepositoryImplTest {
             memberId = "1337",
             breachedUnderwritingGuidelines = null,
             originatingProductId = UUID.randomUUID(),
-            agreementId = UUID.randomUUID()
+            agreementId = UUID.randomUUID(),
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 33.33.toBigDecimal()))
         )
         quoteDao.insert(quote1, timestamp)
         quoteDao.insert(quote2, timestamp)
         quoteDao.insert(quote3, timestamp)
 
-        val updatedQuote = quote1.copy(memberId = "1234567", currentInsurer = "ICA")
+        val updatedQuote = quote1.copy(
+            memberId = "1234567",
+            currentInsurer = "ICA",
+            lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 11.22.toBigDecimal()))
+        )
         quoteDao.update(updatedQuote)
 
         val updatedQuote3 =
-            quote3.copy(memberId = "1234567", data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"))
+            quote3.copy(
+                memberId = "1234567",
+                data = (quote3.data as SwedishApartmentData).copy(zipCode = "12345"),
+                lineItems = listOf(LineItem(type = "PREMIUM", subType = "premium", amount = 33.44.toBigDecimal()))
+            )
         quoteDao.update(updatedQuote3)
 
         val quotes = quoteDao.findQuotes(listOf(quote1Id, quote2Id, quote3Id))
@@ -973,22 +991,38 @@ class QuoteRepositoryImplTest {
         expected: Quote,
         result: Quote?
     ) {
+
         expected::class.memberProperties
             .filterNot { it.name == "updatedAt" }
+            .filterNot { it.name == "lineItems" } //Tested separately below
             .forEach { prop ->
-            if (prop.name == "data") {
-                prop.javaGetter!!.invoke(expected)::class.memberProperties
-                    .filterNot { it.name == "internalId" }
-                    .forEach { dataProp ->
-                    assertThat(dataProp.javaGetter!!.invoke(expected.data)).isEqualTo(
-                        dataProp.javaGetter!!.invoke(
-                            result?.data
-                        )
-                    )
+                if (prop.name == "data") {
+                    prop.javaGetter!!.invoke(expected)::class.memberProperties
+                        .filterNot { it.name == "internalId" }
+                        .forEach { dataProp ->
+                            assertThat(dataProp.javaGetter!!.invoke(expected.data)).isEqualTo(
+                                dataProp.javaGetter!!.invoke(
+                                    result?.data
+                                )
+                            )
+                        }
+                } else {
+                    assertThat(prop.javaGetter!!.invoke(expected)).isEqualTo(prop.javaGetter!!.invoke(result))
                 }
-            } else {
-                assertThat(prop.javaGetter!!.invoke(expected)).isEqualTo(prop.javaGetter!!.invoke(result))
             }
+
+        assertLineItemsEqual(expected.lineItems, result!!.lineItems)
+    }
+
+    private fun assertLineItemsEqual(expected: List<LineItem>, actual: List<LineItem>) {
+
+        assertThat(actual.size).isEqualTo(expected.size)
+
+        // We don't assert on the internalId or revisionId, since they are only internal "DB fields"
+        expected.forEach { eli ->
+            val actualLineItem = actual.firstOrNull() { ali -> ali.type == eli.type && ali.subType == eli.subType }
+            assertThat(actualLineItem).isNotNull
+            assertThat(actualLineItem!!.amount.compareTo(eli.amount)).isEqualTo(0)
         }
     }
 }
