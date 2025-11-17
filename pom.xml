@@ -255,7 +255,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.2.2</version>
+            <version>4.9.2</version>
         </dependency>
 
         <dependency>
@@ -435,8 +435,7 @@
                         <phase>verify</phase>
                         <configuration>
                             <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
-                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true" classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
                                     <arg value="src/**/*.kt"/>
                                 </java>
                             </target>
@@ -449,8 +448,7 @@
                         <id>ktlint-format</id>
                         <configuration>
                             <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
-                                      classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true" classname="com.pinterest.ktlint.Main" classpathref="maven.plugin.classpath">
                                     <arg value="-F"/>
                                     <arg value="src/**/*.kt"/>
                                 </java>
